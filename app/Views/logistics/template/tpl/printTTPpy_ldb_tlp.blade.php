@@ -34,7 +34,7 @@
         </div>
         <div style="width:57mm;height:22mm;float:left;text-align: center;font-size:12px;line-height: 11px;">
             <p>
-                <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=30&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3=" style="margin-top:5px;"/>
+                <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             </p>
             <p style="font-size:13px;font-weight: bold;margin-top: 1px;">
                 {{ $model->tracking_no }}</p>
@@ -98,21 +98,15 @@
                     </td>
                 </tr>
                 <tr style="height:4mm;font-size: 11px;text-align:center;">
-                    @if($model->order)
-                        @foreach($model->order->items as $key => $orderItem)
-                            @if($key == 0)
-                                <td style="border-right:1px solid black;border-bottom:1px solid black;">
-                                    {{ $orderItem->item ? $orderItem->item->name : '' }}&nbsp;&nbsp;&nbsp;&nbsp;{{ 'x1' }}
-                                </td>
-                                <td style="border-right:1px solid black;border-bottom:1px solid black;">
-                                    {{ $orderItem->quantity * $orderItem->item ? $orderItem->item->weight : '' }}
-                                </td>
-                                <td style="border-bottom:1px solid black;">
-                                    {{ $orderItem->quantity * $orderItem->price / $model->order->rate > 20 ? 20 : $orderItem->quantity * $orderItem->price / $model->order->rate }}
-                                </td>
-                            @endif
-                        @endforeach
-                    @endif
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;">
+                        {{ $model->sku_info }}
+                    </td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;">
+                        {{ $model->signal_weight }}
+                    </td>
+                    <td style="border-bottom:1px solid black;">
+                        {{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}
+                    </td>
                 </tr>
                 <tr style="height:4mm;font-size: 11px;text-align:center;">
                     <td style="border-right:1px solid black;border-bottom:1px solid black;">
@@ -140,24 +134,20 @@
                     <td style="border-right:1px solid black;border-bottom:1px solid black;">
                         ORIGIN:China
                     </td>
-                    @if($model->items)
-                        @foreach($model->items as $key => $item)
-                            <td style="border-right:1px solid black;border-bottom:1px solid black;text-align:center;">
-                                {{ sum($item->quantity * $item->item ? $item->item->weight : '') }}
-                            </td>
-                            <td style="border-bottom:1px solid black;text-align:center;">
-                                {{ sum($item->quantity * $item->item ? $item->item->purchase_price : '') }}
-                            </td>
-                        @endforeach
-                    @endif
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;text-align:center;">
+                        {{ $model->total_weight }}
+                    </td>
+                    <td style="border-bottom:1px solid black;text-align:center;">
+                        {{ sprintf("%.2f", $model->total_price > 22 ? 22 : $model->total_price) }}
+                    </td>
                 </tr>
                 <tr style="font-size:10px;line-height: 10px;">
                     <td colspan="3" style="border-bottom:1px solid black;">
-                        The undersigned whose name and address are given on the item certify that the particulars given
-                        in the declartion are correct and taht this item dose not contain any dangerous article or
-                        articles pohibited by legislation or by postal or customs regulaitions
+                        The undersigned whose name and address are given on the item certify that
+                        the particulars given in the declartion are correct and taht this item dose
+                        not contain any dangerous article or articles pohibited by legislation or by
+                        postal or customs regulaitions
                     </td>
-
                 </tr>
                 <tr style="height:4.5mm;font-size: 11px;">
                     <td style="border-right:1px solid black;">
@@ -171,7 +161,6 @@
         </div>
         <div style="border-left:1px solid black;border-bottom:1px solid black;width:31.5mm;height:70mm;float:right;font-size: 12px;">
             <div style="font-weight: bold;margin-top:25px;"><p style="width:116px;float:left;">TO:</p></div>
-
             <p style="margin-right: 2px;">
                 <b>
                     {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}
@@ -190,11 +179,7 @@
     <div style="border-top:1px solid black;height: 4mm;font-size: 12px;clear:both;">
         <p style="margin-left: 6px;width:50mm;float:left">RefNo:<b>{{ $model->order_id }}</b></p>
         <p style="margin-left: 6px;width:10mm;float:right">
-            @if($model->order)
-                @foreach($model->order->items as $item)
-                    {{ $item->sku }} * {{ $item->quantity }} 【{{ $item->item ? ($item->item->warehousePosition ? $item->item->warehousePosition->name : '') : '' }}】
-                @endforeach
-            @endif
+            {{ $model->logistics_id }}
         </p>
     </div>
 </div>

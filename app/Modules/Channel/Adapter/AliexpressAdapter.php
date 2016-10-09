@@ -210,14 +210,14 @@ Class AliexpressAdapter implements AdapterInterface
 
         $orderInfo['channel_ordernum'] = $list['orderId'];
         $orderInfo["email"] = isset($list["buyerInfo"]["email"]) ? $list["buyerInfo"]["email"] : '';
-        $orderInfo['amount'] = $list ["payAmount"] ["amount"];;
+        $orderInfo['amount'] = $list ["payAmount"] ["amount"];
         $orderInfo['currency'] = $list["payAmount"] ["currencyCode"];
         $orderInfo['payment'] = $list['paymentType'];
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];
         $orderInfo['remark'] = $order_remark ? addslashes(implode('<br />', $order_remark)) : ''; //订单备注
-        $orderInfo['shipping_firstname'] = $orderDetail['buyerInfo']['firstName'];
-        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];
+        $orderInfo['shipping_firstname'] =  $orderDetail ["receiptAddress"] ["contactPerson"];
+        $orderInfo['shipping_lastname'] = '';
         $orderInfo['shipping_address'] = $orderDetail ["receiptAddress"] ["detailAddress"];
         $orderInfo['shipping_address1'] = isset($orderDetail ["receiptAddress"] ["address2"]) ? $orderDetail ["receiptAddress"] ["address2"] : '';
         $orderInfo['shipping_city'] = $orderDetail ["receiptAddress"] ["city"];
@@ -225,6 +225,11 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['shipping_country'] = $orderDetail ["receiptAddress"] ["country"];
         $orderInfo['shipping_zipcode'] = $orderDetail ["receiptAddress"] ["zip"];
         $orderInfo['status'] = 'PAID';
+        $leftSendGoodDay = isset($list["payAmount"] ["leftSendGoodDay"])?(int)$list["payAmount"] ["leftSendGoodDay"]:0;
+        $leftSendGoodHour = isset($list["payAmount"] ["leftSendGoodHour"])?(int)$list["payAmount"] ["leftSendGoodHour"]:0;
+        $leftSendGoodMin = isset($list["payAmount"] ["leftSendGoodMin"])?(int)$list["payAmount"] ["leftSendGoodMin"]:0;
+
+        $orderInfo['orders_expired_time'] =time('Y-m-d H:i:s',time()+$leftSendGoodDay*24*60*60+$leftSendGoodHour*60*60+$leftSendGoodMin*60);
 
         $mobileNo = isset($orderDetail ["receiptAddress"] ["mobileNo"]) ? $orderDetail ["receiptAddress"] ["mobileNo"] : '';
         $phoneCountry = isset($orderDetail ["receiptAddress"] ["phoneCountry"]) ? $orderDetail ["receiptAddress"] ["phoneCountry"] : '';
@@ -460,6 +465,17 @@ Class AliexpressAdapter implements AdapterInterface
         $postdata = "grant_type=refresh_token&client_id=" . $this->_appkey . "&client_secret=" . $this->_appsecret . "&refresh_token=" . $refresh_token . "";
         return $this->postCurlHttpsData($serverurl, $postdata);
     }
+    
+    /**
+     *
+     * 使用code获取令牌
+     * 返回令牌   refresh_token 用于刷新令牌  access_token 用于获取数据  memderID 用户ID
+     */
+    public function getAppCode($code) {
+        $getAppCodeUrl = "https://" . self::GWURL . "/openapi/http/".$this->_version."/system.oauth2/getToken/" . $this->_appkey . "";
+        $postdata = "grant_type=authorization_code&need_refresh_token=true&client_id=" . $this->_appkey . "&client_secret=" . $this->_appsecret . "&redirect_uri=" . $this->_returnurl . "&code=" . $code . "";
+        return $this->postCurlHttpsData ( $getAppCodeUrl, $postdata );
+    }
 
     /**
      * Curl https Post 数据
@@ -546,7 +562,7 @@ Class AliexpressAdapter implements AdapterInterface
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
 
-                        dd(json_decode($detailArrJson));
+                        //dd(json_decode($detailArrJson));
 
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);

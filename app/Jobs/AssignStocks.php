@@ -40,7 +40,7 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'stockTaking , stock is locked.';
             $this->lasting = 0;
             $this->log('AssignStocks');
-            throw new Exception();
+            throw new Exception('in stock taking');
         } else {
             $start = microtime(true);
             if (($this->package->status == 'NEED' || $this->package->status == 'NEW') && $this->package->createPackageItems()) {

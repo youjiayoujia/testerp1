@@ -57,8 +57,12 @@ class EbayDataMonitorController extends Controller
                     'multi_attribute' => [
                         1=>'是',
                         0=>'否',
-                    ]
+                    ],
+                ],
+                'erpProduct'=>[
+                    'status'=>config('item.status')
                 ]
+
             ],
             'filterSelects' => [
                 'seller_id' =>$this->sellerCode->getEbayCodeWithName(),

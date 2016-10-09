@@ -12,7 +12,7 @@ return [
     /**
      * 可选分页条数
      */
-    'pageSizes' => [10, 25, 50],
+    'pageSizes' => [50, 25, 10],
     /**
      * 默认排序字段
      */
@@ -131,19 +131,33 @@ return [
         'ebayProduct.account_id'=>'账号',
         'ebayProduct.listing_type'=>'类型',
         'ebayProduct.multi_attribute'=>'多属性',
+        'erpProduct.status' => 'erp状态',
         'price.start_price'=>'价格',
         'time.start_time' => '上架时间',
+        'warehouse'=>'仓库',
+        'site'=>'站点',
+        'category'=>'Erp分类',
         'sku'=>'EbaySku',
         'erp_sku' =>'ErpSku',
         'price.quantity_sold'=>'销量',
+        'site_name'=>'站点',
+        'paypal_email_address'=>'PayPal',
+        'listing_type'=>'上架类型',
+        'multi_attribute'=>'多属性',
+        'details.seller_id'=>'销售人员',
         'channel_name' => '渠道名称',
         'account.account' => '渠道帐号',
         'is_chinese' => '竞拍状态',
+
+        'product.status' => '==ERP状态==',
+        'account' => '=帐号=',
+
         'parent.shipmentCostNum' => '批次号',
         'questionUser.name' => '提问人',
         'answerUser.name' => '解答人',
         'question_group' => '指定分组',
         'skuName.c_name' => '产品名',
         'messageSku.sku' => 'sku',
+
     ],
 ];

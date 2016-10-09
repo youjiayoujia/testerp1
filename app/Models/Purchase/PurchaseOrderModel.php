@@ -4,7 +4,6 @@ namespace App\Models\Purchase;
 use Exception;
 use App\Base\BaseModel;
 use App\Models\Product\SupplierModel;
-use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
 use App\Models\UserModel;

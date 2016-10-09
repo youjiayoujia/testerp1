@@ -20,7 +20,7 @@
         <tr class="dark-{{ $package->status_color }}">
             <td>
                 <input type='checkbox' name='single[]' class='single'>
-                @if($package->order->packages->count() > 1)
+                @if(($package->order ? $package->order->packages->count() : 0) > 1)
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
@@ -39,6 +39,11 @@
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample">
                   <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $package->table }}" data-id="{{$package->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
                 </button>
             </td>
         </tr>

@@ -112,7 +112,7 @@ class OrderController extends Controller
             $this->dispatch($job);
         }
 
-        return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackage队列'));
+        return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));
     }
 
     /**
@@ -161,25 +161,9 @@ class OrderController extends Controller
         if ($special == 'yes') {
             $order = $this->model->where('customer_remark', '!=', '');
         }
-        $page = request()->input('page');
-        $pageSize = request()->input('pageSize');
-        $subtotal = '';
-        if(!$page) {
-            if(!$pageSize) {
-                $pageSize = 10;
-            }
-            $orders = $this->model->orderBy('id', 'desc')->take($pageSize)->get();
-            foreach($orders as $order) {
-                $subtotal += $order->amount * $order->rate;
-            }
-        }else {
-            if(!$pageSize) {
-                $pageSize = 10;
-            }
-            $orders = $this->model->orderBy('id', 'desc')->skip(($page - 1) * $pageSize)->take($pageSize)->get();
-            foreach($orders as $order) {
-                $subtotal += $order->amount * $order->rate;
-            }
+        $subtotal = 0;
+        foreach($this->autoList($this->model) as $value) {
+            $subtotal += $value->amount * $value->rate;
         }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         $response = [
@@ -310,7 +294,9 @@ class OrderController extends Controller
         }
         request()->flash();
         $data = request()->all();
-        $data['order_id'] = $id;
+        $data['order_id']   = $id;
+        $data['channel_id'] = $model->channel_id;
+        $data['account_id'] = $model->channel_account_id;
         $model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
     }

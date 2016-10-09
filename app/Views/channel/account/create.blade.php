@@ -113,6 +113,16 @@
                         </label>
                     </div>
                 </div>
+                <div class="form-group col-lg-1">
+                    <label for="is_available" class="control-label">渠道地域</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+
+                    <select class="form-control" name="catalog_rates_channel_id">
+                        @foreach($catalog_rates_channels as $catalog_rates_channel)
+                            <option value="{{ $catalog_rates_channel->id }}">{{ $catalog_rates_channel->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
     </div>

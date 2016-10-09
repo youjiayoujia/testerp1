@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 导航配置文件
  *
@@ -22,6 +21,11 @@ return [
         'type' => 'group',
         'subnavigations' => [
             '产品管理' => [
+                [
+                    'name' => '分类',
+                    'url' => 'CatalogCategory.index',
+                    'icon' => '',
+                ],
                 [
                     'name' => '品类Category',
                     'url' => 'catalog.index',
@@ -97,6 +101,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '未付款订单',
+                'url' => 'unpaidOrder.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '黑名单',
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
@@ -116,7 +125,7 @@ return [
         'type' => 'group',
         'subnavigations' => [
             '收货质检' => [
-               [
+                [
                     'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
                     'icon' => '',
@@ -231,61 +240,44 @@ return [
                     'icon' => '',
                 ],
             ],
-            '报表' => [
-                [
-                    'name' => '包裹信息',
-                    'url' => 'allReport.report',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '拣货排行榜',
-                    'url' => 'pickReport.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包装排行榜',
-                    'url' => 'packReport.index',
-                    'icon' => '',
-                ],
-            ],
         ],
     ],
     //仓储导航
-    [
-        'name' => '海外仓',
-        'icon' => 'home',
-        'url' => '',
-        'type' => 'group',
-        'subnavigations' => [
-            '海外仓模块' => [
-                [
-                    'name' => '海外仓销量',
-                    'url' => 'suggestForm.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '申请表',
-                    'url' => 'report.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '发货',
-                    'url' => 'report.shipment',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '海外仓箱子',
-                    'url' => 'box.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => 'fba库存信息',
-                    'url' => 'fbaStock.index',
-                    'icon' => '',
-                ],
-            ],
-        ],
-    ],
+    // [
+    //     'name' => '海外仓',
+    //     'icon' => 'home',
+    //     'url' => '',
+    //     'type' => 'group',
+    //     'subnavigations' => [
+    //         '海外仓模块' => [
+    //             [
+    //                 'name' => '海外仓销量',
+    //                 'url' => 'suggestForm.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '申请表',
+    //                 'url' => 'report.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '发货',
+    //                 'url' => 'report.shipment',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '海外仓箱子',
+    //                 'url' => 'box.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => 'fba库存信息',
+    //                 'url' => 'fbaStock.index',
+    //                 'icon' => '',
+    //             ],
+    //         ],
+    //     ],
+    // ],
     //物流导航
     [
         'name' => '物流',
@@ -384,17 +376,15 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '地域渠道名',
+                    'url'  => 'CatalogRatesChannel.index',
+                    'icon' => ''
+                ],
+                [
                     'name' => '账号',
                     'url' => 'channelAccount.index',
                     'icon' => '',
                 ],
-            ],
-            '其他' =>[
-                [
-                    'name' => '产品分类渠道',
-                    'url'  => 'CatalogRatesChannel.index',
-                    'icon' => ''
-                ]
             ],
         ],
     ],
@@ -402,87 +392,154 @@ return [
         'name' => ' 刊登',
         'icon' => 'glyphicon glyphicon-send',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => 'Wish草稿列表',
-                'url' => 'wish.index',
-                'icon' => '',
+            'Wish刊登' => [
+                [
+                    'name' => 'Wish草稿列表',
+                    'url' => 'wish.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Wish在线数据列表',
+                    'url' => 'wish.indexOnlineProduct',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Wish销售代码设置',
+                    'url' => 'wishSellerCode.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => 'Wish在线数据列表',
-                'url' => 'wish.indexOnlineProduct',
-                'icon' => '',
-            ],
-            [
-                'name' => 'Wish销售代码设置',
-                'url' => 'wishSellerCode.index',
-                'icon' => '',
-            ],
-            [
+            'Aliexpress刊登'=>[
+                [
+                    'name' => 'SMT待发布产品列表',
+                    'url' => 'smt.waitPost',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT产品草稿列表',
+                    'url' => 'smt.index',
+                    'icon' => '',
+                ],
+                [
 
-                'name' => 'SMT待发布产品列表',
-                'url' => 'smt.waitPost',
-                'icon' => '',
+                    'name' => 'SMT在线产品列表',
+                    'url' => 'smt.onlineProductIndex',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT售后模版管理',
+                    'url' => 'smtAfterSale.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT框架模版管理',
+                    'url' => 'smtTemplate.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT产品分组',
+                    'url' => 'smtProduct.groupManage',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT服务模版',
+                    'url' => 'smtProduct.serviceManage',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT运费模版',
+                    'url' => 'smtProduct.freightManage',
+                    'icon' => '',
+                ],
+
+                [
+                    'name' => 'SMT调价任务列表',
+                    'url' => 'smtPriceTask.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT销售代码设置',
+                    'url' => 'smtSellerCode.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT帐号管理',
+                    'url' => 'smtAccountManage.index',
+                    'icon' => '',
+                ],
+
             ],
-            [
-                'name' => 'SMT产品草稿列表',
-                'url' => 'smt.index',
-                'icon' => '',
+            'Ebay刊登' => [
+                [
+                    'name' => 'Ebay站点信息',
+                    'url' => 'ebayDetail.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay草稿列表',
+                    'url' => 'ebayPublish.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay在线列表',
+                    'url' => 'ebayOnline.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay销售代码设置',
+                    'url' => 'ebaySellerCode.index',
+                    'icon' => '',
+                ],
+
+                [
+                    'name' => 'Ebay账号设置',
+                    'url' => 'ebayAccountSet.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay描述模板设置',
+                    'url' => 'ebayDescription.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay数据模板设置',
+                    'url' => 'ebayDataTemplate.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay店铺分类设置',
+                    'url' => 'ebayStoreCategory.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay曝光规则设置',
+                    'url' => 'ebayTiming.index',
+                    'icon' => '',
+                ],
+
             ],
-            [
-            
-                'name' => 'SMT在线产品列表',
-                'url' => 'smt.onlineProductIndex',
-                'icon' => '',
-            ],
-            [
-                'name' => 'SMT在线数据监控',
-                'url' => 'smtMonitor.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'SMT售后模版管理',
-                'url' => 'smtAfterSale.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'SMT框架模版管理',
-                'url' => 'smtTemplate.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'SMT产品分组',
-                'url' => 'smtProduct.groupManage',
-                'icon' => '',
-            ],
-            [
-                'name' => 'SMT服务模版',
-                'url' => 'smtProduct.serviceManage',
-                'icon' => '',
-            ],
-            [
-                'name' => 'SMT运费模版',
-                'url' => 'smtProduct.freightManage',
-                'icon' => '',
-            ],
-            
-            [
-                'name' => 'SMT销售代码设置',
-                'url' => 'smtSellerCode.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'Ebay站点信息',
-                'url' => 'ebayDetail.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'Ebay数据监控',
-                'url' => 'ebayProduct.index',
-                'icon' => '',
-            ],
-        ],
+
+            '数据监控'=>[
+                [
+                    'name' => 'Ebay在线数据监控',
+                    'url' => 'ebayProduct.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT在线数据监控',
+                    'url' => 'smtMonitor.index',
+                    'icon' => '',
+                ],
+
+                [
+                    'name' => 'Lazada数据监控',
+                    'url' => 'lazada.index',
+                    'icon' => '',
+                ],
+            ]
+        ]
     ],
     //CRM导航
     [
@@ -576,6 +633,30 @@ return [
                     'icon' => '',
                 ],
             ],
+            '包裹报表' => [
+                [
+                    'name' => '包裹信息',
+                    'url' => 'allReport.report',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包装排行榜',
+                    'url' => 'packReport.index',
+                    'icon' => '',
+                ],
+            ],
+            '订单报表' => [
+                [
+                    'name' => '退款统计',
+                    'url' => 'refund.refundStatistics',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //监控导航
@@ -626,8 +707,6 @@ return [
             ],
         ],
     ],
-
-
     //系统导航
     [
         'name' => '系统',
@@ -702,6 +781,4 @@ return [
             ],
         ],
     ],
-
 ];
-

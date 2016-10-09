@@ -23,7 +23,7 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            @foreach(config('product.supplier_examine_status') as $key => $item)
+            @foreach(config('product.supplier.examine_status') as $key => $item)
                 <li>
                     <a href="{{ DataList::filtersEncode(['examine_status','=',$key]) }}">{{ $item }}</a>
                 </li>
@@ -44,6 +44,7 @@
     <th class='sort' data-field='telephone'>电话</th>
     <th>旺旺</th>
     <th>QQ</th>
+    <th>供货商等级</th>
 {{--    <th>采购员</th>--}}
     <th>创建人</th>
     <th class='sort' data-field='created_at'>创建时间</th>
@@ -73,14 +74,12 @@
             <td>{{ $supplier->telephone }}</td>
             <td>{{ $supplier->wangwang }}</td>
             <td>{{ $supplier->qq }}</td>
+            <td>{{ $supplier->LevelName }}</td>
 {{--            <td>{{ $supplier->purchaseName ? $supplier->purchaseName->name : '' }}</td>--}}
             <td>{{ $supplier->createdByName ? $supplier->createdByName->name : '' }}</td>
             <td>{{ $supplier->created_at }}</td>
-            <td>@foreach(config('product.product_supplier.examine_status') as $key=>$v)
-                    @if($key == $supplier->examine_status)
-                        {{$v}}
-                    @endif
-                @endforeach
+            <td>
+                {{$supplier->ExamineStatusName}}
             </td>
             <td>{{ $supplier->levelByName ? $supplier->levelByName->name : '' }}</td>
             <td>
@@ -108,10 +107,10 @@
         </button>
 
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class="examine" data-channel="0" data-name="待审核">待审核</a></li>
-            <li><a href="javascript:" class="examine" data-channel="1" data-name="待复审 ">待复审</a></li>
-            <li><a href="javascript:" class="examine" data-channel="2" data-name="审核通过">审核通过</a></li>
-            <li><a href="javascript:" class="examine" data-channel="3" data-name="审核不通过">审核不通过</a></li>
+            <li><a href="javascript:" class="examine" data-channel="newData" data-name="待审核">待审核</a></li>
+            <li><a href="javascript:" class="examine" data-channel="confirmModify" data-name="待复审 ">待复审</a></li>
+            <li><a href="javascript:" class="examine" data-channel="unPassed" data-name="不通过">不通过</a></li>
+            <li><a href="javascript:" class="examine" data-channel="currentData" data-name="已通过">已通过</a></li>
         </ul>
         </div>
     @stop

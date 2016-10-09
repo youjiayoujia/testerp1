@@ -35,7 +35,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
 
-
+    Route::get('eventChild/getInfo', ['uses' => 'EventChildController@getInfo', 'as' => 'eventChild.getInfo']);
     Route::resource('eventChild', 'EventChildController');
     //3宝package
     Route::resource('bao3Package', 'Bao3PackageController');
@@ -520,8 +520,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('ExamineProduct', 'Product\ExamineProductController');
     Route::any('ajaxReturnPrice',
         ['as' => 'product.ajaxReturnPrice', 'uses' => 'ProductController@ajaxReturnPrice']);
+    Route::resource('CatalogCategory', 'Product\CatalogCategoryController');
 
-    
+
+
     //产品渠道
     Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);
     Route::any('product/price', ['uses' => 'Product\EditProductController@price', 'as' => 'productPrice']);
@@ -543,6 +545,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('orderStatistics', ['uses' => 'OrderController@orderStatistics', 'as' => 'orderStatistics']);
     Route::resource('order', 'OrderController');
     Route::resource('orderItem', 'Order\ItemController');
+    Route::resource('unpaidOrder', 'Order\UnpaidOrderController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('withdrawAll', ['uses' => 'OrderController@withdrawAll', 'as' => 'withdrawAll']);
@@ -684,7 +687,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
-
+    Route::get('ebayDetail/ajaxUpdate', ['uses' => 'Publish\Ebay\EbayDetailController@ajaxUpdate', 'as' => 'ebayDetail.ajaxUpdate']);
+    Route::get('ebayDetail/ajaxIsUse', ['uses' => 'Publish\Ebay\EbayDetailController@ajaxIsUse', 'as' => 'ebayDetail.ajaxIsUse']);
     Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
     Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
     Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
@@ -693,6 +697,33 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('ebay/productBatchEdit', ['uses' => 'Publish\Ebay\EbayDataMonitorController@productBatchEdit', 'as' => 'ebay.productBatchEdit']);
     Route::resource('ebayProduct','Publish\Ebay\EbayDataMonitorController');
 
+
+    Route::resource('ebaySellerCode','Publish\ebay\EbaySellerCodeController');
+    Route::resource('ebayTiming','Publish\ebay\EbayTimingSetController');
+
+    Route::any('ebayOnline/batchUpdate', ['uses' => 'Publish\Ebay\EbayOnlineController@batchUpdate', 'as' => 'ebayOnline.batchUpdate']);
+    Route::any('ebayOnline/productBatchEdit', ['uses' => 'Publish\Ebay\EbayOnlineController@productBatchEdit', 'as' => 'ebayOnline.productBatchEdit']);
+    Route::any('ebayOnline/singleUpdate', ['uses' => 'Publish\Ebay\EbayOnlineController@singleUpdate', 'as' => 'ebayOnline.singleUpdate']);
+    Route::any('ebayOnline/productSingleEdit', ['uses' => 'Publish\Ebay\EbayOnlineController@productSingleEdit', 'as' => 'ebayOnline.productSingleEdit']);
+
+    Route::resource('ebayOnline','Publish\Ebay\EbayOnlineController');
+
+
+    Route::get('ebayPublish/ajaxuggestCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxSuggestCategory', 'as' => 'ebayPublish.ajaxSuggestCategory']);
+    Route::get('ebayPublish/ajaxSetDataTemplate', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxSetDataTemplate', 'as' => 'ebayPublish.ajaxSetDataTemplate']);
+    Route::get('ebayPublish/ajaxInitErpData', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitErpData', 'as' => 'ebayPublish.ajaxInitErpData']);
+    Route::get('ebayPublish/ajaxInitCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitCategory', 'as' => 'ebayPublish.ajaxInitCategory']);
+    Route::get('ebayPublish/ajaxInitSpecifics', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitSpecifics', 'as' => 'ebayPublish.ajaxInitSpecifics']);
+    Route::get('ebayPublish/ajaxInitCondition', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitCondition', 'as' => 'ebayPublish.ajaxInitCondition']);
+    Route::get('ebayPublish/ajaxInitSite', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitSite', 'as' => 'ebayPublish.ajaxInitSite']);
+    Route::get('ebayPublish/returnDraft', ['uses' => 'Publish\Ebay\EbayPublishController@returnDraft', 'as' => 'ebayPublish.returnDraft']);
+    Route::resource('ebayPublish','Publish\Ebay\EbayPublishController');
+
+    Route::get('ebayStoreCategory/ajaxUpdateStoreCategory', ['uses' => 'Publish\Ebay\EbayStoreCategoryController@ajaxUpdateStoreCategory', 'as' => 'ebayStoreCategory.ajaxUpdateStoreCategory']);
+    Route::resource('ebayStoreCategory','Publish\Ebay\EbayStoreCategoryController');
+    Route::resource('ebayAccountSet','Publish\Ebay\EbayAccountSetController');
+    Route::resource('ebayDescription','Publish\Ebay\EbayDescriptionTemplateController');
+    Route::resource('ebayDataTemplate','Publish\Ebay\EbayDataTemplateController');
 
     Route::post('wish/editOnlineProductStore',
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
@@ -745,7 +776,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         Route::get('changeStatusToWait',
             ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
         Route::post('batchModify',
-            ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);        
+            ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);                       
     });
    
     Route::resource('smt', 'Publish\Smt\SmtController');
@@ -809,13 +840,43 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::post('smtTemplate/copyTemplate',
         ['uses' => 'Publish\Smt\SmtTemplateController@copyTemplate', 'as' => 'smtTemplate.copyTemplate']);
     
-    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');
-   
+    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');   
+    
+    Route::post('smtAccountManage/doAction',
+        ['uses' => 'Publish\Smt\SmtAccountManageController@doAction', 'as' => 'smtAccountManage.doAction']);
+    Route::post('smtAccountManage/resetAuthorization',
+        ['uses' => 'Publish\Smt\SmtAccountManageController@resetAuthorization', 'as' => 'smtAccountManage.resetAuthorization']);
+    
+    Route::resource('smtAccountManage', 'Publish\Smt\SmtAccountManageController');
+    
+    Route::post('smtPriceTask/batchDelete',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@batchDelete', 'as' => 'smtPriceTask.batchDelete']); 
+    Route::post('smtPriceTask/createPriceTask',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@createPriceTask', 'as' => 'smtPriceTask.createPriceTask']);
+    Route::post('smtPriceTask/getSmtPriceTask',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@getSmtPriceTask', 'as' => 'smtPriceTask.getSmtPriceTask']);  
+    Route::resource('smtPriceTask', 'Publish\Smt\SmtPriceTaskController');
+    
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
     Route::any('uploadToProject',
         ['uses' => 'KindeditorController@uploadToProject', 'as' => 'uploadToProject']);
 
+    Route::post('lazada/setQuantity',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setQuantity', 'as' => 'lazada.setQuantity']);
+    Route::post('lazada/setPrice',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setPrice', 'as' => 'lazada.setPrice']);
+    Route::post('lazada/setSellerSkuStatus',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setSellerSkuStatus', 'as' => 'lazada.setSellerSkuStatus']);
+    Route::post('lazada/setSalePrice',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setSalePrice', 'as' => 'lazada.setSalePrice']);
+    
+    Route::get('lazada/productBatchEdit',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@productBatchEdit', 'as' => 'lazada.productBatchEdit']);
+    Route::any('lazada/batchUpdate',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@batchUpdate', 'as' => 'lazada.batchUpdate']);
+    
+    Route::resource('lazada', 'Publish\Lazada\LazadaOnlineMonitorController');
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
@@ -912,7 +973,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
     Route::any('RefundBuyer',['as' => 'case.RefundBuyer', 'uses' => 'Message\EbayCasesController@RefundBuyer']);
     Route::any('PartRefundBuyer',['as' => 'case.PartRefundBuyer', 'uses' => 'Message\EbayCasesController@PartRefundBuyer']);
-    
+
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
     Route::any('feedBackStatistics',['uses' => 'Message\FeedBack\EbayFeedBackController@feedBackStatistics' , 'as' => 'feeback.feedBackStatistics' ]);
     Route::resource('refundCenter','RefundCenterController');
@@ -921,6 +982,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('RefundCsvFormat',['uses' => 'RefundCenterController@RefundCsvFormat', 'as' =>'refund.cvsformat']);
     Route::any('financeExport',['uses' => 'RefundCenterController@financeExport', 'as' =>'refund.financeExport']);
     Route::any('changeReundNoteStatus',['uses' => 'RefundCenterController@changeReundNoteStatus','as' =>'refund.changeReundNoteStatus']);
+    Route::any('refundStatistics',['as' => 'refund.refundStatistics', 'uses' => 'RefundCenterController@refundStatistics']);
+    Route::any('getChannelAccount',['as' => 'refund.getChannelAccount', 'uses' => 'RefundCenterController@getChannelAccount']);
+    Route::any('exportRefundDetail',['as' => 'refund.exportRefundDetail','uses' =>'RefundCenterController@exportRefundDetail']);
+
     Route::resource('AliexpressIssue','Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',['uses' =>'Message\Dispute\AliexpressIssueController@doRefuseIssues' , 'as' =>'aliexpress.doRefuseIssues']);
     //spu

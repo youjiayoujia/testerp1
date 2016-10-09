@@ -26,7 +26,6 @@ class SmtOnlineMonitorController extends Controller
      */
     public function index()
     {
-        set_time_limit(0);
         $this->mainTitle='速卖通在线数量监控';
         $list = $this->model->whereHas('product',function($query){
             $query = $query->whereIn('productStatusType',['onSelling','offline','auditing','editingRequired']);

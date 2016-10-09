@@ -84,6 +84,10 @@ Class LazadaAdapter implements AdapterInterface
         return ['orders' => $result_orders, 'nextToken' => $nextToken];
 
     }
+    
+    public function getOrder($orderID){}
+        
+    
 
 
     public function getLazadaOrder($startDate, $endDate, $status, $offset)
@@ -526,6 +530,148 @@ Class LazadaAdapter implements AdapterInterface
         }
 
 
+    }
+    
+    /**
+     * 获取lazada线上数据
+     * @param unknown $Offset
+     */
+    public function getLazadaProducts($Offset){
+        $return=[];
+        $now = new \DateTime();
+        $parameters = array(
+            'UserID' => $this->config['lazada_user_id'],
+            'Action' => 'GetProducts',
+            'Timestamp' => $now->format(\DateTime::ISO8601),
+            'Version' => '1.0',
+            'Limit' => 100, // 限制返回的条数
+            'Offset' => $Offset
+            
+        );
+        return $this->commonLazada($parameters);
+    }
+    
+    /**
+     * 更新sku信息
+     * @param unknown $sellersku  
+     * @param unknown $type  1:调整数量,2:修改价格,3:调整状态,4:修改特殊价格
+     * @param unknown $infoarr
+     * @param string $pricearr
+     * @return array
+     */
+    public function operateProduct($sellersku,$type,$infoarr,$pricearr=' '){
+        $now = new \DateTime();
+        $parameters = array(
+            'UserID' => $this->config['lazada_user_id'],
+            'Action' => 'ProductUpdate',
+            'Timestamp' => $now->format(\DateTime::ISO8601),
+            'Version' => '1.0',        
+        );
+        $xml =  '<?xml version="1.0" encoding="UTF-8" ?>
+                <Request>';
+        if(!is_array($sellersku)){
+            $sellersku = array($sellersku);
+        }
+        
+        foreach($sellersku as $sku)
+        {
+            if($type==1)
+            {
+                $xml.='<Product>';
+                $xml.= "<SellerSku>$sku</SellerSku>";
+                $xml.='<Quantity>'.$infoarr['Quantity'].'</Quantity>';
+                $xml.='</Product>';
+            }
+            if($type==2)
+            {
+                $xml.='<Product>';
+                $xml.= "<SellerSku>$sku</SellerSku>";
+                $xml.='<Price>'.$infoarr['Price'].'</Price>';
+                $xml.='</Product>';
+            }
+            if($type==3)
+            {
+                $xml.='<Product>';
+                $xml.= "<SellerSku>$sku</SellerSku>";
+                $xml.='<Status>'.$infoarr['Status'].'</Status>';
+                $xml.='</Product>';
+            }
+            if($type==4)
+            {
+                $xml.='<Product>';
+                $xml.= "<SellerSku>$sku</SellerSku>";
+                $xml.='<Price>'.$infoarr['Price'].'</Price>';
+                $xml.='<SalePrice>'.$infoarr['SalePrice'].'</SalePrice>';
+                $xml.='<SaleStartDate>'.$infoarr['StartDate'].'</SaleStartDate>';
+                $xml.='<SaleEndDate>'.$infoarr['EndDate'].'</SaleEndDate>';
+                $xml.='</Product>';
+            }
+            if($type==5)
+            {
+                $xml.='<Product>';
+                $xml.= "<SellerSku>$sku</SellerSku>";
+                $xml.='<Price>'.$pricearr[$sku]['Price'].'</Price>';
+                $xml.='<SalePrice>'.$infoarr['SalePrice'].'</SalePrice>';
+                $xml.='<SaleStartDate>'.$pricearr[$sku]['saleStartDate'].'</SaleStartDate>';
+                $xml.='<SaleEndDate>'.$pricearr[$sku]['saleEndDate'].'</SaleEndDate>';
+                $xml.='</Product>';
+            }
+            if($type==6)
+            {
+                // 批量修改数量
+                $xml .=$infoarr;
+            }
+        }
+        $xml.='</Request>';
+
+        $returninfo = $this->commonLazadaParameters($parameters,$xml);
+        return $returninfo;
+        
+    }
+    
+    public function getCurlData($queryString,$xml='')
+    {    
+        $curl = curl_init();    
+        curl_setopt($curl, CURLOPT_URL, $this->config['lazada_api_host']."/?".$queryString);    
+        curl_setopt($curl, CURLOPT_HEADER, 0);    
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);    
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);    
+        curl_setopt ( $curl, CURLOPT_POST, 1 ); // 发送一个常规的Post请求    
+        curl_setopt($curl,CURLOPT_POSTFIELDS,$xml);    
+        $content = curl_exec($curl);    
+        curl_close($curl);    
+        return $content;
+    }
+    
+    public function commonLazadaParameters($parameters,$xml=''){
+        $api_key = $this->config['lazada_access_key'];
+        $lazada_api_host = $this->config['lazada_api_host'];
+        ksort($parameters);
+        $params = array();
+        
+        foreach ($parameters as $name => $value) {        
+            $params[] = rawurlencode($name) . '=' . rawurlencode($value);        
+        }
+        $strToSign = implode('&', $params);        
+        $parameters['Signature'] = rawurlencode(hash_hmac('sha256', $strToSign, $api_key, false));
+        
+        $request = http_build_query($parameters);
+        
+        $info =simplexml_load_string($this->getCurlData($request,$xml));
+        $result  = $this->XmlToArray($info);
+        
+        return $result;
+    }
+    
+    public function getFeedInfo(){
+        $now = new \DateTime();
+        $parameters = array(
+            'UserID' => $this->config['lazada_user_id'],
+            'Version' => '1.0',
+            'Action' => 'FeedList',
+            'Timestamp' => $now->format(\DateTime::ISO8601),
+        );
+        return $this->commonLazada($parameters);
     }
 
 

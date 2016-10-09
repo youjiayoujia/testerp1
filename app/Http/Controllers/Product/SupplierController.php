@@ -153,7 +153,7 @@ class SupplierController extends Controller
         $product_id_arr = explode(',',$product_id_str);
 		$suppliers=$this->model->find($product_id_arr);
 		foreach($suppliers as $key=>$vo){
-			if($vo->examine_status !=2){
+			if($vo->examine_status != 'currentData'){ //审核通过
 				$vo->update(['examine_status'=>$channel_id]);
 			}
 			}
@@ -181,6 +181,30 @@ class SupplierController extends Controller
         }
 
         return json_encode(false);
+    }
+
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $res = $model->destroy($id);
+
+        if($res){
+            $post['type']         = 'delete';
+            $post['key']          = 'slme';
+            $post['suppliers_id'] = $model->id;
+
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
+        }
+        return redirect($this->mainIndex);
     }
 	
 }

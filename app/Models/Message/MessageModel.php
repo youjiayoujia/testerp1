@@ -61,6 +61,18 @@ class MessageModel extends BaseModel{
         return $this->hasMany('App\Models\Message\OrderModel', 'message_id');
     }
 
+    public function channel(){
+        return $this->hasOne('App\Models\ChannelModel','id','channel_id');
+    }
+
+    public function getChannelNameAttribute(){
+        if(!empty($this->channel_id)){
+            return $this->channel->name;
+        }else{
+            return '无';
+        }
+    }
+
     /**
      * 分配
      * @param $userId
@@ -82,6 +94,7 @@ class MessageModel extends BaseModel{
 
     /**
      * 工作流获取下一个message
+     * 说明：只获取会话客服被分配的账号下的的信息
      * @param $userId
      * @return mixed
      */
@@ -153,7 +166,10 @@ class MessageModel extends BaseModel{
     {
         return $this->hasMany('App\Models\Message\PartModel', 'message_id');
     }
-
+    public function getAttachment()
+    {
+        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
+    }
     public function getMessageContentAttribute()
     {
         $plainBody = '';
@@ -253,10 +269,7 @@ class MessageModel extends BaseModel{
         }
         return false;
     }
-    public function getAttachment()
-    {
-        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
-    }
+
     public function getMessageAttanchmentsAttribute()
     {
         $attanchments = [];
@@ -334,10 +347,11 @@ class MessageModel extends BaseModel{
                             if($this->from_name != $item->summary->receiverName){
                                 $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                 $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
-                                $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
-                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'">
+                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
                                     翻译
-                                </button>';
+                                </button>
+                                <p id="content-'.$k.'" style="color:green"></p>
+                                ';
                                 $html .= '</div>';
                             }else{
                                 $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
@@ -354,7 +368,7 @@ class MessageModel extends BaseModel{
                         $html = $content;
                         break;
                     default :
-                        $html = 'crm was make a big mistake';
+                        $html = 'invaild channel message';
                 }
             }
 
@@ -453,7 +467,7 @@ class MessageModel extends BaseModel{
                 $html .= '<p>Message type:'.$this->label.'</p>';
                 $html .= '<p>Detail type:'.$type.'</p>';
                 $html .= '<p>Order id:'.$files['order_id'].'</p>';
-                $html .= '<p>Order url:<a href="'.$files['order_url'].'">'.$files['order_url'].'</a></p>';
+                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;
@@ -468,7 +482,7 @@ class MessageModel extends BaseModel{
                 $files = $this->MessageFieldsDecodeBase64;
                 if(!empty($files)){
                     $html .= '<p><strong>ItemID</strong>:'.$files['ItemID'].'</p>';
-                    $html .= '<p><strong>Ebay链接</strong>:<a href="'.$files['ResponseDetails'].'">'.$files['ResponseDetails'].'</a></p>';
+                    $html .= '<p><strong>Ebay链接</strong>:<a target="_blank" href="'.$files['ResponseDetails'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
 
                 }
 

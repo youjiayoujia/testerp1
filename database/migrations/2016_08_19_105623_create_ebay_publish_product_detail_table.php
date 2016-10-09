@@ -20,7 +20,7 @@ class CreateEbayPublishProductDetailTable extends Migration
             $table->float('start_price')->comment('售价');
             $table->integer('quantity')->comment('数量');
             $table->string('erp_sku')->comment('erp_sku');
-            $table->string('quantity_sold')->comment('售出量');
+            $table->integer('quantity_sold')->comment('售出量');
             $table->string('item_id')->comment('产品id');
             $table->string('seller_id')->comment('所属销售');
             $table->enum('status', ['0', '1'])->comment('0 未在线 1在线')->default('0');

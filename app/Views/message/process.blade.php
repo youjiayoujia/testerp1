@@ -47,17 +47,23 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('.btn-translation').click(function(){
-                text =changeSome($(this).attr('need-translation-content'),1);
-                if(tran_content = getTransInfo(text)){
-                    $(this).prev().show().addClass('alert-success');
-                    $(this).prev().children('.content').text(tran_content);
-                    $(this).hide();
-                }else{
-                    $(this).prev().show().addClass('alert-danger');
-                    $(this).prev().children('.content').text('翻译失败');
-                    $(this).hide();
+                text        = changeSome($(this).attr('need-translation-content'),1);
+                content_key = $(this).attr('content-key');
 
-                }
+                $.ajax({
+                    url: "{{route('ajaxGetTranInfo')}}",
+                    data: 'content=' + text,
+                    type: 'POST',
+                    dataType: 'JSON',
+                    success: function (data) {
+
+                        if(data.content){
+                            $('#content-'+content_key).text(data.content);
+                        }else{
+                            $('#content-'+content_key).text('翻译失败');
+                        }
+                    }
+                });
             });
         });
 
@@ -72,23 +78,18 @@
 
             return text;
         }
+        var tran_info = false;
 
         function getTransInfo(content) {
-            var tran_info = false;
             $.ajax({
                 url: "{{route('ajaxGetTranInfo')}}",
                 data: 'content=' + content,
                 type: 'POST',
                 dataType: 'JSON',
                 success: function (data) {
-                    if(data.status == {{config('status.ajax.success')}}){
-                        tran_info = changeSome( data.info,2);
-                    }else{
-                        tran_info = false;
-                    }
+                    return data.content ? data.content : false;
                 }
             });
-            return tran_info;
         }
 
         function changeChildren(parent) {

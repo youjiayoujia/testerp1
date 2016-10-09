@@ -12,7 +12,7 @@ use Tool;
 use App\Models\OrderModel;
 use App\Models\Message\Issues\EbayCasesListsModel;
 use App\Models\Message\Issues\EbayCasesDetailsModel;
-
+use App\Models\Publish\Ebay\EbayPublishProductModel;
 
 
 class EbayAdapter implements AdapterInterface
@@ -254,6 +254,10 @@ class EbayAdapter implements AdapterInterface
                 foreach ($items as $item) {
                     $item['currency'] = $reurnOrder['currency'];
                     $item['channel_order_id'] = $reurnOrder['channel_ordernum'];
+                    $is_chinese = EbayPublishProductModel::where(['item_id'=>$item['orders_item_number'],'listing_type'=>'Chinese'])->first();
+                    if(isset($is_chinese->id)){
+                        $reurnOrder['is_chinese'] = 1;
+                    }
                     $reurnOrder['items'][] = $item;
                 }
 
@@ -264,6 +268,10 @@ class EbayAdapter implements AdapterInterface
             foreach ($items as $item) {
                 $item['currency'] = $reurnOrder['currency'];
                 $item['channel_order_id'] = $reurnOrder['channel_ordernum'];
+                $is_chinese = EbayPublishProductModel::where(['item_id'=>$item['orders_item_number'],'listing_type'=>'Chinese'])->first();
+                if(isset($is_chinese->id)){
+                    $reurnOrder['is_chinese'] = 1;
+                }
                 $reurnOrder['items'][] = $item;
             }
 
@@ -449,6 +457,69 @@ class EbayAdapter implements AdapterInterface
 
     }
 
+    public function getStoreCategory($site=0){
+        $return = [];
+        $xml ='<LevelLimit>3</LevelLimit>';
+        $response = $this->buildEbayBody($xml, 'GetStore', $site);
+        if ($response->Ack == 'Success') {
+            $category = $response->Store->CustomCategories->CustomCategory;
+           // var_dump($response);exit;
+            //先删除以前的
+            foreach ($category as $v1) {
+
+                $add_data=array();
+                $add_data['store_category'] = (string)$v1->CategoryID;
+                $add_data['store_category_name'] = (string)$v1->Name;
+                $add_data['level'] = 1;
+                $add_data['category_parent'] = '';
+                $return[] = $add_data;
+                if(isset($v1->ChildCategory)){
+                    foreach($v1->ChildCategory as $v2){
+                        $add_data=array();
+                        $add_data['store_category'] = (string)$v2->CategoryID;
+                        $add_data['store_category_name'] = (string)$v2->Name;
+                        $add_data['level'] = 2;
+                        $add_data['category_parent'] = (string)$v1->CategoryID;
+                        $return[] = $add_data;
+                        if(isset($v2->ChildCategory)){
+                            foreach($v2->ChildCategory as $v3){
+                                $add_data=array();
+                                $add_data['store_category'] = (string)$v3->CategoryID;
+                                $add_data['store_category_name'] = (string)$v3->Name;
+                                $add_data['level'] = 3;
+                                $add_data['category_parent'] = (string)$v2->CategoryID;
+                                $return[] = $add_data;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }else{
+            return false;
+        }
+        return $return;
+    }
+    public function getSuggestedCategories($query,$site)
+    {
+        $return = [];
+        $xml = '<Query>' . $query . '</Query>';
+        $response = $this->buildEbayBody($xml, 'GetSuggestedCategories', $site);
+        if ($response->Ack == 'Success') {
+            $suggestedCategory = $response->SuggestedCategoryArray->SuggestedCategory;
+            $i = 0;
+            foreach($suggestedCategory as $key=> $suggest){
+                $return[$i]['CategoryID']= (string)$suggest->Category->CategoryID;
+                $return[$i]['Percent']= (string)$suggest->PercentItemFound;
+                $i++;
+            }
+
+        }else{
+            return false;
+        }
+        return $return;
+    }
+
     public function getEbayCondition($category_id, $site)
     {
         $return = [];
@@ -506,7 +577,7 @@ class EbayAdapter implements AdapterInterface
                 foreach ($v->ValueRecommendation as $i_v) {
                     $specific_values[] = (string)$i_v->Value;
                 }
-                $data['specific_values'] = serialize($specific_values);
+                $data['specific_values'] = json_encode($specific_values);
                 $data['category_id'] = $category_id;
                 $data['site'] = $site;
                 $return[] = $data;
@@ -516,6 +587,537 @@ class EbayAdapter implements AdapterInterface
         }
         return $return;
     }
+
+    /**验证和上架
+     * @param $api
+     * @param $data
+     * @param $site
+     */
+    public function publish($api,$data,$site){
+        $return = [];
+        $xml = '<Item>';
+        $xml .= '<Title>' . htmlspecialchars($data['title']) . '</Title>';
+        if(!empty($data['sub_title'])){
+            $xml .= '<SubTitle>'.htmlspecialchars($data['sub_title']) .'</SubTitle>';
+        }
+        $xml .= '<Site>'.$data['site_name'].'</Site>';
+        $xml .= '<Currency>'.$data['currency'].'</Currency>';
+        $xml .= '<SKU>'.$data['sku'].'</SKU>';
+        $xml .= '<ListingDuration>'.$data['listing_duration'].'</ListingDuration>';
+        $xml .= '<CategoryMappingAllowed>true</CategoryMappingAllowed>'; //是否允许多分类
+        $xml .='<PrimaryCategory><CategoryID>'.$data['primary_category'].'</CategoryID></PrimaryCategory>';
+        if(!empty( $data['secondary_category'])){
+            $xml .= '<SecondaryCategory><CategoryID>' . $data['secondary_category'] . '</CategoryID></SecondaryCategory>';
+        }
+        $xml .= '<ConditionID>'.$data['condition_id'].'</ConditionID>';
+        if(!empty($data['condition_description'])){
+            $xml .= '<ConditionDescription>'.trim($data['condition_description']).'</ConditionDescription>';
+        }
+        if($data['private_listing']){
+            $xml .= '<PrivateListing>ture</PrivateListing>';
+        }
+        $xml .= '<PaymentMethods>PayPal</PaymentMethods>';  // 付款方式 - 暂时只支持paypal
+        $xml .= '<PayPalEmailAddress>'.$data['paypal_email_address'] .'</PayPalEmailAddress>';
+        if (!empty($data['picture_details'])) //ebay图片
+        {
+            $xml .= '<PictureDetails>';
+            $picture = json_decode($data['picture_details'], true);
+            $i=0;
+            foreach ($picture as $value) {
+                if($i==12){break;}
+                if($i==1&&($data['site_name']=='Italy'||$data['site_name']=='France')){//意大利和法国只上传一张主图片 09.08
+                    break;
+                }
+                $value =  str_replace(" ", "%20",$value);
+                $xml .= '<PictureURL>'.($value).'</PictureURL>';
+                $i++;
+            }
+            $xml .= '</PictureDetails>';
+        }
+        if (!empty($data['country'])) //产品所在的国家
+        {
+            $xml .= '<Country>'.$data['country'].'</Country>';
+        }
+        if (!empty($data['location']))  //地点
+        {
+            $xml .= '<Location>' . $data['location'] . '</Location>';
+        }
+        if (!empty($data['postal_code']))  //邮编
+        {
+            $xml .= '<PostalCode>' . $data['postal_code'] . '</PostalCode>';
+        }
+        $productListingDetails = '';
+        if(!empty($data['item_specifics'])){
+            $xml .= '<ItemSpecifics>';
+            $item_specifics = json_decode($data['item_specifics'],true);
+            foreach($item_specifics as $key=>$value){
+                if(!empty($value)){
+                    if((strtoupper($key)=='UPC')||(strtoupper($key)=='EAN')||(strtoupper($key)=='ISBN')){
+                        $productListingDetails .= '<'.strtoupper($key).'>'.$value.'</'.strtoupper($key).'>';
+                        continue;
+                    }
+                    $xml .= '<NameValueList><Name>'.htmlspecialchars($key).'</Name><Value>'.htmlspecialchars($value).'</Value></NameValueList>';
+                }
+            }
+            $xml .= '</ItemSpecifics>';
+        }
+        if(!empty($productListingDetails)){ //UPC EAN ISBN
+            $xml .='<ProductListingDetails>'.$productListingDetails.'</ProductListingDetails>';
+        }
+
+        $buyerRequirementDetails = '';
+        $buyer_requirement = json_decode($data['buyer_requirement'], true);
+
+        //买家要求
+        if (($buyer_requirement['LinkedPayPalAccount'])&&isset($buyer_requirement['LinkedPayPalAccount'])) {
+            $buyerRequirementDetails .= '<LinkedPayPalAccount>true</LinkedPayPalAccount>'; //只支持PAYPAL付款
+        }
+        if (($buyer_requirement['ShipToRegistrationCountry'])&&isset($buyer_requirement['ShipToRegistrationCountry'])) {
+            $buyerRequirementDetails .= '<ShipToRegistrationCountry>true</ShipToRegistrationCountry>'; //排除运输范围之外的国家
+        }
+        if (isset($buyer_requirement['unpaid_on'])&&$buyer_requirement['unpaid_on']) {
+            $buyerRequirementDetails .= '<MaximumUnpaidItemStrikesInfo><Count>' . $buyer_requirement['MaximumUnpaidItemStrikesInfo']['Count'] . '</Count><Period>' . $buyer_requirement['MaximumUnpaidItemStrikesInfo']['Period'] . '</Period></MaximumUnpaidItemStrikesInfo>';
+        }
+        if (isset($buyer_requirement['policy_on'])&&$buyer_requirement['policy_on']) {
+            $buyerRequirementDetails .= '<MaximumBuyerPolicyViolations><Count>' . $buyer_requirement['MaximumBuyerPolicyViolations']['Count'] . '</Count><Period>' . $buyer_requirement['MaximumBuyerPolicyViolations']['Period'] . '</Period></MaximumBuyerPolicyViolations>';
+        }
+        if (isset($buyer_requirement['feedback_on'])&&$buyer_requirement['feedback_on']) {
+            $buyerRequirementDetails .= '<MinimumFeedbackScore>' . $buyer_requirement['MinimumFeedbackScore']. '</MinimumFeedbackScore>';  //信用低于
+        }
+        if (isset($buyer_requirement['item_count_on'])&&$buyer_requirement['item_count_on']) {
+            $buyerRequirementDetails .= '<MaximumItemRequirements><MaximumItemCount>' . $buyer_requirement['MaximumItemRequirements']['MaximumItemCount'].'</MaximumItemCount><MinimumFeedbackScore>' . $buyer_requirement['MaximumItemRequirements']['MinimumFeedbackScore'].'</MinimumFeedbackScore></MaximumItemRequirements>';
+        }
+
+        if(!empty($buyerRequirementDetails)){
+            $xml .='<BuyerRequirementDetails>'.$buyerRequirementDetails.'</BuyerRequirementDetails>';
+        }
+
+        $returnPolicy = '';
+        $return_policy = json_decode($data['return_policy'],true);
+        //退货政策
+        if ($return_policy['ReturnsAcceptedOption'] == 'ReturnsAccepted')   //退货政策  接受的情况下，
+        {
+            $returnPolicy .= '<ReturnsAcceptedOption>'.$return_policy['ReturnsAcceptedOption'].'</ReturnsAcceptedOption>';
+            if (!empty($return_policy['ReturnsWithinOption'])) {
+                $returnPolicy .= ' <ReturnsWithinOption>' . $return_policy['ReturnsWithinOption'] . '</ReturnsWithinOption>'; //退货天数
+            }
+            if (!empty($return_policy['RefundOption'])) {
+                $returnPolicy .= '<RefundOption>' . $return_policy['RefundOption'] . '</RefundOption>';  //退货方式  一些站点没有这个标签
+            }
+            if (!empty($return_policy['ShippingCostPaidByOption'])) {
+                $returnPolicy .= '<ShippingCostPaidByOption>'.$return_policy['ShippingCostPaidByOption'] . '</ShippingCostPaidByOption>'; // 退货费用谁承担
+            }
+
+            if ($return_policy['ExtendedHolidayReturns']) {
+                $returnPolicy .= '<ExtendedHolidayReturns>true</ExtendedHolidayReturns>'; //节假日延迟
+            }
+            if (!empty($returnPolicy['Description'])) {
+                $returnPolicy .= '<Description>' . trim($return_policy['Description']) . '</Description>'; // 退货详情
+            }
+        }
+        if(!empty($returnPolicy)){
+            $xml .='<ReturnPolicy>'.$returnPolicy.'</ReturnPolicy>';
+        }
+
+        $xml .= '<DispatchTimeMax>'.$data['dispatch_time_max'].'</DispatchTimeMax>'; //  对应的发货天数
+
+        $xml .= '<ShippingDetails>';
+        $shippingServiceOptions = json_decode($data['shipping_details'],true);
+        foreach($shippingServiceOptions['Shipping'] as $key=>$value){
+            if( empty($value['ShippingService'])){
+                continue;
+            }
+            $xml .= '<ShippingServiceOptions>';
+            $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
+            $xml .= ' <ShippingService>' .$value['ShippingService'] . '</ShippingService>';  //国内运输方式
+            if(empty($value['ShippingServiceCost'])&&(empty($value['ShippingServiceAdditionalCost']))){
+                $xml .= '<FreeShipping>true</FreeShipping>'; //是否免费
+            }else{
+                if (!empty($value['ShippingServiceCost'])) {
+                    $xml .= '<ShippingServiceCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceCost']. '</ShippingServiceCost>';//基本运费
+                }
+                if (!empty($value['ShippingServiceAdditionalCost'])) {
+                    $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceAdditionalCost']. '</ShippingServiceAdditionalCost>'; //额外加收
+                }
+            }
+            $xml .= '</ShippingServiceOptions>';
+        }
+
+        foreach($shippingServiceOptions['InternationalShipping'] as $key=>$value){
+            if( empty($value['ShippingService'])){
+                continue;
+            }
+            $xml .= '<InternationalShippingServiceOption>';
+            $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>'; //国际运输 顺序
+            $xml .= '<ShippingService>'.$value['ShippingService'].'</ShippingService>'; //国际运输方式
+            $xml .= '<ShippingServiceCost crenccuyID="' . $data['currency'] . '" >'.$value['ShippingServiceCost'].'</ShippingServiceCost>'; // 费用
+            $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency']. '" >'.$value['ShippingServiceAdditionalCost'].'</ShippingServiceAdditionalCost>';// 额外加收
+            if(!empty($value['ShipToLocation'])){
+                foreach($value['ShipToLocation'] as $v){
+                    if(!empty($v)){
+                        $xml .= '<ShipToLocation>'.$v.'</ShipToLocation>';
+
+                    }
+                }
+            }
+            $xml .= '</InternationalShippingServiceOption>';
+        }
+        if(!empty($shippingServiceOptions['ExcludeShipToLocation'])){
+            foreach($shippingServiceOptions['ExcludeShipToLocation'] as $v){
+                $xml .= '<ExcludeShipToLocation>' . $v . '</ExcludeShipToLocation>';
+            }
+        }
+        $xml .= '</ShippingDetails>';
+
+        if(!empty($data['store_category_id'])){
+            $xml .='<Storefront>';
+            $xml .='<StoreCategoryID>'.$data['store_category_id'].'</StoreCategoryID>';
+            $xml .='</Storefront>';
+        }
+
+        if ($data['listing_type'] == 'Chinese') {
+            $xml .= '<ListingType>Chinese</ListingType>';
+            $xml .= '<StartPrice currencyID="' . $data['currency'].'">'.$data['start_price'].'</StartPrice>';
+            $xml .= '<ReservePrice  currencyID="' . $data['currency'] . '">0.00</ReservePrice>';
+            $xml .= '<BuyItNowPrice currencyID="' . $data['currency'] . '">0.00</BuyItNowPrice>';
+            $xml .= '<Quantity>'.(int)$data['quantity'].'</Quantity>';
+        }
+        if ($data['listing_type'] == 'FixedPriceItem'&&$data['multi_attribute']==0) {
+            $xml .= '<ListingType>FixedPriceItem</ListingType>';
+            $xml .= '<StartPrice currencyID="' .$data['currency']. '">'.$data['start_price'].'</StartPrice>';
+            $xml .= '<Quantity>' . $data['quantity'] . '</Quantity>';
+        }
+        if ($data['listing_type'] == 'FixedPriceItem'&&$data['multi_attribute']==1) {
+            $xml .= '<ListingType>FixedPriceItem</ListingType>';
+            $variation_specifics = json_decode($data['variation_specifics'],true);
+            if(!empty($variation_specifics)){
+                $xml .= '<Variations>';
+                $variationSpecificsSet = '';
+                foreach($variation_specifics as $key => $value){
+                    if((strtoupper($key)!='UPC')&&(strtoupper($key)!='EAN')&&(strtoupper($key)!='ISBN')) {
+                        $variationSpecificsSet .= '<NameValueList><Name>' . $key . '</Name>';
+                        foreach($value as $v){
+                            $variationSpecificsSet .= '<Value>'.$v .'</Value>';
+                        }
+                        $variationSpecificsSet .= '</NameValueList>';
+                    }
+                }
+                if(!empty($variationSpecificsSet))
+                $xml .= '<VariationSpecificsSet>'.$variationSpecificsSet.'</VariationSpecificsSet>';
+            }
+
+            foreach($data['sku_detail'] as $key => $value){
+                $xml .= '<Variation>';
+                $xml .= '<SKU>' . $value['sku'] . '</SKU>';
+                $xml .= '<StartPrice >' . $value['start_price'] . '</StartPrice>';
+                $xml .= '<Quantity>' . $value['quantity']. '</Quantity>';
+                $variationSpecifics =  '';
+                if(!empty($variation_specifics)) {
+                    foreach($variation_specifics as $k => $v) {
+                        if((strtoupper($k)=='UPC')||(strtoupper($k)=='EAN')||(strtoupper($k)=='ISBN')) {
+                            $xml .= '<VariationProductListingDetails>';
+                            $xml .= '<'.strtoupper($k).'>' . $variation_specifics[strtoupper($k)][$key] . '</'.strtoupper($k).'>';
+                            $xml .= '</VariationProductListingDetails>';
+                        }else{
+                            $variationSpecifics .= '<NameValueList>';
+                            $variationSpecifics .= '<Name>' . $k . '</Name>';
+                            $variationSpecifics .= '<Value>'.$variation_specifics[$k][$key].'</Value>';
+                            $variationSpecifics .= '</NameValueList>';
+                        }
+                    }
+                }
+                if(!empty($variationSpecifics)){
+                    $xml .='<VariationSpecifics>'.$variationSpecifics.'</VariationSpecifics>';
+                }
+                $xml .= '</Variation>';
+            }
+            $variation_picture = json_decode($data['variation_picture'],true);
+            if(!empty($variation_picture)){
+                foreach($variation_picture as $key=>$value){
+                    $xml .= '<Pictures>';
+                    $xml .= '<VariationSpecificName>' .$key . '</VariationSpecificName>';
+                    foreach($value as $k=>$v){
+                        $xml .= '<VariationSpecificPictureSet><VariationSpecificValue>' . $k . '</VariationSpecificValue>';
+                        $v =  str_replace(" ", "%20",$v);
+                        $xml .= ' <PictureURL>' . ($v) . '</PictureURL>';
+                        $xml .= '</VariationSpecificPictureSet>';
+                    }
+                    $xml .= '</Pictures>';
+
+                }
+            }
+            $xml .= '</Variations>';
+        }
+        $xml .= '<Description><![CDATA[' . (trim(($data['description']))) .']]></Description>';  //将描述部分 设置完了再传进来
+        $xml .= '<OutOfStockControl>true</OutOfStockControl>'; //无货在线
+        $xml .= '</Item>';
+        //var_dump($xml);
+        if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){
+            $response = $this->buildEbayBody($xml, $api, $site);
+
+        }else{
+            $response =  (object)array();
+          //  $response->ItemID = rand(1000000000, 10000000000);
+        }
+
+        if(isset($response->ItemID)){
+            $return['is_success'] =true;
+            if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){
+                $fee = 0;
+                foreach($response->Fees->Fee as $value){
+                    $fee = $fee + (float)$value->Fee;
+                }
+                $return['info'] =$fee;
+            }else{
+                $return['info'] =(string)$response->ItemID;
+            }
+        }else{
+            $return['is_success'] =false;
+            foreach($response->Errors as $error){
+                if((string)$error->SeverityCode =='Error'){
+                    $info_String = (string)$error->LongMessage;
+                    if(isset($error->ErrorParameters->Value)){
+                        $info_String = $info_String.((string)$error->ErrorParameters->Value);
+                    }
+                    $errorInfo[]=$info_String;
+                }
+            }
+            $errorInfo=  array_unique($errorInfo);
+            $errorInfo =implode(',',$errorInfo);
+            $return['info'] =$errorInfo;
+            //$return['info'] ='测试错误情况下';
+
+        }
+        $return['info_all'] =var_export($response,true);
+        return $return;
+    }
+
+
+    public function ReviseItem($api,$param,$data,$site){
+        $return = [];
+        $xml ='<Item>';
+        $xml .= '<ItemID>'.$data['item_id'].'</ItemID>';
+        if($param=='changeSku'){
+            if(isset($data['sku_detail'])){
+                $xml .= '<Variations>';
+                foreach($data['delete'] as $sku){
+                    $xml .='<Variation>';
+                    $xml .='<Delete>true</Delete>';
+                    $xml .='<SKU>'.$sku.'</SKU>';
+                    $xml .='</Variation>';
+                }
+                $variation_specifics = json_decode($data['variation_specifics'],true);
+                /*      if(!empty($variation_specifics)){
+
+                          $variationSpecificsSet = '';
+                          foreach($variation_specifics as $key => $value){
+                              if((strtoupper($key)!='UPC')&&(strtoupper($key)!='EAN')&&(strtoupper($key)!='ISBN')) {
+                                  $variationSpecificsSet .= '<NameValueList><Name>' . $key . '</Name>';
+                                  foreach($value as $v){
+                                      $variationSpecificsSet .= '<Value>'.$v .'</Value>';
+                                  }
+                                  $variationSpecificsSet .= '</NameValueList>';
+                              }
+                          }
+                          if(!empty($variationSpecificsSet))
+                              $xml .= '<VariationSpecificsSet>'.$variationSpecificsSet.'</VariationSpecificsSet>';
+                      }*/
+
+                foreach($data['sku_detail'] as $key => $value){
+                    $xml .= '<Variation>';
+                    $xml .= '<SKU>' . $value['sku'] . '</SKU>';
+                    $xml .= '<StartPrice >' . $value['start_price'] . '</StartPrice>';
+                    $xml .= '<Quantity>' . $value['quantity']. '</Quantity>';
+                    $variationSpecifics =  '';
+                    if(!empty($variation_specifics)) {
+                        foreach($variation_specifics as $k => $v) {
+                            if((strtoupper($k)=='UPC')||(strtoupper($k)=='EAN')||(strtoupper($k)=='ISBN')) {
+                                $xml .= '<VariationProductListingDetails>';
+                                $xml .= '<'.strtoupper($k).'>' . $variation_specifics[strtoupper($k)][$key] . '</'.strtoupper($k).'>';
+                                $xml .= '</VariationProductListingDetails>';
+                            }else{
+                                $variationSpecifics .= '<NameValueList>';
+                                $variationSpecifics .= '<Name>' . $k . '</Name>';
+                                $variationSpecifics .= '<Value>'.$variation_specifics[$k][$key].'</Value>';
+                                $variationSpecifics .= '</NameValueList>';
+                            }
+                        }
+                    }
+                    if(!empty($variationSpecifics)){
+                        $xml .='<VariationSpecifics>'.$variationSpecifics.'</VariationSpecifics>';
+                    }
+                    $xml .= '</Variation>';
+                }
+                $variation_picture = json_decode($data['variation_picture'],true);
+                if(!empty($variation_picture)){
+                    foreach($variation_picture as $key=>$value){
+                        $xml .= '<Pictures>';
+                        $xml .= '<VariationSpecificName>' .$key . '</VariationSpecificName>';
+                        foreach($value as $k=>$v){
+                            $xml .= '<VariationSpecificPictureSet><VariationSpecificValue>' . $k . '</VariationSpecificValue>';
+                            $v =  str_replace(" ", "%20",$v);
+                            $xml .= ' <PictureURL>' . ($v) . '</PictureURL>';
+                            $xml .= '</VariationSpecificPictureSet>';
+                        }
+                        $xml .= '</Pictures>';
+
+                    }
+                }
+                $xml .= '</Variations>';
+            }else{
+                $xml .= '<SKU>'.$data['sku'].'</SKU>';
+                $xml .= '<StartPrice currencyID="' .$data['currency']. '">'.$data['start_price'].'</StartPrice>';
+                $xml .= '<Quantity>' . $data['quantity'] . '</Quantity>';
+            }
+        }
+        if($param=='changeTitle'){
+            $xml .= '<Title>' . htmlspecialchars($data['title']) . '</Title>';
+            if(!empty($data['sub_title'])){
+                $xml .= '<SubTitle>'.htmlspecialchars($data['sub_title']) .'</SubTitle>';
+            }
+        }
+        if($param=='changeDescription'){
+            $xml .= '<Description><![CDATA['.trim($data['description']).']]></Description><DescriptionReviseMode>Replace</DescriptionReviseMode>';
+        }
+        if($param=='changeShipping'){
+            $xml .= '<ShippingDetails>';
+            $shippingServiceOptions = json_decode($data['shipping_details'],true);
+            foreach($shippingServiceOptions['Shipping'] as $key=>$value){
+                if( empty($value['ShippingService'])){
+                    continue;
+                }
+                $xml .= '<ShippingServiceOptions>';
+                $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
+                $xml .= ' <ShippingService>' .$value['ShippingService'] . '</ShippingService>';  //国内运输方式
+                if(empty($value['ShippingServiceCost'])&&(empty($value['ShippingServiceAdditionalCost']))){
+                    $xml .= '<FreeShipping>true</FreeShipping>'; //是否免费
+                }else{
+                    if (!empty($value['ShippingServiceCost'])) {
+                        $xml .= '<ShippingServiceCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceCost']. '</ShippingServiceCost>';//基本运费
+                    }
+                    if (!empty($value['ShippingServiceAdditionalCost'])) {
+                        $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceAdditionalCost']. '</ShippingServiceAdditionalCost>'; //额外加收
+                    }
+                }
+                $xml .= '</ShippingServiceOptions>';
+            }
+
+            foreach($shippingServiceOptions['InternationalShipping'] as $key=>$value){
+                if( empty($value['ShippingService'])){
+                    continue;
+                }
+                $xml .= '<InternationalShippingServiceOption>';
+                $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>'; //国际运输 顺序
+                $xml .= '<ShippingService>'.$value['ShippingService'].'</ShippingService>'; //国际运输方式
+                $xml .= '<ShippingServiceCost crenccuyID="' . $data['currency'] . '" >'.$value['ShippingServiceCost'].'</ShippingServiceCost>'; // 费用
+                $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency']. '" >'.$value['ShippingServiceAdditionalCost'].'</ShippingServiceAdditionalCost>';// 额外加收
+                if(!empty($value['ShipToLocation'])){
+                    foreach($value['ShipToLocation'] as $v){
+                        if(!empty($v)){
+                            $xml .= '<ShipToLocation>'.$v.'</ShipToLocation>';
+
+                        }
+                    }
+                }
+                $xml .= '</InternationalShippingServiceOption>';
+            }
+            if(!empty($shippingServiceOptions['ExcludeShipToLocation'])){
+                foreach($shippingServiceOptions['ExcludeShipToLocation'] as $v){
+                    $xml .= '<ExcludeShipToLocation>' . $v . '</ExcludeShipToLocation>';
+                }
+            }
+            $xml .= '</ShippingDetails>';
+
+        }
+        if($param=='changePicture'){
+            if (!empty($data['picture_details'])) //ebay图片
+            {
+                $xml .= '<PictureDetails>';
+                $picture = json_decode($data['picture_details'], true);
+                $i=0;
+                foreach ($picture as $value) {
+                    if($i==12){break;}
+                    if($i==1&&($data['site_name']=='Italy'||$data['site_name']=='France')){//意大利和法国只上传一张主图片 09.08
+                        break;
+                    }
+                    $value =  str_replace(" ", "%20",$value);
+                    $xml .= '<PictureURL>'.($value).'</PictureURL>';
+                    $i++;
+                }
+                $xml .= '</PictureDetails>';
+            }
+        }
+        if($param=='changeSpecifics'){
+
+
+            $xml .= '<ConditionID>'.$data['condition_id'].'</ConditionID>';
+            if(!empty($data['condition_description'])){
+                $xml .= '<ConditionDescription>'.trim($data['condition_description']).'</ConditionDescription>';
+            }
+
+            $productListingDetails = '';
+            if(!empty($data['item_specifics'])){
+                $xml .= '<ItemSpecifics>';
+                $item_specifics = json_decode($data['item_specifics'],true);
+                foreach($item_specifics as $key=>$value){
+                    if(!empty($value)){
+                        if((strtoupper($key)=='UPC')||(strtoupper($key)=='EAN')||(strtoupper($key)=='ISBN')){
+                            $productListingDetails .= '<'.strtoupper($key).'>'.$value.'</'.strtoupper($key).'>';
+                            continue;
+                        }
+                        $xml .= '<NameValueList><Name>'.htmlspecialchars($key).'</Name><Value>'.htmlspecialchars($value).'</Value></NameValueList>';
+                    }
+                }
+                $xml .= '</ItemSpecifics>';
+            }
+            if(!empty($productListingDetails)){ //UPC EAN ISBN
+                $xml .='<ProductListingDetails>'.$productListingDetails.'</ProductListingDetails>';
+            }
+        }
+
+        $xml .='</Item>';
+        $response = $this->buildEbayBody($xml, $api, $site);
+        if(isset($response->ItemID)){
+            $return['is_success'] =true;
+            $return['info'] ='修改成功';
+        }else{
+            $errorInfo = [];
+            $return['is_success'] =false;
+            if(isset($response->Errors)){
+                foreach($response->Errors as $error){
+                    if((string)$error->SeverityCode =='Error'){
+                        $info_String = (string)$error->LongMessage;
+                        if(isset($error->ErrorParameters->Value)){
+                            $info_String = $info_String.((string)$error->ErrorParameters->Value);
+                        }
+                        $errorInfo[]=$info_String;
+                    }
+                }
+                $errorInfo=  array_unique($errorInfo);
+                $errorInfo =implode(',',$errorInfo);
+            }
+
+            $return['info'] =empty($errorInfo)?'未知错误':$errorInfo;
+        }
+        return $return;
+
+    }
+
+    public function endItem($item_id,$site=0){
+        $return = [];
+        $xml = '<ItemID>'.$item_id.'</ItemID>';
+        $xml .= '<EndingReason>NotAvailable</EndingReason>';
+        $response = $this->buildEbayBody($xml, 'EndItem', $site);
+        if((string)$response->Ack=='Success'){
+            $return['is_success'] = true;
+            $return['info'] = '下架成功';
+        }else{
+            $return['is_success'] = false;
+            $return['info'] = '下架失败';
+        }
+        return $return;
+    }
+
 
 
     /** 获取该账号近一个月的Feedback
@@ -615,7 +1217,7 @@ class EbayAdapter implements AdapterInterface
         $xml .= '</ActiveList>';
         $xml .= '<HideVariations>false</HideVariations>';
         $response = $this->buildEbayBody($xml, 'GetMyeBaySelling', $site);
-        if(isset($response->ActiveList->PaginationResult->TotalNumberOfPages)&&($page>(int)$response->ActiveList->PaginationResult->TotalNumberOfPages)){
+        if (isset($response->ActiveList->PaginationResult->TotalNumberOfPages) && ($page > (int)$response->ActiveList->PaginationResult->TotalNumberOfPages)) {
             return false;
         }
         if (isset($response->ActiveList->ItemArray->Item) && !empty($response->ActiveList->ItemArray->Item)) {
@@ -628,17 +1230,18 @@ class EbayAdapter implements AdapterInterface
         }
     }
 
-    public function getSellerEvents($start_time='',$end_time='',$site = 0){
+    public function getSellerEvents($start_time = '', $end_time = '', $site = 0)
+    {
         $return = [];
         $xml = '';
-        $xml .=' <EndTimeFrom>'.$start_time.'T00:00:00.000Z</EndTimeFrom><EndTimeTo>'.$end_time.'T00:00:00.000Z</EndTimeTo>';
+        $xml .= ' <EndTimeFrom>' . $start_time . 'T00:00:00.000Z</EndTimeFrom><EndTimeTo>' . $end_time . 'T00:00:00.000Z</EndTimeTo>';
         $response = $this->buildEbayBody($xml, 'GetSellerEvents', $site);
-        if(isset($response->ItemArray)&&!empty($response->ItemArray)&&$response->Ack == 'Success'){
-            foreach($response->ItemArray->Item as $item){
-                $return[] =$item->ItemID;
+        if (isset($response->ItemArray) && !empty($response->ItemArray) && $response->Ack == 'Success') {
+            foreach ($response->ItemArray->Item as $item) {
+                $return[] = $item->ItemID;
             }
             return $return;
-        }else{
+        } else {
             return false;
         }
     }
@@ -663,7 +1266,7 @@ class EbayAdapter implements AdapterInterface
             $list_info['item_id'] = (string)$response->Item->ItemID;
             $list_info['currency'] = (string)$response->Item->Currency;
             $list_info['country'] = (string)$response->Item->Country;
-            $list_info['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+            $list_info['start_time'] = date('Y-m-d H:i:s', strtotime((string)$response->Item->ListingDetails->StartTime));
             $list_info['view_item_url'] = (string)$response->Item->ListingDetails->ViewItemURL;
             $list_info['listing_duration'] = (string)$response->Item->ListingDuration;
             $list_info['listing_type'] = (string)$response->Item->ListingType;
@@ -676,7 +1279,7 @@ class EbayAdapter implements AdapterInterface
             $list_info['private_listing'] = (string)$response->Item->PrivateListing;
             $list_info['dispatch_time_max'] = (string)$response->Item->DispatchTimeMax;
             $list_info['start_price'] = (float)$response->Item->StartPrice;
-            $list_info['quantity'] = (int)$response->Item->Quantity-(int)$response->Item->SellingStatus->QuantitySold;
+            $list_info['quantity'] = (int)$response->Item->Quantity - (int)$response->Item->SellingStatus->QuantitySold;
             $list_info['reserve_price'] = (float)$response->Item->ReservePrice;
             $list_info['buy_it_now_price'] = (float)$response->Item->BuyItNowPrice;
             $list_info['title'] = (string)$response->Item->Title;
@@ -686,6 +1289,14 @@ class EbayAdapter implements AdapterInterface
             $list_info['site'] = config('ebaysite.site_name_id')[$list_info['site_name']];
             $list_info['quantity_sold'] = (int)$response->Item->SellingStatus->QuantitySold;
             $list_info['store_category_id'] = (string)$response->Item->Storefront->StoreCategoryID;
+            $list_info['description_id'] = 1;
+            $list_info['country'] = isset($response->Item->Country) ? (string)$response->Item->Country: '';
+            $list_info['warehouse'] = 1;
+            $list_info['description_picture'] = '';
+            $list_info['note'] = '';
+            $list_info['description'] =isset($response->Item->Description) ? htmlspecialchars($response->Item->Description) :'';
+
+
 
             //ConditionID
             $list_info['condition_id'] = (string)$response->Item->ConditionID;
@@ -713,11 +1324,11 @@ class EbayAdapter implements AdapterInterface
                 foreach ($Variations as $variation) {
                     $sku_info[$i]['sku'] = (string)$variation->SKU;
                     $sku_info[$i]['start_price'] = (float)$variation->StartPrice;
-                    $sku_info[$i]['quantity'] = (int)$variation->Quantity-(int)$variation->SellingStatus->QuantitySold;
+                    $sku_info[$i]['quantity'] = (int)$variation->Quantity - (int)$variation->SellingStatus->QuantitySold;
                     $sku_info[$i]['erp_sku'] = (string)$variation->SKU;
                     $sku_info[$i]['quantity_sold'] = isset($variation->SellingStatus->QuantitySold) ? (int)$variation->SellingStatus->QuantitySold : 0;
                     $sku_info[$i]['item_id'] = (string)$response->Item->ItemID;
-                    $sku_info[$i]['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+                    $sku_info[$i]['start_time'] = date('Y-m-d H:i:s', strtotime((string)$response->Item->ListingDetails->StartTime));
                     $variation_specifics = [];
                     if (isset($variation->VariationSpecifics)) {
                         if (isset($variation->VariationSpecifics->NameValueList[0])) {
@@ -740,11 +1351,11 @@ class EbayAdapter implements AdapterInterface
             } else {
                 $sku_info[0]['sku'] = (string)$response->Item->SKU;
                 $sku_info[0]['start_price'] = (float)$response->Item->StartPrice;;
-                $sku_info[0]['quantity'] = (int)$response->Item->Quantity-(int)$response->Item->SellingStatus->QuantitySold;
+                $sku_info[0]['quantity'] = (int)$response->Item->Quantity - (int)$response->Item->SellingStatus->QuantitySold;
                 $sku_info[0]['erp_sku'] = (string)$response->Item->SKU;;
                 $sku_info[0]['quantity_sold'] = (int)$response->Item->SellingStatus->QuantitySold;
                 $sku_info[0]['item_id'] = (string)$response->Item->ItemID;
-                $sku_info[0]['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+                $sku_info[0]['start_time'] = date('Y-m-d H:i:s', strtotime((string)$response->Item->ListingDetails->StartTime));
             }
             $VariationPicture = isset($response->Item->Variations->Pictures) ? $response->Item->Variations->Pictures : '';
             $variation_picture = [];
@@ -807,11 +1418,11 @@ class EbayAdapter implements AdapterInterface
                     $shipping_details['InternationalShipping'][$key]['ShippingServiceCost'] = (float)$InternationalShippingServiceOption->ShippingServiceCost;
                     $shipping_details['InternationalShipping'][$key]['ShippingServiceAdditionalCost'] = (float)$InternationalShippingServiceOption->ShippingServiceAdditionalCost;
                     $shipToLocation = [];
-                    if(isset($InternationalShippingServiceOption->ShipToLocation[0])){
-                        foreach($InternationalShippingServiceOption->ShipToLocation as $location){
-                            $shipToLocation[]=(string)$location;
+                    if (isset($InternationalShippingServiceOption->ShipToLocation[0])) {
+                        foreach ($InternationalShippingServiceOption->ShipToLocation as $location) {
+                            $shipToLocation[] = (string)$location;
                         }
-                    }else{
+                    } else {
                         $shipToLocation[] = (string)$InternationalShippingServiceOption->ShipToLocation;
                     }
 
@@ -826,16 +1437,15 @@ class EbayAdapter implements AdapterInterface
                 $shipping_details['InternationalShipping'][1]['ShipToLocation'] = (string)$InternationalShippingServiceOption->ShipToLocation;
 
 
-
             }
             $shipping_details['ExcludeShipToLocation'] = (array)$response->Item->ShippingDetails->ExcludeShipToLocation;
             $list_info['shipping_details'] = json_encode($shipping_details);
-            if(isset($response->Item->OutOfStockControl)&&((string)$response->Item->OutOfStockControl=='true')){
+            if (isset($response->Item->OutOfStockControl) && ((string)$response->Item->OutOfStockControl == 'true')) {
                 $list_info['is_out_control'] = 1;
             }
             unset($shipping_details);
-            $return['sku_info']=$sku_info;
-            $return['list_info']=$list_info;
+            $return['sku_info'] = $sku_info;
+            $return['list_info'] = $list_info;
             return $return;
         } else {
             return false;
@@ -848,16 +1458,17 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return mixed
      */
-    public function changeOutOfStock($itemId,$is_out_stock,$site = 0){
+    public function changeOutOfStock($itemId, $is_out_stock, $site = 0)
+    {
         $xml = '';
-        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><OutOfStockControl>'.$is_out_stock.'</OutOfStockControl></Item>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><OutOfStockControl>' . $is_out_stock . '</OutOfStockControl></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -868,16 +1479,17 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return mixed
      */
-    public function changeProcessingDays($itemId,$day,$site = 0){
+    public function changeProcessingDays($itemId, $day, $site = 0)
+    {
         $xml = '';
-        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><DispatchTimeMax>'.$day.'</DispatchTimeMax></Item>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><DispatchTimeMax>' . $day . '</DispatchTimeMax></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -888,16 +1500,17 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return mixed
      */
-    public function changePayPal($itemId,$paypal,$site = 0){
+    public function changePayPal($itemId, $paypal, $site = 0)
+    {
         $xml = '';
-        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><PayPalEmailAddress>'.$paypal.'</PayPalEmailAddress></Item>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><PayPalEmailAddress>' . $paypal . '</PayPalEmailAddress></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -909,32 +1522,33 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function changePrice($itemId,$sku,$is_mul=0,$site=0){
-        $return =[];
-        $xml='';
-        if($is_mul){
-            foreach($sku as $key=> $v){
+    public function changePrice($itemId, $sku, $is_mul = 0, $site = 0)
+    {
+        $return = [];
+        $xml = '';
+        if ($is_mul) {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
                 $xml .= '<ItemID>' . $itemId . '</ItemID>';
-                $xml .= '<SKU>'.$key.'</SKU>';
-                $xml .= '<StartPrice>'.$v.'</StartPrice>';
+                $xml .= '<SKU>' . $key . '</SKU>';
+                $xml .= '<StartPrice>' . $v . '</StartPrice>';
                 $xml .= '</InventoryStatus>';
             }
-        }else{
-            foreach($sku as $key=> $v){
+        } else {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
                 $xml .= '<ItemID>' . $itemId . '</ItemID>';
-                $xml .= '<StartPrice>'.$v.'</StartPrice>';
+                $xml .= '<StartPrice>' . $v . '</StartPrice>';
                 $xml .= '</InventoryStatus>';
             }
         }
         $response = $this->buildEbayBody($xml, 'ReviseInventoryStatus', $site);
-        if ($response->Ack == 'Success'||$response->Ack=='Warning') {
+        if ($response->Ack == 'Success' || $response->Ack == 'Warning') {
             $return['status'] = true;
-            $return['info'] = isset($response->Errors->LongMessage)?'Success'.(string)$response->Errors->LongMessage:'Success';
-        }else{
+            $return['info'] = isset($response->Errors->LongMessage) ? 'Success' . (string)$response->Errors->LongMessage : 'Success';
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -946,32 +1560,33 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function changeQuantity($itemId,$sku,$is_mul=0,$site=0){
-        $return =[];
-        $xml='';
-        if($is_mul){
-            foreach($sku as $key=> $v){
+    public function changeQuantity($itemId, $sku, $is_mul = 0, $site = 0)
+    {
+        $return = [];
+        $xml = '';
+        if ($is_mul) {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
                 $xml .= '<ItemID>' . $itemId . '</ItemID>';
-                $xml .= '<SKU>'.$key.'</SKU>';
-                $xml .= '<Quantity>'.$v.'</Quantity>';
+                $xml .= '<SKU>' . $key . '</SKU>';
+                $xml .= '<Quantity>' . $v . '</Quantity>';
                 $xml .= '</InventoryStatus>';
             }
-        }else{
-            foreach($sku as $key=> $v){
+        } else {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
-                $xml .= '<ItemID>'.$itemId.'</ItemID>';
-                $xml .= '<Quantity>'.$v.'</Quantity>';
+                $xml .= '<ItemID>' . $itemId . '</ItemID>';
+                $xml .= '<Quantity>' . $v . '</Quantity>';
                 $xml .= '</InventoryStatus>';
             }
         }
         $response = $this->buildEbayBody($xml, 'ReviseInventoryStatus', $site);
-        if ($response->Ack == 'Success'||$response->Ack=='Warning') {
+        if ($response->Ack == 'Success' || $response->Ack == 'Warning') {
             $return['status'] = true;
-            $return['info'] = isset($response->Errors->LongMessage)?'Success'.(string)$response->Errors->LongMessage:'Success';
-        }else{
+            $return['info'] = isset($response->Errors->LongMessage) ? 'Success' . (string)$response->Errors->LongMessage : 'Success';
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -982,41 +1597,42 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function changeShippingFee($itemId,$ship_info,$site=0){
-        $return =[];
+    public function changeShippingFee($itemId, $ship_info, $site = 0)
+    {
+        $return = [];
         $xml = '';
-        $xml .='<Item><ItemID>'.$itemId.'</ItemID><ShippingDetails>';
-            foreach($ship_info['Shipping'] as $key=>$shipping){
-                $xml .='<ShippingServiceOptions>';
-                $xml .='<ShippingService>'.$shipping['ShippingService'].'</ShippingService>';
-                $xml .='<ShippingServiceAdditionalCost>'.sprintf("%.2f",$shipping['ShippingServiceAdditionalCost']).'</ShippingServiceAdditionalCost>';
-                $xml .='<ShippingServiceCost>'. sprintf("%.2f",$shipping['ShippingServiceCost']).'</ShippingServiceCost>';
-                $xml .='<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
-                $xml .='</ShippingServiceOptions>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><ShippingDetails>';
+        foreach ($ship_info['Shipping'] as $key => $shipping) {
+            $xml .= '<ShippingServiceOptions>';
+            $xml .= '<ShippingService>' . $shipping['ShippingService'] . '</ShippingService>';
+            $xml .= '<ShippingServiceAdditionalCost>' . sprintf("%.2f", $shipping['ShippingServiceAdditionalCost']) . '</ShippingServiceAdditionalCost>';
+            $xml .= '<ShippingServiceCost>' . sprintf("%.2f", $shipping['ShippingServiceCost']) . '</ShippingServiceCost>';
+            $xml .= '<ShippingServicePriority>' . $key . '</ShippingServicePriority>';
+            $xml .= '</ShippingServiceOptions>';
+        }
+        foreach ($ship_info['InternationalShipping'] as $key => $shipping) {
+            $xml .= '<InternationalShippingServiceOption>';
+            $xml .= '<ShippingService>' . $shipping['ShippingService'] . '</ShippingService>';
+            $xml .= '<ShippingServiceAdditionalCost>' . sprintf("%.2f", $shipping['ShippingServiceAdditionalCost']) . '</ShippingServiceAdditionalCost>';
+            $xml .= '<ShippingServiceCost>' . sprintf("%.2f", $shipping['ShippingServiceCost']) . '</ShippingServiceCost>';
+            $xml .= '<ShippingServicePriority>' . $key . '</ShippingServicePriority>';
+            foreach ($shipping['ShipToLocation'] as $location) {
+                $xml .= '<ShipToLocation>' . $location . '</ShipToLocation>';
             }
-            foreach($ship_info['InternationalShipping'] as $key=>$shipping){
-                $xml .='<InternationalShippingServiceOption>';
-                $xml .='<ShippingService>'.$shipping['ShippingService'].'</ShippingService>';
-                $xml .='<ShippingServiceAdditionalCost>'.sprintf("%.2f",$shipping['ShippingServiceAdditionalCost']).'</ShippingServiceAdditionalCost>';
-                $xml .='<ShippingServiceCost>'.sprintf("%.2f",$shipping['ShippingServiceCost']).'</ShippingServiceCost>';
-                $xml .='<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
-                foreach($shipping['ShipToLocation'] as $location){
-                    $xml .='<ShipToLocation>'.$location.'</ShipToLocation>';
-                }
-                $xml .='</InternationalShippingServiceOption>';
-            }
-            if(!empty($ship_info['ExcludeShipToLocation'])){
-                foreach($ship_info['ExcludeShipToLocation'] as $exclude)
-                $xml .= '<ExcludeShipToLocation>'.$exclude.'</ExcludeShipToLocation>';
-            }
-        $xml .='</ShippingDetails></Item>';
+            $xml .= '</InternationalShippingServiceOption>';
+        }
+        if (!empty($ship_info['ExcludeShipToLocation'])) {
+            foreach ($ship_info['ExcludeShipToLocation'] as $exclude)
+                $xml .= '<ExcludeShipToLocation>' . $exclude . '</ExcludeShipToLocation>';
+        }
+        $xml .= '</ShippingDetails></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -1027,22 +1643,22 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function endItems($itemId,$reason='NotAvailable Sorry',$site = 0){
-        $return =[];
+    public function endItems($itemId, $reason = 'NotAvailable Sorry', $site = 0)
+    {
+        $return = [];
         $xml = '';
-        $xml .= '<EndingReason>'.$reason.'</EndingReason>';
-        $xml .= '<ItemID>'.$itemId.'</ItemID>';
+        $xml .= '<EndingReason>' . $reason . '</EndingReason>';
+        $xml .= '<ItemID>' . $itemId . '</ItemID>';
         $response = $this->buildEbayBody($xml, 'EndItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
-
 
 
     public function  buildEbayBody($xml, $call, $site = 0)
@@ -1061,14 +1677,15 @@ class EbayAdapter implements AdapterInterface
     /**
      * case XML DOM
      */
-    public function buildcaseBody($xml,$call){
+    public function buildcaseBody($xml, $call)
+    {
         $this->serverUrl = 'https://svcs.ebay.com/services/resolution/v1/ResolutionCaseManagementService';  //cases API地址
         $this->verb = $call;
         $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?><' . $call . 'Request xmlns="http://www.ebay.com/marketplace/resolution/v1/services">';
         $requestXmlBody .= $xml;
         $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . $this->requestToken . '</eBayAuthToken></RequesterCredentials></' . $call . 'Request>';
 
-        $result = $this->sendHttpRequest($requestXmlBody,'Resolution');
+        $result = $this->sendHttpRequest($requestXmlBody, 'Resolution');
         $response = simplexml_load_string($result);
 
         return $response;
@@ -1090,63 +1707,64 @@ class EbayAdapter implements AdapterInterface
     }
 
 
-/*    public function sendHttpRequestMessage($requestBody, $mode='Trading') {
-        //build eBay headers using variables passed via constructor
-        if (strcasecmp($mode, 'Trading') === 0) {       //交易API的头信息
-            $headers = $this->buildEbayHeaders();
-        }elseif (strcasecmp($mode, 'Resolution') === 0){//resolution Api头信息
-            $headers = $this->buildEbayResolutionHeaders();
-        }elseif (strcasecmp($mode, 'Return') === 0){ //return case Api头信息
-            $headers = $this->buildEbayReturnHeaders();
-        }else {
-            $headers = $this->buildEbayHeaders();
-        }
-        $connection = curl_init();
-        curl_setopt($connection, CURLOPT_VERBOSE, 1);
-        //set the server we are using (could be Sandbox or Production server)
-        curl_setopt($connection, CURLOPT_URL, $this->serverUrl);
-        //stop CURL from verifying the peer's certificate
-        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
-        //set the headers using the array of headers
-        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
-        //set method as POST
-        curl_setopt($connection, CURLOPT_POST, 1);
-        //set the XML body of the request
-        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
-        //set it to return the transfer as a string from curl_exec
-        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
+    /*    public function sendHttpRequestMessage($requestBody, $mode='Trading') {
+            //build eBay headers using variables passed via constructor
+            if (strcasecmp($mode, 'Trading') === 0) {       //交易API的头信息
+                $headers = $this->buildEbayHeaders();
+            }elseif (strcasecmp($mode, 'Resolution') === 0){//resolution Api头信息
+                $headers = $this->buildEbayResolutionHeaders();
+            }elseif (strcasecmp($mode, 'Return') === 0){ //return case Api头信息
+                $headers = $this->buildEbayReturnHeaders();
+            }else {
+                $headers = $this->buildEbayHeaders();
+            }
+            $connection = curl_init();
+            curl_setopt($connection, CURLOPT_VERBOSE, 1);
+            //set the server we are using (could be Sandbox or Production server)
+            curl_setopt($connection, CURLOPT_URL, $this->serverUrl);
+            //stop CURL from verifying the peer's certificate
+            curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
+            //set the headers using the array of headers
+            curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
+            //set method as POST
+            curl_setopt($connection, CURLOPT_POST, 1);
+            //set the XML body of the request
+            curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
+            //set it to return the transfer as a string from curl_exec
+            curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
 
-        curl_setopt($connection, CURLOPT_TIMEOUT, 250);
-        //Send the Request
-        $response = curl_exec($connection);
-        //$error = curl_error($connection);
-        //close the connection
-        curl_close($connection);
-        return $response;
-    }*/
+            curl_setopt($connection, CURLOPT_TIMEOUT, 250);
+            //Send the Request
+            $response = curl_exec($connection);
+            //$error = curl_error($connection);
+            //close the connection
+            curl_close($connection);
+            return $response;
+        }*/
 
     /**
      * cases 使用的头部
      * 创建resolution API的头信息
      * @return multitype:
      */
-    private function buildEbayResolutionHeaders(){
+    private function buildEbayResolutionHeaders()
+    {
         $headers = array(
             'X-EBAY-SOA-SERVICE-NAME: ResolutionCaseManagementService',
-            'X-EBAY-SOA-OPERATION-NAME: '.$this->verb,
+            'X-EBAY-SOA-OPERATION-NAME: ' . $this->verb,
             'X-EBAY-SOA-SERVICE-VERSION: 1.1.0',
-            'X-EBAY-SOA-SECURITY-TOKEN: '.$this->requestToken,
+            'X-EBAY-SOA-SECURITY-TOKEN: ' . $this->requestToken,
             'X-EBAY-SOA-REQUEST-DATA-FORMAT: XML'
         );
         return $headers;
     }
 
-    public function sendHttpRequest($requestBody,$type=false)
+    public function sendHttpRequest($requestBody, $type = false)
     {
-        if($type == 'Resolution'){ //case 头部
+        if ($type == 'Resolution') { //case 头部
             $headers = $this->buildEbayResolutionHeaders();
-        }else{
+        } else {
             $headers = $this->buildEbayHeaders();
 
         }
@@ -1180,7 +1798,6 @@ class EbayAdapter implements AdapterInterface
         $time_end = $arr[0] . 'T' . $arr[1] . '.000Z';
         $arr = explode(' ', $time_begin);
         $time_begin = $arr[0] . 'T' . $arr[1] . '.000Z';
-
         $message_xml_dom = '<WarningLevel>High</WarningLevel>
                             <DetailLevel>ReturnSummary</DetailLevel>
                             <StartTime>' . $time_begin . '</StartTime>
@@ -1188,33 +1805,27 @@ class EbayAdapter implements AdapterInterface
         //2.获取消息
         $call = 'GetMyMessages';
         $message_ary =  $this->buildEbayBody($message_xml_dom,$call);
-
-
         $headers_count = $message_ary->Summary->TotalMessageCount;
         $headers_pages_count = ceil($headers_count / 100); //统计页数
-
         for($index = 1 ; $index <= $headers_pages_count ; $index ++){
             $content_xml_dom = '<WarningLevel>High</WarningLevel>
                                 <DetailLevel>ReturnHeaders</DetailLevel>
                                 <Pagination>
                                     <EntriesPerPage>100</EntriesPerPage>
                                     <PageNumber>' . $index . '</PageNumber>
-                                </Pagination>        
+                                </Pagination>
                                 <StartTime>' . $time_begin . '</StartTime>
                                 <EndTime>' . $time_end . '</EndTime>';
             $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
-
-
             if(isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message){
                     $member_xlm_dom = '
                                     <WarningLevel>High</WarningLevel>
                                     <DetailLevel>ReturnMessages</DetailLevel>
                                     <MessageIDs><MessageID>'.$message->MessageID.'</MessageID>
-                                    </MessageIDs>                    
+                                    </MessageIDs>
                                     ';
                     $content_detail = $this->buildEbayBody($member_xlm_dom,'GetMyMessages');
-
                     $message_lists[$order]['message_id'] = $message->MessageID;
                     $message_lists[$order]['from_name'] = $message->Sender;
                     $message_lists[$order]['from'] = $message->SendingUserID;
@@ -1226,21 +1837,18 @@ class EbayAdapter implements AdapterInterface
                     $message_lists[$order]['attachment'] = ''; //附件
                     $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
                     $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID, //应该是订单号
+                        'ItemID'            => (string)$message->ItemID, //应该是订单号
                         'ExternalMessageID' => (string)$message->ExternalMessageID,
                         'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+                    $message_lists[$order]['channel_order_number'] = (string)$message->ItemID;
                     $order += 1;
                 }
             }
-
         }
-
         return (!empty($message_lists)) ?  array_reverse($message_lists) : false;
-
     }
-
     public function createMemberMessageXML($page) {
         $this->input_str = '
                             <RequesterCredentials>
@@ -1256,11 +1864,9 @@ class EbayAdapter implements AdapterInterface
                             </Pagination>
         ';
     }
-
     public function sendMessages($replyMessage)
     {
         $message_obj = $replyMessage->message; //关联关系  获取用户邮件
-
         if(!empty($message_obj)){
             $fields = unserialize(base64_decode($message_obj->channel_message_fields)); //渠道特殊值
             //1.封装XML DOM
@@ -1276,18 +1882,14 @@ class EbayAdapter implements AdapterInterface
                               <ParentMessageID>' . $fields['ExternalMessageID'] . '</ParentMessageID>
                               <RecipientID>' . $message_obj->from_name . '</RecipientID>
                               </MemberMessage>';
-
             $content = $this->buildEbayBody($reply_xml_dom,'AddMemberMessageRTQ');
-
             return $content->Ack == 'Success' ? true : false;
         }
     }
-
     /**
      * 获取纠纷
      */
     public function getCases(){
-
         /**
          * status   先写死   所有状态都获取
          * time 写死 7天
@@ -1305,15 +1907,12 @@ class EbayAdapter implements AdapterInterface
                         <pageNumber>'.$page.'</pageNumber>
                      </paginationInput>
                      <sortOrder>CREATION_DATE_DESCENDING</sortOrder>';
-
         $usercases = $this->buildcaseBody($cases_xml,'getUserCases');
-
         if($usercases->ack == 'Success'){
-            
+
             foreach ($usercases->cases->caseSummary as $case){
                 $buyer = '';
                 $seller = '';
-
                 if((string)$case->user->role == 'SELLER'){
                     $seller = (string)$case->user->userId;
                 }
@@ -1352,17 +1951,14 @@ class EbayAdapter implements AdapterInterface
                     'account_id'      => $this->accountID,
                     'process_status'  => 'UNREAD'
                 ];
-
                 //获取case 详情	 获取EBP_INR，EBP_SNAD， RETURN三类的详情
-
                 $valid_type = ['EBP_INR','EBP_SNAD','RETURN'];
-
                 if(in_array($case->caseId->type,$valid_type)){
                     $case_detail_ary = [];
                     $content = '';
                     $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
                     if($case_detail->ack == 'Success'){
-                       // $transaction_id = ''; //paypal交易号
+                        // $transaction_id = ''; //paypal交易号
                         if($case_detail->caseDetail->responseHistory){
                             $detail = (array)$case_detail->caseDetail;
                             //dd($detail);
@@ -1377,8 +1973,7 @@ class EbayAdapter implements AdapterInterface
                                 }
                                 $content = base64_encode(serialize($content));
                             }
-                           // $transaction_id = isset($case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId) ? (string)$case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId : '';
-
+                            // $transaction_id = isset($case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId) ? (string)$case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId : '';
                         }
                         $case_detail_ary = [
                             'tran_price' => $case_detail->item->transactionPrice,
@@ -1400,21 +1995,18 @@ class EbayAdapter implements AdapterInterface
                     }else{
                         echo $case->caseId->id.'exist insert into ERP';
                     }
-
                 }
             }
         }
     }
-
     public function createCaseDetailXml($caseId,$caseType){
         return '<caseId>
-					<id>'.$caseId.'</id>
-					<type>'.$caseType.'</type>
-				</caseId>';
+                    <id>'.$caseId.'</id>
+                    <type>'.$caseType.'</type>
+                </caseId>';
     }
-
     /**
-     * 
+     *
      * 创建offerOtherSolution API发送的XML信息
      *
      * @param  [type] $caseArray [description]
@@ -1422,21 +2014,19 @@ class EbayAdapter implements AdapterInterface
      */
     public function createSolutionXml($caseArray){
         $this->input_str = '
-		<caseId>
-		<id>'.$caseArray['caseId'].'</id>
-		<type>'.$caseArray['caseType'].'</type>
-		</caseId>
-		<messageToBuyer>'.htmlspecialchars($caseArray['messageToBuyer']).'</messageToBuyer>
-		';
+        <caseId>
+        <id>'.$caseArray['caseId'].'</id>
+        <type>'.$caseArray['caseType'].'</type>
+        </caseId>
+        <messageToBuyer>'.htmlspecialchars($caseArray['messageToBuyer']).'</messageToBuyer>
+        ';
     }
-
     /**
      * 提供其他的解决方案      send a message
      * @param  [type] $caseArray [description]
      * @return [type]            [description]
      */
     public function offerOtherSolution($paramAry){
-
         $xml = $this->createSolutionXml($paramAry);
         $content = $this->buildcaseBody($xml,'offerOtherSolution');
         if($content->Ack =='Success' || $content->Ack == 'Warning'){
@@ -1444,27 +2034,24 @@ class EbayAdapter implements AdapterInterface
         }else{
             return false;
         }
-
     }
-
     /**
      * 创建跟踪号输入
      * @param unknown $caseArray
      */
     public function createTrackingXml($caseArray){
         $this->input_str = '
-			  <carrierUsed>'.$caseArray['carrierUsed'].'</carrierUsed>
-			  <caseId>
-			    <id>'.$caseArray['caseId'].'</id>
-			    <type>'.$caseArray['caseType'].'</type>
-			  </caseId>
-			  <trackingNumber>'.$caseArray['trackingNumber'].'</trackingNumber>
-			  ';
+              <carrierUsed>'.$caseArray['carrierUsed'].'</carrierUsed>
+              <caseId>
+                <id>'.$caseArray['caseId'].'</id>
+                <type>'.$caseArray['caseType'].'</type>
+              </caseId>
+              <trackingNumber>'.$caseArray['trackingNumber'].'</trackingNumber>
+              ';
         if ($caseArray['comments']) {
             $this->input_str .= '<comments>'.htmlspecialchars($caseArray['comments']).'</comments>';
         }
     }
-
     /**
      * 提供追踪信息
      */
@@ -1477,7 +2064,6 @@ class EbayAdapter implements AdapterInterface
             return false;
         }
     }
-
     /**
      * 提供发货信息
      */
@@ -1490,7 +2076,6 @@ class EbayAdapter implements AdapterInterface
             return false;
         }
     }
-
     /**
      * 创建发货相关的XML信息
      * @param unknown $array
@@ -1498,44 +2083,41 @@ class EbayAdapter implements AdapterInterface
     public function createShippingXml($array){
         $shippedDate = date('Y-m-d\TH:i:s.000\Z', strtotime($array['shippedDate']));
         $this->input_str = '
-			  <carrierUsed>'.$array['carrierUsed'].'</carrierUsed>
-			  <caseId>
-			    <id>'.$array['caseId'].'</id>
-			    <type>'.$array['caseType'].'</type>
-			  </caseId>
-			  <shippedDate>'.$shippedDate.'</shippedDate>';
+              <carrierUsed>'.$array['carrierUsed'].'</carrierUsed>
+              <caseId>
+                <id>'.$array['caseId'].'</id>
+                <type>'.$array['caseType'].'</type>
+              </caseId>
+              <shippedDate>'.$shippedDate.'</shippedDate>';
         if ($array['comments']) {
             $this->input_str .= '<comments>'.htmlspecialchars($array['comments']).'</comments>';
         }
     }
-
     /**
      * compact('item_id','buyer_id','itemids','title','content')
      * 订单列表 send ebay message
      */
     public function ebayOrderSendMessage($paramAry){
         $total = count($paramAry['itemids']);
-
         $ItemIDXML = ($total == 1) ? "<ItemID>$paramAry[itemids][0]</ItemID>" : '' ;
         $moreItem  = ($total > 1) ?  implode(',',$paramAry['itemids']) : '' ;
-        
+
         $xml ='<WarningLevel>High</WarningLevel>
                ' . $ItemIDXML . '
-		      <MemberMessage>
+              <MemberMessage>
                 <Subject>' . addslashes($paramAry['title']) . ' ' . addslashes($moreItem) . '</Subject>
                 <Body>' . addslashes($paramAry['content']) . '</Body>
                 <QuestionType>CustomizedSubject</QuestionType>
                 <RecipientID>' . addslashes($paramAry['buyer_id']) . '</RecipientID>
-		      </MemberMessage>';
+              </MemberMessage>';
         $result = $this->buildcaseBody($xml,'AddMemberMessageAAQToPartner');
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
             return true;
         }else{
             return false;
         }
-        
-    }
 
+    }
     /**
      * 修改ebay平台 unpaid case
      * compact('order_item_number','transcation_id')
@@ -1553,12 +2135,11 @@ class EbayAdapter implements AdapterInterface
             default:
                 break;
         }
-
         $xml = '
         	  <DisputeExplanation>' . $disputeExplanation . '</DisputeExplanation>
-			  <DisputeReason>' . $disputeReason . '</DisputeReason>
-			  <ItemID>'.$paramAry['order_item_number'].'</ItemID>
-			  <TransactionID>'.$paramAry['transcation_id'].'</TransactionID>
+              <DisputeReason>' . $disputeReason . '</DisputeReason>
+              <ItemID>'.$paramAry['order_item_number'].'</ItemID>
+              <TransactionID>'.$paramAry['transcation_id'].'</TransactionID>
         ';
         $result = $this->buildcaseBody($xml,'AddDispute');
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
@@ -1567,17 +2148,16 @@ class EbayAdapter implements AdapterInterface
             return false;
         }
     }
-
     /**
      * 全额退款操作
      *
      */
     public function caseFullRefund($paramAry){
         $xml = '<caseId>
-				    <id>'.$paramAry['caseId'].'</id>
-				    <type>'.$paramAry['caseType'].'</type>
-			    </caseId>
-			    ';
+                    <id>'.$paramAry['caseId'].'</id>
+                    <type>'.$paramAry['caseType'].'</type>
+                </caseId>
+                ';
         $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
         $result = $this->buildcaseBody($xml,'issueFullRefund');
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
@@ -1586,14 +2166,13 @@ class EbayAdapter implements AdapterInterface
             return false;
         }
     }
-
     public function casePartRefund($paramAry){
         $xml = '
         	      <amount>'.$paramAry['amount'].'</amount>
-				  <caseId>
-				    <id>'.$paramAry['caseId'].'</id>
-				    <type>EBP_SNAD</type>
-				  </caseId>
+                  <caseId>
+                    <id>'.$paramAry['caseId'].'</id>
+                    <type>EBP_SNAD</type>
+                  </caseId>
         ';
         $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
         $result = $this->buildcaseBody($xml,'issuePartialRefund');
@@ -1603,5 +2182,4 @@ class EbayAdapter implements AdapterInterface
             return false;
         }
     }
-
 }

@@ -93,7 +93,7 @@
         </div>
         <div class="form-group col-lg-3">
             <label for="qq">QQ</label>
-            <input class="form-control" id="email" placeholder="QQ" name='qq' value="{{ old('qq') }}">
+            <input class="form-control"  placeholder="QQ" name='qq' value="{{ old('qq') }}">
         </div>
     </div>
     <div class="row">
@@ -108,8 +108,8 @@
         <div class="form-group col-lg-4">
             <label for="level">供货商等级</label>
             <select name='level_id' class='form-control'>
-            @foreach($levels as $level)
-                <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $level->id ? 'selected' : '') : '' }}> {{$level->name}} </option>
+            @foreach(config('product.supplier.level') as $key => $level)
+                <option value="{{$key}}" {{ old('level_id') ? (old('level_id') == $key ? 'selected' : '') : '' }}> {{$level}} </option>
             @endforeach
             </select>
        </div>

@@ -35,12 +35,12 @@
             <img src="{{ asset('picture/post_logo.jpg') }}" style="width:140px;height:50px;"/>
             <span style="font-size:10px;">Small Packet By Air</span><br/>
             <span style="display:inline-block;width:55px;height:22px;border:2px solid #000;margin-left:40px;text-align:center;font-size:18px;font-weight:bold;">
-                {{ $model->country ? $model->country->cn_name : '' }}{{ '根据国家简码获取分拣编码' }}
+                {{ $model->country ? $model->country->code : '' }}{{ '编码' }}
             </span>
         </p>
         <p style="float:left;width:238px;height:90px;text-align:center;border-right:1px solid #000;">
             <span style="display:inline-block;margin-top:12px;margin-left:40px;">
-                <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3="/>
+                <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 {{ $model->tracking_no }}
             </span>
             <span style="font-weight:bold;font-size:11px;display:inline-block;">Untracked 平小包</span>
@@ -58,6 +58,10 @@
                 @if($model->warehouse)
                     @if($model->warehouse->name == '金华仓')
                         {{ '中邮金华仓' }}
+                    @elseif($model->warehouse->name == '南京仓')
+                        {{ '中邮南京仓' }}
+                    @elseif($model->warehouse->name == '广州仓')
+                        {{ '中邮广州仓' }}
                     @else
                         {{ '中邮深圳仓' }}
                     @endif
@@ -70,10 +74,10 @@
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
             {{ $model->shipping_city }}<br/>
             {{ $model->shipping_state }}<br/>
-            {{ $model->shipping_country . ' ' . $model->shipping_zipcode }}<br/>
+            {{ $model->country ? $model->country->name : '' . ' ' . $model->shipping_zipcode }}<br/>
             phone:{{ $model->shipping_phone }}&nbsp;&nbsp;&nbsp;
             <span style="font-size:16px;">{{ $model->country ? $model->country->cn_name : '' }}</span>
-            &nbsp;&nbsp;&nbsp;$allParamArr['country_Info']['zone']
+            &nbsp;&nbsp;&nbsp;{{ '分区' }}
         </p>
     </div>
     <table border="0" style="width:382px;height:110px;" cellspacing="0" cellpadding="0">
@@ -89,35 +93,23 @@
             </td>
         </tr>
         <tr style="font-size:12px;">
-            @if($model->items)
-                @foreach($model->items as $key => $item)
-                    @if($key == 0)
-                        <td width="70%" style="border-right:none;">$p['products_declared_en']</td>
-                        <td width="15%" style="border-right:none;">{{ $item->quantity * $item->item ? $item->item->weight : '' }}</td>
-                        <td width="15%">{{ $item->quantity * $item->item ? $item->item->purchase_price : '' }}</td>
-                    @endif
-                @endforeach
-            @endif
+            <td width="70%" style="border-right:none;">{{ $model->declared_en }}</td>
+            <td width="15%" style="border-right:none;">{{ $model->signal_weight }}</td>
+            <td width="15%">{{ $model->signal_price }}</td>
         </tr>
         <tr height="15" style="font-size:12px;">
             <td width="70%" style="border-right:none;font-size:12px;">
                 Totalg Gross Weight(kg)
             </td>
-            @if($model->items)
-                @foreach($model->items as $key => $item)
-                    @if($key == 0)
-                        <td width="15%" style="border-right:none;">{{ $item->quantity * $item->item ? $item->item->weight : '' }}</td>
-                        <td width="15%">{{ $item->quantity * $item->item ? $item->item->purchase_price : '' }}</td>
-                    @endif
-                @endforeach
-            @endif
+            <td width="15%" style="border-right:none;">{{ $model->total_weight }}</td>
+            <td width="15%">{{ $model->total_price }}</td>
         </tr>
         <tr height="55">
             <td colspan="3" style="border-bottom:1px solid #000;font-size:9px;">
                 I the undersigned,certify that the particulars given in this declaration are correct and this item
                 does not contain any dangerous articles prohibited by legislation or by postal or customers
                 regulations.<br/>
-                <span style="font-weight:bold;font-size:12px;">Sender\'s signiture& Data Signed :SLME</span>
+                <span style="font-weight:bold;font-size:12px;">Sender's signiture& Data Signed :SLME</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span style="font-weight:bold;display:inline-block;width:60px;line-height:15px;height:15px;font-size:14px;">
                 CN22
@@ -127,15 +119,9 @@
     </table>
     <div style="width:382px;height:40px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
         <span style="font-size:12px;font-weight:bold;">
-            【
-            @if($model->order)
-                @foreach($model->order->items as $item)
-                    {{ $item->sku }} * {{ $item->quantity }}
-                @endforeach
-            @endif
-            】
+            【{{ $model->logistics_id }}】
         </span>
-        $allParamArr['skuInfo']
+        {{ $model->sku_info }}
     </div>
 </div>
 </body>

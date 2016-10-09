@@ -15,8 +15,8 @@
             <tr style="height:50px;">
                 <td style="width:98mm;">
                     <p style="width:100px;font-size:22px;font-weight:bold;float:left;line-height:50px;margin-left:10px;">PRIORITY</p>
-                    <p style="float:right;height:50px;margin-right:7px;"><img src="'.site_url('attachments').'/images/hl-logo.jpg" style="height:50px;margin-top:5px;"></p>
-                    <p style="float:right;height:50px;margin-right:7px;"><img src="'.site_url('attachments').'/images/sf-logo.png" style="margin-top:5px;"></p>
+                    <p style="float:right;height:50px;margin-right:7px;"><img src="{{ asset('picture/hl-logo.jpg') }}" style="height:50px;margin-top:5px;"></p>
+                    <p style="float:right;height:50px;margin-right:7px;"><img src="{{ asset('picture/sf-logo.png') }}" style="margin-top:5px;"></p>
                 </td>
             </tr>
             <tr style="height:25px;line-height:12px;">
@@ -30,7 +30,7 @@
                     <div style="width:10mm;height:80px;line-height:80px;font-weight:bold;font-size:40px;float:left;margin-left:5px;">X</div>
                     <div style="height:80px;float:right;width:83mm;">
                         <p style="font-size:20px;font-weight:bold;margin-top:2px;">R</p>
-                        <P style="margin-top:5px;text-align:center;"><img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text='{{ $model->tracking_no }}'&f1=-1&f2=8&a1=&a2=B&a3=" ></P>
+                        <P style="margin-top:5px;text-align:center;"><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}"></P>
                         <p style="margin-top:5px;text-align:center;font-size:17px;font-weight:bold;">{{$model->tracking_no}}</p>
                     </div>
                 </td>
@@ -117,18 +117,18 @@
             </tr>
             <tr>
                 <td colspan="4" style="font-size:13px;line-height:13px;height:6mm">
-                    <p style="margin-top:5px;width:46mm;float:left;">Date and sender\'s signature </p>
+                    <p style="margin-top:5px;width:46mm;float:left;">Date and sender's signature </p>
                     <p style="margin-top:5px;border-bottom:2px dashed ;width:36mm;float:left;">{{ date('Y-m-d H:i:s') }}</p>
                     <p style="margin-top:5px;width:10mm;float:left;margin-left:10px;font-weight:bold;">SLME</p>
                 </td>
             </tr>
         </table>
         <div style="width:80mm;float:left;line-height:18px;">
-            <p style="width:80mm;text-align:center;margin-right:7px;"><img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text='{{ $model->tracking_no }}'&f1=-1&f2=8&a1=&a2=B&a3=" style="height:40px;margin-top:5px;"></p>
+            <p style="width:80mm;text-align:center;margin-right:7px;"><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height:40px;margin-top:5px;"></p>
             <p style="width:80mm;text-align:center;margin-right:7px;font-size:14px;">{{ $model->tracking_no }}</p>
 
         </div>
-        <div style="width:16mm;float:right;"><img src="'.site_url('attachments').'/images/start.png" style="width:16mm;"></div>
+        <div style="width:16mm;float:right;"><img src="{{ asset('picture/start.png') }}" style="width:16mm;"></div>
     </div>
     </body>
 </html>

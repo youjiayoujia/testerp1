@@ -6,7 +6,7 @@ namespace App\Modules\Channel\Adapter;
  * User: Vincent
  * Date: 16/5/17
  * Time: 下午2:54
- * modify:jiangdi 2016-6-27 11:13:39 增加获取亚马逊平台邮件 function
+ * modify:Norton 2016-6-27 11:13:39 增加获取亚马逊平台邮件 function
  */
 
 use App\Models\Channel\AccountModel;

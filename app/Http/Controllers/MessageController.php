@@ -1,6 +1,6 @@
 <?php
 /**
- * @modify jiangdi
+ * @modify Norton
  * @data 2016-6-20
  * @time 16:13:48
  */
@@ -21,6 +21,7 @@ use App\Modules\Channel\Adapter\WishAdapter;
 use App\Modules\Channel\Adapter\EbayAdapter;
 use App\Models\Message\SendEbayMessageListModel;
 use App\Models\Order\ItemModel;
+use App\Models\ChannelModel;
 
 
 class MessageController extends Controller
@@ -46,11 +47,12 @@ class MessageController extends Controller
         //$userarr=config('user.staff');
         $users=UserModel::all();
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model),
+            'metas'             => $this->metas(__FUNCTION__),
+            'data'              => $this->autoList($this->model,$this->model),
             'mixedSearchFields' => $this->model->mixed_search,
-            'channel_accounts' => Channel_account::all(),
-            'users' => $users,
+            'channel_accounts'  => Channel_account::all(),
+            'users'             => $users,
+            'channels'          => ChannelModel::All(),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -369,37 +371,20 @@ class MessageController extends Controller
      * ajax获取百度翻译
      */
     public function ajaxGetTranInfo(){
-        if(request()->ajax()){
+
             $content = request()->input('content');
             if(!empty($content)){
                 $result = Translation::translate($content);
             }else{
                 $result = false;
             }
-            if(isset($result['trans_result'][0]['dst'])){
-                echo json_encode(['content'=>$result['trans_result'][0]['dst'],'status'=>config('status.ajax.success')]);
-            }else{
+       // echo json_encode(['content'=>'翻译结果','status'=>config('status.ajax.success')]);exit;
+        if(isset($result['error_code'])){
                 echo json_encode(['status'=>config('status.ajax.fail')]);
+            }else{
+                echo json_encode(['content'=>$result['trans_result'][0]['dst'],'status'=>config('status.ajax.success')]);
             }
-
-        }
     }
-
-
-
-
-/*    public function testbaidu(){
-        $text =$_POST['info'];
-        $baidu = new Mybaidu_transapi();
-        $result =  $baidu->translate($text);
-        if(isset($result['trans_result'][0]['dst'])){
-            ajax_return($result['trans_result'][0]['dst'],1);
-        }else{
-            ajax_return('',2);
-        }
-
-    }*/
-
     /**
      * 速卖通批量留言（订单留言）
      */

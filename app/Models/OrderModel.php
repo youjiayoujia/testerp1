@@ -217,6 +217,11 @@ class OrderModel extends BaseModel
         ];
     }
 
+    public function unpaidOrder()
+    {
+        return $this->belongsTo('App\Models\Order\UnpaidOrderModel', 'by_id', 'ordernum');
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
@@ -284,7 +289,7 @@ class OrderModel extends BaseModel
     public function getStatusNameAttribute()
     {
         $config = config('order.status');
-        return $config[$this->status];
+        return isset($config[$this->status]) ? $config[$this->status] : '';
     }
 
     public function getStatusColorAttribute()
@@ -359,7 +364,7 @@ class OrderModel extends BaseModel
     {
         $total = 0;
         foreach ($this->items as $item) {
-            $total += $item->item->cost * $item->item->quantity;
+            $total += $item->item->purchase_price * $item->quantity;
         }
         return $total;
     }
@@ -416,7 +421,20 @@ class OrderModel extends BaseModel
                 }
             }
             $data['customer_id'] = request()->user()->id;
-            return RefundModel::create($data);
+            $refund = new RefundModel;
+            $refund_new=$refund->create($data);
+            if ($data['type'] == 'FULL') {
+                foreach ($data['arr']['id'] as $fullid) {
+                    $orderItem = $this->items->find($fullid);
+                    $orderItem->update(['refund_id' => $refund_new->id]);
+                }
+            }else{
+                foreach ($data['tribute_id'] as $partid) {
+                    $orderItem = $this->items->find($partid);
+                    $orderItem->update(['refund_id' => $refund_new->id]);
+                }
+            }
+            return;
         }
         return 1;
     }
@@ -429,12 +447,11 @@ class OrderModel extends BaseModel
             $blacklist = BlacklistModel::where('zipcode', $this['shipping_zipcode'])->where('name', $name);
         } else {
             $blacklist = BlacklistModel::where('email', $this['email']);
-
         }
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
             foreach ($blacklist->get() as $value) {
-                if ($value['type'] == 'CONFIRMED') {
+                if ($value->type == 'CONFIRMED') {
                     return true;
                 }
             }
@@ -459,11 +476,11 @@ class OrderModel extends BaseModel
                     $orderItem['item_id'] = $item->id;
                 }
             }
-            // if (!isset($orderItem['item_id'])) {
-            //     $orderItem['item_id'] = 0;
-            //     $order->update(['status' => 'REVIEW']);
-            //     $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
-            // }
+            if (!isset($orderItem['item_id'])) {
+                $orderItem['item_id'] = 0;
+                $order->update(['status' => 'REVIEW']);
+                $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
+            }
             $order->items()->create($orderItem);
         }
         if($order->status == 'COMPLETE' && $order->fulfill_by == 'AFN') {
@@ -592,12 +609,11 @@ class OrderModel extends BaseModel
      */
     public function calculateProfitProcess()
     {
-        $orderItems = $this->items;
         $orderAmount = $this->amount;
         $orderCosting = $this->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee();
-        $orderRate = ($this->amount - ($orderCosting + $this->calculateOrderChannelFee() + $this->logistics_fee)) / $this->amount;
-        if ($this->status != 'CANCLE' && $orderRate <= 0) {
+        $orderRate = ($this->amount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $this->amount;
+        if ($this->status != 'CANCEL' && $orderRate <= 0) {
             //利润率为负撤销0
             $this->OrderCancle();
         }
@@ -617,35 +633,19 @@ class OrderModel extends BaseModel
         $sum = 0;
         $orderItems = $this->items;
         $channel = $this->channel;
-        if ($channel->flat_rate == 'channel' && $channel->rate == 'channel') {
-            return ($this->amount + $this->logistics_fee) * $channel->rate_value + $channel->flat_rate_value;
-        }
-        if ($channel->flat_rate == 'channel' && $channel->rate == 'catalog') {
-            $sum += $channel->flat_rate_value;
-            foreach ($orderItems as $orderItem) {
-                $rate = $orderItem->item->catalog->channels->first()->pivot->rate;
-                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate;
-                $sum += $tmp;
-            }
-            return $sum;
-        }
-        if ($channel->flat_rate == 'catalog' && $channel->rate == 'channel') {
-            $sum = ($this->amount + $this->logistics_fee) * $channel->rate_value;
-            foreach ($orderItems as $orderItem) {
-                $flat_rate_value = $orderItem->item->catalog->channels->first()->pivot->flat_rate_value;
-                $sum += $flat_rate_value;
-            }
-            return $sum;
-        }
-        if ($channel->flat_rate == 'catalog' && $channel->rate == 'catalog') {
-            foreach ($orderItems as $orderItem) {
-                $buf = $orderItem->item->catalog->channels->first()->pivot;
-                $flat_rate_value = $buf->flat_rate_value;
-                $rate_value = $buf->rate_value;
+        foreach ($orderItems as $orderItem) {
+            $buf = $orderItem->item->catalog->channels->where('id', $this->channelAccount->catalog_rates_channel_id)->first();
+            if($buf) {
+                $buf = $buf->pivot;
+                $flat_rate_value = $buf->flat_rate;
+                $rate_value = $buf->rate;
                 $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
+            } else {
+                return 0;
             }
-            return $sum;
         }
+        
+        return $sum;
     }
 
     /**
@@ -658,19 +658,21 @@ class OrderModel extends BaseModel
     public function OrderCancle()
     {
         $orderItems = $this->items;
-        $this->update(['status' => 'CANCLE']);
+        $this->update(['status' => 'CANCEL']);
         foreach ($orderItems as $orderItem) {
             $orderItem->update(['is_active' => '0']);
         }
         $packages = $this->packages;
         foreach ($packages as $package) {
-            $package->update(['status' => 'CANCLE']);
             foreach ($package->items as $packageItem) {
                 $item = $packageItem->item;
-                $item->in($packageItem->warehouse_position_id, $packageItem->quantity,
-                    $packageItem->quantity * $item->cost, 'PACKAGE_CANCLE', '',
-                    ('订单号:' . $this->ordernum . ' 包裹号:' . $package->id));
+                if(!in_array($package->status, ['NEW', 'WAITASSIGN', 'NEED', 'SHIPPED', 'PACKED'])) {
+                    $item->unhold($packageItem->warehouse_position_id, $packageItem->quantity,
+                         'CANCEL');
+                }
+                $packageItem->delete();
             }
+            $package->delete();
         }
     }
 
@@ -690,6 +692,17 @@ class OrderModel extends BaseModel
         }else{
             return false;
         }
+    }
+
+    public function getOrderReamrksAttribute(){
+        $remarks = '';
+        if(!$this->remarks->isEmpty()){
+            foreach ($this->remarks as $remark){
+                $remarks .= empty($remarks) ? $remark->remark : $remark->remark.';';
+
+            }
+        }
+        return $remarks;
     }
 
 }

@@ -23,6 +23,7 @@ use App\Models\Stock\AllotmentLogisticsModel;
 use App\Models\Stock\InOutModel;
 use Tool;
 use App\Models\LogisticsModel;
+use App\Models\UserModel;
 
 class AllotmentController extends Controller
 {
@@ -85,6 +86,7 @@ class AllotmentController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.item_id')));
+        $name = UserModel::find(request()->user()->id)->name;
         $buf = request()->all();
         $obj = $this->model->create($buf);
         for($i=0; $i<$len; $i++)
@@ -101,6 +103,9 @@ class AllotmentController extends Controller
             $item = ItemModel::find($buf['item_id']);
             $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ALLOTMENT', $obj->id);
         }
+        $to = $this->model->find($obj->id);
+        $to = base64_encode(serialize($to));
+        $this->eventLog($name, '新增调拨记录,id='.$obj->id, $to);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
@@ -160,6 +165,8 @@ class AllotmentController extends Controller
         $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $model->allotmentforms;
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_encode(serialize($model));
         foreach($obj as $key => $value) {
             $item = ItemModel::find($value->item_id);
             $item->unhold($value->warehouse_position_id, $value->quantity, 'ALLOTMENT', $model->id);
@@ -188,6 +195,8 @@ class AllotmentController extends Controller
             $item = ItemModel::find($value->item_id);
             $item->hold($value->warehouse_position_id, $value->quantity, 'ALLOTMENT', $model->id);
         }
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '调拨记录更新,id='.$model->id, $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
@@ -225,14 +234,18 @@ class AllotmentController extends Controller
     {
         $model = $this->model->find($id);
         $arr = request()->all();
-        $time = date('Y-m-d',time());       
+        $time = date('Y-m-d',time());    
+        $name = UserModel::find(request()->user()->id)->name;   
         if($arr['result'] == 0) {
             $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]);
+            $to = base64_encode(serialize($model));
+            $this->eventLog($name, '审核未通过', $to, $to);
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核已拒绝...'));
         }
         $time = date('Y-m-d',time());       
         $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]); 
-
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '审核通过', $to, $to);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
     }
 
@@ -268,6 +281,7 @@ class AllotmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $name = UserModel::find(request()->user()->id)->name; 
         $arr = request()->all();
         $arr['allotment_id'] = $id;
         DB::beginTransaction();
@@ -287,7 +301,8 @@ class AllotmentController extends Controller
             DB::rollback();
         }
         DB::commit();
-
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '确认出库', $to, $to);
         return redirect($this->mainIndex);
     }
 
@@ -299,7 +314,11 @@ class AllotmentController extends Controller
      */
     public function allotmentOver($id)
     {
-        $this->model->find($id)->update(['allotment_status'=>'over']);
+        $model = $this->model->find($id);
+        $model->update(['allotment_status'=>'over']);
+        $name = UserModel::find(request()->user()->id)->name; 
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '强制结束调拨单', $to, $to);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '强制结束调拨单成功'));
     }
@@ -334,8 +353,12 @@ class AllotmentController extends Controller
     {
         if(request()->ajax()) {
             $id = request()->input('id');
-            $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'0', 'check_time'=>'0000-00-00',
+            $model = $this->model->find($id);
+            $model->update(['allotment_status'=>'new', 'check_status'=>'0', 'check_time'=>'0000-00-00',
                 'check_by'=>request()->user()->id]);
+            $name = UserModel::find(request()->user()->id)->name; 
+            $to = base64_encode(serialize($model));
+            $this->eventLog($name, '重置信息', $to, $to);
             return json_encode('111');
         }
 
@@ -371,6 +394,7 @@ class AllotmentController extends Controller
     public function allotmentpick($id)
     {
         $model = $this->model->find($id);
+        $name = UserModel::find(request()->user()->id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -383,6 +407,8 @@ class AllotmentController extends Controller
             'model' => $model,
             'allotmentforms' => $allotmentforms,
         ];
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '打印拣货单', $to, $to);
         
         return view($this->viewPath.'printAllotment', $response);
     }
@@ -429,6 +455,9 @@ class AllotmentController extends Controller
 
         $arr = request()->all();
         $this->model->find($id)->update(['checkform_by'=>request()->user()->id]);
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_encode(serialize($this->model->find($id)));
+
         $obj = $this->model->find($id)->allotmentforms;
         DB::beginTransaction();
         try {
@@ -483,7 +512,9 @@ class AllotmentController extends Controller
             DB::rollback();
         }
         DB::commit();
-      
+        $to = base64_encode(serialize($this->model->find($id)));
+        $this->eventLog($name, '对单', $to, $from);
+
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '对单成功'));
     }
 }

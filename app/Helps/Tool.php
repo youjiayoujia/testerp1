@@ -307,6 +307,28 @@ class Tool
 
     }
 
+    /** 设置新的后缀
+     * @param $sku
+     * @param $suffix
+     * @return string
+     */
+    public function getNewEbaySku($sku,$suffix='')
+    {
+        $tmpSku = explode('+', $sku);
+        $returnSku = array();
+        foreach ($tmpSku as $k => $sku) {
+            if (stripos($sku, '[') !== false) {
+                $sku = preg_replace('/\[.*\]/', '', $sku);
+            }
+            if ($suffix != '') {
+                $returnSku[] = $sku . '[' . $suffix . ']';
+            } else {
+                $returnSku[] = $sku;
+            }
+        }
+        return implode('+', $returnSku);
+    }
+
     //先base64解码，再反序列化
     public function unserializeBase64Decode($data){
         $array = unserialize(base64_decode($data));//先base64解码，再反序列化

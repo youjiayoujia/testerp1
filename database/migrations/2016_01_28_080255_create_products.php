@@ -18,6 +18,7 @@ class CreateProducts extends Migration
             $table->integer('spu_id')->comment('spu_id')->nullable()->default(0);
             $table->string('name')->comment('英文名')->nullable()->default(NUll);
             $table->string('c_name')->comment('中文名')->nullable()->default(NUll);
+            $table->string('competition_url')->comment('competition_url')->nullable()->default(NUll);
             $table->string('alias_name')->comment('别名英文')->nullable()->default(NULL);
             $table->string('alias_cname')->comment('别名中文')->nullable()->default(NUll);
             $table->integer('catalog_id')->comment('分类id')->nullable()->default(0);
@@ -32,7 +33,8 @@ class CreateProducts extends Migration
             $table->decimal('purchase_price',8,2)->comment('采购价')->nullable()->default(0);
             $table->decimal('purchase_carriage',6,2)->comment('运费')->nullable()->default(0);
             $table->string('product_size')->comment('产品尺寸')->nullable()->default(NUll);
-            $table->integer('warehouse_id')->comment('仓库')->default(0);
+            $table->integer('warehouse_id')->comment('仓库')->default(1);
+            $table->integer('warehouse_position')->comment('仓库')->default(0);
             $table->string('quality_standard')->comment('质检标准')->nullable()->default(NUll);
             $table->string('carriage_limit')->comment('运费限制')->nullable()->default(NULL);
             $table->string('package_limit')->comment('物流限制')->nullable()->default(NULL);
@@ -53,6 +55,7 @@ class CreateProducts extends Migration
             $table->string('size_description')->comment('尺码描述')->nullable()->default(NULL);
             $table->string('description')->comment('描述')->nullable()->default(NULL);
             $table->decimal('weight',5,2)->comment('重量')->nullable()->default(0);
+            $table->decimal('package_weight',5,2)->comment('包装后重量')->nullable()->default(0);
             $table->string('url1')->comment('url1')->default(NULL);
             $table->string('url2')->comment('url2')->default(NULL);
             $table->string('url3')->comment('url3')->default(NULL);

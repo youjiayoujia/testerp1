@@ -163,14 +163,26 @@ class WishPublishController extends Controller
                     foreach ($post["extra_images"] as $key => $image) {
                         $post["extra_images"][$key] = $this->replaceDomainPictures($image, $channel_accounts->image_domain);
                     }
+                    $wish_product['extra_images'] = implode('|', $post["extra_images"]);
                 }
-
-
             }
 
+            //var_dump($post['arr']['sku']);exit; autoRemovePerfix
+            if(isset($post['check_repeat'])){
+                $check_sku  = [];
+                foreach($post['arr']['sku'] as $key=> $sku){
+                    $erp_sku =$this->autoRemovePerfix($sku,$channel_accounts->wish_sku_resolve);
+                    $check_sku[] = $erp_sku;
+                }
 
-            $wish_product['extra_images'] = implode('|', $post["extra_images"]);
-
+                $is_repeat =  $this->wishProductDetail->where(['account_id'=>$channel_accounts->id,'enabled'=>1])->whereIn('erp_sku',$check_sku)->first();
+                if(!empty($is_repeat)){
+                    $result[$k]['id'] = '';
+                    $result[$k]['account'] = $accountInfo[intval($account)];
+                    $result[$k]['info'] = '检查测到该账号该SKU已经存在上架广告'.$is_repeat->productID;
+                    continue;
+                }
+            }
             foreach ($post['arr']['sku'] as $key => $variant) {
 
                 //autoFillSuffix
@@ -533,6 +545,12 @@ class WishPublishController extends Controller
 
     }
 
+    /** 自动填充后缀
+     * @param $sku
+     * @param $suffix
+     * @param $type
+     * @return string
+     */
     function autoFillSuffix($sku, $suffix, $type)
     {
         $retrunSku = [];
@@ -545,6 +563,36 @@ class WishPublishController extends Controller
                 $retrunSku[] = $v;
             } else {
                 $retrunSku[] = $v . $suffix;
+            }
+        }
+
+        return implode('+', $retrunSku);
+    }
+
+    /**去除前缀
+     * @param $sku
+     * @param $suffix
+     * @param $type
+     * @return string
+     */
+    function autoRemovePerfix($sku, $type){
+        $retrunSku = [];
+        if (stripos($sku, '[') !== false) { //先去除【】
+            $sku = preg_replace('/\[.*\]/', '', $sku);
+        }
+        $sku = explode('+', $sku);
+        foreach ($sku as $v) {
+            if ($type == 2) { //特殊处理
+
+                $prePart = substr($v, 0, 1);
+                $suffPart = substr($v, 4);
+                $v = $prePart . $suffPart;
+                $retrunSku[] = $v;
+            } else {
+
+                $tmpErpSku = explode('*', $v);
+                $i = count($tmpErpSku) - 1;
+                $retrunSku[] = $tmpErpSku[$i];
             }
         }
 

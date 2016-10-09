@@ -14,7 +14,10 @@
        <div style="font-weight:bold; font-size:2.5mm; text-align:center; width:190px;">
          {{$model->productItem->c_name}}
        </div> 
-       <?php echo Tool::barcodePrint($model->sku,$type = 'C128', $width = '3', $height='33') ?><br /> <span style="font-size:10px;">{{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]</span> </td> 
+        <div>
+            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
+        </div>
+       <br /> <span style="font-size:10px;">{{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]</span> </td> 
      </tr> 
     </tbody>
    </table> 
@@ -24,7 +27,7 @@
     break;   
     case 'small':
 ?>
-<body>
+<body onLoad="printpage_zzjs()">
     <div style="width:100%;height:29mm;margin-bottom:2px;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
@@ -37,7 +40,10 @@
                     <div style="font-weight:bold; font-size:2.5mm; line-height:4mm; text-align:center; width:100%; white-space: normal; word-break: break-all; word-wrap: break-word;">
                         {{$model->productItem->c_name}}
                     </div>
-                    <?php echo Tool::barcodePrint($model->sku) ?>
+                    <div>
+                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
+                    </div>
+                    
                     <br />
                     <span style="font-size:10px;">
                         {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]
@@ -60,8 +66,10 @@
                             <span style="font-size:4mm;">
                             </span>
                         </b>
+                        <div>
+                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'26' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.19' ])}}">
+                        </div>
                         
-                        <?php echo Tool::barcodePrint($model->sku) ?>
                         <br />
                         <div style="font-weight:bold; font-size:2.8mm; text-align:center; width:40mm;">
                             {{$model->sku}}
@@ -88,8 +96,10 @@
                         <div style="font-weight:bold; font-size:2mm; text-align:left; width:190px;">
                            {{$model->productItem->c_name}}
                         </div>
-                        
-                        <?php echo Tool::barcodePrint($model->sku) ?>
+                        <div>
+                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
+                        </div>
+                        <?php //echo Tool::barcodePrint($model->sku) ?>
                         <br />
                         <span style="font-size:8px;">
                             {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]
@@ -101,3 +111,7 @@
     </body>
     <?php break;} ?>   
 </html>
+
+<script type="text/javascript">
+    window.onload = function(){window.print();}
+</script>

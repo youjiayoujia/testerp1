@@ -35,6 +35,11 @@
                    data-url="{{ route('unpaidOrder.destroy', ['id' => $unpaidOrder->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $unpaidOrder->table }}" data-id="{{$unpaidOrder->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

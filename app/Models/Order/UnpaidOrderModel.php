@@ -12,11 +12,11 @@ use App\Base\BaseModel;
 
 class UnpaidOrderModel extends BaseModel
 {
-    protected $table = 'order_unpaids';
+    public $table = 'order_unpaids';
 
     public $searchFields = ['ordernum' => '订单号'];
 
-    protected $fillable = [
+    public $fillable = [
         'id',
         'ordernum',
         'remark',

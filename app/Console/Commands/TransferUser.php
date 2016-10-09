@@ -59,7 +59,6 @@ class TransferUser extends Command
                     $exist->update($cd);
                     $updatedNum++;
                 } else {
-                    $cd['id'] = $smCd->id;
                     UserModel::create($cd);
                     $createdNum++;
                 }

@@ -96,6 +96,7 @@ class UserController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $data = request()->all();
+        
         if(array_key_exists('user_role', $data)){
             $model->role()->sync($data['user_role']);
         }

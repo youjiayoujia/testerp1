@@ -18,12 +18,12 @@
     <th class="text-center">EbaySku</th>
     <th class="text-center">物品名称</th>
     <th class="text-center">Local</th>
-    <th class="text-center">刊登时间</th>
+    <th class="sort text-center" data-field="start_time">刊登时间</th>
     <th class="text-center">刊登人</th>
     <th class="text-center">是否在线</th>
-    <th class="text-center sort" data-field="start_price">价格</th>
+    <th class="sort text-center" data-field="start_price">价格</th>
     <th class="text-center">运费</th>
-    <th class="text-center">销量</th>
+    <th class="sort text-center" data-field="quantity_sold">销量</th>
     <th class="text-center">在线数量</th>
     <th class="text-center">PayPal</th>
     <th class="text-center">处理天数</th>
@@ -154,6 +154,10 @@
                 ids += checkbox[i].value + ",";
             }
             ids = ids.substr(0, (ids.length) - 1);
+            if(ids==''){
+                alert("请先勾选");
+                return false;
+            }
             var url = "{{ route('ebay.productBatchEdit') }}";
             window.location.href = url + "?ids=" + ids + "&param=" + param;
         });

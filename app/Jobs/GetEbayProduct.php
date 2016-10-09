@@ -12,6 +12,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
 use App\Models\Publish\Ebay\EbayPublishProductDetailModel;
 use App\Models\Publish\Ebay\EbaySellerCodeModel;
+use App\Models\ItemModel;
 
 class GetEbayProduct extends Job implements SelfHandling, ShouldQueue
 {
@@ -46,6 +47,7 @@ class GetEbayProduct extends Job implements SelfHandling, ShouldQueue
         $account = AccountModel::find($this->account_id);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getProductDetail($this->item_id);
+        //echo $this->item_id;
         $EbaySellerCode = new EbaySellerCodeModel();
         $sellerIdInfo = $EbaySellerCode->getAllEbayCode();
         if($result){
@@ -67,6 +69,12 @@ class GetEbayProduct extends Job implements SelfHandling, ShouldQueue
                         $sell_code = Tool::getSellCode($sku['sku']);
                         $sku['seller_id'] = isset($sellerIdInfo[$sell_code])?$sellerIdInfo[$sell_code]:'';
                         $sku['erp_sku'] = Tool::getErpSkuBySku($sku['sku']);
+                        $erp_item = ItemModel::where('sku',$sku['erp_sku'])->first();
+                        if(!empty($erp_item)){
+                            $sku['product_id'] =$erp_item->id;
+                        }else{
+                            $sku['product_id'] = 0;
+                        }
                         $sku['update_time'] = date('Y-m-d H:i:s');
                         EbayPublishProductDetailModel::create($sku);
                     }
@@ -76,11 +84,18 @@ class GetEbayProduct extends Job implements SelfHandling, ShouldQueue
                 EbayPublishProductDetailModel::where('item_id',$this->item_id)->update(array('status'=>0));
                 foreach($sku_info as $sku){
                     $sku['publish_id'] = $is_has->id;
-                    $sku['product_id'] = 0;//暂设0
+
                     $sku['status'] = 1;
                     $sell_code = Tool::getSellCode($sku['sku']);
                     $sku['seller_id'] = isset($sellerIdInfo[$sell_code])?$sellerIdInfo[$sell_code]:'';
                     $sku['erp_sku'] = Tool::getErpSkuBySku($sku['sku']);
+                    $erp_item = ItemModel::where('sku',$sku['erp_sku'])->first();
+                    var_dump($erp_item);
+                    if(!empty($erp_item)){
+                        $sku['product_id'] =$erp_item->id;
+                    }else{
+                        $sku['product_id'] = 0;
+                    }
                     $sku['update_time'] = date('Y-m-d H:i:s');
                     $is_has_sku = EbayPublishProductDetailModel::where(['item_id'=>$this->item_id,'sku'=>$sku['sku']])->first();
                     if(empty($is_has_sku)){

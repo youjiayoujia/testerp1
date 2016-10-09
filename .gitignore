@@ -16,6 +16,9 @@ public/uploads
 #ENV
 .env
 
+#COMPOSER
+composer.lock
+
 #Hook
 public/hook
 ~

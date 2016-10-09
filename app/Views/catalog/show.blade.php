@@ -9,8 +9,11 @@
             <div class="col-lg-3">
                 <strong>品类名称</strong>: {{ $model->all_name }}
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-2">
                 <strong>品类前缀</strong>: {{ $model->code }}
+            </div>
+            <div class="col-lg-2">
+                <strong>所属分类</strong>: {{ $model->CatalogCategoryName }}
             </div>
             <div class="col-lg-3">
                 <strong>创建时间</strong>: {{ $model->created_at }}

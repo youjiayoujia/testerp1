@@ -52,7 +52,7 @@ class AccountModel extends BaseModel
     }
     public function catalogChannel()
     {
-        return $this->belongsTo('App\Models\channel\CatalogRatesModel', 'catalog_rates_channel_id', 'id');
+        return $this->belongsTo('App\Models\Channel\CatalogRatesModel', 'catalog_rates_channel_id', 'id');
     }
 
     public function country()

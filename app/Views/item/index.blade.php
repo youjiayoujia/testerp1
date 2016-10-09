@@ -48,7 +48,11 @@
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
-            <td><img src="{{ asset($item->product->dimage) }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;"></td>
+            <td>
+                <img src="{{ asset($item->product->dimage) }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;">
+                <br><br>
+                <div style='text-align:center' ><a href='' data-toggle="modal" data-target="#imgModal_{{$item->id}}">[{{count($item->product->shape)}}]<a></div>
+            </td>
             <td>{{ $item->c_name }}<br>物品分类：{{ $item->product->catalog?$item->product->catalog->all_name:'' }}<br>
                                     开发时间：{{ $item->created_at }}<br>
                                     【包装方式：<br>

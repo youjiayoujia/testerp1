@@ -25,12 +25,12 @@ class CatalogCategoryModel extends BaseModel{
 
     protected $rules = [
         'create' => [
-            'cn_name' => 'required',
-            'en_name' => 'required',
+            'cn_name' => 'required|unique:catalog_category,cn_name',
+            'en_name' => 'required|unique:catalog_category,en_name',
         ],
         'update' => [
-            'cn_name' => 'required',
-            'en_name' => 'required',
+            'cn_name' => 'required|unique:catalog_category,cn_name',
+            'en_name' => 'required|unique:catalog_category,en_name',
         ]
     ];
     protected $searchFields = [];

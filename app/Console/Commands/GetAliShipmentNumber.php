@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Modules\Paypal\Alibaba;
+use App\Models\Purchase\PurchasePostageModel;
+use App\Models\Purchase\PurchaseOrderModel;
 
 class GetAliShipmentNumber extends Command
 {
@@ -28,6 +31,8 @@ class GetAliShipmentNumber extends Command
     public function __construct()
     {
         parent::__construct();
+
+        
         echo 123;
     }
 

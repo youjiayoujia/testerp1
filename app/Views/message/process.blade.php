@@ -47,7 +47,8 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('.btn-translation').click(function(){
-                text =changeSome($(this).attr('need-translation-content'),1);
+                text        = changeSome($(this).attr('need-translation-content'),1);
+                content_key = $(this).attr('content-key');
 
                 $.ajax({
                     url: "{{route('ajaxGetTranInfo')}}",
@@ -57,16 +58,9 @@
                     success: function (data) {
 
                         if(data.content){
-                            $('.btn-translation').prev().show().addClass('alert-success');
-                            $('.btn-translation').prev().children('.content').text(data.content);
-                            $('.btn-translation').hide();
+                            $('#content-'+content_key).text(data.content);
                         }else{
-                            console.log(data.content);
-
-                            $(this).prev().show().addClass('alert-danger');
-                            $(this).prev().children('.content').text('翻译失败');
-                            $(this).hide();
-
+                            $('#content-'+content_key).text('翻译失败');
                         }
                     }
                 });

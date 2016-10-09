@@ -378,26 +378,13 @@ class MessageController extends Controller
             }else{
                 $result = false;
             }
-        echo json_encode(['content'=>'翻译结果','status'=>config('status.ajax.success')]);exit;
+       // echo json_encode(['content'=>'翻译结果','status'=>config('status.ajax.success')]);exit;
         if(isset($result['error_code'])){
                 echo json_encode(['status'=>config('status.ajax.fail')]);
             }else{
                 echo json_encode(['content'=>$result['trans_result'][0]['dst'],'status'=>config('status.ajax.success')]);
             }
     }
-
-/*    public function testbaidu(){
-        $text =$_POST['info'];
-        $baidu = new Mybaidu_transapi();
-        $result =  $baidu->translate($text);
-        if(isset($result['trans_result'][0]['dst'])){
-            ajax_return($result['trans_result'][0]['dst'],1);
-        }else{
-            ajax_return('',2);
-        }
-
-    }*/
-
     /**
      * 速卖通批量留言（订单留言）
      */

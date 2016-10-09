@@ -19,18 +19,13 @@
                 <label for="name">所属分类</label>
                 <select class="form-control" name="catalog_category_id">
                     @foreach($catalogCategory as $item)
-                        <option value="{{$item->id}}">{{$item->cn_name}}</option>
+                        <option value="{{$item->id}}" @if($model->catalog_category_id) selected @endif>{{$item->cn_name}}</option>
                     @endforeach
                 </select>
             </div>
 
         </div>
         </div>
-
-
-
-
-
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>

@@ -284,6 +284,11 @@
                     <a href="{{ route('order.show', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 查看
                     </a>
+                    <button class="btn btn-primary btn-xs dialog"
+                            data-toggle="modal"
+                            data-target="#dialog" data-table="{{ $order->table }}" data-id="{{$order->id}}">
+                        <span class="glyphicon glyphicon-road"></span>
+                    </button>
                 </div>
             </td>
         </tr>

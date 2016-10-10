@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Modules\Alibaba\Alibaba;
+use App\Models\Purchase\PurchasePostageModel;
+use App\Models\Purchase\PurchaseOrderModel;
 
 class GetAliShipmentNumber extends Command
 {
@@ -28,7 +31,6 @@ class GetAliShipmentNumber extends Command
     public function __construct()
     {
         parent::__construct();
-        echo 123;
     }
 
     /**
@@ -39,5 +41,15 @@ class GetAliShipmentNumber extends Command
     public function handle()
     {
         //
+        $ali =  new Alibaba();
+        $postages = PurchasePostageModel::where('purchase_order_id','<>','')->where('post_coding','=',Null)->get();
+        foreach ($postages as $postage){
+            if(!empty($postage->purchaseOrder->post_coding)){ //外部单号
+
+
+                dd($postage->purchaseOrder->post_coding);
+            }
+        }
+
     }
 }

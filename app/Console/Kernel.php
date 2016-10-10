@@ -44,6 +44,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetEbayCases::class,
         \App\Console\Commands\GetAliexpressIssues::class,
         \App\Console\Commands\getSellmoreSuppliers::class,
+        \App\Console\Commands\GetAliShipmentNumber::class,
     ];
     /**
      * Define the application's command schedule.

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUsersTable extends Migration
+class CreateCatalogCategoryTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,15 +12,13 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('catalog_category', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->tinyInteger('is_available')->default(1);
-            $table->string('password', 60);
-            $table->rememberToken();
+            $table->string('cn_name')->comment('一级品类分类中文名');
+            $table->string('en_name')->comment('一级品类分类中文名');
             $table->timestamps();
-            $table->softDeletes();
+            $table->softdeletes();
+
         });
     }
 
@@ -31,6 +29,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('users');
+        Schema::drop('catalog_category');
     }
 }

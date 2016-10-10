@@ -82,13 +82,73 @@ class ItemController extends Controller
      */
     public function update($id)
     {
+        $data = request()->all();
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
-        $model->updateItem(request()->all());
+        $model->updateItem($data);
+
+        $data['products_with_battery'] = 0;
+        $data['products_with_adapter'] = 0;
+        $data['products_with_fluid'] = 0;
+        $data['products_with_powder'] = 0;
+        if(array_key_exists('carriage_limit_arr', $data)){
+            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
+                $brr[] = $logistics_limits_id;         
+            }
+            $model->product->logisticsLimit()->sync($brr);
+            //回传旧系统
+            if(in_array('1', $data['carriage_limit_arr']))$data['products_with_battery'] = 1;
+            if(in_array('4', $data['carriage_limit_arr']))$data['products_with_adapter'] = 1;
+            if(in_array('5', $data['carriage_limit_arr']))$data['products_with_fluid'] = 1;
+            if(in_array('2', $data['carriage_limit_arr']))$data['products_with_powder'] = 1;
+        }
+
+        if(array_key_exists('package_limit_arr', $data)){
+            foreach($data['package_limit_arr'] as $wrap_limits_id){
+                $arr[] = $wrap_limits_id;         
+            }
+            $model->product->wrapLimit()->sync($arr);
+        }
+
+        //回传老系统
+        $old_data['products_name_en'] = $model->name;
+        $old_data['products_name_cn'] = $model->c_name;
+        $old_data['products_sku'] = $model->sku;
+        $old_data['products_sort'] = $model->product->catalog?$model->product->catalog->name:'异常';
+        $old_data['products_declared_en'] = $model->product->declared_en;
+        $old_data['products_declared_cn'] = $model->product->declared_cn;
+        $old_data['products_value'] = $model->purchase_price;
+        $old_data['products_weight'] = $model->weight;
+        $old_data['weightWithPacket'] = $model->package_weight;
+        $old_data['products_suppliers_id'] = $model->supplier_id;
+        $old_data['products_check_standard'] = $model->quality_standard;
+
+        $old_data['product_warehouse_id'] = $model->warehouse_id;
+        $old_data['products_location'] = $model->warehouse_position;
+        $old_data['products_more_img'] = $model->purchase_url;
+
+        $old_data['products_with_battery'] = $data['products_with_battery'];
+        $old_data['products_with_adapter'] = $data['products_with_adapter'];
+        $old_data['products_with_fluid'] = $data['products_with_fluid'];
+        $old_data['products_with_powder'] = $data['products_with_powder'];
+        $old_data['productsPhotoStandard'] = $model->product->competition_url;
+        $old_data['products_remark_2'] = $model->product->notify;
+        $old_data['productsLastModify '] = $model->updated_at->format('Y-m-d H:i:s');
+        $old_data['dev_uid'] = $model->product->spu->developer;
+        $old_data['type'] = 'edit';
+
+        $url="http://120.24.100.157:60/api/products.php";
+        $c = curl_init(); 
+        curl_setopt($c, CURLOPT_URL, $url); 
+        curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
+        $buf = curl_exec($c);
         return redirect($this->mainIndex);
     }
 

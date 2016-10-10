@@ -10,8 +10,22 @@
         <input class="form-control" id="name" placeholder="English Name" name='name' value="{{old('name')}}">
     </div>
     <div class="form-group">
-        <label for="name">前缀</label>
-        <input class="form-control" id="code" placeholder="前缀" name='code' value="{{old('code')}}">
+        <div class="row">
+            <div class="col-lg-6">
+                <label for="name">前缀</label>
+                <input class="form-control" id="code" placeholder="前缀" name='code' value="{{old('code')}}">
+            </div>
+            <div class="col-lg-6">
+                <label for="name">分类</label>
+                <select class="form-control" name="catalog_category_id">
+                    @foreach($catalogCategory as $item)
+                        <option value="{{$item->id}}">{{$item->cn_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>

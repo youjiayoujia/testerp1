@@ -5,6 +5,7 @@
  * Date: 2016/10/9
  * Time: 16:32
  */
+namespace App\Modules\Alibaba;
 class Alibaba {
     public $app_key='1023183';
 
@@ -23,4 +24,5 @@ class Alibaba {
      *生成阿里接口访问地址及参数
      */
     public function getRequestUrl(){}
+
 }

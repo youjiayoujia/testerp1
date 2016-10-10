@@ -34,7 +34,7 @@ class AccountModel extends BaseModel
             'channel_id' => 'required',
             'operator_id' => 'required',
             'customer_service_id' => 'required',
-            'catalog_rates_cahnnel_id' => 'required',
+            'catalog_rates_channel_id' => 'required',
         ],
         'update' => [
             'account' => 'required|unique:channel_accounts,account,{id}',

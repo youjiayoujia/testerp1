@@ -7,6 +7,13 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="name" placeholder="用户姓名" name='name' value="{{ old('name') }}">
         </div>
+        <div class="form-group col-lg-4">
+            <label for="name" class='control-label'>是否启用</label>
+            <div>
+                <input type='radio' name='is_available' value='0' >禁用
+                <input type='radio' name='is_available' value='1' checked>启用
+            </div>                   
+        </div>
     </div>
     <div class="row">
         <div class="form-group col-lg-6">

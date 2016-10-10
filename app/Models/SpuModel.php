@@ -59,6 +59,11 @@ class SpuModel extends BaseModel
         return $this->hasMany('App\Models\Spu\SpuMultiOptionModel', 'spu_id');
     }
 
+    public function productRequire()
+    {
+        return $this->hasMany('App\Models\Product\RequireModel', 'product_require_id');
+    }
+
     /**
      * 更新多渠道多语言信息
      * 2016年6月3日10:43:18 YJ

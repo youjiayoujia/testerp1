@@ -262,6 +262,6 @@ abstract class Controller extends BaseController
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $model->destroy($id);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功.') );
     }
 }

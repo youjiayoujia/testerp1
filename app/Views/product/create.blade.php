@@ -134,8 +134,12 @@
             </select>
         </div>
         <div class="form-group col-md-2">
-            <label for="size">产品重量(kg)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="size">重量(kg)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') }}">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="size">包装后重量(kg)</label>
+            <input class="form-control" id="package_weight" placeholder="包装后重量" name='package_weight' value="{{ old('package_weight') }}">
         </div>
         
     </div>

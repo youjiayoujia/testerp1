@@ -70,8 +70,9 @@ class getSellmoreSuppliers extends Command
                     }
                     $insert = [
                         'id'              => $value->suppliers_id,
-                        'company'         => $value->suppliers_company,
+                        'name'            => $value->suppliers_company,
                         'address'         => $value->suppliers_address,
+                        'company'         => $value->suppliers_company,
                         'contact_name'    => $value->suppliers_name,
                         'telephone'       => $value->suppliers_mobile,
                         'official_url'    => $value->suppliers_website,

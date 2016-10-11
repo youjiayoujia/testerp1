@@ -64,7 +64,7 @@ class ItemController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'suppliers' => $this->supplier->all(),
+            //'suppliers' => $this->supplier->all(),
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'wrapLimit' => $this->wrapLimit->all(),
             'logisticsLimit' => $this->logisticsLimit->all(),

@@ -215,7 +215,7 @@
                 <a href="{{ route('item.show', ['id'=>$item->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 查看
                 </a>
-                <a href="{{ route('item.edit', ['id'=>11]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('item.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">

@@ -207,21 +207,22 @@ class SpuController extends Controller
 
     public function uploadSku()
     {
-
+        set_time_limit(0);
         $file = request()->file('upload');
         $path = config('setting.excelPath');
         !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
         $data_array = '';
         $result = false;
+        //echo '<pre>';
         Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
             $reader->noHeading();
             $data_array = $reader->all()->toArray();
-            echo '<pre>';
-            //print_r($data_array);exit;
+            
             foreach ($data_array as $key => $value) {
                 if($key==0)continue;
                 //print_r($value);exit;
+                if(count(ItemModel::where('sku',$value['3'])->get()))continue;
                 if($value['15']!=''){
                     $position['warehouse_id'] = $value['14']==1000?'1':'2';
                     $position['name'] = $value['15'];
@@ -233,10 +234,17 @@ class SpuController extends Controller
                 
                 $spuData['spu'] = $value['1'];
                 //创建spu
-                $spuModel = $this->model->create($spuData);
+                if(count(SpuModel::where('spu',$value['1'])->get())){
+                    $spu_id = SpuModel::where('spu',$value['1'])->get()->toArray()[0]['id'];
+                    //print_r($spu_id);exit;
+                }else{
+                    $spuModel = $this->model->create($spuData);
+                    $spu_id = $spuModel->id;
+                }
+                
 
                 $productData['model'] = $value['2'];
-                $productData['spu_id'] = $spuModel->id;
+                $productData['spu_id'] = $spu_id;
                 $productData['name'] = $value['5'];
                 $productData['c_name'] = $value['4'];
                 $catalog_id = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
@@ -256,9 +264,14 @@ class SpuController extends Controller
                 $productData['width'] = $value['17'];
                 $productData['length'] = $value['16'];
                 //创建model
-                $productModel = ProductModel::create($productData);
+                if(count(ProductModel::where('model',$value['2'])->get())){
+                    $product_id = ProductModel::where('model',$value['2'])->get()->toArray()[0]['id'];
+                }else{
+                    $productModel = ProductModel::create($productData);
+                    $product_id = $productModel->id;
+                }
 
-                $skuData['product_id'] = $productModel->id;
+                $skuData['product_id'] = $product_id;
                 $skuData['catalog_id'] = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
                 $skuData['sku'] = $value['3'];
                 $skuData['name'] = $value['5'];
@@ -287,6 +300,7 @@ class SpuController extends Controller
                     $arr['supplier_id'] = $_supplier_id;
                     $itemModel->skuPrepareSupplier()->attach($arr);
                 }
+
                 
             }
         },'gb2312');        

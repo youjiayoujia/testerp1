@@ -119,6 +119,11 @@ class ItemModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'item_id');
     }
 
+    public function skuPrepareSupplier()
+    {
+        return $this->belongsToMany('App\Models\Product\SupplierModel', 'item_prepare_suppliers', 'item_id','supplier_id')->withTimestamps();
+    }
+
     public function updateItem($data)
     {
         $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',', $data['carriage_limit_arr']);

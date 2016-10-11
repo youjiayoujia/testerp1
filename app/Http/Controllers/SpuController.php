@@ -269,6 +269,8 @@ class SpuController extends Controller
                 }else{
                     $productModel = ProductModel::create($productData);
                     $product_id = $productModel->id;
+                    $wrr['wrap_limits_id'] = $value['39'];
+                    $productModel->wrapLimit()->attach($wrr);
                 }
 
                 $skuData['product_id'] = $product_id;

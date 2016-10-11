@@ -19,7 +19,7 @@
             <td>{{ $unpaidOrder->remark . ' ' . $unpaidOrder->note }}</td>
             <td>{{ $unpaidOrder->date }}</td>
             <td>{{ $unpaidOrder->channel->name }}</td>
-            <td>{{ $unpaidOrder->user->name }}</td>
+            <td>{{ $unpaidOrder->user ? $unpaidOrder->user->name : '' }}</td>
             <td>{{ $unpaidOrder->status_name }}</td>
             <td>{{ $unpaidOrder->updated_at }}</td>
             <td>{{ $unpaidOrder->created_at }}</td>

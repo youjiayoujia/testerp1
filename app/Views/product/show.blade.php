@@ -77,7 +77,7 @@
         <div class="panel-heading">供应商信息:</div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>主供应商</strong>: {{ $model->supplier->name }}
+                <strong>主供应商</strong>: {{ $model->supplier?$model->supplier->name:'' }}
             </div>
             <div class="col-lg-3">
                 <strong>销售链接</strong>: <a href="http://{{ $model->product_sale_url }}" target="_blank">{{ $model->product_sale_url }}</a>
@@ -108,7 +108,7 @@
                 <strong>辅供应商sku</strong>:{{ $model->second_supplier_sku }}
             </div>
             <div class="col-lg-3">
-                <strong>仓库</strong>: {{ $warehouse->name }}
+                <strong>仓库</strong>: 
             </div>
         </div>
     </div>

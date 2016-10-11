@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('APP_QUEUE', 'redis'),
+    'default' => env('APP_QUEUE', 'database'),
 
     /*
     |--------------------------------------------------------------------------

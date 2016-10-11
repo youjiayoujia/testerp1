@@ -134,6 +134,7 @@ class OrderController extends Controller
         $data['priority'] = 0;
         $data['package_times'] = 0;
         $this->model->createOrder($data);
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($this->model->createOrder($data))));
 
         return redirect($this->mainIndex);
     }
@@ -289,6 +290,8 @@ class OrderController extends Controller
     public function refundUpdate($id)
     {
         $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -298,6 +301,8 @@ class OrderController extends Controller
         $data['channel_id'] = $model->channel_id;
         $data['account_id'] = $model->channel_account_id;
         $model->refundCreate($data, request()->file('image'));
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '退款新增,id='.$id, $to, $from);
         return redirect($this->mainIndex);
     }
 
@@ -322,6 +327,8 @@ class OrderController extends Controller
     public function update($id)
     {
         request()->flash();
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($this->model->find($id)));
         $this->validate(request(), $this->model->updateRule(request()));
         $data = request()->all();
         $data['status'] = 'REVIEW';
@@ -365,6 +372,9 @@ class OrderController extends Controller
         $job = new DoPackages($this->model->find($id));
         $job->onQueue('doPackages');
         $this->dispatch($job);
+
+        $to = base64_encode(serialize($this->model->find($id)));
+        $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
 
         return redirect($this->mainIndex);
     }
@@ -471,7 +481,11 @@ class OrderController extends Controller
     public function updateStatus()
     {
         $order_id = request()->input('order_id');
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($this->model->find($order_id)));
         $this->model->find($order_id)->update(['status' => 'PREPARED']);
+        $to = base64_encode(serialize($this->model->find($order_id)));
+        $this->eventLog($userName->name, '审核更新,id='.$order_id, $to, $from);
 
         return 1;
     }
@@ -480,7 +494,11 @@ class OrderController extends Controller
     public function updatePrepared()
     {
         $order_id = request()->input('order_id');
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($this->model->find($order_id)));
         $this->model->find($order_id)->update(['active' => 'STOP']);
+        $to = base64_encode(serialize($this->model->find($order_id)));
+        $this->eventLog($userName->name, '暂停发货更新,id='.$order_id, $to, $from);
 
         return 1;
     }
@@ -489,7 +507,11 @@ class OrderController extends Controller
     public function updateNormal()
     {
         $order_id = request()->input('order_id');
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($this->model->find($order_id)));
         $this->model->find($order_id)->update(['active' => 'NORMAL']);
+        $to = base64_encode(serialize($this->model->find($order_id)));
+        $this->eventLog($userName->name, '恢复正常更新,id='.$order_id, $to, $from);
 
         return 1;
     }
@@ -498,7 +520,11 @@ class OrderController extends Controller
     public function updateRecover()
     {
         $order_id = request()->input('order_id');
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($this->model->find($order_id)));
         $this->model->find($order_id)->update(['status' => 'REVIEW']);
+        $to = base64_encode(serialize($this->model->find($order_id)));
+        $this->eventLog($userName->name, '恢复订单更新,id='.$order_id, $to, $from);
 
         return 1;
     }
@@ -510,12 +536,16 @@ class OrderController extends Controller
      */
     public function withdrawAll()
     {
+        $userName = UserModel::find(request()->user()->id);
         $order_ids = request()->input('order_ids');
         $order_ids_arr = explode(',', $order_ids);
         $data = request()->all();
         foreach($order_ids_arr as $id) {
             if($this->model->find($id)) {
+                $from = base64_encode(serialize($this->model->find($id)));
                 $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
+                $to = base64_encode(serialize($this->model->find($id)));
+                $this->eventLog($userName->name, '批量撤单新增,id='.$id, $to, $from);
             }
             if($this->model->find($id)->packages) {
                 foreach($this->model->find($id)->packages as $package) {
@@ -528,6 +558,8 @@ class OrderController extends Controller
 
     public function withdrawUpdate($id)
     {
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($this->model->find($id)));
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
@@ -536,6 +568,8 @@ class OrderController extends Controller
                 $package->delete();
             }
         }
+        $to = base64_encode(serialize($this->model->find($id)));
+        $this->eventLog($userName->name, '撤单新增,id='.$id, $to, $from);
 
         return redirect($this->mainIndex);
     }

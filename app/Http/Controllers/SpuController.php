@@ -39,7 +39,7 @@ class SpuController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->with('Purchase','editUser','imageEdit','Developer')),
             'num_arr' =>$num_arr,
             'users' => UserModel::all(),
             'mixedSearchFields' => $this->model->mixed_search,
@@ -157,7 +157,7 @@ class SpuController extends Controller
     }
 
     /**
-     * 批量更新
+     * 
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View

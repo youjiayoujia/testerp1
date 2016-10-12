@@ -65,7 +65,7 @@ class Kernel extends ConsoleKernel
                     break;
                case 'aliexpress':
                    foreach ($channel->accounts as $account) {
-                       $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');;
+                       $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
                    }
                    break;
                 case 'wish':

@@ -55,7 +55,7 @@ class ProductController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->find($requireModel->catalog_id),
-            'suppliers' => $this->supplier->all(),
+            //'suppliers' => $this->supplier->all(),
             'wrapLimit' => $this->wrapLimit->all(),
             'data' =>$data,
             'require_id' =>$require_id,
@@ -127,7 +127,7 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'product' => $product,
-            'suppliers' => $this->supplier->all(),
+            //'suppliers' => $this->supplier->all(),
             'features_input' => array_values($product->featureTextValues->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,

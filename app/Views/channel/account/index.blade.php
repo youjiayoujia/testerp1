@@ -41,8 +41,8 @@
     <th>客服人员</th>
     <th>客服邮箱地址</th>
     <th>状态</th>
-    <th>状态</th>
     <th>地域渠道名</th>
+    <th>创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop

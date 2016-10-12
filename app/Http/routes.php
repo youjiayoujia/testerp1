@@ -698,8 +698,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('ebayProduct','Publish\Ebay\EbayDataMonitorController');
 
 
-    Route::resource('ebaySellerCode','Publish\ebay\EbaySellerCodeController');
-    Route::resource('ebayTiming','Publish\ebay\EbayTimingSetController');
+    Route::resource('ebaySellerCode','Publish\Ebay\EbaySellerCodeController');
+    Route::resource('ebayTiming','Publish\Ebay\EbayTimingSetController');
 
     Route::any('ebayOnline/batchUpdate', ['uses' => 'Publish\Ebay\EbayOnlineController@batchUpdate', 'as' => 'ebayOnline.batchUpdate']);
     Route::any('ebayOnline/productBatchEdit', ['uses' => 'Publish\Ebay\EbayOnlineController@productBatchEdit', 'as' => 'ebayOnline.productBatchEdit']);
@@ -709,7 +709,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('ebayOnline','Publish\Ebay\EbayOnlineController');
 
 
-    Route::get('ebayPublish/ajaxuggestCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxSuggestCategory', 'as' => 'ebayPublish.ajaxSuggestCategory']);
+    Route::get('ebayPublish/ajaxSuggestCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxSuggestCategory', 'as' => 'ebayPublish.ajaxSuggestCategory']);
     Route::get('ebayPublish/ajaxSetDataTemplate', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxSetDataTemplate', 'as' => 'ebayPublish.ajaxSetDataTemplate']);
     Route::get('ebayPublish/ajaxInitErpData', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitErpData', 'as' => 'ebayPublish.ajaxInitErpData']);
     Route::get('ebayPublish/ajaxInitCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitCategory', 'as' => 'ebayPublish.ajaxInitCategory']);
@@ -877,6 +877,21 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@batchUpdate', 'as' => 'lazada.batchUpdate']);
     
     Route::resource('lazada', 'Publish\Lazada\LazadaOnlineMonitorController');
+	//joom Online Monitor
+    Route::resource('joomonline', 'Publish\Joom\JoomOnlineMonitorController');
+    Route::post('joomonline/setSellerinventory',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setSellerinventory', 'as' => 'joomonline.setSellerinventory']);
+    Route::post('joomonline/setPrice',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setPrice', 'as' => 'joomonline.setPrice']);
+    Route::post('joomonline/setshipping',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setshipping', 'as' => 'joomonline.setshipping']);
+    Route::get('setstatus',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setstatus', 'as' => 'joomonline.setstatus']);
+    Route::get('productBatchEdit',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@productBatchEdit', 'as' => 'joomonline.productBatchEdit']);
+    Route::any('batchUpdate',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@batchUpdate', 'as' => 'joomonline.batchUpdate']);
+
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
@@ -1022,6 +1037,7 @@ Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
 Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
 Route::any('getSmtIssue',['uses'=> 'TestController@getSmtIssue']);
-
+Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);
+Route::any('joomOrdersList', ['uses' => 'TestController@joomOrdersList']);
 
 

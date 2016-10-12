@@ -34,7 +34,7 @@ class AccountModel extends BaseModel
             'channel_id' => 'required',
             'operator_id' => 'required',
             'customer_service_id' => 'required',
-            'catalog_rates_cahnnel_id' => 'required',
+            'catalog_rates_channel_id' => 'required',
         ],
         'update' => [
             'account' => 'required|unique:channel_accounts,account,{id}',
@@ -52,7 +52,7 @@ class AccountModel extends BaseModel
     }
     public function catalogChannel()
     {
-        return $this->belongsTo('App\Models\channel\CatalogRatesModel', 'catalog_rates_channel_id', 'id');
+        return $this->belongsTo('App\Models\Channel\CatalogRatesModel', 'catalog_rates_channel_id', 'id');
     }
 
     public function country()
@@ -188,6 +188,19 @@ class AccountModel extends BaseModel
                     'cd_currency_type_cn' => $this->cd_currency_type_cn,
                     'cd_currency_type' => $this->cd_currency_type,
                     'cd_expires_in' => $this->cd_expires_in,
+                ];
+                break;
+			case 'joom':
+                $config = [
+                    'publish_code' => $this->joom_publish_code,
+                    'client_id' => $this->joom_client_id,
+                    'client_secret' => $this->joom_client_secret,
+                    'redirect_uri' => $this->joom_redirect_uri,
+                    'refresh_token' => $this->joom_refresh_token,
+                    'access_token' => $this->joom_access_token,
+                    'expiry_time' => $this->joom_expiry_time,
+                    'proxy_address' => $this->joom_proxy_address,
+                    'sku_resolve' => $this->joom_sku_resolve,
                 ];
                 break;
         }

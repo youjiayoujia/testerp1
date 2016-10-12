@@ -22,7 +22,7 @@ return [
         'subnavigations' => [
             '产品管理' => [
                 [
-                    'name' => '品类一级分类',
+                    'name' => '分类',
                     'url' => 'CatalogCategory.index',
                     'icon' => '',
                 ],
@@ -538,6 +538,11 @@ return [
                     'url' => 'lazada.index',
                     'icon' => '',
                 ],
+				[
+                'name' => 'Joom数量监控',
+                'url' => 'joomonline.index',
+                'icon' => '',
+            ],
             ]
         ]
     ],

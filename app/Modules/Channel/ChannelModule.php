@@ -14,6 +14,7 @@ use App\Modules\Channel\Adapter\LazadaAdapter;
 use App\Modules\Channel\Adapter\WishAdapter;
 use App\Modules\Channel\Adapter\EbayAdapter;
 use App\Modules\Channel\Adapter\CdiscountAdapter;
+use App\Modules\Channel\Adapter\JoomAdapter;
 
 class ChannelModule
 {
@@ -66,5 +67,9 @@ class ChannelModule
     public function createCdiscountDriver($config)
     {
         return new CdiscountAdapter($config);
+    }
+	public function createJoomDriver($config)
+    {
+        return new JoomAdapter($config);
     }
 }

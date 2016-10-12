@@ -9,7 +9,7 @@ return [
         'trySale' => '试销',
         'unSellTemp' => '货源待定',
         'notFound' => '未找到',
-        'clearaceSale' => '清库存',
+        'cleaning' => '清库存',
     ],
     //是否激活
     'is_available' => [

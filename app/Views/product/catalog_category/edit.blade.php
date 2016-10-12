@@ -6,12 +6,12 @@
     <div class="row">    
         <div class="form-group col-md-3">
             <label for="color">中文名称</label>
-            <input class="form-control"  placeholder="中文名称" name='cn_name' value="{{ old('cn_name') ?  old('declared_cn') : $model->cn_name }}">
+            <input class="form-control"  placeholder="中文名称" name='cn_name' value="{{ old('cn_name') ?  old('cn_name') : $model->cn_name }}">
         </div>
         
         <div class="form-group col-md-3">
             <label for="color">英文名称</label>
-            <input class="form-control"  placeholder="英文名称" name='en_name' value="{{ old('en_name') ?  old('declared_en') : $model->en_name }}">
+            <input class="form-control"  placeholder="英文名称" name='en_name' value="{{ old('en_name') ?  old('en_name') : $model->en_name }}">
         </div>
     </div>
 @stop

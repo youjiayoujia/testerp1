@@ -78,6 +78,13 @@ class TakingController extends Controller
         return view($this->viewPath.'edit', $response);
     }
 
+    /**
+     *  跳转盘点调整页面
+     *
+     *  @param $id 盘点单id
+     *  @return view
+     *
+     */
     public function takingAdjustmentShow($id)
     {
         $model = $this->model->find($id);
@@ -171,6 +178,7 @@ class TakingController extends Controller
         DB::table('stock_taking_forms')->where('stock_taking_id', $model->id)->delete();
         $model->delete();
         Cache::store('file')->forever('stockIOStatus', 1);
+        exec('supervisorctl start laravel-queue-assignStocks');
 
         return redirect($this->mainIndex);
     }
@@ -252,10 +260,12 @@ class TakingController extends Controller
             }
             $model->update(['check_by'=>request()->user()->id, 'check_status'=>'2', 'check_time'=>date('Y-m-d h:m:s', time())]);
             Cache::store('file')->forever('stockIOStatus', '1');
+            exec('supervisorctl start laravel-queue-assignStocks');
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '审核已通过'));
         } else {
             $model->update(['check_by'=>request()->user()->id, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
             Cache::store('file')->forever('stockIOStatus', '1');
+            exec('supervisorctl start laravel-queue-assignStocks');
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核未通过'));
         }
     }

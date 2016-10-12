@@ -70,7 +70,8 @@ class ImageController extends Controller
         $data['tag'] = explode(',', substr($data['image_type'],0, strlen($data['image_type'])-1));
         $data['uploadType'] = 'image';
         $path = $this->model->imageCreate($data, request()->files);    
-        echo json_encode($path);
+        
+        return $path;
     }
 
     /**

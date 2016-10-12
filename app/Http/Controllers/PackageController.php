@@ -37,6 +37,13 @@ class PackageController extends Controller
         $this->middleware('StockIOStatus');
     }
 
+    /**
+     *  将包裹need放到匹配队列中 
+     *
+     *  @param none
+     *  @return redirect
+     *
+     */
     public function putNeedQueue()
     {
         $len = 1000;
@@ -142,6 +149,13 @@ class PackageController extends Controller
         return view($this->viewPath . 'logisticsDelivery', $response);
     }
 
+    /**
+     *  批量修改包裹物流方式 
+     *
+     *  @param $arr  packageId数组    $id     物流id
+     *  @return redirect
+     *
+     */
     public function changeLogistics($arr, $id) 
     {
         $arr = explode(',', $arr);
@@ -163,6 +177,13 @@ class PackageController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 批量删除包裹 
+     *
+     *  @param $array  packageId
+     *  @return redirect
+     *
+     */
     public function removePackages($arr)
     {
         $arr = explode(',', $arr);
@@ -186,6 +207,13 @@ class PackageController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 批量清空物流方式 
+     *
+     *  @param arr packageId 数组
+     *  @return redirect
+     *
+     */
     public function removeLogistics($arr) 
     {
         $arr = explode(',', $arr);

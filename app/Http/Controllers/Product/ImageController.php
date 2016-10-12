@@ -164,19 +164,6 @@ class ImageController extends Controller
         ];
         return view($this->viewPath . 'spucreate', $response);
     }
-
-    /**
-     * 删除
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function imagelable()
-    {
-        echo 111;exit;
-    }
-
-
 }
 
 

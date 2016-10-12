@@ -3,7 +3,7 @@
  * 数据模板控制器
  * 处理仓库相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 15/12/18
  * Time: 15:22pm
  */
@@ -190,6 +190,13 @@ class ExportPackageController extends Controller
         return view($this->viewPath.'exportPackageView', $response);
     }
 
+    /**
+     *  导出包裹数据信息 
+     *
+     *  @param none
+     *  @return excel
+     *
+     */
     public function exportPackageDetail()
     {
         if(!request()->hasFile('accordingTracking')) {

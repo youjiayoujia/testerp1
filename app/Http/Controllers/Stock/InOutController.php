@@ -28,6 +28,13 @@ class InOutController extends Controller
         $this->viewPath = 'stock.inout.';
     }
 
+    /**
+     *  跳转导出库存数据页面 
+     *
+     *  @param none
+     *  @return view
+     *
+     */
     public function export()
     {
         $response = [
@@ -39,6 +46,13 @@ class InOutController extends Controller
         return view($this->viewPath.'export', $response);
     }
 
+    /**
+     *  导出出入库记录 
+     *
+     *  @param none
+     *  @return excel
+     *
+     */
     public function exportResult()
     {
         $query = $this->model;

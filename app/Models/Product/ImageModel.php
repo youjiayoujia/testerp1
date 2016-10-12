@@ -96,6 +96,7 @@ class ImageModel extends BaseModel
      */
     public function imageCreate($data, $files = null)
     {
+        var_dump($data);exit;
         $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['is_link'] . '/';
         $disk = Storage::disk('product');
         switch ($data['uploadType']) {

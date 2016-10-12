@@ -157,7 +157,7 @@ class SpuController extends Controller
     }
 
     /**
-     * 批量更新
+     * 
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View

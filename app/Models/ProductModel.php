@@ -740,7 +740,7 @@ class ProductModel extends BaseModel
                     break;
 
                 case 'normal':
-                    $data[$key] = 6;
+                    $data[$key] = 3;
                     break;
             }
         }

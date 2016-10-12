@@ -233,7 +233,7 @@ class StockController extends Controller
             $job = new StockTaking();
             $job = $job->onQueue('stockTaking');
             $this->dispatch($job);
-            system('supervisorctl stop laravel-queue-assignStocks');
+            exec('supervisorctl stop laravel-queue-assignStocks');
         }
         
         return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '已加入队列'));

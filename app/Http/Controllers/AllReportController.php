@@ -1,11 +1,10 @@
 <?php
 /**
- * 渠道控制器
+ * 包裹信息报表
  *
  * 2016-01-04
- * @author: Vincent<nyewon@gmail.com>
+ * @author: MC<178069409>
  */
-
 namespace App\Http\Controllers;
 
 use App\Models\Package\AllReportModel;
@@ -21,6 +20,13 @@ class AllReportController extends Controller
         $this->viewPath = 'package.allReport.';
     }
 
+    /**
+     *  生成数据 
+     *
+     *  @param none
+     *  @return view
+     *
+     */
     public function createData()
     {
         $allByWarehouseId = PackageModel::where('created_at', '>', date('Y-m-d', strtotime('now')))->get()
@@ -91,6 +97,13 @@ class AllReportController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     *  主页显示 
+     *
+     *  @param none
+     *  @return view
+     *
+     */
     public function packageReport()
     {
         $model = $this->model->orderBy('day_time', 'desc')->first();

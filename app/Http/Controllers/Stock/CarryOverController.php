@@ -50,6 +50,13 @@ class CarryOverController extends Controller
         return view($this->viewPath . 'show', $response);
     }
 
+    /**
+     *  跳转结转页面
+     *
+     *  @param none
+     *  @return view
+     *
+     */
     public function createCarryOver(){
         $response = [
             'metas' => $this->metas(__FUNCTION__, '月结'),
@@ -58,6 +65,13 @@ class CarryOverController extends Controller
         return view($this->viewPath.'month', $response);
     }
 
+    /**
+     *  将结转任务抛队列 
+     *
+     *  @param none
+     *  @return view
+     *
+     */
     public function CreateCarryOverResult()
     {
         $tmp_timestamp = strtotime(request('stockTime'));
@@ -67,6 +81,13 @@ class CarryOverController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '库存结转成功加入队列'));
     }
 
+    /**
+     *  查看库存 
+     *
+     *  @param none
+     *  @return view
+     *
+     */
     public function showStock()
     {
         $response = [
@@ -76,6 +97,13 @@ class CarryOverController extends Controller
         return view($this->viewPath.'showStock', $response);
     }
 
+    /**
+     *  将库存数据导出 
+     *
+     *  @param none
+     *  @return excel
+     *
+     */
     public function showStockView()
     {
         set_time_limit(0);

@@ -1,7 +1,7 @@
 <?php
 /**
  * 通关报关控制器
- * @author: tupgu
+ * @author: MC <178069409>
  * Date: 2016-1-4 10:46:32
  */
 namespace App\Http\Controllers;
@@ -38,6 +38,13 @@ class CustomsClearanceController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    /**
+     * index页面 
+     * 
+     *  @param none
+     *  @return view
+     *
+     */
     public function bao3index()
     {
         request()->flash();
@@ -205,8 +212,6 @@ class CustomsClearanceController extends Controller
             return view($this->viewPath.'uploadOverResult', $response);
         }
     }
-
-
 
     public function uploadProduct()
     {

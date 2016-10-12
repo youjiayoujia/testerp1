@@ -1,9 +1,9 @@
 <?php
 /**
  * 库存调拨控制器
- * 处理库存调整相关的Request与Response
+ * 处理库存调拨相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 15/1/11
  * Time: 11:09
  */

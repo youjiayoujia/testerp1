@@ -593,7 +593,7 @@ class ProductModel extends BaseModel
             $old_data['products_create_time'] = $itemModel->created_at->format('Y-m-d H:i:s');
             $old_data['dev_uid'] = $itemModel->product->spu->product_require_id;
             $old_data['type'] = 'add';
-            $old_data['products_title'] = $temp['title'];
+            $old_data['products_title'] = '';
             //回传老系统
             $url="http://120.24.100.157:60/api/products.php";
             $c = curl_init(); 

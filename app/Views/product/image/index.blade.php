@@ -14,7 +14,7 @@
         <tr>
             <td>{{ $image->id }}</td>
             <td><img src="{{ asset($image->src) }}" height="50px"></td>
-            <td>{{ $image->product->model}}</td>
+            <td>{{ $image->product?$image->product->model:''}}</td>
             <td>{{ $image->spu_id}}</td>
             <td>{{ $image->product_id}}</td>
             <td>{{ $image->type }}</td>

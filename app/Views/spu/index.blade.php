@@ -16,7 +16,6 @@
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
-    <th>图片</th>
     <th>采购员</th>
     <th>编辑</th>
     <th>美工</th>
@@ -34,7 +33,6 @@
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$spu->id}}"></td>
             <td>{{ $spu->id }}</td>
-            <td>{{ $spu->spu }}</td>
             <td>{{ $spu->spu }}</td>
             <td>{{ $spu->Purchase?$spu->Purchase->name:'' }}</td>
             <td>{{ $spu->editUser?$spu->editUser->name:'' }}</td>

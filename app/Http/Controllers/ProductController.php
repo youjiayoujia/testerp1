@@ -55,7 +55,7 @@ class ProductController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->find($requireModel->catalog_id),
-            'suppliers' => $this->supplier->all(),
+            //'suppliers' => $this->supplier->all(),
             'wrapLimit' => $this->wrapLimit->all(),
             'data' =>$data,
             'require_id' =>$require_id,

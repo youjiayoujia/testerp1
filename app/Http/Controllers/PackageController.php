@@ -278,6 +278,7 @@ class PackageController extends Controller
             'packageException' => $this->model->where('status', 'ERROR')->count(),
             'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
         ];
+
         return view($this->viewPath . 'flow', $response);
     }
 
@@ -870,11 +871,17 @@ class PackageController extends Controller
         $logistics = LogisticsModel::find($logistics_id);
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
         $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
-        if($is_auto) {
-            $job = new PlaceLogistics($model);
-            $job = $job->onQueue('placeLogistics');
-            $this->dispatch($job);
+        $orderRate = $model->order->calculateProfitProcess();
+        if($orderRate > 0) {
+            if($is_auto) {
+                $job = new PlaceLogistics($model);
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+            } 
+        } else {
+            $this->model->order->OrderCancle();
         }
+        
         return json_encode(true);
     }
 

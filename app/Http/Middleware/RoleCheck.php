@@ -35,7 +35,6 @@ class RoleCheck
      */
     public function handle($request, Closure $next)
     {
-
         if ($this->auth->guest()) {
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);

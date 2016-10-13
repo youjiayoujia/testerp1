@@ -55,7 +55,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
-        $schedule->command('purchase:create')->cron('01 0 * * *');
+        $schedule->command('purchase:create')->cron('20 0,12 * * *');
         //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {

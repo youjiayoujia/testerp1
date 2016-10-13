@@ -347,10 +347,11 @@ class MessageModel extends BaseModel{
                             if($this->from_name != $item->summary->receiverName){
                                 $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                 $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
-                                $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
-                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'">
+                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
                                     翻译
-                                </button>';
+                                </button>
+                                <p id="content-'.$k.'" style="color:green"></p>
+                                ';
                                 $html .= '</div>';
                             }else{
                                 $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;

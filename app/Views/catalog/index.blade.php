@@ -48,6 +48,7 @@
 @section('tableHeader')
     <th><input type='checkbox' name='select_all' class='select_all'> 全选</th>
     <th class="sort" data-field="id">ID</th>
+    <th>分类</th>
     <th>名称</th>
     @foreach($channels as $channel)
         <th>{{$channel->name}}</th>
@@ -63,6 +64,7 @@
             </td>
 
             <td>{{ $catalog->id }}</td>
+            <td>{{ $catalog->CatalogCategoryName }}</td>
             <td>{{ $catalog->all_name }}</td>
             @foreach($channels as $channel)
                 <?php $rate =''; ?>

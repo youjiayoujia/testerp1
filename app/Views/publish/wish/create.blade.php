@@ -481,6 +481,15 @@
                 </div>
 
             </div>
+
+            <div class="row">
+                <div class="form-group col-sm-2">
+                    <label for="subject" class="right">检查重复刊登：</label>
+                </div>
+                <div class="form-group col-sm-8">
+                    <input type="checkbox" checked name="check_repeat" value="check_repeat">
+                </div>
+            </div>
         </div>
     </div>
     <input type="hidden" name="action" id="action" value=""/>

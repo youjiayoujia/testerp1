@@ -3,7 +3,7 @@
  * 汇率控制器
  * 处理汇率相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 15/12/18
  * Time: 15:22pm
  */

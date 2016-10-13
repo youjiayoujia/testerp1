@@ -24,7 +24,7 @@ class EbaySiteModel extends BaseModel
         'is_use'
     ];
 
-    protected $searchFields = [];
+    public $searchFields = ['site' => '站点名称'];
 
  /*   protected $rules = [
         'create' => [
@@ -54,5 +54,6 @@ class EbaySiteModel extends BaseModel
         }
         return $return;
     }
+
 
 }

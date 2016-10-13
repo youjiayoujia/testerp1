@@ -36,3 +36,7 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolButtons')
+
+
+@stop

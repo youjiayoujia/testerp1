@@ -23,9 +23,70 @@ use App\Models\Oversea\ChannelSaleModel;
 
 class OrderModel extends BaseModel
 {
-    protected $table = 'orders';
+    public $table = 'orders';
 
-    protected $guarded = ['items', 'remark'];
+    public $guarded = ['items', 'remark'];
+
+    public $fillable = [
+        'id',
+        'channel_id',
+        'channel_account_id',
+        'ordernum',
+        'channel_ordernum',
+        'channel_listnum',
+        'by_id',
+        'email',
+        'status',
+        'active',
+        'order_is_alert',
+        'amount',
+        'gross_margin',
+        'profit_rate',
+        'amount_product',
+        'amount_shipping',
+        'amount_coupon',
+        'transaction_number',
+        'customer_service',
+        'operator',
+        'payment',
+        'currency',
+        'rate',
+        'address_confirm',
+        'shipping',
+        'shipping_firstname',
+        'shipping_lastname',
+        'shipping_address',
+        'shipping_address1',
+        'shipping_city',
+        'shipping_state',
+        'shipping_country',
+        'shipping_zipcode',
+        'shipping_phone',
+        'billing_firstname',
+        'billing_lastname',
+        'billing_address',
+        'billing_city',
+        'billing_state',
+        'billing_country',
+        'billing_zipcode',
+        'billing_phone',
+        'customer_remark',
+        'withdraw_reason',
+        'withdraw',
+        'cele_admin',
+        'priority',
+        'package_times',
+        'split_times',
+        'split_quantity',
+        'fulfill_by',
+        'blacklist',
+        'platform',
+        'aliexpress_loginId',
+        'payment_date',
+        'create_time',
+        'is_chinese',
+        'orders_expired_time',
+    ];
 
     private $canPackageStatus = ['PREPARED'];
 
@@ -634,11 +695,17 @@ class OrderModel extends BaseModel
         $orderItems = $this->items;
         $channel = $this->channel;
         foreach ($orderItems as $orderItem) {
-            $buf = $orderItem->item->catalog->channelRates->where('id', $this->channel_id)->first()->pivot;
-            $flat_rate_value = $buf->flat_rate;
-            $rate_value = $buf->rate;
-            $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
+            $buf = $orderItem->item->catalog->channels->where('id', $this->channelAccount->catalog_rates_channel_id)->first();
+            if($buf) {
+                $buf = $buf->pivot;
+                $flat_rate_value = $buf->flat_rate;
+                $rate_value = $buf->rate;
+                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
+            } else {
+                return 0;
+            }
         }
+        
         return $sum;
     }
 

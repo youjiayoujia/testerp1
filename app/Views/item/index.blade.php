@@ -47,8 +47,13 @@
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
-            <td><img src="{{ asset($item->product->dimage) }}" width="100px"></td>
-            <td>{{ $item->c_name }}<br>物品分类：{{ $item->product->catalog?$item->product->catalog->all_name:'' }}<br>
+            <td>
+                <!-- 100条sql -->
+                <img src="{{ asset($item->product->dimage) }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;">
+                <br><br>
+                <div style='text-align:center' ><a href='' data-toggle="modal" data-target="#imgModal_{{$item->id}}">[{{count($item->product->shape)}}]<a></div>
+            </td>
+            <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
                                     开发时间：{{ $item->created_at }}<br>
                                     【包装方式：<br>
                                     @foreach($item->product->wrapLimit as $wrap)
@@ -70,6 +75,7 @@
             </td>
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>
+                <!-- 400条sql -->
                 <div>虚：{{$item->available_quantity}}</div>
                 <div>实：{{$item->all_quantity}}</div>
                 <div>途：{{$item->normal_transit_quantity}}</div>
@@ -229,6 +235,25 @@
                 </a>
             </td>
         </tr>
+
+        <!-- 图片模态框（Modal -->
+            <div class="modal fade" id="imgModal_{{$item->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog" style="width:800px">
+                  <div class="modal-content">
+                     
+                     <div class="modal-body">
+                        <!-- 50条sql -->
+                        @foreach($item->product->shape as $image)
+                            <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
+                        @endforeach
+                     </div>
+                     
+                  </div>
+            </div>
+            </div>   
+        <!-- 图片模态框结束（Modal） -->
+
         <!-- 模态框（Modal）转采购负责人 -->
         <form action="/item/changePurchaseAdmin/{{$item->id}}" method="post">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">

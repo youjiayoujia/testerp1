@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetWishProduct::class,
         \App\Console\Commands\GetEbayProduct::class,
         \App\Console\Commands\GetAliexpressProduct::class,
+        \App\Console\Commands\GetJoomProduct::class,
         \App\Console\Commands\ProductImage::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
@@ -48,6 +49,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\uploadSmtOrderOnline::class,
         \App\Console\Commands\getSmtTrackNoOnline::class,
         \App\Console\Commands\autoAddMessageForSmtOrders::class,
+        \App\Console\Commands\GetAliShipmentNumber::class,
+
     ];
     /**
      * Define the application's command schedule.
@@ -58,6 +61,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
+        $schedule->command('purchase:create')->cron('01 11 * * *');
         //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {
@@ -66,11 +70,11 @@ class Kernel extends ConsoleKernel
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
-//                case 'aliexpress':
-//                    foreach ($channel->accounts as $account) {
-//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-//                    }
-//                    break;
+               case 'aliexpress':
+                   foreach ($channel->accounts as $account) {
+                       $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
+                   }
+                   break;
                 case 'wish':
                     foreach ($channel->accounts as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
@@ -93,5 +97,7 @@ class Kernel extends ConsoleKernel
                     break;
             }
         }
+
+        
     }
 }

@@ -13,6 +13,7 @@ use App\Models\ChannelModel;
 use App\Models\Catalog\CatalogChannelsModel;
 use App\Models\Channel\CatalogRatesModel;
 use App\Models\Catalog\RatesChannelsModel;
+use App\Models\Product\CatalogCategoryModel;
 use Excel;
 
 class CatalogController extends Controller
@@ -34,8 +35,9 @@ class CatalogController extends Controller
     {
         $CatalogRatesModel = CatalogRatesModel::all();
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas'             => $this->metas(__FUNCTION__),
             'CatalogRatesModel' => $CatalogRatesModel,
+            'catalogCategory'   => CatalogCategoryModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -240,6 +242,7 @@ class CatalogController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'channels_all' => $channels_all,
+            'catalogCategory'   => CatalogCategoryModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -254,8 +257,10 @@ class CatalogController extends Controller
     public function catalogCsvFormat(){
         $rows = [
             [
-                '中文分类名称'=>'鞋子',
-                '分类英文名称' => 'shoes',
+                '一级分类中文名'=>'玩具及爱好(实例：不用删除)',
+                '一级分类英文'=>'toy and hobby',
+                '二级中文分类名称'=>'鞋子',
+                '二级分类英文名称' => 'shoes',
                 '前缀'=>'XL',
                 'Set属性'=>'name1:value1,value2;name2:value1,value2',
                 'variation属性'=>'name1:value1,value2;name2:value1,value2',
@@ -272,174 +277,29 @@ class CatalogController extends Controller
         $this->exportExcel($rows, '批量添加产品品类csv格式');
     }
     public function addLotsOfCatalogs(){
-        $file = request()->file('excel');
-
-        $path = config('setting.excelPath');
-        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
-        $file->move($path, 'excelProcess.xls');
-        $data_array = '';
-        $result = false;
-        Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
-            $reader->noHeading();
-            $data_array = $reader->all()->toArray();
-
-            $th_long = count($data_array[0]); //表头字段数
-            for($i = 6 ; $i < $th_long ; $i++){
-                $channels[$i] = $data_array[0][$i];
+        if(!isset($_FILES['excel']['tmp_name'])) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '请上传表格!'));
+        }
+        $CSV = Excel::load($_FILES['excel']['tmp_name'],'gb2312')->noHeading()->toArray();
+        unset($CSV[0]); //删除表头
+        if($CSV[1][2] == 'toy and hobby') //删除实例行
+            unset($CSV[1]);
+        
+        foreach($CSV as $key => $value){
+            if(empty($value[1]) || empty($value[2]) || empty($value[3]) || empty($value[3])){
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '必填字段不能为空，请核修改重新填写!'));
             }
-            unset($data_array[0]); //去掉表头
-
-            if($data_array[1][1] == 'shoes'){
-                unset($data_array[1]); //去掉实例行
-            }
-                $insert_array =[];
-                foreach ($data_array as $key => $item){
-                    if(empty($item[0])){ //品类名中文名
-                        $result = [
-                            'info' => '品类中文名',
-                            'id'   => $key
-                        ];
-                        break;
-                    }
-                    if(empty($item[1])){ //品类英文名
-                        $result = [
-                            'info' => '品类英文名',
-                            'id'   => $key
-                        ];
-                        break;
-                    }
-                    $set = '';
-                    $variation = '';
-                    $feature = '';
-                    if(!empty($item[3])){ //SET属性
-                        $set_group = explode(';',trim($item[3]));
-                        foreach ($set_group as $itemset){
-                            $set_name_ary = '';
-                            $tmp_arr = explode(':',$itemset);
-
-                            if(count($tmp_arr) != 2){
-                                $result = [
-                                    'info' => 'Set属性格式错误',
-                                    'id'   => $key
-                                ];
-                                break 2;
-                            }
-                            $name_tmp_ary = explode(',',$tmp_arr[1]);
-                            foreach ($name_tmp_ary as $name_temp_value){
-                                $set_name_ary[] = ['name' => $name_temp_value];
-                            }
-                            $set[] = [
-                                'name'  => $tmp_arr[0],
-                                'value' => ['name' => $set_name_ary],
-                            ];
-                        }
-                    }
-                    if(!empty($item[4])){ //variation属性
-                        $set_group = explode(';',trim($item[4]));
-                        foreach ($set_group as $item_var){
-                            $var_name_ary = '';
-                            $tmp_variation_arr = explode(':',$item_var);
-                            if(count($tmp_variation_arr) != 2){
-
-                                $result = [
-                                    'info' => 'variation属性格式错误',
-                                    'id'   => $key
-                                ];
-                                break 2;
-                            }
-                            $name_var_ary = explode(',',$tmp_variation_arr[1]);
-                            foreach ($name_var_ary as $name_var_ary){
-                                $var_name_ary[] = ['name' => $name_var_ary];
-                            }
-                            $variation[] = [
-                                'name'  => $tmp_variation_arr[0],
-                                'value' => ['name' => $var_name_ary],
-                            ];
-
-                        }
-                    }
-
-                    if(!empty($item[5])){ //Feature属性 包括单选 多选 文本 通过 type控制
-
-                        $set_group = explode(';',trim($item[5]));
-                        foreach ($set_group as $item_feature){
-                            $feature_value_ary = explode(':',$item_feature);
-                            $fea_type_name = explode('-',$feature_value_ary[0]);
-                            if(count($feature_value_ary) == 1){//文本
-                                $check = explode('-',$item_feature);
-                                if(count($check) == 2){
-                                    if(empty($check[0]) || empty($check[1]) ){
-                                        $result = [
-                                            'info' => 'Feature属性填写错误',
-                                            'id'   => $key
-                                        ];
-                                        break 2;
-                                    }
-                                }elseif(!isset($fea_type_name[1]) || !isset($fea_type_name[0])){
-                                    $result = [
-                                        'info' => 'Feature属性填写错误',
-                                        'id'   => $key
-                                    ];
-                                    break 2;
-                                }
-                                $fea_name_ary1[] = ['name' => ''];
-                                $feature[] = [
-                                    'name'  => $fea_type_name[1],
-                                    'type'  => $fea_type_name[0],
-                                    'value' => ['name' => $fea_name_ary1]
-                                ];
-                            }else{
-                                if(empty($feature_value_ary[1]) || empty($fea_type_name[1]) || empty($fea_type_name[0])){
-                                    $result = [
-                                        'info' => 'Feature属性填写错误',
-                                        'id'   => $key
-                                    ];
-                                    break 2;
-                                }
-                                $fea_name_ary2 = '';
-                                foreach (explode(',',$feature_value_ary[1]) as $val){
-                                    $fea_name_ary2[] = ['name' => $val];
-                                }
-                                $feature[] = [
-                                    'name'  => $fea_type_name[1],
-                                    'type'  => $fea_type_name[0],
-                                    'value' => ['name' => $fea_name_ary2]
-                                ];
-                            }
-                        }
-                    }
-                    //整合费率
-
-                    $rates = '';
-                    foreach ($channels as $key => $value){
-                        $rates[$value] = $item[$key];
-                    }
-                    $insert_array[] = [
-                        'c_name' => $item[0],
-                        'name'   => $item[1],
-                        'code'   => $item[2],
-                        'channel_rate' => $rates,
-                        'attributes' =>[
-                            'sets'       => $set,
-                            'variations' => $variation,
-                            'features'   => $feature,
-                        ],
-                    ];
-                }
-                $result = $this->model->createLotsCatalogs($insert_array);
-        },'gb2312');
-
-
+        }
+        
+        if(count($CSV) < 1){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '请先填写数据'));
+        }
+        
+        $result = $this->model->csvInsertCatalogs($CSV);
         if($result){
             return redirect(route('catalog.index'))->with('alert', $this->alert('success', '批量插入成功!'));
         }else{
-            if($result != false && isset($result['id']) && isset($result['info'])){
-                $error_info = '操作失败,错误位置：<第'.$result['id'].'行>-<'.$result['info'].'>';
-            }else{
-                $error_info = '表格填写有误，请检查';
-            }
-            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', $error_info));
-
+            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', '批量导入失败'));
         }
 
 

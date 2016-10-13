@@ -29,7 +29,7 @@ Class AliexpressAdapter implements AdapterInterface
     private $_version = 1;
     private $_aliexpress_member_id;
 
-    public function __construct($config)
+                    public function __construct($config)
     {
         $this->_appkey = $config["appkey"];
         $this->_appsecret = $config["appsecret"];

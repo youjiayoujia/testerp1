@@ -360,6 +360,13 @@ return [
                     'icon' => '',
                 ],
             ],
+            '采购账号' => [
+                [
+                    'name' => '阿里巴巴账号',
+                    'url' => 'purchaseAccount.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //渠道导航

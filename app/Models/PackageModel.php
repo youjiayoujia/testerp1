@@ -250,7 +250,20 @@ class PackageModel extends BaseModel
             }
         }
         return $declared_en;
-    }    
+    } 
+    
+    /**
+     * 获取申报价值
+     */
+    public function getDeclearedValueAttribute(){
+        $declared_val = 0;
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_val = $packageItem->item->product ? $packageItem->item->product->declared_value: 0;
+            }
+        }
+        return $declared_val;
+    }
 
     public function getStatusColorAttribute()
     {

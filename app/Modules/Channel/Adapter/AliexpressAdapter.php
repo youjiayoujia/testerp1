@@ -1530,5 +1530,13 @@ Class AliexpressAdapter implements AdapterInterface
        // $respon_ary = json_decode($this->getJsonData('api.addMsg','api.sellerRefuseIssue'));
 
     }
+    
+    //根据交易订单获取线上发货物流服务列表
+    public function getOnlineLogisticsServiceListByOrderId($orderId){
+        $query = 'orderId='.$orderId;
+        $api = "api.getOnlineLogisticsServiceListByOrderId";
+        $result = json_decode($this->getJsonData($api,$query),true);
+        return $result;
+    }
 
 }

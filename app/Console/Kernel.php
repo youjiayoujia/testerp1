@@ -43,6 +43,11 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetEbayCases::class,
         \App\Console\Commands\GetAliexpressIssues::class,
         \App\Console\Commands\getSellmoreSuppliers::class,
+        \App\Console\Commands\SetSkuStockZero::class,
+        \App\Console\Commands\SetSkuStockZeroBak::class,
+        \App\Console\Commands\uploadSmtOrderOnline::class,
+        \App\Console\Commands\getSmtTrackNoOnline::class,
+        \App\Console\Commands\autoAddMessageForSmtOrders::class,
     ];
     /**
      * Define the application's command schedule.

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Input;
 use App\Models\Channel\AccountModel;
 use App\Models\Publish\Smt\smtProductList;
 use App\Models\ProductModel;
+use App\Models\ItemModel;
 
 
 class SmtOnlineMonitorController extends Controller
@@ -126,54 +127,60 @@ class SmtOnlineMonitorController extends Controller
     public function manualUpdateProductInfo(){
         $product_info_str = Input::get('productIds');        
         $productInfo = explode(' ', $product_info_str);
-        
+        $msg = '';
         foreach($productInfo as $val){
             list($productId,$smtSkuCode) = explode(',',$val); 
-            $sku_info = smtProductSku::where(['productId'=>$productId,'smtSkuCode'=>$smtSkuCode,'isRemove'=>0])->first();
-            foreach($sku_info as $sku_item){
-                if(strstr($sku_item->skuCode,"{YY}")){
-                    $sku_item->skuCode = substr($sku_item->skuCode,4);
+            $sku_info = smtProductSku::where(['productId'=>$productId,'smtSkuCode'=>$smtSkuCode,'isRemove'=>0])->first();                  
+            if(strstr($sku_info->skuCode,'{YY}')){
+                $sku_info->skuCode = substr($sku_info->skuCode,4);
+            }else{
+                continue;
+            }
+            $virtualStock = $sku_info->productItem ? $sku_info->productItem->available_quantity : 0;        //虚库存
+            $product_info = ItemModel::where('sku',$sku_info->skuCode)->first();
+            $account_id = $sku_info->product->token_id;
+            $account = AccountModel::findOrFail($account_id);         
+            $data = array();
+            if($product_info){
+                if($sku_info->product->productStatusType != 'onSelling'){               
+                    $msg = 'SKU:'.$sku_info->skuCode.'已下架，操作失败!<br/>';
+                    continue;
                 }
-                
-                $virtualStock = '';
-            }
-        }
-        /*$productIds = array_unique($productIds);
-        foreach($productIds as $productId){                          
-            $account_id = smtProductList::where('productId',$productId)->first()->token_id;
+                if($product_info->status == 'selling'){
+                    if($sku_info->product->multiattribute == 0){
+                        $targetStock = $virtualStock > 1 ? $virtualStock : 1;
+                        $skuStocks[$sku_info->sku_active_id] = $targetStock;
+                        
+                        $data['skuStocks'] = json_decode($skuStocks);
+                        $data['productId'] = $sku_info->productId;
+                        $this->editSkuStocks($account,$data);                                        
+                    }else{
+                        $product_skus = smtProductSku::where('productId',$sku_info->productId)->get();
+                        foreach($product_skus as $skuRow){
+                            $sku = $this->changeSku($skuRow->skuCode);
+                            $productType = $skuRow->product ? $skuRow->product->status : '';
+                            if(empty($productType)){
+                                continue;
+                            }
+                            
+                            
+                        }
+                    }
+                }
+            }           
             
-            $account = AccountModel::findOrFail($account_id);
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $result = $channel->findAeProductById($productId);
-            if(array_key_exists('success', $result) && $result['success']){
-               
-                $product['product_url'] = 'http://www.aliexpress.com/item/-/' . $productId . '.html';
-                $product['token_id'] = $account->id;
-                $product['subject'] = array_key_exists('subject', $result) ? $result['subject'] : '';
-                $product['productPrice'] = $result['productPrice'];
-                $product['productStatusType'] = $result['productStatusType'];
-                $product['ownerMemberId'] = $result['ownerMemberId'];
-                $product['ownerMemberSeq'] = $result['ownerMemberSeq'];
-                $product['wsOfflineDate'] = $this->parseDateString($result['wsOfflineDate']);
-                $product['wsDisplay'] = array_key_exists('wsDisplay', $result) ? $result['wsDisplay'] : '';
-                $product['groupId'] = array_key_exists('groupId', $result) ? $result['groupId'] : '';
-                $product['categoryId'] = $result['categoryId'];
-                $product['packageLength'] = $result['packageLength'];
-                $product['packageWidth'] = $result['packageWidth'];
-                $product['packageHeight'] = $result['packageHeight'];
-                $product['grossWeight'] = $result['grossWeight'];
-                $product['deliveryTime'] = $result['deliveryTime'];
-                $product['wsValidNum'] = $result['wsValidNum'];
-                $product['productMinPrice'] = $productItem['productMinPrice'];
-                $product['productMaxPrice'] = $productItem['productMaxPrice'];
-                $product['gmtCreate'] = $this->parseDateString($productItem['gmtCreate']);
-                $product['gmtModified'] = $this->parseDateString($productItem['gmtModified']);
-                $product['multiattribute'] = count($result['aeopAeProductSKUs']) > 1 ? 1 : 0;
-            }
- 
         }
-        return $result;*/
-       // return array('statue'=>true,'Msg'=>'更新成功!');
+    }
+    
+    /**
+     * 过滤带{YY}了类型的SKU
+     * @param unknown $sku
+     */
+    public function changeSku($sku){
+        if (strstr($sku, "{YY}")) {
+            $sku = substr(trim($sku),4);
+        }
+        return $sku;
     }
     
     /**
@@ -276,7 +283,7 @@ class SmtOnlineMonitorController extends Controller
             $account_id = $skuInfo->product->token_id;
             
             $account = AccountModel::findOrFail($account_id);
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            
             
             //获取商品的最新信息
             $last_product_Info = $channel->findAeProductById($productId);
@@ -375,14 +382,17 @@ class SmtOnlineMonitorController extends Controller
         return $product_ids;
     }
     
-    /**
-     * 计算sku的虚拟库存
-     * @param string $skuCode
-     */
-    public function calculateVirtualStock($skuCode){
-       //虚库存 = 实际库存-已打印-已通过-新录入的sku的数量
+    public function editSkuStocks(AccountModel $account,$data){
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $api = 'api.editMutilpleSkuStocks';
+        $result = $channel->getJsonDataUsePostMethod($api,$data);
+        $result = json_decode($result,true);
+        if(array_key_exists('success', $result) && $result['success'] && $result['modifyCount'] > 0){
+            smtProductSku::where(['productId'=>$data['productId'],'sku_active_id'=>$data['sku_active_id']])->update(['ipmSkuStock'=>$data['$data']]);
+        }
        
     }
+    
     
    
 }

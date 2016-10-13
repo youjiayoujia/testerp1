@@ -168,42 +168,24 @@ class SmtProductsController
     private function _chooseProductShip($productInfo, $price, $shipArray){
         $shipmentId = 0;
         if(count($productInfo->logisticsLimit)){
-            $product_limit_type = $productInfo->logisticsLimit->name;
+            foreach($productInfo->logisticsLimit as $logisticsLimit)
+            $product_limit_type = $logisticsLimit->name;
         }else{
             return $shipmentId;
-        }
+        }  
     
-    
-        /*
-         if ($price > 10){ //15美金以上
-         if ($productInfo['products_with_battery']){ //带电
-         $shipmentId = isset($shipArray['gt15']['battery']) ? $shipArray['gt15']['battery'] : 0;//151;
-         }elseif ($productInfo['products_with_fluid'] || $productInfo['products_with_powder']){ //液体粉末
-         $shipmentId = isset($shipArray['gt15']['fluid']) ? $shipArray['gt15']['fluid'] : 0;//317;
-         }else { //普货
-         $shipmentId = isset($shipArray['gt15']['other']) ? $shipArray['gt15']['other'] : 0;//28;
-         }
-         }else { //15美金或以下
-         if ($productInfo['products_with_battery']){ //带电
-         $shipmentId = isset($shipArray['le15']['battery']) ? $shipArray['le15']['battery'] : 0;//273;
-         }elseif ($productInfo['products_with_fluid'] || $productInfo['products_with_powder']){ //液体粉末
-         $shipmentId = isset($shipArray['le15']['fluid']) ? $shipArray['le15']['fluid'] : 0;//316;
-         }else { //普货
-         $shipmentId = isset($shipArray['le15']['other']) ? $shipArray['le15']['other'] : 0;//291;
-         }
-         }*/
         if ($price > 10){
-            if ($product_limit_type == 'battery')  {//带电
+            if ($product_limit_type == '含电池')  {//带电
                 $shipmentId = isset($shipArray['gt15']['battery']) ? $shipArray['gt15']['battery'] : 0;//151;
-            }elseif ($product_limit_type == 'fluid' || $product_limit_type == 'powder'){
+            }elseif ($product_limit_type == '含液体' || $product_limit_type == '含粉尘'){
                 $shipmentId = isset($shipArray['gt15']['fluid']) ? $shipArray['gt15']['fluid'] : 0;//317;
             }else {
                 $shipmentId = isset($shipArray['gt15']['other']) ? $shipArray['gt15']['other'] : 0;//28;
             }
         }else{
-            if ($product_limit_type == 'battery')  {//带电
+            if ($product_limit_type == '含电池')  {//带电
                 $shipmentId = isset($shipArray['le15']['battery']) ? $shipArray['le15']['battery'] : 0;//273;
-            }elseif ($product_limit_type == 'fluid' || $product_limit_type == 'powder'){
+            }elseif ($product_limit_type == '含液体' || $product_limit_type == '含粉尘'){
                 $shipmentId = isset($shipArray['le15']['fluid']) ? $shipArray['le15']['fluid'] : 0;//316;
             }else {
                 $shipmentId = isset($shipArray['le15']['other']) ? $shipArray['le15']['other'] : 0;//291;
@@ -402,12 +384,12 @@ class SmtProductsController
     
     /**
      * 速卖通计算利润率
-     * @param  integer $price    售价
-     * @param  string  $cost     成本价
-     * @param  integer $token_id [description]
-     * @param  integer $weight   [description]
-     * @return [type]            [description]
-     * @author Allen zjlallen@qq.com / 2014-08-04 16:03:08
+     * @param integer $price 售价
+     * @param string $cost  成本价
+     * @param float $weight 重量
+     * @param string $products_sort
+     * @param unknown $product_limit_type  物流限制类型(是否含电、液体、粉尘)
+     * @return number
      */
     public function getProfitRate($price=10, $cost = '6', $weight=0.02, $products_sort ='14324', $product_limit_type){
         $salePlat    = ErpSalesPlatform::where('platID',5)->first()->toArray();// 获取速卖通平台费率等信息
@@ -423,14 +405,13 @@ class SmtProductsController
 
         if($price <= 15){               
             $shipMethod = 176;    //普货
-            if( $product_limit_type == 'battery' ) $shipMethod = 188;//带电
-            if( $product_limit_type == 'fluid' || $product_limit_type == 'powder' ) $shipMethod = 175;//液体粉末
+            if( $product_limit_type == '含电池' ) $shipMethod = 188;
+            if( $product_limit_type == '含液体' || $product_limit_type == '含粉尘' ) $shipMethod = 175;
             if( $products_sort == 15052 ) $shipMethod = 180;//耳机
             if( $products_sort == 176994 ) $shipMethod = 188;//点烟器电子烟类目    
-        }else{// 15美金以上
-            // 普货
-            $shipMethod = 139;
-            if( $product_limit_type == 'battery' ) $shipMethod = 151;//带电
+        }else{// 15美金以上            
+            $shipMethod = 139;  // 普货
+            if( $product_limit_type == '含电池' ) $shipMethod = 151;
         }
       
         $shipFee = $this->getShipFee($shipMethod,$weight);

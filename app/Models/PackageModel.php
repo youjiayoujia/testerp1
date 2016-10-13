@@ -223,6 +223,47 @@ class PackageModel extends BaseModel
 
         return $flag;
     }
+    
+    /**
+     * 申报中文名
+     * @return string
+     */
+    public function getDeclearedCnameAttribute(){
+        $declared_cn = '';
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_cn = $packageItem->item->product ? $packageItem->item->product->declared_cn : '';
+            }
+        }
+        return $declared_cn;
+    }
+    
+    /**
+     * 申报英文名
+     * @return string
+     */
+    public function getDeclearedEnameAttribute(){
+        $declared_en = '';
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_en = $packageItem->item->product ? $packageItem->item->product->declared_en : '';
+            }
+        }
+        return $declared_en;
+    } 
+    
+    /**
+     * 获取申报价值
+     */
+    public function getDeclearedValueAttribute(){
+        $declared_val = 0;
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_val = $packageItem->item->product ? $packageItem->item->product->declared_value: 0;
+            }
+        }
+        return $declared_val;
+    }
 
     public function getStatusColorAttribute()
     {
@@ -332,6 +373,10 @@ class PackageModel extends BaseModel
     public function country()
     {
         return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+    
+    public function russiaPYCode(){
+        return $this->belongsTo('App\Models\Logistics\Zone\RussiaPingCodeModel', 'shipping_country', 'country_code');
     }
 
     public function getStatusNameAttribute()

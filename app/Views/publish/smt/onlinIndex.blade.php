@@ -76,7 +76,152 @@
               批量修改
             </a>
         </div>
+        <div class="btn-group">
+            <a class="btn btn-success export" href="javascript:void(0)"  data-toggle="modal"
+                    data-target="#myPriceModalSelect">
+              同步指定帐号广告
+            </a>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-success export" href="javascript:void(0)"  id="coyp_account">COPY账号在线广告</a>              
+        </div>
+        
+   <div class="modal fade" id="myPriceModalSelect"    tabindex="-1" role="dialog"   aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="text-left modal-title" >同步指定账号广告</h4>
+			</div>
+			<div class="modal-body">
+			     <form class="form-horizontal">				
+        			<div class="form-group">
+						<label class="col-sm-2">账号:</label>
+						<div class="col-sm-4">
+							<select  id="selectaccount" class="form-control">
+								<option value="">---请选择---</option>
+								@foreach($accountList as $account)
+        						    <option value="{{ $account->id }}">{{ $account->account}}</option>'
+        						@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2">产品分组</label>
+						<div class="col-sm-4">
+							<select  id="groupId3"  class="form-control">
+								<option value="">=所有分组=</option>
+							</select>
 
+						</div>
+					</div>
+
+
+					<div class="modal-footer">
+						<a href="#"   class="btn btn-primary " id="confirm">确定</a>
+						<!--<a href="#" class="btn btn-default" data-dismiss="modal">关闭</a>-->
+					</div>
+        	   </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="coypaccountModalSelect"    tabindex="-1" role="dialog"   aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" >复制信息</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal"  >                
+    				<div class="form-group">
+    					<label class="col-sm-2">(From)账号</label>
+    					<div class="col-sm-4">
+    						<select  id="selectaccountfrom" class="form-control">
+    							<option value="">---请选择---</option>
+    							@foreach($accountList as $account)
+        						    <option value="{{ $account->id }}">{{ $account->account}}</option>'
+        						@endforeach
+    						</select>
+    					</div>
+    				</div>
+    
+    				<div class="form-group">
+    					<label class="col-sm-2">产品分组</label>
+    					<div class="col-sm-4">
+    						<select  id="groupId1" class="form-control">
+    							<option value="">=所有分组=</option>
+    						</select>
+    
+    					</div>
+    				</div>
+    
+    				<div class="form-group">
+    					<label class="col-sm-2">选择分类</label>
+    					<div class="col-sm-1">
+    						<input type="checkbox" id="needcategoryone"  name="needcategoryone">
+    
+    					</div>
+    				</div>
+    
+    				<div  class="needcategory hidden">
+    					<div class="form-group">
+    						<label class="col-sm-2">搜索类目</label>
+    						<div class="col-sm-4">
+    							<input type="text"  size="15" id="searchcategoryinfo" class="form-control">
+    							
+    							
+    						</div>    						
+    						<div class="col-sm-2">
+    							<a href="#" class="btn btn-primary btn-xs" id="searchcategory" style="float: left"> 搜索</a>
+    						</div>
+    					</div>
+    
+    					<div class="form-group">
+    						<label class="col-sm-2">确认类目</label>
+    						<div class="col-sm-4">
+    							<select id="checkecategory" class="form-control">
+    							</select>
+    						</div>
+    					</div>
+    				</div>
+    				<div class="form-group">
+    					<label class="col-sm-2">(To)账号</label>
+    					<div class="col-sm-4">
+    						<select  id="selectaccountto" class="form-control">
+    							<option value="">---请选择---</option>
+    							@foreach($accountList as $account)
+        						    <option value="{{ $account->id }}">{{ $account->account}}</option>'
+        						@endforeach
+    						</select>
+    					</div>
+    				</div>
+    
+    				<div class="form-group">
+    					<label class="col-sm-2">产品分组</label>
+    					<div class="col-sm-4">
+    						<select  id="groupId2" class="form-control">
+    							<option value="">=所有分组=</option>
+    						</select>						
+    					</div>
+    					<div class="col-sm-4">
+    					  <span style="color:red">请指定产品分组，否则新草稿分组为空</span>
+    					</div>
+    				</div>
+    
+    
+    				<div class="modal-footer">
+    					<a href="#"   class="btn btn-primary " id="copycheck">确定</a>
+    					<!--<a href="#" class="btn btn-default" data-dismiss="modal">关闭</a>-->
+    				</div>
+    				<!--<button type="submit" class="btn btn-primary">提交</button>-->
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
 @stop
 @section('childJs')
 <link href="{{ asset('plugins/layer/skin/layer.css')}}" type="text/css" rel="stylesheet">
@@ -289,5 +434,165 @@ $(document).on('click', '#batch_copy', function(event) {
 			return false;
 		}
 	});
+
+$(document).on('change', '#selectaccount', function(){
+	var token_id = $(this).val();
+	$('#groupId3').empty();
+	if (token_id == ''){ //账号为空，隐藏分组信息
+		return false;
+	}else {
+		//异步获取账号信息
+		$.ajax({
+			url: "{{ route('smtProduct.showAccountProductGroup') }}",
+			data: 'token_id='+token_id,
+			type: 'POST',
+			dataType: 'JSON',
+			success: function(data){
+				if (data.status){
+					$('#groupId3').append(data.data);
+				}
+			}
+		});
+	}
+});
+
+$('#confirm').click(function(){
+	var token_id =$("#selectaccount").val();
+	var groupId3 = $("#groupId3").val();
+	if(groupId3=='none')
+	{
+		alert('无法同步该分组');
+		return false;
+	}
+	$.ajax({
+		url: "{{ route('smtProduct.SynchronousDataByAccount') }}",
+		data: 'token_id='+token_id+'&groupId3='+groupId3,
+		type: 'POST',
+		dataType: 'JSON',
+		beforeSend: function(){
+			 ii = layer.load('更新中。。。');
+		},
+		success: function(data){
+			layer.close(ii);
+			$('#myPriceModalSelect').modal('toggle');
+			alert(data.info)
+		}
+	});
+});
+
+$('#coyp_account').click(function(){
+	$('#coypaccountModalSelect').modal('toggle');
+	$("#searchcategoryinfo").val("");
+
+	$("#needcategoryone").removeProp('checked');
+	$("#needcategoryone").prop('checked',false);
+});
+
+$(document).on('change', '#selectaccountfrom', function(){
+		var token_id = $(this).val();
+		$('#groupId1').empty();
+		if (token_id == ''){ //账号为空，隐藏分组信息
+			return false;
+		}else {
+			//异步获取账号信息
+			$.ajax({
+				url: "{{ route('smtProduct.showAccountProductGroup') }}",
+				data: 'token_id='+token_id,
+				type: 'POST',
+				dataType: 'JSON',
+				success: function(data){
+					if (data.status){
+						$('#groupId1').append(data.data);
+					}
+				}
+			});
+		}
+});
+
+$(document).on('change', '#selectaccountto', function(){
+	var token_id = $(this).val();
+	$('#groupId2').empty();
+	if (token_id == ''){ //账号为空，隐藏分组信息
+		return false;
+	}else {
+		//异步获取账号信息
+		$.ajax({
+			url: "{{ route('smtProduct.showAccountProductGroup') }}",
+			data: 'token_id='+token_id,
+			type: 'POST',
+			dataType: 'JSON',
+			success: function(data){
+				if (data.status){
+					$('#groupId2').append(data.data);
+				}
+			}
+		});
+	}
+});
+
+$('#needcategoryone').click(function(){
+	if($('#needcategoryone').is(":checked"))
+	{
+		$(".needcategory").removeClass("hidden");
+	}
+	else
+	{
+		$(".needcategory").addClass("hidden");
+	}
+})
+
+$('#copycheck').click(function(){
+	var token_id_from = $('#selectaccountfrom').val();
+	var token_id_to = $('#selectaccountto').val();
+	var groupId1 = $('#groupId1').val();
+	var groupId2 = $('#groupId2').val();
+	var	checkecategory='';
+	if($('#needcategoryone').is(":checked")){
+		var	 checkecategory = $("#checkecategory").val();
+	}
+
+	if(token_id_from==''||token_id_to==''||(token_id_from==token_id_to)){
+		alert("请选择账号,两个账号不能相同");
+		return false;
+	}
+
+	$.ajax({
+		url: "{{ route('smtProduct.copyAllAccountNew') }}",
+		data: 'token_id_from='+token_id_from+'&token_id_to='+token_id_to+'&groupId1='+groupId1+'&groupId2='+groupId2+'&checkecategory='+checkecategory,
+		type: 'POST',
+		dataType: 'JSON',
+		beforeSend: function(){
+			ii = layer.load('更新中。。。');
+		},
+		success: function(data){
+			layer.close(ii);
+			if(data.status){
+				alert("复制完成");
+			}else{
+				alert(data.data);
+			}
+			$('#coypaccountModalSelect').modal('toggle');
+		}
+	});
+})
+	
+$("#searchcategory").click(function(){
+	var searchcategoryinfo = $("#searchcategoryinfo").val();
+	if (searchcategoryinfo == ""){
+		alert("请填写分类信息");
+		return false;
+	}
+	$.ajax({
+		url: "{{ route('smtProduct.getCategoryInfo') }}",
+		data: 'searchcategoryinfo='+searchcategoryinfo,
+		type: 'POST',
+		dataType: 'JSON',
+
+		success:function(data){
+			$('#checkecategory').empty();
+			$('#checkecategory').append(data.info);
+		}
+	})
+})
 </script>
 @stop

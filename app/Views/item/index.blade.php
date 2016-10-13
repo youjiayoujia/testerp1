@@ -36,8 +36,6 @@
     <th>售价</th>
     <th>体积系数</th>
     <th>税率</th>
-    <th class="sort" data-field="created_at">创建时间</th>
-    <th>更新时间</th>
     <th>操作</th>
 @stop
 
@@ -210,20 +208,18 @@
             </td>
             <td>1</td>
             <td>1</td>
-            <td>{{ $item->updated_at }}</td>
-            <td>{{ $item->created_at }}</td>
             <td>
                 <a href="{{ route('item.show', ['id'=>$item->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 查看
+                    <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 <a href="{{ route('item.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">
-                    <span class="glyphicon glyphicon-pencil"></span> 打印
+                    <span class="glyphicon glyphicon-print"></span>
                 </a>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-zoom-in">转移采购员</span>
+                    <span class="glyphicon glyphicon-user"></span>
                 </a>
                 <a data-toggle="modal" data-target="#question_{{$item->id}}" title="常见问题" class="btn btn-info btn-xs" id="ques">
                     <span class="glyphicon glyphicon-question-sign"></span>
@@ -231,7 +227,7 @@
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $item->id }}"
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
             </td>
         </tr>

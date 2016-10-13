@@ -267,11 +267,8 @@
                         </h4>
                      </div>
                      <div class="modal-body">
-                         <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div>
-                         <div>转移至：</div>
-                         <div><select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select></div>
-                         或者：
-                         <input type="text" value='' name='manual_name' id='manual_name'>
+                         <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div><br>
+                         <div>转移至：<select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select>  或者：<input type="text" value='' placeholder="姓名" name='manual_name' id='manual_name'></div>
                      </div>
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default" 

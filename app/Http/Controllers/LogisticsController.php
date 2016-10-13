@@ -14,6 +14,7 @@ use App\Models\Logistics\EmailTemplateModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Logistics\TemplateModel;
 use App\Models\LogisticsModel;
+use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
 use App\Models\ChannelModel;
@@ -95,6 +96,7 @@ class LogisticsController extends Controller
             }
         }
         $model->channelName()->sync($buf);
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
         return redirect($this->mainIndex);
     }
 
@@ -163,6 +165,8 @@ class LogisticsController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -208,6 +212,8 @@ class LogisticsController extends Controller
             }
         }
         $model->channelName()->sync($buf);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         return redirect($this->mainIndex);
     }
 

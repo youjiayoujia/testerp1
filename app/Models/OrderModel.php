@@ -502,12 +502,12 @@ class OrderModel extends BaseModel
 
     public function checkBlack()
     {
-        $channel = $this->channel->find($this['channel_id']);
-        if ($channel['driver'] == 'wish') {
-            $name = $this['shipping_lastname'] . ' ' . $this['shipping_firstname'];
-            $blacklist = BlacklistModel::where('zipcode', $this['shipping_zipcode'])->where('name', $name);
+        $channel = $this->channel->find($this->channel_id);
+        if ($channel->driver == 'wish') {
+            $name = $this->shipping_lastname . ' ' . $this->shipping_firstname;
+            $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
         } else {
-            $blacklist = BlacklistModel::where('email', $this['email']);
+            $blacklist = BlacklistModel::where('email', $this->email);
         }
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);

@@ -90,6 +90,7 @@ class SmtController extends Controller{
            'metas' => $this->metas(__FUNCTION__),
            'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
+           'accountList' => AccountModel::where('channel_id',$this->channel_id)->get(),
        ];
        return view($this->viewPath . 'onlinIndex', $response);
    }
@@ -310,7 +311,6 @@ class SmtController extends Controller{
        /**自定义产品关联信息开始**/
        //自定义关联产品
        $relationProductArr = array_key_exists('relationProduct', $posts) ? $posts['relationProduct'] : array();
-       //$relationStr        = '';
        $relationProductIds = '';
        if ($relationProductArr) {
            $relationProductIds = implode(';', $relationProductArr);
@@ -737,9 +737,7 @@ class SmtController extends Controller{
                 }
 
             }
-
-            /* $token_info = $this->userToken->getOneTokenInfo($token_id);
-            $this->smt->setToken($token_info); */
+ 
             $replace_flag = false; //是否替换图片的标识
 
             if ($isAdd) { //新增的话，该替换的还是要替换
@@ -1737,6 +1735,7 @@ html;
             $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
         }
         $data = json_decode($result, true);
+        dd($data);
         if (isset($data['success']) && $data['total'] > 0) {
            $rs = $data['cateogryIds'];
         }

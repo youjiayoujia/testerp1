@@ -36,4 +36,12 @@ class CountriesModel extends BaseModel
     {
         return $this->belongsTo('App\Models\CountriesSortModel', 'parent_id', 'id');
     }
+    
+    public function shsHkZone(){
+        return $this->belongsTo('App\Models\Logistics\Zone\SHSHKZoneModel', 'cn_name', 'country_cn');
+    }
+    
+    public function geKou(){
+        return $this->belongsTo('App\Models\Logistics\Zone\GeKouModel', 'cn_name', 'country');
+    }
 }

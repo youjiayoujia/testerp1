@@ -14,11 +14,11 @@ use App\Base\BaseModel;
 
 class CollectionInfoModel extends BaseModel
 {
-    protected $table = 'logistics_collection_infos';
+    public $table = 'logistics_collection_infos';
 
     public $searchFields = ['bank' => '收款银行', 'account' => '收款账户'];
 
-    protected $fillable = [
+    public $fillable = [
         'id',
         'bank',
         'account',

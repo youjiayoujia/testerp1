@@ -44,7 +44,13 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetEbayCases::class,
         \App\Console\Commands\GetAliexpressIssues::class,
         \App\Console\Commands\getSellmoreSuppliers::class,
+        \App\Console\Commands\SetSkuStockZero::class,
+        \App\Console\Commands\SetSkuStockZeroBak::class,
+        \App\Console\Commands\uploadSmtOrderOnline::class,
+        \App\Console\Commands\getSmtTrackNoOnline::class,
+        \App\Console\Commands\autoAddMessageForSmtOrders::class,
         \App\Console\Commands\GetAliShipmentNumber::class,
+
     ];
     /**
      * Define the application's command schedule.
@@ -55,6 +61,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
+        $schedule->command('purchase:create')->cron('20 0,12 * * *');
         //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {

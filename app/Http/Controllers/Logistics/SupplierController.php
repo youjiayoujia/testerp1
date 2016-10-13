@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Logistics;
 use App\Http\Controllers\Controller;
 use App\Models\Logistics\CollectionInfoModel;
 use App\Models\Logistics\SupplierModel;
+use App\Models\UserModel;
 
 class SupplierController extends Controller
 {
@@ -39,7 +40,8 @@ class SupplierController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
-        $this->model->createSupplier($data, request()->file('credentials'));
+        $model = $this->model->createSupplier($data, request()->file('credentials'));
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
         return redirect($this->mainIndex);
     }
 
@@ -60,12 +62,16 @@ class SupplierController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $data = request()->all();
         $this->validate(request(), $this->model->rules('update'));
         $this->model->updateSupplier($id, $data, request()->file('credentials'));
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         return redirect($this->mainIndex);
     }
 

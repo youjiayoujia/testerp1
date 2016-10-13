@@ -716,14 +716,15 @@ class PackageModel extends BaseModel
     public function calculateLogisticsFee()
     {
         $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
+        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($zones as $zone) {
             if ($zone->inZone($this->shipping_country)) {
                 $fee = '';
                 if ($zone->type == 'first') {
                     if ($this->weight <= $zone->fixed_weight) {
-                        $fee = $this->fixed_price;
+                        $fee = $zone->fixed_price;
                     } else {
-                        $fee = $this->fixed_price;
+                        $fee = $zone->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
                         $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
                     }
@@ -732,12 +733,12 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $fee * $zone->discount + $zone->other_fixed_price;
                     }
-                    return $fee;
+                    return $fee * $currency;
                 } else {
                     $sectionPrices = $zone->zone_section_prices;
                     foreach ($sectionPrices as $sectionPrice) {
                         if ($this->weight >= $sectionPrice->weight_from && $this->weight < $sectionPrice->weight_to) {
-                            return $sectionPrice->price;
+                            return $sectionPrice->price * $currency;
                         }
                     }
                 }

@@ -121,8 +121,8 @@
                 </a>--}}
 
                 <?php } ?>
-                <a data-toggle="modal" data-target="#switch_purchase_{{$product->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-user">转移采购员</span>
+                <!-- <a data-toggle="modal" data-target="#switch_purchase_{{$product->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-user">转移采购员</span> -->
 
                 <a href="{{ route('createImage', ['model'=>$product->model]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片

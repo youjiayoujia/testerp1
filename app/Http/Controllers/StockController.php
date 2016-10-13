@@ -230,10 +230,10 @@ class StockController extends Controller
         if(!Cache::store('file')->get('stockIOStatus')) {
             return redirect(route('stockTaking.index'))->with('alert', $this->alert('fail', '盘点中...'));
         } else {
+            system('supervisorctl stop laravel-queue-assignStocks');
             $job = new StockTaking();
             $job = $job->onQueue('stockTaking');
             $this->dispatch($job);
-            exec('supervisorctl stop laravel-queue-assignStocks');
         }
         
         return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '已加入队列'));

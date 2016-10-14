@@ -1,8 +1,10 @@
 <?php
 namespace App\Console;
+
 use App\Models\ChannelModel;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
 class Kernel extends ConsoleKernel
 {
     /**
@@ -46,6 +48,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\getSellmoreSuppliers::class,
         \App\Console\Commands\GetAliShipmentNumber::class,
     ];
+
     /**
      * Define the application's command schedule.
      *

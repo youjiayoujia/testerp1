@@ -384,6 +384,31 @@ class PackageModel extends BaseModel
         $arr = config('package');
         return isset($arr[$this->status]) ? $arr[$this->status] : '';
     }
+	    public function shunyou()
+    {
+        return $this->belongsTo('App\Models\ShunyouModel','shipping_country','country_code');
+    }
+
+    public function fourpx()
+    {
+        return $this->belongsTo('App\Models\FourModel','shipping_country','fourpx_country_code');
+    }
+
+    public function Fourcode()
+    {
+        return $this->belongsTo('App\Models\FourcodeModel','shipping_country','code');
+    }
+
+    public function postconfig()
+    {
+        return $this->belongsTo('App\Models\PostpacketModel','logistics_id','shipment_id_string');
+    }
+
+    public function catelog()
+    {
+        return $this->belongsTo('App\Models\CatalogModel',$this->items->first()->item->product->catalog_id);
+    }
+
 
     public function processGoods($file)
     {

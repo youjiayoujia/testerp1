@@ -19,8 +19,7 @@ class PermissionModel extends BaseModel
             'action_name' => 'required|unique:permissions,action_name',
         ],
         'update' => [
-            'action' => 'required|unique:permissions,action,{id}',
-            'action_name' => 'required|unique:permissions,action_name,{id}',
+            
         ]
     ];
     public $searchFields = ['name', 'id'];

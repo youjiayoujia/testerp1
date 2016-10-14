@@ -20,6 +20,7 @@ use App\Models\CatalogModel;
 use App\Models\ChannelModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\CountriesSortModel;
+use App\Models\UserModel;
 
 class RuleController extends Controller
 {
@@ -62,6 +63,7 @@ class RuleController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->create(request()->all());
         $model->createAll(request()->all());
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
         return redirect($this->mainIndex);
     }
 
@@ -135,12 +137,16 @@ class RuleController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateAll(request()->all());
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         return redirect($this->mainIndex);
     }
 

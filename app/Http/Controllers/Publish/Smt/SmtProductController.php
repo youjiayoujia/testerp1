@@ -19,6 +19,8 @@ use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Models\Publish\Smt\smtProductUnit;
 use App\Models\Publish\Smt\smtUserSaleCode;
 use Illuminate\Support\Facades\DB;
+use App\Models\Publish\Smt\smtCategoryModel;
+use App\Modules\Common\common_helper;
 
 
 class SmtProductController extends Controller
@@ -1020,5 +1022,427 @@ class SmtProductController extends Controller
         return view($this->viewPath.'show_freight_detail',$response);
     }
     
+    /**
+     * 异步显示账号的产品分组信息
+     */
+    public function showAccountProductGroup(){
+        $token_id = request()->input('token_id');
+        if ($token_id){ //有账号信息
+            $group_list = $this->getLocalProductGroupList($token_id);
+            $option_str = '<option value="">=所有分组=</option>';
+            $option_str .= '<option value="none">未分组</option>';
+            if (!empty($group_list)){
+                foreach($group_list as $id => $item){
+                    $option_str .= '<option value="'.$item['group_id'].'">'.$item['group_name'].'</option>';
+                    if (!empty($item['child'])){
     
+                        foreach ($item['child'] as $pid => $row){
+                            $option_str .= '<option value="'.$row['group_id'].'">&nbsp;&nbsp;&nbsp;&nbsp;--'.$row['group_name'].'</option>';
+                        }
+                    }
+                }
+            }
+            $this->ajax_return('', true, $option_str);
+        }
+    
+        $this->ajax_return('请先选择账号', false);
+    }
+    
+    /**
+     * 根据帐号、分组同步线上数据
+     */
+    public function SynchronousDataByAccount(){
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);        
+        $token_id = request()->input('token_id');
+        $groupId = request()->input('groupId3');
+        $product_statues_type = array("onSelling","offline","auditing","editingRequired");
+        
+        //获取帐号信息
+        $account = AccountModel::find($token_id);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        foreach($product_statues_type as $type)
+        {                           
+            $result = $channel->getOnlineProduct($type,1,100,$groupId); 
+            if (array_key_exists('success', $result) && $result['success']) {
+                    $totalPage = $result['totalPage'];
+                    $this->_handleProductList($account,$result);
+    
+                    if($totalPage > 1){
+                        for ($i=2; $i <= $totalPage; $i++) {
+                            $product_list =  $channel->getOnlineProduct( $type, $i, 100,$groupId);
+                            $product_list['productStatusType'] = $type;
+                            $this->_handleProductList($account,$product_list);
+                        }
+                    }
+             }else {
+                    $this->ajax_return('同步失败!'.$result['error_code'] . ':' . $result['error_message']);                  
+             }
+            $this->ajax_return('同步完成');
+        }
+    }
+    
+    public function _handleProductList(AccountModel $account,$productList){
+        $productDetail = array();
+        $product = array();
+        $productSKU = array();
+        $smtProductsObj = new SmtProductsController();
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        if (array_key_exists('aeopAEProductDisplayDTOList', $productList) && $productList['aeopAEProductDisplayDTOList']) {
+            foreach ($productList['aeopAEProductDisplayDTOList'] as $productItem) {
+                $productInfo = $channel->findAeProductById($productItem['productId']);
+                $product['productId'] = $productItem['productId'];
+                $product['product_url'] = 'http://www.aliexpress.com/item/-/' . $productItem['productId'] . '.html';
+                $product['token_id'] = $account->id;
+                $product['subject'] = array_key_exists('subject', $productInfo) ? $productInfo['subject'] : '';
+                $product['productPrice'] = array_key_exists('productPrice', $productInfo) ? $productInfo['productPrice'] : '';
+                $product['productStatusType'] = $productInfo['productStatusType'];
+                $product['ownerMemberId'] = $productInfo['ownerMemberId'];
+                $product['ownerMemberSeq'] = $productInfo['ownerMemberSeq'];
+                $product['wsDisplay'] = array_key_exists('wsDisplay', $productInfo) ? $productInfo['wsDisplay'] : '';
+                $product['groupId'] = array_key_exists('groupId', $productInfo) ? $productInfo['groupId'] : 0;
+                $product['categoryId'] = $productInfo['categoryId'];
+                $product['packageLength'] = $productInfo['packageLength'];
+                $product['packageWidth'] = $productInfo['packageWidth'];
+                $product['packageHeight'] = $productInfo['packageHeight'];
+                $product['grossWeight'] = $productInfo['grossWeight'];
+                $product['deliveryTime'] = $productInfo['deliveryTime'];
+                $product['wsValidNum'] = $productInfo['wsValidNum'];
+                $product['gmtCreate'] = $smtProductsObj->parseDateString($productItem['gmtCreate']);
+                $product['gmtModified'] = $smtProductsObj->parseDateString($productItem['gmtModified']);
+                $product['wsOfflineDate'] = $smtProductsObj->parseDateString($productInfo['wsOfflineDate']);
+                $product['multiattribute'] = count($productInfo['aeopAeProductSKUs']) > 1 ? 1 : 0;
+    
+                $res = smtProductList::where('productId', $productItem['productId'])->first();
+               
+                $oldUserId = $res ? $res->user_id : 0;
+                if(!$oldUserId){
+                    $tempSKU =($productInfo['aeopAeProductSKUs'][0]);
+                    $user_id = '';
+                    //获取销售前缀
+                    $sale_prefix = $smtProductsObj->get_skucode_prefix($tempSKU['skuCode']);
+                    if ($sale_prefix) {
+                        $userInfo = smtUserSaleCode::where('sale_code', $sale_prefix)->first();
+                        if ($userInfo) {
+                            $user_id = $userInfo->user_id;
+                        }
+                    }
+                    $product['user_id'] = $user_id;
+                }             
+              
+    
+                $productDetail['productId'] = $productItem['productId'];
+                $productDetail['aeopAeProductPropertys'] = array_key_exists('aeopAeProductPropertys', $productInfo) ? serialize($productInfo['aeopAeProductPropertys']) : '';
+                $productDetail['imageURLs'] = $productInfo['imageURLs'];
+                $productDetail['detail'] = array_key_exists('detail', $productInfo) ? htmlspecialchars($productInfo['detail']) : '';
+                $productDetail['productUnit'] = $productInfo['productUnit'];
+                $productDetail['isImageDynamic'] = $productInfo['isImageDynamic'] ? 1 : 0;
+                $productDetail['isImageWatermark'] = array_key_exists('isImageWatermark', $productInfo) ? ($productInfo['isImageWatermark'] ? 1 : 0) : 0;
+                $productDetail['lotNum'] = $productInfo['lotNum'];
+                $productDetail['bulkOrder'] = array_key_exists('bulkOrder', $productInfo) ? $productInfo['bulkOrder'] : 0;
+                $productDetail['packageType'] = $productInfo['packageType'];
+                $productDetail['isPackSell'] = $productInfo['isPackSell'] ? 1 : 0;
+                $productDetail['promiseTemplateId'] = $productInfo['promiseTemplateId'];
+                $productDetail['freightTemplateId'] = $productInfo['freightTemplateId'];
+                $productDetail['sizechartId'] = array_key_exists('sizechartId', $productInfo) ? $productInfo['sizechartId'] : 0;
+                $productDetail['src'] = array_key_exists('src', $productInfo) ? $productInfo['src'] : '';
+                $productDetail['bulkDiscount'] = array_key_exists('bulkDiscount', $productInfo) ? $productInfo['bulkDiscount'] : 0;
+    
+                $detail = smtProductDetail::where('productId', $productItem['productId'])->first();
+                if ($detail) {
+                    smtProductDetail::where('productId', $productItem['productId'])->update($productDetail);
+                    $localSmtSkuList = $smtProductsObj->getLocalSmtSkuCodeBy($productItem['productId']);
+                    $onlineSmtSkuList = array();
+                    foreach ($productInfo['aeopAeProductSKUs'] as $sku_list) {
+                        $onlineSmtSkuList[] = strtoupper(trim($sku_list['skuCode']));
+                    }
+                    //本地存在，线上已被删除的SKU部分
+                    $removedSmtSkuList = array_diff($localSmtSkuList, $onlineSmtSkuList);
+                    if ($removedSmtSkuList) {
+                        //删除erp内线上已被删除的SKU部分
+                        foreach ($removedSmtSkuList as $sku) {
+                            smtProductSku::where(['productId' => $productItem['productId'], 'smtSkuCode' => $sku])->delete();
+                        }
+                    }
+                    unset($localSmtSkuList);
+                    unset($onlineSmtSkuList);
+                    unset($removedSmtSkuList);
+                } else {
+                    smtProductDetail::create($productDetail);
+                }
+                unset($productDetail);
+                $maxPrice = 0;
+                $minPrice = $productInfo['aeopAeProductSKUs'][0]['skuPrice'];  //sku最小值
+                foreach ($productInfo['aeopAeProductSKUs'] as $skuItem) {
+                    //根据属性值来判断是不是属于海外仓 --海外仓的产品SKU可能还是会一样的
+                    $valId = $smtProductsObj->checkProductSkuAttrIsOverSea($skuItem['aeopSKUProperty']);
+                    $skuData = array();
+                    $skuData['aeopSKUProperty'] = $skuItem['aeopSKUProperty'] ? serialize($skuItem['aeopSKUProperty']) : '';
+                    $sku_arr = $smtProductsObj->_buildSysSku(trim($skuItem['skuCode']));
+                    if ($sku_arr) {
+                        foreach ($sku_arr as $sku_new) {                           
+                            $maxPrice = $maxPrice > $skuItem['skuPrice'] ? $maxPrice : $skuItem['skuPrice'];
+                            $minPrice = $minPrice < $skuItem['skuPrice'] ? $maxPrice : $skuItem['skuPrice'];
+                            
+                            $skuData['skuCode'] = $sku_new;
+                            $skuData['skuMark'] = $productItem['productId'] . ':' . $sku_new;
+                            $skuData['smtSkuCode'] = $skuItem['skuCode'];
+                            $skuData['skuPrice'] = $skuItem['skuPrice'];
+                            $skuData['ipmSkuStock'] = $skuItem['ipmSkuStock'];
+                            $skuData['productId'] = $productItem['productId'];
+                            $skuData['sku_active_id'] = $skuItem['id'];
+                            $tempSKUProperty = $skuItem['aeopSKUProperty'];
+                            $aeopSKUProperty = array_shift($tempSKUProperty);
+                            $skuData['propertyValueId'] = isset($aeopSKUProperty['propertyValueId']) ? $aeopSKUProperty['propertyValueId'] : 0;
+                            $skuData['skuPropertyId'] = isset($aeopSKUProperty['skuPropertyId']) ? $aeopSKUProperty['skuPropertyId'] : 0;
+                            $skuData['propertyValueDefinitionName'] =  isset($aeopSKUProperty['propertyValueDefinitionName']) ? $aeopSKUProperty['propertyValueDefinitionName'] : '';
+                            $skuData['synchronizationTime'] = date('Y:m:d H:i:s', time());
+                            $skuData['updated'] = 1;
+                            $skuData['overSeaValId'] = $valId;
+                            $skuData['isRemove'] = 0;
+                            //$skuData['lowerPrice'] = 0;
+                            //$skuData['discountRate'] = $disCountRate;
+                            $skuInfo = smtProductSku::where(['smtSkuCode' => $skuItem['skuCode'],
+                                'productId' => $productItem['productId'],
+                                'overSeaValId'=>$valId,
+                                'skuCode'=>$sku_new])->first();
+                            if ($skuInfo) {
+                                smtProductSku::where(['smtSkuCode' => $skuItem['skuCode'],
+                                    'productId' => $productItem['productId'],
+                                    'overSeaValId'=>$valId,
+                                    'skuCode'=>$sku_new])->update($skuData);
+                            } else {
+                                smtProductSku::create($skuData);                                
+                            }
+                        }
+                    }
+                }
+                $product['productMinPrice']     = $minPrice;
+                $product['productMaxPrice']     = $maxPrice;
+                if ($res) {
+                    smtProductList::where('productId', $productItem['productId'])->update($product);
+                } else {
+                    smtProductList::create($product);
+                }
+                unset($product);
+                unset($productDetail);
+                unset($skuData);
+            }
+        }else{
+            $this->ajax('该分组下没有产品 ！');
+        }
+    }
+    
+    /**
+     * copy帐号在线广告
+     */
+    public function copyAllAccountNew(){
+        set_time_limit(0);
+        $account_form = request()->input('token_id_from');
+        $account_to = request()->input('token_id_to');
+        $groupId = request()->input('$groupId1');
+        $groupId2 = request()->input('$groupId2');
+        $checkecategory = request()->input('checkecategory');
+        
+        $where = array();
+        $where['token_id'] = $account_form;
+        $where['productStatusType'] = 'onSelling';
+        $where['isRemove'] = 0;
+        $newAccountGroup =0;
+       
+        if (!empty($groupId)) {
+            if($groupId=='none'){
+                $where['groupId'] =0;
+            }else            {
+                $where['groupId'] = $groupId;
+            }       
+        }
+        
+        if(!empty($groupId2)&&$groupId2 !='none'){
+            $newAccountGroup  = $groupId2;
+        }
+        
+        if(!empty($checkecategory)){  
+            $category_info = smtCategoryModel::where('category_id',$checkecategory)->first(); //先判断是不是末节点啊  
+            if($category_info->isleaf==1){ // 是末节点 才表示精确查找            
+                $where['categoryId'] = $checkecategory;
+                $product_list = smtProductList::where($where)->get();
+            }
+            else{ //不是。将该分类下的所有末节点都找出来          
+                $categoryArr = $this->getLastCategory($checkecategory);  
+                $product_list = smtProductList::where($where)->where(function($query){$query->whereIn('categoryId',$categoryArr);})->get();
+            }        
+        }else{
+            $product_list = smtProductList::where($where)->get();
+        }
+        
+        $flag = false;
+        $error = array();
+        if($product_list){
+            foreach($product_list as $product){
+                $detail_info  = smtProductDetail::where('productId',$product->productId)->first()->toArray();      //产品详情
+                $sku_info = smtProductSku::where('productId',$product->productId)->get();               //产品SKU信息
+                
+                DB::beginTransaction();
+                try{
+                    $productId = $this->createUniqueKey($product->productId, $account_to);
+                    $draft_product['productId'] = $productId;
+                    $draft_product['token_id'] = $account_to;
+                    $draft_product['old_token_id']  = $product->token_id;
+                    $draft_product['subject']       = $product->subject;
+                    $draft_product['productPrice']  = $product->productPrice;
+                    $draft_product['groupId']       = $newAccountGroup;  //重新生成草稿的产品分组id
+                    $draft_product['categoryId']    = $product->categoryId;
+                    $draft_product['packageLength'] = $product->packageLength;
+                    $draft_product['packageWidth']  = $product->packageWidth;
+                    $draft_product['packageHeight'] = $product->packageHeight;
+                    $draft_product['grossWeight']   = $product->grossWeight;
+                    $draft_product['deliveryTime']  = $product->deliveryTime;
+                    $draft_product['wsValidNum']    = $product->wsValidNum;
+                    $draft_product['productStatusType']  = 'newData';
+                    $draft_product['old_productId'] = $product->productId;
+                    smtProductList::create($draft_product);
+                    
+                    $common_obj = new common_helper();
+                    $draft_detail['productId']              = $productId;
+                    $draft_detail['aeopAeProductPropertys'] = $detail_info['aeopAeProductPropertys'];
+                    $draft_detail['imageURLs']              = $detail_info['imageURLs'];
+                    $detail                                 = htmlspecialchars_decode($detail_info['detail']);
+                    $detail                                 = $common_obj->filterSmtRelationProduct($detail);//过滤关联产品
+                    $draft_detail['detail']                 = htmlspecialchars($detail);
+                    $draft_detail['keyword']                = $detail_info['keyword'];
+                    $draft_detail['productMoreKeywords1']   = $detail_info['productMoreKeywords1'];
+                    $draft_detail['productMoreKeywords2']   = $detail_info['productMoreKeywords2'];
+                    $draft_detail['productUnit']            = $detail_info['productUnit'];
+                    $draft_detail['isImageDynamic']         = $detail_info['isImageDynamic'];
+                    $draft_detail['isImageWatermark']       = $detail_info['isImageWatermark'];
+                    $draft_detail['lotNum']                 = $detail_info['lotNum'];
+                    $draft_detail['bulkOrder']              = $detail_info['bulkOrder'];
+                    $draft_detail['packageType']            = $detail_info['packageType'];
+                    $draft_detail['isPackSell']             = $detail_info['isPackSell'];
+                    $draft_detail['bulkDiscount']           = $detail_info['bulkDiscount'];
+                    $draft_detail['promiseTemplateId']      = $detail_info['promiseTemplateId'];
+                    $draft_detail['src']                    = 'isv';
+                    $draft_detail['freightTemplateId']      = $detail_info['freightTemplateId'];
+                    
+                    $freightTemplateId = $this->getTemplateIdByToken_id($account_to);
+                    if($freightTemplateId){
+                        $draft_detail['freightTemplateId']  = $freightTemplateId;
+                    }
+                    
+                    $draft_detail['templateId']             = $detail_info['templateId'];
+                    $draft_detail['shouhouId']              = $detail_info['shouhouId'];
+                    $draft_detail['detail_title']           = $detail_info['detail_title'];
+                    //  $draft_detail['sizechartId']            = $detail_info['sizechartId'];
+                    $draft_detail['sizechartId']            = -1;                     //复制的尺码ID 都设置成-1
+                    $draft_detail['detailPicList']          = $detail_info['detailPicList'];
+                    $detailLocal                            = htmlspecialchars_decode($detail_info['detailLocal']);
+                    $detailLocal                            = $common_obj->filterSmtRelationProduct($detailLocal);//过滤关联产品
+                    $draft_detail['detailLocal']            = htmlspecialchars($detailLocal);
+                    
+                    unset($detail);
+                    smtProductDetail::create($draft_detail);
+                    
+                    foreach($sku_info as $row){
+                        $draft_skus['productId']       = $productId;
+                        $draft_skus['skuCode']         = $row['skuCode']; //这个需要处理下
+                        $draft_skus['skuPrice']        = $row['skuPrice'];
+                        $draft_skus['skuStock']        = $row['skuStock'];
+                        $draft_skus['smtSkuCode']      = $common_obj->rebuildSmtSku($row['smtSkuCode']);
+                        $draft_skus['skuMark']         = $draft_skus['productId'].':'.$row['skuCode'];
+                        $draft_skus['aeopSKUProperty'] = $row['aeopSKUProperty']; //sku属性--注意可能含有图片
+                        $draft_skus['ipmSkuStock']     = $row['ipmSkuStock'];
+                        $draft_skus['overSeaValId']    = $row['overSeaValId'];
+                        
+                        smtProductSku::create($draft_skus);
+                    }
+                    $flag = true;
+                   
+                }catch(Exception $e){
+                    $error[] = $product->productId.',tokenId:' . $account_to . '复制错误';
+                    DB::rollback();
+                    
+                }
+                unset($draft_product);
+                unset($draft_detail);
+                unset($draft_skus);
+                DB::commit();               
+            }
+        }else{
+            $error =  '您选择的帐号：'.$account_form.'的分组或分类的产品数据不存在!';
+        }
+        $this->ajax_return('另存为草稿' . ($flag ? '成功' : '失败'), $flag, $error);
+    }
+    
+    /**
+     * 获取某一属性的末节点ID
+     * @param unknown $pid
+     * @return array
+     */
+    public function getLastCategory($pid){
+        $result = array();
+        $category_info = smtCategoryModel::where('category_id',$pid)->first();
+        if($category_info->isleaf == 1){
+            $result[] = $category_info->category_id;
+        }else{
+            $result = $this->getLastCategory($category_info->category_id);
+        }
+        return $result;
+        
+    }
+    
+    /**
+     * 生成唯一标识
+     * @param unknown $productId
+     * @param unknown $token_id
+     */
+    public function createUniqueKey($productId,$token_id){
+        $randNum = mt_rand(1000,9999);
+        $uniqueKey = $productId.'-'.$token_id.'-'.$randNum;
+        $isExist = smtProductList::where('productId',$uniqueKey)->first();
+        if($isExist){
+            $this->createUniqueKey($productId, $token_id);
+        }else{
+            return $uniqueKey;
+        }        
+    }
+    
+    /**
+     * 根据关键词获取分类信息
+     */
+    public function getCategoryInfo(){
+        $keyword = request()->input('searchcategoryinfo');
+        //如果是纯数字就指定分类；不是纯数字模糊查询
+        if(is_numeric($keyword)){
+            $result = smtCategoryModel::where('category_id',$keyword)->get();
+        }
+        else{
+            $result = smtCategoryModel::where('category_name','like','%'.$keyword.'%')->get();
+        }
+        $string = "<option>--请选择--</option>";
+        if($result){
+            foreach($result as $category_info){
+                if($category_info->isleaf == 1){
+                    $string = $string."<option class='red' value=".$category_info['category_id'].">".$category_info['category_id']."-".$category_info['category_name']."<option>";
+                }
+                else{
+                    $string = $string."<option value=".$category_info['category_id'].">".$category_info['category_id']."-".$category_info['category_name']."<option>";
+                }
+            }
+        }
+        $this->ajax_return($string,1);
+    }
+    
+    /**
+     * 根据token_id获取默认的运费模版
+     * @param unknown $token_id
+     */
+    public function getTemplateIdByToken_id($token_id){
+        $freightTemplate = smtFreightTemplate::where(['token_id'=>$token_id,'default'=>1])->first();
+        if(!$freightTemplate){
+            return false;
+        }
+        return $freightTemplate->templateId;
+        
+    }
 }

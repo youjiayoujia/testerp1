@@ -68,6 +68,10 @@ class smtProductSku extends BaseModel
         return $this->belongsTo('App\Models\Publish\Smt\smtProductList', 'productId','productId');
     }
     
+    public function productItem(){
+        return $this->belongsTo('App\Models\ItemModel', 'skuCode','sku');
+    }
+    
     public function getAccountNumber($model, $name)
     {
         $channel =  ChannelModel::where('driver','aliexpress')->first();

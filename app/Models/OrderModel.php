@@ -13,6 +13,7 @@ namespace App\Models;
 use Tool;
 use Exception;
 use Storage;
+use App\Models\CurrencyModel;
 use App\Base\BaseModel;
 use App\Models\ItemModel;
 use App\Models\Order\RefundModel;
@@ -424,10 +425,11 @@ class OrderModel extends BaseModel
     public function getAllItemCostAttribute()
     {
         $total = 0;
+        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($this->items as $item) {
             $total += $item->item->purchase_price * $item->quantity;
         }
-        return $total;
+        return $total * $currency;
     }
 
     public function getPartialOverAttribute()
@@ -502,12 +504,12 @@ class OrderModel extends BaseModel
 
     public function checkBlack()
     {
-        $channel = $this->channel->find($this['channel_id']);
-        if ($channel['driver'] == 'wish') {
-            $name = $this['shipping_lastname'] . ' ' . $this['shipping_firstname'];
-            $blacklist = BlacklistModel::where('zipcode', $this['shipping_zipcode'])->where('name', $name);
+        $channel = $this->channel->find($this->channel_id);
+        if ($channel->driver == 'wish') {
+            $name = $this->shipping_lastname . ' ' . $this->shipping_firstname;
+            $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
         } else {
-            $blacklist = BlacklistModel::where('email', $this['email']);
+            $blacklist = BlacklistModel::where('email', $this->email);
         }
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
@@ -670,7 +672,8 @@ class OrderModel extends BaseModel
      */
     public function calculateProfitProcess()
     {
-        $orderAmount = $this->amount;
+        $currency = CurrencyModel::where('code', $this->currency)->first()->rate;
+        $orderAmount = $this->amount * $currency;
         $orderCosting = $this->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee();
         $orderRate = ($this->amount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $this->amount;
@@ -694,13 +697,14 @@ class OrderModel extends BaseModel
         $sum = 0;
         $orderItems = $this->items;
         $channel = $this->channel;
+        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($orderItems as $orderItem) {
             $buf = $orderItem->item->catalog->channels->where('id', $this->channelAccount->catalog_rates_channel_id)->first();
             if($buf) {
                 $buf = $buf->pivot;
                 $flat_rate_value = $buf->flat_rate;
                 $rate_value = $buf->rate;
-                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
+                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value/100 + $flat_rate_value * $currency;
             } else {
                 return 0;
             }
@@ -719,7 +723,8 @@ class OrderModel extends BaseModel
     public function OrderCancle()
     {
         $orderItems = $this->items;
-        $this->update(['status' => 'CANCEL']);
+        $this->update(['status' => 'REVIEW']);
+        $this->remarks->create(['remark' => 'profit is less than 0', 'user_id' => request()->user()->id]);
         foreach ($orderItems as $orderItem) {
             $orderItem->update(['is_active' => '0']);
         }

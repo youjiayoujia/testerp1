@@ -70,7 +70,8 @@ class ImageController extends Controller
         $data['tag'] = explode(',', substr($data['image_type'],0, strlen($data['image_type'])-1));
         $data['uploadType'] = 'image';
         $path = $this->model->imageCreate($data, request()->files);    
-        echo json_encode($path);
+        
+        return $path;
     }
 
     /**
@@ -163,19 +164,6 @@ class ImageController extends Controller
         ];
         return view($this->viewPath . 'spucreate', $response);
     }
-
-    /**
-     * 删除
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function imagelable()
-    {
-        echo 111;exit;
-    }
-
-
 }
 
 

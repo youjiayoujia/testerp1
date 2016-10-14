@@ -39,8 +39,8 @@ class SmtAccountManageController extends Controller
         $smtApi = Channel::driver($account_info->channel->driver, $account_info->api_config);
         if($type == 'check'){
             //通过请求smtAPI来确定token是否正常
-            $parameter = "keyword=case";
-            $result = $smtApi->getJsonData("api.recommendCategoryByKeyword",$parameter);
+            $parameter = "cateId=0";
+            $result = $smtApi->getJsonData("api.getChildrenPostCategoryById",$parameter);
             $result = json_decode($result, true);
             if(isset($result['success']) && $result['success']){
                 $this->ajax_return("账号正常",1);

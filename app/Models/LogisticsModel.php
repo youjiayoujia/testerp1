@@ -15,11 +15,11 @@ use App\Models\Logistics\LimitsModel;
 
 class LogisticsModel extends BaseModel
 {
-    protected $table = 'logisticses';
+    public $table = 'logisticses';
 
     public $searchFields = ['code' => '物流方式简码', 'name' => '物流方式名称'];
 
-    protected $fillable = [
+    public $fillable = [
         'id',
         'code',
         'name',

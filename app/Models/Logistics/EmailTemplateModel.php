@@ -14,7 +14,7 @@ use App\Base\BaseModel;
 
 class EmailTemplateModel extends BaseModel
 {
-    protected $table = 'logistics_email_templates';
+    public $table = 'logistics_email_templates';
 
     public $searchFields = [
         'customer' => '协议客户',
@@ -24,7 +24,7 @@ class EmailTemplateModel extends BaseModel
         'sender' => '寄件人'
     ];
 
-    protected $fillable = [
+    public $fillable = [
         'name',
         'customer',
         'address',

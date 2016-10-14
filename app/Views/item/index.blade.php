@@ -218,7 +218,7 @@
                 <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-primary btn-xs" data-id="{{ $item->id }}">
                     <span class="glyphicon glyphicon-print"></span>
                 </a>
-                <a data-toggle="modal" data-target="#add_supplier_{{$item->id}}" title="添加供应商" class="btn btn-success btn-xs">
+                <a data-toggle="modal" data-target="#add_supplier_{{$item->id}}" title="添加备选供应商" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-shopping-cart"></span>
                 </a>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
@@ -334,7 +334,7 @@
         <!-- 模态框提问结束（Modal） -->
 
         <!-- 添加供应商模态框（Modal -->
-            <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
+            <form action="/item/addSupplier/{{$item->id}}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="modal fade" id="add_supplier_{{$item->id}}"  role="dialog" 
                aria-labelledby="myModalLabel" aria-hidden="true">
@@ -346,12 +346,12 @@
                               &times;
                         </button>
                         <h4 class="modal-title" id="myModalLabel">
-                           添加供应商
+                           添加备选供应商
                         </h4>
                      </div>
 
                      <div class="modal-body">        
-                        <select id="supplier_id" class="form-control supplier" name="supplier_id">
+                        <select id="supplier_id" style="width:550px" class="form-control supplier" name="supplier_id">
                            <option value="{{$item->supplier->id}}">{{$item->supplier->name}}</option>
                         </select>
                      </div>

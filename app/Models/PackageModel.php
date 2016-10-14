@@ -223,6 +223,47 @@ class PackageModel extends BaseModel
 
         return $flag;
     }
+    
+    /**
+     * 申报中文名
+     * @return string
+     */
+    public function getDeclearedCnameAttribute(){
+        $declared_cn = '';
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_cn = $packageItem->item->product ? $packageItem->item->product->declared_cn : '';
+            }
+        }
+        return $declared_cn;
+    }
+    
+    /**
+     * 申报英文名
+     * @return string
+     */
+    public function getDeclearedEnameAttribute(){
+        $declared_en = '';
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_en = $packageItem->item->product ? $packageItem->item->product->declared_en : '';
+            }
+        }
+        return $declared_en;
+    } 
+    
+    /**
+     * 获取申报价值
+     */
+    public function getDeclearedValueAttribute(){
+        $declared_val = 0;
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_val = $packageItem->item->product ? $packageItem->item->product->declared_value: 0;
+            }
+        }
+        return $declared_val;
+    }
 
     public function getStatusColorAttribute()
     {
@@ -332,6 +373,10 @@ class PackageModel extends BaseModel
     public function country()
     {
         return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+    
+    public function russiaPYCode(){
+        return $this->belongsTo('App\Models\Logistics\Zone\RussiaPingCodeModel', 'shipping_country', 'country_code');
     }
 
     public function getStatusNameAttribute()
@@ -716,14 +761,15 @@ class PackageModel extends BaseModel
     public function calculateLogisticsFee()
     {
         $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
+        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($zones as $zone) {
             if ($zone->inZone($this->shipping_country)) {
                 $fee = '';
                 if ($zone->type == 'first') {
                     if ($this->weight <= $zone->fixed_weight) {
-                        $fee = $this->fixed_price;
+                        $fee = $zone->fixed_price;
                     } else {
-                        $fee = $this->fixed_price;
+                        $fee = $zone->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
                         $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
                     }
@@ -732,12 +778,12 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $fee * $zone->discount + $zone->other_fixed_price;
                     }
-                    return $fee;
+                    return $fee * $currency;
                 } else {
                     $sectionPrices = $zone->zone_section_prices;
                     foreach ($sectionPrices as $sectionPrice) {
                         if ($this->weight >= $sectionPrice->weight_from && $this->weight < $sectionPrice->weight_to) {
-                            return $sectionPrice->price;
+                            return $sectionPrice->price * $currency;
                         }
                     }
                 }

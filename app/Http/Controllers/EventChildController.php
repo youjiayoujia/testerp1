@@ -24,6 +24,13 @@ class EventChildController extends Controller
         $this->viewPath = 'event.child.';
     }
 
+    /**
+     *  返回对应的操作日志,ajax请求 
+     *
+     *  @param none
+     *  @return html
+     *
+     */
     public function getInfo()
     {
         $table = request('table');

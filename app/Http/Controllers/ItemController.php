@@ -64,7 +64,7 @@ class ItemController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'suppliers' => $this->supplier->all(),
+            //'suppliers' => $this->supplier->all(),
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'wrapLimit' => $this->wrapLimit->all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
@@ -388,7 +388,7 @@ class ItemController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit')),
             'mixedSearchFields' => $this->model->mixed_search,
             'Compute_channels' => ChannelModel::all(),
 
@@ -459,6 +459,16 @@ class ItemController extends Controller
         $data['status'] = 'close';
         $sku_message->update($data);
         return redirect(route('item.questionIndex'));
+    }
+
+    //添加供应商
+    public function addSupplier($item_id)
+    {
+        $supplier_id = request()->input('supplier_id');
+        $model = $this->model->find($item_id);
+        $arr['supplier_id'] = $supplier_id;
+        $model->skuPrepareSupplier()->attach($arr);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '备选供应商添加成功.'));
     }
 
     public function curlApiChangeWarehousePositon()

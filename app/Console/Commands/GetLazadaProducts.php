@@ -54,25 +54,36 @@ class GetLazadaProducts extends Command
                 break;
             }
             
-            $resultProducts = $result['Body']['Products']['Product'];               
+            $resultProducts = $result['Body']['Products']['Product'];    
             foreach($resultProducts as $productInfo){
                 $sku = $this->getSkuCode($productInfo['SellerSku']);
                 $productInfo['sku'] = trim($sku);
                 $productInfo['account'] = $account->account;
-                $res = erpLazadaProduct::where('sellerSku',$productInfo['SellerSku'])->first();
+                $res = erpLazadaProduct::where(['sellerSku'=>$productInfo['SellerSku'],'account'=>$account->account])->first();
                 
                 //从lazada上获取的产品的Variation数据理论上string,但是不知为何有些返回为array
-                if(is_array($productInfo['Variation'])){
+                if(is_array($productInfo['Variation']) && !empty($productInfo['Variation'])){
                     $variation = json_encode($productInfo['Variation']);
-                }else{
+                }elseif(!empty($productInfo['Variation'])){
                     $variation = $productInfo['Variation'];
+                }else{
+                    $variation = '';
                 }
+                
+                if(is_array($productInfo['ProductId']) && !empty($productInfo['ProductId'])){
+                    $productId = json_encode($productInfo['ProductId']);
+                }elseif(!empty($productInfo['ProductId'])){
+                    $productId = $productInfo['ProductId'];
+                }else{
+                    $productId = '';
+                }
+                
                 if($res){
                     $updateArr = array();
-                    $updateArr['sellerSku'] = $productInfo['SellerSku'];
+                    //$updateArr['sellerSku'] = $productInfo['SellerSku'];
                     $updateArr['shopSku'] = empty($productInfo['ShopSku']) ? '' : $productInfo['ShopSku'];
-                    $updateArr['sku'] = $productInfo['sku'];
-                    $updateArr['name'] = $productInfo['Name'];
+                    //$updateArr['sku'] = $productInfo['sku'];
+                    $updateArr['name'] = addslashes($productInfo['Name']);
                     $updateArr['variation'] = $variation;
                     $updateArr['quantity'] = $productInfo['Quantity'];
                     $updateArr['price'] = $productInfo['Price'];
@@ -81,7 +92,7 @@ class GetLazadaProducts extends Command
                     $updateArr['saleEndDate'] = empty($productInfo['SaleEndDate'] ? '0000-00-00 00:00:00' : $productInfo['SaleEndDate']);
                     $updateArr['status'] = $productInfo['Status'];
                     $updateArr['account'] = $productInfo['account'];
-                    $updateArr['productId'] = isset($productInfo['ProductId']) ? json_encode($productInfo['ProductId']) : '';
+                    $updateArr['productId'] = $productId;
                     erpLazadaProduct::where('id',$res['id'])->update($updateArr);
                 }else{
                     $addArr = array();
@@ -96,7 +107,7 @@ class GetLazadaProducts extends Command
                     $addArr['saleStartDate'] = $productInfo['SaleStartDate'];
                     $addArr['saleEndDate'] = $productInfo['SaleEndDate'];
                     $addArr['status'] = $productInfo['Status']; 
-                    $addArr['productId'] = isset($productInfo['ProductId']) ? json_encode($productInfo['ProductId']) : '';
+                    $addArr['productId'] = $productId;
                     $addArr['account'] = $productInfo['account'];
                     erpLazadaProduct::create($addArr);
                 }           

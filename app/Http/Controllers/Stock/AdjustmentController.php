@@ -254,6 +254,13 @@ class AdjustmentController extends Controller
         }
     }
 
+    /**
+     * 跳转审核页面 
+     *
+     * @param $id adjustment  id
+     * @return view 
+     *
+     */
     public function check($id)
     {
         $model = $this->model->find($id);
@@ -270,6 +277,13 @@ class AdjustmentController extends Controller
         return view($this->viewPath.'check', $response);
     }
 
+    /**
+     * 审核结果处理 
+     *
+     *  @param $id adjustment id
+     *  @return index
+     *
+     */
     public function checkResult($id)
     {
         $result = request('result');

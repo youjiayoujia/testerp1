@@ -19,7 +19,7 @@
             <td>{{ $unpaidOrder->remark . ' ' . $unpaidOrder->note }}</td>
             <td>{{ $unpaidOrder->date }}</td>
             <td>{{ $unpaidOrder->channel->name }}</td>
-            <td>{{ $unpaidOrder->user->name }}</td>
+            <td>{{ $unpaidOrder->user ? $unpaidOrder->user->name : '' }}</td>
             <td>{{ $unpaidOrder->status_name }}</td>
             <td>{{ $unpaidOrder->updated_at }}</td>
             <td>{{ $unpaidOrder->created_at }}</td>
@@ -35,6 +35,11 @@
                    data-url="{{ route('unpaidOrder.destroy', ['id' => $unpaidOrder->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $unpaidOrder->table }}" data-id="{{$unpaidOrder->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

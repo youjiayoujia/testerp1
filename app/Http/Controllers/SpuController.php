@@ -7,6 +7,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\SpuModel;
+use App\Models\CatalogModel;
+use App\Models\Warehouse\PositionModel;
 use App\Models\ProductModel;
 use App\Models\ItemModel;
 use App\Models\UserModel;
@@ -37,7 +39,7 @@ class SpuController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->with('Purchase','editUser','imageEdit','Developer')),
             'num_arr' =>$num_arr,
             'users' => UserModel::all(),
             'mixedSearchFields' => $this->model->mixed_search,
@@ -155,7 +157,7 @@ class SpuController extends Controller
     }
 
     /**
-     * 批量更新
+     * 
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -205,65 +207,103 @@ class SpuController extends Controller
 
     public function uploadSku()
     {
-
+        set_time_limit(0);
         $file = request()->file('upload');
         $path = config('setting.excelPath');
         !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
         $data_array = '';
         $result = false;
+        //echo '<pre>';
         Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
             $reader->noHeading();
             $data_array = $reader->all()->toArray();
-            echo '<pre>';
-            //print_r($data_array);exit;
+            
             foreach ($data_array as $key => $value) {
                 if($key==0)continue;
+                //print_r($value);exit;
+                if(count(ItemModel::where('sku',$value['3'])->get()))continue;
+                if($value['15']!=''){
+                    $position['warehouse_id'] = $value['14']==1000?'1':'2';
+                    $position['name'] = $value['15'];
+                    $position['is_available'] = 1;
+                    if(!count(PositionModel::where('name',$value['15'])->get())){
+                        PositionModel::create($position);
+                    }
+                }
+                
                 $spuData['spu'] = $value['1'];
-                $spuModel = $this->model->create($spuData);
+                //创建spu
+                if(count(SpuModel::where('spu',$value['1'])->get())){
+                    $spu_id = SpuModel::where('spu',$value['1'])->get()->toArray()[0]['id'];
+                    //print_r($spu_id);exit;
+                }else{
+                    $spuModel = $this->model->create($spuData);
+                    $spu_id = $spuModel->id;
+                }
+                
 
                 $productData['model'] = $value['2'];
-                $productData['spu_id'] = $spuModel->id;
+                $productData['spu_id'] = $spu_id;
                 $productData['name'] = $value['5'];
                 $productData['c_name'] = $value['4'];
-                $productData['catalog_id'] = $value['6'];
+                $catalog_id = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
+                //print_r($catalog_id);exit;
+                $productData['catalog_id'] = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
                 $productData['supplier_id'] = $value['7'];
-                $productData['purchase_url'] = $value['8'];
-                $productData['purchase_day'] = $value['9'];
-                $productData['product_sale_url'] = $value['10'];
-                $productData['purchase_price'] = $value['11'];
-                $productData['warehouse_id'] = $value['13'];
-                $productData['package_height'] = $value['20'];
-                $productData['package_width'] = $value['19'];
-                $productData['package_length'] = $value['18'];
-                $productData['height'] = $value['17'];
-                $productData['width'] = $value['16'];
-                $productData['length'] = $value['15'];
-                $productModel = ProductModel::create($productData);
+                $productData['purchase_url'] = $value['9'];
+                $productData['purchase_day'] = $value['10'];
+                $productData['product_sale_url'] = $value['11'];
+                //采购价
+                $productData['purchase_price'] = $value['12'];
+                //$productData['warehouse_id'] = $value['14']==1000?'1':'2';
+                $productData['package_height'] = $value['21'];
+                $productData['package_width'] = $value['20'];
+                $productData['package_length'] = $value['19'];
+                $productData['height'] = $value['18'];
+                $productData['width'] = $value['17'];
+                $productData['length'] = $value['16'];
+                //创建model
+                if(count(ProductModel::where('model',$value['2'])->get())){
+                    $product_id = ProductModel::where('model',$value['2'])->get()->toArray()[0]['id'];
+                }else{
+                    $productModel = ProductModel::create($productData);
+                    $product_id = $productModel->id;
+                    $wrr['wrap_limits_id'] = $value['39'];
+                    $productModel->wrapLimit()->attach($wrr);
+                }
 
-                $skuData['product_id'] = $productModel->id;
-                $skuData['catalog_id'] = $value['6'];
+                $skuData['product_id'] = $product_id;
+                $skuData['catalog_id'] = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
                 $skuData['sku'] = $value['3'];
                 $skuData['name'] = $value['5'];
                 $skuData['c_name'] = $value['4'];
-                $skuData['weight'] = $value['24'];
-                $skuData['warehouse_id'] = $value['13'];
-                $skuData['warehouse_position'] = $value['14'];
+                $skuData['weight'] = $value['25'];
+                $skuData['warehouse_id'] = $value['14']==1000?'1':'2';
+                $skuData['warehouse_position'] = $value['15'];
                 $skuData['supplier_id'] = $value['7'];
-                $skuData['purchase_url'] = $value['8'];
-                $skuData['purchase_price'] = $value['11'];
-                $skuData['purchase_adminer'] = $value['21'];
-                $skuData['cost'] = $value['12'];
-                $skuData['height'] = $value['17'];
-                $skuData['width'] = $value['16'];
-                $skuData['length'] = $value['15'];
-                $skuData['package_height'] = $value['20'];
-                $skuData['package_width'] = $value['19'];
-                $skuData['package_length'] = $value['18'];
-                $skuData['status'] = $value['28'];
-                $skuData['is_available'] = $value['39'];
-                $skuData['remark'] = $value['40'];
-                ItemModel::create($skuData);
+                $skuData['purchase_url'] = $value['9'];
+                $skuData['purchase_price'] = $value['12'];
+                $skuData['purchase_adminer'] = $value['22'];
+                $skuData['cost'] = $value['13'];
+                $skuData['height'] = $value['18'];
+                $skuData['width'] = $value['17'];
+                $skuData['length'] = $value['16'];
+                $skuData['package_height'] = $value['21'];
+                $skuData['package_width'] = $value['20'];
+                $skuData['package_length'] = $value['19'];
+                $skuData['status'] = $value['29'];
+                $skuData['is_available'] = $value['40'];
+                $skuData['remark'] = $value['41'];
+                //创建sku
+                $itemModel = ItemModel::create($skuData);
+                foreach(explode(',',$value['8']) as $_supplier_id){
+                    //print_r($itemModel->skuPrepareSupplier());exit;
+                    $arr['supplier_id'] = $_supplier_id;
+                    $itemModel->skuPrepareSupplier()->attach($arr);
+                }
+
+                
             }
         },'gb2312');        
     }

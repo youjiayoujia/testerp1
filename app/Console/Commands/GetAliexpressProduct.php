@@ -96,8 +96,7 @@ class GetAliexpressProduct extends Command
                 $product['productPrice'] = array_key_exists('productPrice', $productInfo) ? $productInfo['productPrice'] : '';
                 $product['productStatusType'] = $productInfo['productStatusType'];
                 $product['ownerMemberId'] = $productInfo['ownerMemberId'];
-                $product['ownerMemberSeq'] = $productInfo['ownerMemberSeq'];
-                $product['wsOfflineDate'] = $smtProductsObj->parseDateString($productInfo['wsOfflineDate']);
+                $product['ownerMemberSeq'] = $productInfo['ownerMemberSeq'];                
                 $product['wsDisplay'] = array_key_exists('wsDisplay', $productInfo) ? $productInfo['wsDisplay'] : '';
                 $product['groupId'] = array_key_exists('groupId', $productInfo) ? $productInfo['groupId'] : '';
                 $product['categoryId'] = $productInfo['categoryId'];
@@ -111,30 +110,37 @@ class GetAliexpressProduct extends Command
                 $product['productMaxPrice'] = $productItem['productMaxPrice'];
                 $product['gmtCreate'] = $smtProductsObj->parseDateString($productItem['gmtCreate']);
                 $product['gmtModified'] = $smtProductsObj->parseDateString($productItem['gmtModified']);
-                $product['multiattribute'] = count($productInfo['aeopAeProductSKUs']) > 1 ? 1 : 0;
-                
-                $tempSKU =($productInfo['aeopAeProductSKUs'][0]);
-                $user_id = '';
-                //获取销售前缀
-                $sale_prefix = $smtProductsObj->get_skucode_prefix($tempSKU['skuCode']);
-                if ($sale_prefix) {
-                    $userInfo = smtUserSaleCode::where('sale_code', $sale_prefix)->first();
-                    if ($userInfo) {
-                        $user_id = $userInfo->user_id;
+                $product['wsOfflineDate'] = $smtProductsObj->parseDateString($productInfo['wsOfflineDate']);
+                $product['multiattribute'] = count($productInfo['aeopAeProductSKUs']) > 1 ? 1 : 0;                
+
+                $res = smtProductList::where('productId', $productItem['productId'])->first();
+                if(isset($productInfo['aeopAeProductSKUs'][0]) && $product['gmtCreate'] > '2014-09-01'){
+                    $oldUserId = $res ? $res->user_id : 0;
+                    if(!$oldUserId){
+                        $tempSKU =($productInfo['aeopAeProductSKUs'][0]);
+                        $user_id = '';
+                        //获取销售前缀
+                        $sale_prefix = $smtProductsObj->get_skucode_prefix($tempSKU['skuCode']);
+                        if ($sale_prefix) {
+                            $userInfo = smtUserSaleCode::where('sale_code', $sale_prefix)->first();
+                            if ($userInfo) {
+                                $user_id = $userInfo->user_id;
+                            }
+                        }
+                        $product['user_id'] = $user_id;
                     }
                 }
-                $product['user_id'] = $user_id;
-                $res = smtProductList::where('productId', $productItem['productId'])->first();
+               
                 if ($res) {
                     smtProductList::where('productId', $productItem['productId'])->update($product);
                 } else {
                     smtProductList::create($product);
                 }
-            
+                
                 $productDetail['productId'] = $productItem['productId'];
                 $productDetail['aeopAeProductPropertys'] = array_key_exists('aeopAeProductPropertys', $productInfo) ? serialize($productInfo['aeopAeProductPropertys']) : '';
                 $productDetail['imageURLs'] = $productInfo['imageURLs'];
-                $productDetail['detail'] = array_key_exists('detail', $productInfo) ? $productInfo['detail'] : '';
+                $productDetail['detail'] = array_key_exists('detail', $productInfo) ? htmlspecialchars($productInfo['detail']) : '';
                 $productDetail['productUnit'] = $productInfo['productUnit'];
                 $productDetail['isImageDynamic'] = $productInfo['isImageDynamic'] ? 1 : 0;
                 $productDetail['isImageWatermark'] = array_key_exists('isImageWatermark', $productInfo) ? ($productInfo['isImageWatermark'] ? 1 : 0) : 0;
@@ -207,9 +213,15 @@ class GetAliexpressProduct extends Command
                             $skuData['overSeaValId'] = $valId;
                             $skuData['lowerPrice'] = $lowerPrice;
                             $skuData['discountRate'] = $disCountRate;
-                            $skuInfo = smtProductSku::where(['smtSkuCode' => $skuItem['skuCode'], 'productId' => $productItem['productId']])->first();
+                            $skuInfo = smtProductSku::where(['smtSkuCode' => $skuItem['skuCode'], 
+                                                             'productId' => $productItem['productId'],
+                                                             'overSeaValId'=>$valId,
+                                                              'skuCode'=>$sku_new])->first();                            
                             if ($skuInfo) {
-                                smtProductSku::where(['smtSkuCode' => $skuItem['skuCode'], 'productId' => $productItem['productId']])->update($skuData);
+                                smtProductSku::where(['smtSkuCode' => $skuItem['skuCode'], 
+                                                      'productId' => $productItem['productId'],
+                                                      'overSeaValId'=>$valId,
+                                                      'skuCode'=>$sku_new])->update($skuData);
                             } else {
                                 smtProductSku::create($skuData);
                                 $plat_info = $smtProductsObj->_getProductPlatInfoByPlatType('SMT');

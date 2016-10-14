@@ -35,36 +35,28 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        if(!Cache::store('file')->get('stockIOStatus')) {
-            $this->result['status'] = 'fail';
-            $this->result['remark'] = 'stockTaking , stock is locked.';
-            $this->lasting = 0;
-            $this->log('AssignLogistics');
-            throw new Exception('in stock taking');
-        } else {
-            $start = microtime(true);
-            $this->package->assignLogistics();
-            if ($this->package->status == 'ASSIGNED') {
-                //计算订单利润率
-                $orderRate = $this->package->order->calculateProfitProcess();
-                if ($orderRate > 0) {
-                    $job = new PlaceLogistics($this->package);
-                    $job = $job->onQueue('placeLogistics');
-                    $this->dispatch($job);
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success.';
-                } else {
-                    $order = $this->package->order;
-                    $order->OrderCancle();
-                    $this->result['status'] = 'fail';
-                    $this->result['remark'] = "Order's profit isn't more than 0.";
-                }
+        $start = microtime(true);
+        $this->package->assignLogistics();
+        if ($this->package->status == 'ASSIGNED') {
+            //计算订单利润率
+            $orderRate = $this->package->order->calculateProfitProcess();
+            if ($orderRate > 0) {
+                $job = new PlaceLogistics($this->package);
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'Success.';
             } else {
+                $order = $this->package->order;
+                $order->OrderCancle();
                 $this->result['status'] = 'fail';
-                $this->result['remark'] = 'Fail to assign logistics.';
+                $this->result['remark'] = "Order's profit isn't more than 0.";
             }
-            $this->lasting = round(microtime(true) - $start, 3);
-            $this->log('AssignLogistics');
+        } else {
+            $this->result['status'] = 'fail';
+            $this->result['remark'] = 'Fail to assign logistics.';
         }
+        $this->lasting = round(microtime(true) - $start, 3);
+        $this->log('AssignLogistics');
     }
 }

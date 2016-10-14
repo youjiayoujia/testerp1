@@ -74,8 +74,12 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = OrderModel::find(184);
-        var_dump($package->calculateProfitProcess());
+        $package = PackageModel::find(1);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $package,
+        ];
+        return view('logistics.template.tpl.printChinaPY_ldb_tlp', $response);
     }
 
     public function test3()

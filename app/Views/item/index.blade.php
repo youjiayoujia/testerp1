@@ -36,24 +36,22 @@
     <th>售价</th>
     <th>体积系数</th>
     <th>税率</th>
-    <th class="sort" data-field="created_at">创建时间</th>
-    <th>更新时间</th>
     <th>操作</th>
 @stop
 
 @section('tableBody')
 
     @foreach($data as $item)
-    <?php //print_r($item->product->shape);exit; ?>
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
             <td>
+                <!-- 100条sql -->
                 <img src="{{ asset($item->product->dimage) }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;">
                 <br><br>
                 <div style='text-align:center' ><a href='' data-toggle="modal" data-target="#imgModal_{{$item->id}}">[{{count($item->product->shape)}}]<a></div>
             </td>
-            <td>{{ $item->c_name }}<br>物品分类：{{ $item->product->catalog?$item->product->catalog->all_name:'' }}<br>
+            <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
                                     开发时间：{{ $item->created_at }}<br>
                                     【包装方式：<br>
                                     @foreach($item->product->wrapLimit as $wrap)
@@ -75,6 +73,7 @@
             </td>
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>
+                <!-- 400条sql -->
                 <div>虚：{{$item->available_quantity}}</div>
                 <div>实：{{$item->all_quantity}}</div>
                 <div>途：{{$item->normal_transit_quantity}}</div>
@@ -209,20 +208,21 @@
             </td>
             <td>1</td>
             <td>1</td>
-            <td>{{ $item->updated_at }}</td>
-            <td>{{ $item->created_at }}</td>
             <td>
                 <a href="{{ route('item.show', ['id'=>$item->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 查看
+                    <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 <a href="{{ route('item.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
-                <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">
-                    <span class="glyphicon glyphicon-pencil"></span> 打印
+                <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-primary btn-xs" data-id="{{ $item->id }}">
+                    <span class="glyphicon glyphicon-print"></span>
+                </a>
+                <a data-toggle="modal" data-target="#add_supplier_{{$item->id}}" title="添加供应商" class="btn btn-success btn-xs">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
                 </a>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-zoom-in">转移采购员</span>
+                    <span class="glyphicon glyphicon-user"></span>
                 </a>
                 <a data-toggle="modal" data-target="#question_{{$item->id}}" title="常见问题" class="btn btn-info btn-xs" id="ques">
                     <span class="glyphicon glyphicon-question-sign"></span>
@@ -230,7 +230,7 @@
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $item->id }}"
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
             </td>
         </tr>
@@ -242,8 +242,9 @@
                   <div class="modal-content">
                      
                      <div class="modal-body">
+                        <!-- 50条sql -->
                         @foreach($item->product->shape as $image)
-                         <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
+                            <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
                         @endforeach
                      </div>
                      
@@ -269,11 +270,8 @@
                         </h4>
                      </div>
                      <div class="modal-body">
-                         <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div>
-                         <div>转移至：</div>
-                         <div><select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select></div>
-                         或者：
-                         <input type="text" value='' name='manual_name' id='manual_name'>
+                         <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div><br>
+                         <div>转移至：<select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select>  或者：<input type="text" value='' placeholder="姓名" name='manual_name' id='manual_name'></div>
                      </div>
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default" 
@@ -287,7 +285,7 @@
             </div>
             </div>
         </form>
-        <!-- 模态框结束（Modal） -->
+        <!-- 模态框转采购负责人结束（Modal） -->
 
         <!-- 模态框（Modal）提问 -->
         <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
@@ -333,7 +331,44 @@
             </div>
             </div>
         </form>
-        <!-- 模态框结束（Modal） -->
+        <!-- 模态框提问结束（Modal） -->
+
+        <!-- 添加供应商模态框（Modal -->
+            <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="add_supplier_{{$item->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           添加供应商
+                        </h4>
+                     </div>
+
+                     <div class="modal-body">        
+                        <select id="supplier_id" class="form-control supplier" name="supplier_id">
+                           <option value="{{$item->supplier->id}}">{{$item->supplier->name}}</option>
+                        </select>
+                     </div>
+                     
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 添加供应商模态框结束（Modal） -->
 
     @endforeach
 
@@ -435,6 +470,22 @@
                   return {
                     user:params.term,
                     item_id: $(this).attr('id'),
+                  };
+                },
+                results: function(data, page) {
+                    
+                }
+            },
+        });
+
+        $('.supplier').select2({
+            ajax: {
+                url: "{{ route('ajaxSupplier') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    supplier:params.term,
                   };
                 },
                 results: function(data, page) {

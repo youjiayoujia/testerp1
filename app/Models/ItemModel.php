@@ -629,6 +629,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
+            if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -637,6 +638,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
+            if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -645,6 +647,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
+            if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
 
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {

@@ -16,15 +16,13 @@
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
-    <th>图片</th>
     <th>采购员</th>
     <th>编辑</th>
     <th>美工</th>
     <th>开发</th>
     <th>当前进度</th>
     <th>备注</th>
-    <th class="sort" data-field="created_at">录入时间</th>
-    <th class="sort" data-field="updated_at">更新时间</th>
+    <th class="sort" data-field="updated_at">用户操作时间</th>
     <th>操作</th>
 @stop
 
@@ -35,7 +33,6 @@
             <td><input type="checkbox" name="tribute_id" value="{{$spu->id}}"></td>
             <td>{{ $spu->id }}</td>
             <td>{{ $spu->spu }}</td>
-            <td>{{ $spu->spu }}</td>
             <td>{{ $spu->Purchase?$spu->Purchase->name:'' }}</td>
             <td>{{ $spu->editUser?$spu->editUser->name:'' }}</td>
             <td>{{ $spu->imageEdit?$spu->imageEdit->name:'' }}</td>
@@ -43,21 +40,20 @@
             <td>{{ $spu->status?config('spu.status')[$spu->status]:'' }}</td>
             <td>{{ $spu->remark }}</td>
             <td>{{ $spu->updated_at }}</td>
-            <td>{{ $spu->created_at }}</td>
             <td>
                 <?php if(count($spu->products)>0){ ?>
                 <a href="{{ route('createSpuImage', ['spu_id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑图片
+                    <span class="glyphicon glyphicon-picture"></span> 编辑图片
                 </a>
                 <?php } ?>
-                <a href="{{ route('spu.MultiEdit', ['id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('spu.MultiEdit', ['id'=>$spu->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 小语言
                 </a>
-                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-info btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-zoom-in"></span>备注
+                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-warning btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-envelope"></span>备注
                 </a>
-                <a href="" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 日志
+                <a href="" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-road"></span> 日志
                 </a>
             </td>
         </tr>

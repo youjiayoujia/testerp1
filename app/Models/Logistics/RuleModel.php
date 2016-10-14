@@ -23,11 +23,11 @@ use App\Models\Logistics\LimitsModel;
 
 class RuleModel extends BaseModel
 {
-    protected $table = 'logistics_rules';
+    public $table = 'logistics_rules';
 
     public $searchFields = [];
 
-    protected $fillable = [
+    public $fillable = [
         'name',
         'weight_from',
         'weight_to',

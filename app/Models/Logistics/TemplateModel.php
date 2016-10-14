@@ -14,11 +14,12 @@ use App\Base\BaseModel;
 
 class TemplateModel extends BaseModel
 {
-    protected $table = 'logistics_templates';
+    public $table = 'logistics_templates';
 
     public $searchFields = ['name' => '面单名称', 'view' => '视图'];
 
-    protected $fillable = [
+    public $fillable = [
+        'id',
         'name',
         'view',
         'size'

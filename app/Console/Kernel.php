@@ -101,6 +101,9 @@ class Kernel extends ConsoleKernel
             }
         }
 
-        
+        $schedule->command('purchase:create')->cron('8,40 15 * * *');
+
+
+
     }
 }

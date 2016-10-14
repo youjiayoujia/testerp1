@@ -16,6 +16,7 @@ class CreateItemPrepareSupplierTable extends Migration
             $table->increments('id');
             $table->integer('item_id')->comment('sku_id');
             $table->integer('supplier_id')->comment('sku_supplier');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

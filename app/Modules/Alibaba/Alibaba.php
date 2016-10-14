@@ -18,8 +18,8 @@ class Alibaba {
 
     public $redirect_uri = "http://erp.moonarstore.com/aliAPI/Index.php";
 
-    //public $order_list_api_url = 'param2/2/cn.alibaba.open/trade.order.list.get';//获取订单详情
-    public $order_list_api_url = 'trade.order.detail.get';//获取订单详情
+    public $order_list_api_url = 'param2/2/cn.alibaba.open/trade.order.list.get';//获取订单列表
+    //public $order_list_api_url = 'param2/2/cn.alibaba.open/trade.order.detail.get';//获取订单详情
 
     function __construct(){
         $accounts = json_decode($this->getSlmeAliAccount(),true);

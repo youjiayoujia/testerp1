@@ -215,8 +215,11 @@
                 <a href="{{ route('item.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
-                <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">
+                <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-primary btn-xs" data-id="{{ $item->id }}">
                     <span class="glyphicon glyphicon-print"></span>
+                </a>
+                <a data-toggle="modal" data-target="#add_supplier_{{$item->id}}" title="添加供应商" class="btn btn-success btn-xs">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
                 </a>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-user"></span>
@@ -282,7 +285,7 @@
             </div>
             </div>
         </form>
-        <!-- 模态框结束（Modal） -->
+        <!-- 模态框转采购负责人结束（Modal） -->
 
         <!-- 模态框（Modal）提问 -->
         <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
@@ -328,7 +331,44 @@
             </div>
             </div>
         </form>
-        <!-- 模态框结束（Modal） -->
+        <!-- 模态框提问结束（Modal） -->
+
+        <!-- 添加供应商模态框（Modal -->
+            <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="add_supplier_{{$item->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           添加供应商
+                        </h4>
+                     </div>
+
+                     <div class="modal-body">        
+                        <select id="supplier_id" class="form-control supplier" name="supplier_id">
+                           <option value="{{$item->supplier->id}}">{{$item->supplier->name}}</option>
+                        </select>
+                     </div>
+                     
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 添加供应商模态框结束（Modal） -->
 
     @endforeach
 
@@ -430,6 +470,22 @@
                   return {
                     user:params.term,
                     item_id: $(this).attr('id'),
+                  };
+                },
+                results: function(data, page) {
+                    
+                }
+            },
+        });
+
+        $('.supplier').select2({
+            ajax: {
+                url: "{{ route('ajaxSupplier') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    supplier:params.term,
                   };
                 },
                 results: function(data, page) {

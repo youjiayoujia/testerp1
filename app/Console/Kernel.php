@@ -52,6 +52,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\getSmtTrackNoOnline::class,
         \App\Console\Commands\autoAddMessageForSmtOrders::class,
         \App\Console\Commands\GetAliShipmentNumber::class,
+        \App\Console\Commands\AutoGetMessageAliexpress::class,
+        \App\Console\Commands\AutoGetWishMessage::class,
 
     ];
 
@@ -101,7 +103,13 @@ class Kernel extends ConsoleKernel
             }
         }
 
-        $schedule->command('purchase:create')->cron('8,40 15 * * *');
+        //CRM
+        $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');
+        $schedule->command('AutoEbayMessage:get')->everyFiveMinutes();
+        $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
+        $schedule->command('getEbayCases')->everyTenMinutes('8,12,13,14,16,30 17 * * *');
+        $schedule->command('getFeedBack:account')->everyMinutes('');
+
 
 
 

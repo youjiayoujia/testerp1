@@ -3,17 +3,19 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+
 use App\Models\ChannelModel;
 use App\Models\Message\MessageModel;
 use Channel;
-class AutoGetMessageAliexpress extends Command
+
+class AutoGetEbayMessage extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'AutoMessageAliexpress:get';
+    protected $signature = 'AutoEbayMessage:get';
 
     /**
      * The console command description.
@@ -39,11 +41,12 @@ class AutoGetMessageAliexpress extends Command
      */
     public function handle()
     {
+        //
         /**
-         * 获取所有账号的速卖通消息
-         * 执行时间： 每天  8:00 ，15:40 执行
+         * 获取所有账号的Ebay消息
+         * 执行时间： 每四分钟一次
          */
-        $channel = ChannelModel::where('driver','=','aliexpress')->first();
+        $channel = ChannelModel::where('driver','=','ebay')->first();
         $accounts =  $channel->accounts;
 
         if(!$accounts->isEmpty()){

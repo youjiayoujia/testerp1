@@ -1015,6 +1015,20 @@ class PurchaseOrderController extends Controller
             });
         })->download('csv');        
     }
+
+    /**
+     * 7天采购未到货
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function sevenPurchaseSku()
+    {   
+        $time = date('Y-m-d H:i:s',time()-60*60*24*7);
+        print_r($time);exit;
+        $this->model->where('created_at') ->whereIn('status',['1','2','3'])->get();    
+    }
         
 }
 

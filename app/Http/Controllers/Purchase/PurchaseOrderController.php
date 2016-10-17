@@ -28,6 +28,7 @@ use App\Jobs\AssignStocks;
 use Excel;
 use Tool;
 use App\Jobs\Job;
+use Mail;
 
 class PurchaseOrderController extends Controller
 {
@@ -1017,7 +1018,7 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * 7天采购未到货
+     * 下单7天未到货
      *
      * @param none
      * @return obj
@@ -1026,8 +1027,33 @@ class PurchaseOrderController extends Controller
     public function sevenPurchaseSku()
     {   
         $time = date('Y-m-d H:i:s',time()-60*60*24*7);
-        print_r($time);exit;
-        $this->model->where('created_at') ->whereIn('status',['1','2','3'])->get();    
+        $purchaseOrder = $this->model->where('created_at','<',$time)->whereIn('status',['1','2','3'])->get();
+        
+        //邮件模板数据
+        $data = ['email'=>'549991570@qq.com', 'name'=>'youjiatest@163.com','purchaseOrder'=>$purchaseOrder];
+        //发送邮件
+        Mail::send('purchase.purchaseOrder.mailSevenPurchase', $data, function($message) use($data){
+            $message->to($data['email'], $data['name'])->subject('采购单7天未到货');
+        });
+    }
+
+    /**
+     * 已收货未入库
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function sevenPurchaseSku()
+    {   
+        echo '<pre>';
+        
+        //邮件模板数据
+        $data = ['email'=>'549991570@qq.com', 'name'=>'youjiatest@163.com','purchaseOrder'=>$purchaseOrder];
+        //发送邮件
+        Mail::send('purchase.purchaseOrder.mailSevenPurchase', $data, function($message) use($data){
+            $message->to($data['email'], $data['name'])->subject('采购单7天未到货');
+        });
     }
         
 }

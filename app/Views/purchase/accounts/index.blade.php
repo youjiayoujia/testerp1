@@ -31,11 +31,11 @@
                 <a href="{{ route('purchaseAccount.edit', ['id'=>$account->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+{{--                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $account->id }}"
                    data-url="{{ route('purchaseAccount.destroy', ['id' => $account->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
+                </a>--}}
             </td>
         </tr>
     @endforeach

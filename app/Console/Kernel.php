@@ -108,7 +108,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('AutoEbayMessage:get')->everyFiveMinutes();
         $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
         $schedule->command('getEbayCases')->everyTenMinutes('8,12,13,14,16,30 17 * * *');
-        $schedule->command('getFeedBack:account')->everyMinutes('');
+        $schedule->command('getFeedBack:account')->everyNineMinutes();
 
 
 

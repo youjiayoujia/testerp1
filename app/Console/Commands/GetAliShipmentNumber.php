@@ -78,10 +78,14 @@ class GetAliShipmentNumber extends Command
 
 
         $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
-
         $orderList = json_decode($ali->get($crul_url,$curl_params),true);
 
-        dd($orderList);
+        foreach($orderList['orderListResult']['modelList'] as $model){
+
+            
+            dd($model['logisticsStatus']['logisticsOrderList']);
+        }
+
 
 
 

@@ -1245,11 +1245,7 @@
                 "framework",
                 "laravel"
             ],
-<<<<<<< HEAD
-            "time": "2016-09-29 13:45:07"
-=======
             "time": "2016-09-29T13:45:07+00:00"
->>>>>>> master
         },
         {
             "name": "league/flysystem",
@@ -1332,11 +1328,7 @@
                 "sftp",
                 "storage"
             ],
-<<<<<<< HEAD
-            "time": "2016-10-07 12:20:37"
-=======
             "time": "2016-10-07T12:20:37+00:00"
->>>>>>> master
         },
         {
             "name": "maatwebsite/excel",
@@ -1403,11 +1395,7 @@
                 "import",
                 "laravel"
             ],
-<<<<<<< HEAD
-            "time": "2016-09-15 21:03:21"
-=======
             "time": "2016-09-15T21:03:21+00:00"
->>>>>>> master
         },
         {
             "name": "maximebf/debugbar",
@@ -1468,11 +1456,7 @@
                 "debug",
                 "debugbar"
             ],
-<<<<<<< HEAD
-            "time": "2016-09-15 14:01:59"
-=======
             "time": "2016-09-15T14:01:59+00:00"
->>>>>>> master
         },
         {
             "name": "milon/barcode",
@@ -1741,11 +1725,7 @@
                 "parser",
                 "php"
             ],
-<<<<<<< HEAD
-            "time": "2016-09-16 12:04:44"
-=======
             "time": "2016-09-16T12:04:44+00:00"
->>>>>>> master
         },
         {
             "name": "paragonie/random_compat",
@@ -2046,11 +2026,7 @@
                 "psr",
                 "psr-3"
             ],
-<<<<<<< HEAD
-            "time": "2016-10-10 12:19:37"
-=======
             "time": "2016-10-10T12:19:37+00:00"
->>>>>>> master
         },
         {
             "name": "psy/psysh",
@@ -2235,11 +2211,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-27 17:33:51"
-=======
             "time": "2016-09-27T17:33:51+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/css-selector",
@@ -2292,11 +2264,7 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-06 10:55:00"
-=======
             "time": "2016-09-06T10:55:00+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/debug",
@@ -2353,11 +2321,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-06 07:26:07"
-=======
             "time": "2016-09-06T07:26:07+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/dom-crawler",
@@ -2521,11 +2485,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-16 16:53:37"
-=======
             "time": "2016-09-16T16:53:37+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/http-foundation",
@@ -2581,11 +2541,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-21 11:21:12"
-=======
             "time": "2016-09-21T11:21:12+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/http-kernel",
@@ -2667,11 +2623,7 @@
             ],
             "description": "Symfony HttpKernel Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-10-03 18:15:49"
-=======
             "time": "2016-10-03T18:15:49+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -2887,11 +2839,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-29 02:20:21"
-=======
             "time": "2016-09-29T02:20:21+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/routing",
@@ -2965,11 +2913,7 @@
                 "uri",
                 "url"
             ],
-<<<<<<< HEAD
-            "time": "2016-08-16 10:55:04"
-=======
             "time": "2016-08-16T10:55:04+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/translation",
@@ -3032,11 +2976,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-06 07:26:07"
-=======
             "time": "2016-09-06T07:26:07+00:00"
->>>>>>> master
         },
         {
             "name": "symfony/var-dumper",
@@ -3095,11 +3035,7 @@
                 "debug",
                 "dump"
             ],
-<<<<<<< HEAD
-            "time": "2016-09-29 12:21:39"
-=======
             "time": "2016-09-29T12:21:39+00:00"
->>>>>>> master
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -3192,11 +3128,7 @@
                 "env",
                 "environment"
             ],
-<<<<<<< HEAD
-            "time": "2015-05-30 15:59:26"
-=======
             "time": "2015-05-30T15:59:26+00:00"
->>>>>>> master
         }
     ],
     "packages-dev": [
@@ -3509,11 +3441,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-<<<<<<< HEAD
-            "time": "2016-09-30 07:12:33"
-=======
             "time": "2016-09-30T07:12:33+00:00"
->>>>>>> master
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -3672,11 +3600,7 @@
                 "testing",
                 "tests"
             ],
-<<<<<<< HEAD
-            "time": "2016-09-26 20:28:11"
-=======
             "time": "2016-09-26T20:28:11+00:00"
->>>>>>> master
         },
         {
             "name": "phpspec/prophecy",
@@ -4530,11 +4454,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-<<<<<<< HEAD
-            "time": "2016-09-25 08:27:07"
-=======
             "time": "2016-09-25T08:27:07+00:00"
->>>>>>> master
         },
         {
             "name": "webmozart/assert",
@@ -4590,12 +4510,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-<<<<<<< HEAD
-        "picoprime/barcodegen": 20
-=======
         "picoprime/barcodegen": 20,
         "bluecode/laravel-generator": 20
->>>>>>> master
     },
     "prefer-stable": false,
     "prefer-lowest": false,

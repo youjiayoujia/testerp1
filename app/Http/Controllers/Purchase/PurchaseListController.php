@@ -62,22 +62,22 @@ class PurchaseListController extends Controller
 		$data=request()->all();
 		$postcodingNum=PurchasePostageModel::where('post_coding',$data['post_coding'])->count();
 		if($postcodingNum>0){
-		$res['postcoding']=PurchasePostageModel::where('post_coding',$data['post_coding'])->first();
-		$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id);
-		$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-			'postcodingNum' =>$postcodingNum,
-			'data' =>$res,
-			'postCoding' =>$data['post_coding'],
-        ];
+    		$res['postcoding']=PurchasePostageModel::where('post_coding',$data['post_coding'])->first();
+    		$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id);
+    		$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+    			'postcodingNum' =>$postcodingNum,
+    			'data' =>$res,
+    			'postCoding' =>$data['post_coding'],
+            ];
 		}else{
-			$response = [
-            'metas' => $this->metas(__FUNCTION__),
-			'postcodingNum' =>$postcodingNum,
-			'postCoding' =>$data['post_coding'],
-        ];
-			}
+    			$response = [
+                'metas' => $this->metas(__FUNCTION__),
+    			'postcodingNum' =>$postcodingNum,
+    			'postCoding' =>$data['post_coding'],
+            ];
+		}
 		$response['metas']['title']='查询采购运单';
         return view($this->viewPath . 'show', $response);
     }

@@ -253,7 +253,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics', ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
     //缺货报表
-    Route::get('purchaseOrder/outOfStock', ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);    
+    Route::get('purchaseOrder/outOfStock', ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);  
+    Route::get('purchaseOrder/sevenPurchaseSku', ['uses' => 'Purchase\PurchaseOrderController@sevenPurchaseSku', 'as' => 'purchase.sevenPurchaseSku']);  
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
     Route::any('PurchaseOrder/trackingNoSearch',
         ['uses' => 'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
@@ -357,6 +358,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('itemUser/ajaxSupplierUser', ['uses' => 'ItemController@ajaxSupplierUser', 'as' => 'item.ajaxSupplierUser']);
     Route::any('item/changePurchaseAdmin/{id}', ['uses' => 'ItemController@changePurchaseAdmin', 'as' => 'changePurchaseAdmin']);
     Route::any('item/question/{id}', ['uses' => 'ItemController@question', 'as' => 'item.question']);
+    Route::any('item/addSupplier/{id}', ['uses' => 'ItemController@addSupplier', 'as' => 'item.addSupplier']);
     Route::any('item/questionStatus', ['uses' => 'ItemController@questionStatus', 'as' => 'item.questionStatus']);
     Route::any('item/extraQuestion', ['uses' => 'ItemController@extraQuestion', 'as' => 'item.extraQuestion']);
     Route::any('item/answer', ['uses' => 'ItemController@answer', 'as' => 'item.answer']);
@@ -663,6 +665,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('package/flow',
         ['uses' => 'PackageController@flow', 'as' => 'package.flow']);
     Route::resource('package', 'PackageController');
+    
     Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);
     Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);
     Route::get('getChoiesOrder', ['uses' => 'OrderController@getChoiesOrder', 'as' => 'getChoiesOrder']);
@@ -812,7 +815,16 @@ Route::group(['middleware' => 'roleCheck'], function () {
         Route::get('freightManage',
             ['uses' => 'SmtProductController@freightManage', 'as' => 'smtProduct.freightManage']);
         Route::get('getFreightDetailById',
-            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);           
+            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);  
+        Route::post('showAccountProductGroup',
+            ['uses' => 'SmtProductController@showAccountProductGroup', 'as' => 'smtProduct.showAccountProductGroup']);
+        Route::post('SynchronousDataByAccount',
+            ['uses' => 'SmtProductController@SynchronousDataByAccount', 'as' => 'smtProduct.SynchronousDataByAccount']);
+        Route::post('copyAllAccountNew',
+            ['uses' => 'SmtProductController@copyAllAccountNew', 'as' => 'smtProduct.copyAllAccountNew']); 
+        Route::post('getCategoryInfo',
+            ['uses' => 'SmtProductController@getCategoryInfo', 'as' => 'smtProduct.getCategoryInfo']);       
+        
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     

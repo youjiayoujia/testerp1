@@ -223,6 +223,47 @@ class PackageModel extends BaseModel
 
         return $flag;
     }
+    
+    /**
+     * 申报中文名
+     * @return string
+     */
+    public function getDeclearedCnameAttribute(){
+        $declared_cn = '';
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_cn = $packageItem->item->product ? $packageItem->item->product->declared_cn : '';
+            }
+        }
+        return $declared_cn;
+    }
+    
+    /**
+     * 申报英文名
+     * @return string
+     */
+    public function getDeclearedEnameAttribute(){
+        $declared_en = '';
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_en = $packageItem->item->product ? $packageItem->item->product->declared_en : '';
+            }
+        }
+        return $declared_en;
+    } 
+    
+    /**
+     * 获取申报价值
+     */
+    public function getDeclearedValueAttribute(){
+        $declared_val = 0;
+        foreach($this->items as $packageItem){
+            if($packageItem->item){
+                $declared_val = $packageItem->item->product ? $packageItem->item->product->declared_value: 0;
+            }
+        }
+        return $declared_val;
+    }
 
     public function getStatusColorAttribute()
     {
@@ -333,12 +374,41 @@ class PackageModel extends BaseModel
     {
         return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
     }
+    
+    public function russiaPYCode(){
+        return $this->belongsTo('App\Models\Logistics\Zone\RussiaPingCodeModel', 'shipping_country', 'country_code');
+    }
 
     public function getStatusNameAttribute()
     {
         $arr = config('package');
         return isset($arr[$this->status]) ? $arr[$this->status] : '';
     }
+	    public function shunyou()
+    {
+        return $this->belongsTo('App\Models\ShunyouModel','shipping_country','country_code');
+    }
+
+    public function fourpx()
+    {
+        return $this->belongsTo('App\Models\FourModel','shipping_country','fourpx_country_code');
+    }
+
+    public function Fourcode()
+    {
+        return $this->belongsTo('App\Models\FourcodeModel','shipping_country','code');
+    }
+
+    public function postconfig()
+    {
+        return $this->belongsTo('App\Models\PostpacketModel','logistics_id','shipment_id_string');
+    }
+
+    public function catelog()
+    {
+        return $this->belongsTo('App\Models\CatalogModel',$this->items->first()->item->product->catalog_id);
+    }
+
 
     public function processGoods($file)
     {
@@ -628,8 +698,10 @@ class PackageModel extends BaseModel
         $i = true;
         foreach ($items as $warehouseId => $packageItems) {
             if ($i) {
+                $weight = 0;
                 foreach ($packageItems as $key => $packageItem) {
                     $newPackageItem = $this->items()->create($packageItem);
+                    $weight += $newPackageItem->item->weight * $newPackageItem->quantity;
                     DB::beginTransaction();
                     try {
                         $newPackageItem->item->hold(
@@ -642,13 +714,15 @@ class PackageModel extends BaseModel
                     }
                     DB::commit();
                 }
-                $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN']);
+                $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                 $i = false;
             } else {
                 $newPackage = $this->create($this->toArray());
+                $weight = 0;
                 if ($newPackage) {
                     foreach ($packageItems as $key => $packageItem) {
                         $newPackageItem = $newPackage->items()->create($packageItem);
+                        $weight += $newPackageItem->item->weight * $newPackageItem->quantity;
                         DB::beginTransaction();
                         try {
                             $newPackageItem->item->hold(
@@ -661,7 +735,7 @@ class PackageModel extends BaseModel
                         }
                         DB::commit();
                     }
-                    $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN']);
+                    $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                 }
             }
         }
@@ -716,14 +790,15 @@ class PackageModel extends BaseModel
     public function calculateLogisticsFee()
     {
         $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
+        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($zones as $zone) {
             if ($zone->inZone($this->shipping_country)) {
                 $fee = '';
                 if ($zone->type == 'first') {
                     if ($this->weight <= $zone->fixed_weight) {
-                        $fee = $this->fixed_price;
+                        $fee = $zone->fixed_price;
                     } else {
-                        $fee = $this->fixed_price;
+                        $fee = $zone->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
                         $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
                     }
@@ -732,12 +807,12 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $fee * $zone->discount + $zone->other_fixed_price;
                     }
-                    return $fee;
+                    return $fee * $currency;
                 } else {
                     $sectionPrices = $zone->zone_section_prices;
                     foreach ($sectionPrices as $sectionPrice) {
                         if ($this->weight >= $sectionPrice->weight_from && $this->weight < $sectionPrice->weight_to) {
-                            return $sectionPrice->price;
+                            return $sectionPrice->price * $currency;
                         }
                     }
                 }

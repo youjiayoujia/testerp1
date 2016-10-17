@@ -7,7 +7,7 @@
     <button type='button' class='btn btn-info search'>查找</button>
 </div>
 <div class="panel panel-default">
-    <div class="panel-heading">包装排行榜<a href="{{ route('packReport.createData') }}">生成数据</a></div>
+    <div class="panel-heading">包装排行榜</div>
     <div class="panel-body">
         <table class="table table-bordered">
             <thead>

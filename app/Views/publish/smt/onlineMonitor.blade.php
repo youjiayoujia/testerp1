@@ -295,7 +295,7 @@ function operator(id,type,e){
 
 $("#manual_update").click(function () {
 	var productIds = $('input[name="single[]"]:checked').map(function(){
-		return $(this).attr('data-productId');
+		return $(this).val();
 	}).get().join(' ');
 
 	//var token = '<?php echo csrf_token(); ?>';

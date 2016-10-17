@@ -23,7 +23,6 @@ use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
 
-
 class ItemController extends Controller
 {
     public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel, SkuMessageModel $message, ImageModel $imageModel)
@@ -459,6 +458,16 @@ class ItemController extends Controller
         $data['status'] = 'close';
         $sku_message->update($data);
         return redirect(route('item.questionIndex'));
+    }
+
+    //添加供应商
+    public function addSupplier($item_id)
+    {
+        $supplier_id = request()->input('supplier_id');
+        $model = $this->model->find($item_id);
+        $arr['supplier_id'] = $supplier_id;
+        $model->skuPrepareSupplier()->attach($arr);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '备选供应商添加成功.'));
     }
 
     public function curlApiChangeWarehousePositon()

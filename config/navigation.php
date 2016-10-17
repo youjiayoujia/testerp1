@@ -428,7 +428,6 @@ return [
                     'icon' => '',
                 ],
                 [
-
                     'name' => 'SMT在线产品列表',
                     'url' => 'smt.onlineProductIndex',
                     'icon' => '',
@@ -474,7 +473,6 @@ return [
                     'url' => 'smtAccountManage.index',
                     'icon' => '',
                 ],
-
             ],
             'Ebay刊登' => [
                 [
@@ -525,7 +523,6 @@ return [
                 ],
 
             ],
-
             '数据监控'=>[
                 [
                     'name' => 'Ebay在线数据监控',

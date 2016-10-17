@@ -15,6 +15,7 @@ use App\Models\UserModel;
 use App\Models\ChannelModel;
 use App\Models\Spu\SpuMultiOptionModel;
 use Excel;
+use Mail;
 
 class SpuController extends Controller
 {
@@ -33,6 +34,24 @@ class SpuController extends Controller
      */
     public function index()
     {
+        /*$name = 'youjiatest@163.com';
+        $flag = Mail::send('item.test',['name'=>$name],function($message){
+            $to = '549991570@qq.com';
+            $message ->to($to)->subject('邮件测试');
+        });
+        if($flag){
+            echo '发送邮件成功，请查收！';
+        }else{
+            echo '发送邮件失败，请重试！';
+        }*/
+
+        $data = ['email'=>'549991570@qq.com', 'name'=>'youjiatest@163.com', 'uid'=>'youjiatest@163.com', 'activationcode'=>'youjiatest@163.com'];
+        Mail::send('item.test', $data, function($message) use($data)
+        {
+            $message->to($data['email'], $data['name'])->subject('欢迎注册我们的网站，请激活您的账号！');
+        });
+        
+exit;
         request()->flash();
         foreach(config('spu.status') as $key=>$value){
         	$num_arr[$key] = $this->model->where('status',$key)->count();

@@ -43,38 +43,70 @@ class EventChildController extends Controller
         $html = '';
         foreach($models as $model) {
             $to = unserialize(base64_decode($model->to_arr));
+            if($to) {
+                $to = $to->toarray();
+            }
             $from = unserialize(base64_decode($model->from_arr));
-            $toFillable = $to->fillable;
+            if($from) {
+                $from = $from->toarray();
+            }
             if(!$from) {
                 $html .= "<div class='panel panel-default'>
                         <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
                         <div class='panel-body'>";
-                foreach($toFillable as $key => $value) {
-                    $html .= "<div class='row'>";
-                    $html .= $value . "&nbsp;&nbsp;:&nbsp;&nbsp;" . $to->$value;
+                foreach($to as $key => $value) {
+                    $html .= "<div class='form-control col-lg-6'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
+                    if(is_array($value)) {
+                        foreach($value as $k => $v) {
+                            foreach($v as $k1 => $v1) {
+                                $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>"+$v1+"&nbsp;&nbsp;&nbsp;&nbsp;";
+                            }
+                        }
+                    } else {
+                        $html .= $value;
+                    }
                     $html .= "</div>";
-                }               
-                $html .= "</div></div>";   
+                }  
+                $html .= "</div></div>";
                 continue;     
             }
-            $fromFillable = $from->fillable;
             $html .= "<div class='panel panel-default'>
                         <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
                         <div class='panel-body'>";
             $flag = 1;
-            foreach($toFillable as $key => $value) {
-                if($to->$value == $from->$value) {
-                    continue;
+            $this->calcTwoArr($from,$to);
+            foreach($from as $key => $value) {
+                $html .= "<div class='row'>from['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
+                if(is_array($value)) {
+                    foreach($value as $k => $v) {
+                        $html .="<div class='row'>";
+                        foreach($v as $k1 => $v1) {
+                            $html .= "from['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                        }
+                        $html .="</div>";
+                    }
+                } else {
+                    $html .= $value;
                 }
-                $flag = 0;
-                $html .= "<div class='row'>";
-                $html .= $value . "&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;" . $from->$value . "&nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-arrow-right'></span>&nbsp;&nbsp;&nbsp;&nbsp;" . $to->$value;
                 $html .= "</div>";
-            }      
-            if($flag) {
-                $html .= "<div class='row'>数据无变化</div>";
-            }         
-            $html .= "</div></div>";
+            }
+            $html .= "<hr/>";
+            foreach($to as $key => $value) {
+                $html .= "<div class='row'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
+                if(is_array($value)) {
+                    foreach($value as $k => $v) {
+                        $html .="<div class='row'>";
+                        foreach($v as $k1 => $v1) {
+                            $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                        }
+                        $html .="</div>";
+                    }
+                } else {
+                    $html .= $value;
+                }
+                $html .= "</div>";
+            }
+            $html.= '</div></div>';
         }
 
         return $html;

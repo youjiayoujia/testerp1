@@ -144,7 +144,7 @@
                     @endforeach
                 </select>
                 <input type='text' class='form-control' name='{{$key1}}_merchant_name' placeholder='备选框'>
-                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $single->channel_id }}>
+                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $singles->first()->channel_id }}>
             </div>
             @endforeach
         </div>

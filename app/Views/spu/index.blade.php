@@ -22,8 +22,7 @@
     <th>开发</th>
     <th>当前进度</th>
     <th>备注</th>
-    <th class="sort" data-field="created_at">录入时间</th>
-    <th class="sort" data-field="updated_at">更新时间</th>
+    <th class="sort" data-field="updated_at">用户操作时间</th>
     <th>操作</th>
 @stop
 
@@ -41,21 +40,20 @@
             <td>{{ $spu->status?config('spu.status')[$spu->status]:'' }}</td>
             <td>{{ $spu->remark }}</td>
             <td>{{ $spu->updated_at }}</td>
-            <td>{{ $spu->created_at }}</td>
             <td>
                 <?php if(count($spu->products)>0){ ?>
                 <a href="{{ route('createSpuImage', ['spu_id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑图片
+                    <span class="glyphicon glyphicon-picture"></span> 编辑图片
                 </a>
                 <?php } ?>
-                <a href="{{ route('spu.MultiEdit', ['id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('spu.MultiEdit', ['id'=>$spu->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 小语言
                 </a>
-                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-info btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-zoom-in"></span>备注
+                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-warning btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-envelope"></span>备注
                 </a>
-                <a href="" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 日志
+                <a href="" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-road"></span> 日志
                 </a>
             </td>
         </tr>

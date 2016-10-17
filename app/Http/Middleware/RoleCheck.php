@@ -35,7 +35,6 @@ class RoleCheck
      */
     public function handle($request, Closure $next)
     {
-
         if ($this->auth->guest()) {
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);
@@ -45,6 +44,7 @@ class RoleCheck
         }
 
         if(!request()->user()->is_available){
+            header("Content-type: text/html; charset=utf-8");
             echo '<span style="color:red">注意！</span>用户已删除,请不要再登录此账号，清除缓存后再次登录';exit;
         }
         

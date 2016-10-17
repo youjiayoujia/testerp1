@@ -74,8 +74,59 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = OrderModel::find(184);
-        var_dump($package->calculateProfitProcess());
+        $item = ItemModel::find(1);
+        $result = $item->assignStock(1);
+        var_dump($result);
+    }
+    // public function test2()
+    // {
+    //     $a = ['a' => 'b', 'c' => 'e', 'f' => ['f','g','i']];
+    //     $b = ['b' => 'c', 'a' => 'b', 'f' => ['f','k']];
+    //     $arr = $this->calctowarr($a,$b);
+    //     var_dump($a);
+    //     var_dump($b);
+    // }
+
+    public function calcTwoArr(&$a,&$b)
+    {
+        foreach($a as $key => $value) {
+            if(array_key_exists($key, $b)) {
+                if($this->valueequal($value,$b[$key])) {
+                    unset($a[$key]);
+                    unset($b[$key]);
+                } else {
+                    if(getType($value) == getType($b[$key]) && is_array($value)) {
+                        $this->calcTwoArr($a[$key],$b[$key]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function valueEqual($c,$d)
+    {
+        if(getType($c) == getType($d)) {
+            if(!is_array($c)) {
+                if($c == $d) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                foreach($c as $key => $value) {
+                    if(array_key_exists($key, $d)) {
+                        if(!$this->valueEqual($value, $d[$key])) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
     public function test3()

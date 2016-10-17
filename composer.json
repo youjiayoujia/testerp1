@@ -15,8 +15,8 @@
     "milon/barcode": "^5.1",
     "predis/predis": "~1.0",
     "picoprime/barcodegen": "@dev",
-    "google/apiclient": "1.*"
-
+    "google/apiclient": "1.*",
+    "bluecode/laravel-generator": "dev-master"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",

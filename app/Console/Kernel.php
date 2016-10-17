@@ -73,11 +73,11 @@ class Kernel extends ConsoleKernel
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
-               case 'aliexpress':
-                   foreach ($channel->accounts as $account) {
-                       $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
-                   }
-                   break;
+                case 'aliexpress':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
+                    }
+                    break;
                 case 'wish':
                     foreach ($channel->accounts as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
@@ -101,6 +101,5 @@ class Kernel extends ConsoleKernel
             }
         }
 
-        
     }
 }

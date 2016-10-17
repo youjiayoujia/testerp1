@@ -32,7 +32,21 @@
         <th>{{$item->product->quantitySold1}}</th>
         <th>{{$item->product->gmtCreate}}</th>
         <th><?php if($item->product->userInfo) echo $item->product->userInfo->name ;?></th>
-        <th></th>
+        <th>
+            <?php 
+                $status = $item->productItem ? $item->productItem->status : '';
+                switch($status){
+                    case 'selling' :        echo '在售';break;
+                    case 'sellWaiting':     echo '待售';break;
+                    case 'cleaning':        echo '清库存中';break;
+                    case 'stopping':        echo '停产';break;
+                    case 'saleOutStopping': echo '卖完下架';break;
+                    case 'unSellTemp':      echo '货源待定';break;
+                    case 'trySale':         echo '试销(卖多少采多少)';break;
+                    default:                echo ' ';break;
+                }
+            ?>
+        </th>
         <th>{{$item->product->productStatusType}}</th>
         <th>{{$item->skuPrice}}
             <button class="btn btn-primary btn-xs"

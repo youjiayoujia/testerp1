@@ -19,6 +19,7 @@ use Tool;
 use App\Models\Pick\ErrorListModel;
 use App\Models\ItemModel;
 use DB;
+use App\Models\UserModel;
 
 class PickListController extends Controller
 {
@@ -100,7 +101,9 @@ class PickListController extends Controller
         $picklist = request('picklist');
         $pickBy = request('pickBy');
         $id = request('id');
-        $model = $this->model->where('picknum', $picklist)->first();
+        $model = $this->model->where('picknum', $picklist)->with('pickListItem')->first();
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_encode(serialize($model));
         if(!$model) {
             return json_encode(false);
         }
@@ -113,6 +116,9 @@ class PickListController extends Controller
         } else {
             $model->update(['pick_by' => $pickBy]);
         }
+        $to = base64_encode(serialize($model));;
+        $this->eventLog($name, '修改拣货人员,id='.$model->id, $to, $from);
+
         return json_encode(true);
     }
 
@@ -126,6 +132,8 @@ class PickListController extends Controller
     public function printPickList($id)
     {
         $model = $this->model->find($id);
+        $from = base64_encode(serialize($model));
+        $name = UserModel::find(request()->user()->id)->name;
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -139,6 +147,7 @@ class PickListController extends Controller
             'size' => $model->logistics ? ($model->logistics->template ? $model->logistics->template->size : '暂无面单尺寸信息') : '暂无面单尺寸信息',
             'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
         ];
+        $this->eventLog($name, '打印拣货单,id='.$model->id, $from, $from);
 
         return view($this->viewPath.'print', $response);
     }
@@ -146,6 +155,8 @@ class PickListController extends Controller
     public function confirmPickBy()
     {
         $model = $this->model->find(request('pickId'));
+        $from = base64_encode(serialize($model));
+        $name = UserModel::find(request()->user()->id)->name;
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -157,7 +168,9 @@ class PickListController extends Controller
             }
         }
         $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time()), 'status' => 'PICKING']);
-        
+        $to = base64_encode(serialize($model));;
+        $this->eventLog($name, '修改拣货人员,id='.$model->id, $to, $from);
+
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
     }
 
@@ -414,12 +427,15 @@ class PickListController extends Controller
     public function inboxStore($id)
     {
         $obj = $this->model->find($id);
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_encode(serialize($obj));
         $obj->update(['status' => 'INBOXED', 'inbox_by' => request()->user()->id, 'inbox_at' => date('Y-m-d H:i:s', time())]);
         foreach($obj->package as $package)
         {
             $package->status = 'PICKED';
             $package->save();
         }
+        $this->eventLog($name, '分拣完成,id='.$obj->id, $from, $from);
 
         return redirect($this->mainIndex);
     }

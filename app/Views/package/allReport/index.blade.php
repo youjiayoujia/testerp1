@@ -1,7 +1,7 @@
 @extends('common.detail')
 @section('detailBody')
 <div class="panel panel-default">
-    <div class="panel-heading">包裹中心<a href="{{ route('allReport.createData') }}">生成数据</a></div>
+    <div class="panel-heading">包裹中心</div>
     <div class="panel-body">
         <table class="table table-bordered">
             <thead>

@@ -32,6 +32,9 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetAliexpressProduct::class,
         \App\Console\Commands\GetJoomProduct::class,
         \App\Console\Commands\ProductImage::class,
+        \App\Console\Commands\PickReport::class,
+        \App\Console\Commands\PackReport::class,
+        \App\Console\Commands\AllReport::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
@@ -52,7 +55,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\getSmtTrackNoOnline::class,
         \App\Console\Commands\autoAddMessageForSmtOrders::class,
         \App\Console\Commands\GetAliShipmentNumber::class,
-
     ];
 
     /**
@@ -100,6 +102,9 @@ class Kernel extends ConsoleKernel
                     break;
             }
         }
+        $schedule->command('pick:report')->hourly();
+        $schedule->command('pick:report')->dailyAt('1:5');
+        $schedule->command('all:report')->daily();
 
     }
 }

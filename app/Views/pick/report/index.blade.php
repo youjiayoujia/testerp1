@@ -32,7 +32,7 @@
     </div>
 </div>
 <div class="panel panel-default">
-    <div class="panel-heading">拣货排行榜<a href="{{ route('pickReport.createData') }}">生成数据</a></div>
+    <div class="panel-heading">拣货排行榜</div>
     <div class="panel-body">
         <table class="table table-bordered">
             <thead>

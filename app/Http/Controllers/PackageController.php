@@ -468,7 +468,7 @@ class PackageController extends Controller
                 $model->delete();
             }
         }
-        $model = $this->model->find($buf[0]);
+        $model = $this->model->with('items')->find($buf[0]);
         $from = base64_encode(serialize($model));
         $model->update(['status' => 'NEW']);
         $model->order->update(['status' => 'REVIEW']);
@@ -486,7 +486,7 @@ class PackageController extends Controller
 
     public function editTrackStore($id)
     {
-        $model = $this->model->find($id);
+        $model = $this->model->with('items')->find($id);
         $name = UserModel::find(request()->user()->id)->name;
         $from = base64_encode(serialize($model));
         if (!$model) {
@@ -600,7 +600,7 @@ class PackageController extends Controller
     {
         $package_id = trim(request('package_id'));
         $name = UserModel::find(request()->user()->id)->name;
-        $package = $this->model->find($package_id);
+        $package = $this->model->with('items')->find($package_id);
         $from = base64_decode(serialize($package));
         if (!$package) {
             return json_encode(false);
@@ -642,7 +642,7 @@ class PackageController extends Controller
     {
         $model = $this->model->find($id);
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_decode(serialize($model));
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -651,7 +651,7 @@ class PackageController extends Controller
             $model->update(['is_auto' => '0']);
         }
         $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
-        $to = base64_decode(serialize($model));
+        $to = base64_encode(serialize($model));
         $this->eventLog($name, '拆分包裹', $to, $from);
 
         return redirect($this->mainIndex);

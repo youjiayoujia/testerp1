@@ -663,6 +663,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('package/flow',
         ['uses' => 'PackageController@flow', 'as' => 'package.flow']);
     Route::resource('package', 'PackageController');
+    
     Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);
     Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);
     Route::get('getChoiesOrder', ['uses' => 'OrderController@getChoiesOrder', 'as' => 'getChoiesOrder']);

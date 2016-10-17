@@ -13,7 +13,9 @@ namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserModel;
+use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Item\ItemPrepareSupplierModel;
 use App\Models\Product\SupplierLevelModel;
 use App\Models\Product\SupplierChangeHistoryModel;
 
@@ -115,6 +117,29 @@ class SupplierController extends Controller
             return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '文件上传失败.'));
 
         }
+    }
+
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $item_id_arr = ItemPrepareSupplierModel::where('supplier_id',$id)->get(['item_id'])->toArray();
+        $item_id = array_column($item_id_arr,'item_id');
+        $itemModel = ItemModel::whereIn('id',$item_id)->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'itemModel' => $itemModel,
+        ];
+        return view($this->viewPath . 'show', $response);
     }
 
     /**

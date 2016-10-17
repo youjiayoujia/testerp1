@@ -709,7 +709,7 @@ class OrderModel extends BaseModel
                 return 0;
             }
         }
-        
+
         return $sum;
     }
 

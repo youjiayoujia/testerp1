@@ -124,7 +124,7 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">渠道对应物流</div>
+        <div class="panel-heading">渠道回传编码</div>
         <div class="panel-body">
             @foreach($arr as $key1 => $singles)
             <div class='form-group col-lg-3'>

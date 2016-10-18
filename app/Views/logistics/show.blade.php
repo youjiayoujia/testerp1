@@ -50,7 +50,7 @@
             </div>
             @foreach($channelNames as $channelName)
             <div class="col-lg-4">
-                <strong>{{$channelName->channel ? $channelName->channel->name : ''}}承运商</strong>: {{ $channelName->name }}
+                <strong>{{$channelName->channel ? $channelName->channel->name : ''}}渠道回传编码</strong>: {{ $channelName->name }}
             </div>
             @endforeach
         </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * 运输方式模型
+ * 渠道展示编码模型
  *
  * Created by PhpStorm.
  * User: bianhaiwei
@@ -14,11 +14,11 @@ use App\Base\BaseModel;
 
 class TransportModel extends BaseModel
 {
-    protected $table = 'logistics_transports';
+    public $table = 'logistics_transports';
 
     public $searchFields = ['name' => '名称'];
 
-    protected $fillable = [
+    public $fillable = [
         'name',
         'code',
     ];
@@ -26,11 +26,9 @@ class TransportModel extends BaseModel
     public $rules = [
         'create' => [
             'name' => 'required',
-            'code' => 'required',
         ],
         'update' => [
             'name' => 'required',
-            'code' => 'required',
         ],
     ];
 }

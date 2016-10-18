@@ -65,4 +65,69 @@
             </div>
         </div>
     </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">物品信息</div><br>
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="gridtable" align="center" valign="center">
+                    <tr>
+                        <th>NO.</th>
+                        <th>SKU</th>
+                        <th>名称</th>
+                        <th>售价</th>
+                        <th>中文申报名</th>
+                        <th>英文申报名</th>
+                        <th>申报价值</th>
+                        <th>物流限制</th>
+                        <th>图片源</th>
+                        <th>备注</th>
+                    </tr>
+                    @foreach($itemModel as $key=>$item)
+                        <tr>
+                            <td>{{$key+1}}</td>
+                            <td>{{$item->sku}}</td>
+                            <td>{{$item->c_name}}</td>
+                            <td>{{$item->purchase_price}}</td>
+                            <td>{{$item->product->declared_cn}}</td>
+                            <td>{{$item->product->declared_en}}</td>
+                            <td>{{$item->product->declared_value}}</td>
+                            <td>
+                                @foreach($item->product->logisticsLimit as $limit)
+                                    {{$limit->name}}
+                                @endforeach
+                            </td>
+                            <td>{{$item->product->product_sale_url}}</td>
+                            <td>{{$item->remark}}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+        </div>
+        <br>
+    </div>
 @stop
+
+<style type="text/css">
+table.gridtable {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 1px;
+    border-color: #666666;
+    border-collapse: collapse;
+}
+table.gridtable th {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
+}
+table.gridtable td {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
+}
+</style>

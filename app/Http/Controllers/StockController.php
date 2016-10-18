@@ -377,8 +377,6 @@ class StockController extends Controller
             return json_encode('false');
     }
 
-    
-
     /**
      * 调拨调出仓库对应的ajax调用
      *

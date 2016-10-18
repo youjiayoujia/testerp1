@@ -32,6 +32,9 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetAliexpressProduct::class,
         \App\Console\Commands\GetJoomProduct::class,
         \App\Console\Commands\ProductImage::class,
+        \App\Console\Commands\PickReport::class,
+        \App\Console\Commands\PackReport::class,
+        \App\Console\Commands\AllReport::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
@@ -75,11 +78,11 @@ class Kernel extends ConsoleKernel
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
-               case 'aliexpress':
-                   foreach ($channel->accounts as $account) {
-                       $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
-                   }
-                   break;
+                case 'aliexpress':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
+                    }
+                    break;
                 case 'wish':
                     foreach ($channel->accounts as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
@@ -107,8 +110,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');
         $schedule->command('AutoEbayMessage:get')->everyFiveMinutes();
         $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
-        $schedule->command('getEbayCases')->everyTenMinutes('8,12,13,14,16,30 17 * * *');
-        $schedule->command('getFeedBack:account')->everyNineMinutes();
+        $schedule->command('getEbayCases')->cron('8,12,13,14,16,30 17 * * *');
+        $schedule->command('getFeedBack:account')->everyTenMinutes();
+
+        //采购
+        $schedule->command('aliShipmentName:get')->hourly();
 
 
 

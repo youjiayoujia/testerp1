@@ -384,6 +384,31 @@ class PackageModel extends BaseModel
         $arr = config('package');
         return isset($arr[$this->status]) ? $arr[$this->status] : '';
     }
+	    public function shunyou()
+    {
+        return $this->belongsTo('App\Models\ShunyouModel','shipping_country','country_code');
+    }
+
+    public function fourpx()
+    {
+        return $this->belongsTo('App\Models\FourModel','shipping_country','fourpx_country_code');
+    }
+
+    public function Fourcode()
+    {
+        return $this->belongsTo('App\Models\FourcodeModel','shipping_country','code');
+    }
+
+    public function postconfig()
+    {
+        return $this->belongsTo('App\Models\PostpacketModel','logistics_id','shipment_id_string');
+    }
+
+    public function catelog()
+    {
+        return $this->belongsTo('App\Models\CatalogModel',$this->items->first()->item->product->catalog_id);
+    }
+
 
     public function processGoods($file)
     {
@@ -673,8 +698,10 @@ class PackageModel extends BaseModel
         $i = true;
         foreach ($items as $warehouseId => $packageItems) {
             if ($i) {
+                $weight = 0;
                 foreach ($packageItems as $key => $packageItem) {
                     $newPackageItem = $this->items()->create($packageItem);
+                    $weight += $newPackageItem->item->weight * $newPackageItem->quantity;
                     DB::beginTransaction();
                     try {
                         $newPackageItem->item->hold(
@@ -687,13 +714,15 @@ class PackageModel extends BaseModel
                     }
                     DB::commit();
                 }
-                $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN']);
+                $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                 $i = false;
             } else {
                 $newPackage = $this->create($this->toArray());
+                $weight = 0;
                 if ($newPackage) {
                     foreach ($packageItems as $key => $packageItem) {
                         $newPackageItem = $newPackage->items()->create($packageItem);
+                        $weight += $newPackageItem->item->weight * $newPackageItem->quantity;
                         DB::beginTransaction();
                         try {
                             $newPackageItem->item->hold(
@@ -706,7 +735,7 @@ class PackageModel extends BaseModel
                         }
                         DB::commit();
                     }
-                    $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN']);
+                    $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                 }
             }
         }

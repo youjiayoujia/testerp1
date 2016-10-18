@@ -48,7 +48,7 @@ class TakingController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'stockTakingForms'=>$model->stockTakingForms()->paginate('1000'),
+            'stockTakingForms'=>$model->stockTakingForms()->paginate('100'),
             'stockins' => InOutModel::where(['inner_type'=>'INVENTORY_PROFIT', 'relation_id'=>$id])->with('stock')->paginate('500'),
             'stockouts' => InOutModel::where(['inner_type'=>'SHORTAGE', 'relation_id'=>$id])->with('stock')->paginate('500'),
         ];

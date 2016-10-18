@@ -119,7 +119,7 @@ class AdjustmentController extends Controller
             }
             AdjustFormModel::create($buf);
         }
-        $to = $this->model->find($obj->id);
+        $to = $this->model->with('adjustments')->find($obj->id);
         $to = base64_encode(serialize($to));
         $this->eventLog($name, '新增调整记录,id='.$obj->id, $to);
 
@@ -174,7 +174,7 @@ class AdjustmentController extends Controller
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
-        $model = $this->model->find($id);
+        $model = $this->model->with('adjustments')->find($id);
         $name = UserModel::find(request()->user()->id)->name;
         $from = base64_encode(serialize($model));
         foreach($model->adjustments as $single) {

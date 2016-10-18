@@ -27,7 +27,7 @@ class Alibaba {
             foreach ($accounts as $account){
                 $obj_account               = AlibabaSupliersAccountModel::firstOrNew(['resource_owner' => $account['resource_owner']]);
                 $obj_account->memberId     = $account['memberId'];
-                $obj_account->access_token = $account['access_token'];
+               // $obj_account->access_token = $account['access_token'];
                 $obj_account->access_token = $account['access_token'];
                 $obj_account->save();
             }
@@ -88,7 +88,6 @@ class Alibaba {
     {
         $http=$url.'?'.http_build_query($params);
         $ch = curl_init($http) ;
-        
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true) ; // 获取数据返回
         curl_setopt($ch, CURLOPT_BINARYTRANSFER, true) ; // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回
         curl_setopt($ch, CURLOPT_HEADER, 0); // 不要http header 加快效率

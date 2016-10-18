@@ -74,9 +74,9 @@ class TestController extends Controller
 
     public function test2()
     {
-        $item = ItemModel::find(1);
-        $result = $item->assignStock(1);
-        var_dump($result);
+        $a = [1,2,[3,4]];
+        var_dump(count($a));
+        var_dump(count($a,1));
     }
     // public function test2()
     // {

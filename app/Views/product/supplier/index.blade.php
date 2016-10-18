@@ -96,6 +96,12 @@
                         <span class="glyphicon glyphicon-trash"></span>
                     </a>
                  @endif
+
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $supplier->table }}" data-id="{{$supplier->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

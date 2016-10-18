@@ -14,11 +14,11 @@ use App\Base\BaseModel;
 
 class RefundModel extends BaseModel
 {
-    protected $table = 'order_refunds';
+    public $table = 'order_refunds';
 
     public $searchFields = ['order_id' => '订单号'];
 
-    protected $fillable = [
+    public $fillable = [
         'order_id',
         'refund_amount',
         'price',

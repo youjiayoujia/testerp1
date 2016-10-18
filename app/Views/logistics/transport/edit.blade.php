@@ -11,7 +11,6 @@
         </div>
         <div class="form-group col-lg-3">
             <label for="code" class="control-label">简称</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="code" placeholder="简称" name='code' value="{{ old('code') ?  old('code') : $model->code }}">
         </div>
     </div>

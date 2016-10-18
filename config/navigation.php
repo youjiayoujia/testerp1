@@ -322,7 +322,12 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '物流渠道名',
+                    'name' => '渠道展示编码',
+                    'url' => 'logisticsTransport.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '渠道回传编码',
                     'url' => 'logisticsChannelName.index',
                     'icon' => '',
                 ],

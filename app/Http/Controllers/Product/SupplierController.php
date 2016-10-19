@@ -18,6 +18,7 @@ use App\Models\Product\SupplierModel;
 use App\Models\Item\ItemPrepareSupplierModel;
 use App\Models\Product\SupplierLevelModel;
 use App\Models\Product\SupplierChangeHistoryModel;
+use Tool;
 
 class SupplierController extends Controller
 {
@@ -58,6 +59,10 @@ class SupplierController extends Controller
 		if($model=='imageError'){
 			return redirect(route('productSupplier.create'))->with('alert', $this->alert('danger', '图片格式不正确.'));
 		}else{
+            $name = UserModel::find(request()->user()->id)->name;
+            $to = base64_encode(serialize($model));
+            $this->eventLog($name, '数据更新', $to, '');
+
 			SupplierChangeHistoryModel::create([
 				'supplier_id' => $model->id,
 				/*'to' =>request()->input('purchase_id'),*/
@@ -97,6 +102,9 @@ class SupplierController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $from = base64_encode(serialize($model));
+
+
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -112,6 +120,10 @@ class SupplierController extends Controller
         }
         $res=$this->model->updateSupplier($id,$data,request()->file('qualifications'));
 		if($res == true){
+            $name = UserModel::find(request()->user()->id)->name;
+            $to = $this->model->find($id);
+            $to = base64_encode(serialize($to));
+            $this->eventLog($name, '数据更新', $to, $from);
             return redirect($this->mainIndex);
         }else{
             return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '文件上传失败.'));

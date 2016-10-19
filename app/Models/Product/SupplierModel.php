@@ -12,14 +12,14 @@ class SupplierModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'product_suppliers';
+    public $table = 'product_suppliers';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
+    public $fillable = [
         'id',
         'name',
         'url',

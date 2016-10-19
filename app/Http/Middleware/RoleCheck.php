@@ -43,17 +43,13 @@ class RoleCheck
             }
         }
 
-        if(!request()->user()->is_available){
-            header("Content-type: text/html; charset=utf-8");
-            echo '<span style="color:red">注意！</span>用户已删除,请不要再登录此账号，清除缓存后再次登录';exit;
-        }
         
-        //待删除
-        return $next($request);
+        
+        //待去掉
+        //if(request()->user()->role->where('role','adminer')->toArray()){
+            return $next($request);
+        //}
 
-
-        /*echo '<pre>';
-        print_r(Route::currentRouteAction());exit;*/
         $route = Route::currentRouteAction();
         foreach (request()->user()->role as $role) {
             $gate = $role->permission()->where('route',$route)->get()->toArray();

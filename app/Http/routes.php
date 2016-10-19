@@ -341,6 +341,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
     Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
     Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+    Route::resource('purchaseAccount','Purchase\AccountController');
 
     //品类路由
     Route::resource('catalog', 'CatalogController');

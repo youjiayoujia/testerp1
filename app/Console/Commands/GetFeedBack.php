@@ -5,6 +5,7 @@ use Channel;
 use Illuminate\Console\Command;
 use App\Models\Publish\Ebay\EbayFeedBackModel;
 use App\Models\Channel\AccountModel;
+use App\Models\ChannelModel;
 
 class GetFeedBack extends Command
 {
@@ -13,7 +14,7 @@ class GetFeedBack extends Command
      *
      * @var string
      */
-    protected $signature = 'getFeedBack:account{accountIDs}';
+    protected $signature = 'getFeedBack:account{accountIDs=all}';
 
     /**
      * The console command description.
@@ -40,16 +41,28 @@ class GetFeedBack extends Command
     public function handle()
     {
         //
-        $accountIds = explode(',', $this->argument('accountIDs'));
-        foreach ($accountIds as $accountId) {
-            $account = AccountModel::findOrFail($accountId);
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $result = $channel->GetFeedback();
-            foreach($result as $re){
-                $re['channel_account_id'] = $accountId;
-                $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$accountId])->first();
-                if(empty($feedback)){
-                    EbayFeedBackModel::create($re);
+
+        if($this->argument('accountIDs') == 'all'){
+            $channel = ChannelModel::where('driver','=','ebay')->first();
+            $accounts = $channel->accounts;
+            if(!$accounts->isEmpty()){
+                foreach($accounts as $account){
+                    $driver = Channel::driver($account->channel->driver, $account->api_config);
+                    $driver->GetFeedback();
+                }
+            }
+        }else{
+            $accountIds = explode(',', $this->argument('accountIDs'));
+            foreach ($accountIds as $accountId) {
+                $account = AccountModel::findOrFail($accountId);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $result = $channel->GetFeedback();
+                foreach($result as $re){
+                    $re['channel_account_id'] = $accountId;
+                    $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$accountId])->first();
+                    if(empty($feedback)){
+                        EbayFeedBackModel::create($re);
+                    }
                 }
             }
         }

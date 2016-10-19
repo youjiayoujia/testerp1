@@ -1044,7 +1044,7 @@ class PurchaseOrderController extends Controller
      * @return obj
      * 
      */
-    public function sevenPurchaseSku()
+/*    public function sevenPurchaseSku()
     {   
         echo '<pre>';
         
@@ -1054,7 +1054,7 @@ class PurchaseOrderController extends Controller
         Mail::send('purchase.purchaseOrder.mailSevenPurchase', $data, function($message) use($data){
             $message->to($data['email'], $data['name'])->subject('采购单7天未到货');
         });
-    }
+    }*/
         
 }
 

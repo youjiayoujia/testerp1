@@ -57,9 +57,15 @@ class EventChildController extends Controller
                 foreach($to as $key => $value) {
                     $html .= "<div class='form-control col-lg-6'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                     if(is_array($value)) {
-                        foreach($value as $k => $v) {
-                            foreach($v as $k1 => $v1) {
-                                $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>"+$v1+"&nbsp;&nbsp;&nbsp;&nbsp;";
+                        if(count($value) == count($value,1)) {
+                            foreach($value as $k => $v) {
+                                $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>"+$v+"&nbsp;&nbsp;&nbsp;&nbsp;";
+                            }
+                        } else {
+                            foreach($value as $k => $v) {
+                                foreach($v as $k1 => $v1) {
+                                    $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>"+$v1+"&nbsp;&nbsp;&nbsp;&nbsp;";
+                                }
                             }
                         }
                     } else {

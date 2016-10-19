@@ -48,7 +48,7 @@ class RoleCheck
             echo '<span style="color:red">注意！</span>用户已删除,请不要再登录此账号，清除缓存后再次登录';exit;
         }
         
-        if(request()->user()->email=='adminer'){
+        if(request()->user()->role->where('role','adminer')->toArray()){
             return $next($request);
         }
         

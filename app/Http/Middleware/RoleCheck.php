@@ -48,10 +48,11 @@ class RoleCheck
             echo '<span style="color:red">注意！</span>用户已删除,请不要再登录此账号，清除缓存后再次登录';exit;
         }
         
-        if(request()->user()->role->where('role','adminer')->toArray()){
+        //待去掉
+        //if(request()->user()->role->where('role','adminer')->toArray()){
             return $next($request);
-        }
-        
+        //}
+
         $route = Route::currentRouteAction();
         foreach (request()->user()->role as $role) {
             $gate = $role->permission()->where('route',$route)->get()->toArray();

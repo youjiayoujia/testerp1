@@ -69,23 +69,6 @@ return [
                     'icon' => '',
                 ],
             ],
-            '通关报关' => [
-                [
-                    'name' => 'home',
-                    'url' => 'customsClearance.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '三宝产品',
-                    'url' => 'customsClearance.bao3index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '三宝package',
-                    'url' => 'bao3Package.index',
-                    'icon' => '',
-                ],
-            ],
         ],
     ],
     //订单导航

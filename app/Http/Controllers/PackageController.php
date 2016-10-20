@@ -37,6 +37,13 @@ class PackageController extends Controller
         $this->middleware('StockIOStatus');
     }
 
+    /**
+     *  将包裹need放到匹配队列中 
+     *
+     *  @param none
+     *  @return redirect
+     *
+     */
     public function putNeedQueue()
     {
         $len = 1000;
@@ -142,6 +149,13 @@ class PackageController extends Controller
         return view($this->viewPath . 'logisticsDelivery', $response);
     }
 
+    /**
+     *  批量修改包裹物流方式 
+     *
+     *  @param $arr  packageId数组    $id     物流id
+     *  @return redirect
+     *
+     */
     public function changeLogistics($arr, $id) 
     {
         $arr = explode(',', $arr);
@@ -163,6 +177,13 @@ class PackageController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 批量删除包裹 
+     *
+     *  @param $array  packageId
+     *  @return redirect
+     *
+     */
     public function removePackages($arr)
     {
         $arr = explode(',', $arr);
@@ -186,6 +207,13 @@ class PackageController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 批量清空物流方式 
+     *
+     *  @param arr packageId 数组
+     *  @return redirect
+     *
+     */
     public function removeLogistics($arr) 
     {
         $arr = explode(',', $arr);
@@ -250,6 +278,7 @@ class PackageController extends Controller
             'packageException' => $this->model->where('status', 'ERROR')->count(),
             'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
         ];
+
         return view($this->viewPath . 'flow', $response);
     }
 
@@ -439,7 +468,7 @@ class PackageController extends Controller
                 $model->delete();
             }
         }
-        $model = $this->model->find($buf[0]);
+        $model = $this->model->with('items')->find($buf[0]);
         $from = base64_encode(serialize($model));
         $model->update(['status' => 'NEW']);
         $model->order->update(['status' => 'REVIEW']);
@@ -457,7 +486,7 @@ class PackageController extends Controller
 
     public function editTrackStore($id)
     {
-        $model = $this->model->find($id);
+        $model = $this->model->with('items')->find($id);
         $name = UserModel::find(request()->user()->id)->name;
         $from = base64_encode(serialize($model));
         if (!$model) {
@@ -571,7 +600,7 @@ class PackageController extends Controller
     {
         $package_id = trim(request('package_id'));
         $name = UserModel::find(request()->user()->id)->name;
-        $package = $this->model->find($package_id);
+        $package = $this->model->with('items')->find($package_id);
         $from = base64_decode(serialize($package));
         if (!$package) {
             return json_encode(false);
@@ -613,7 +642,7 @@ class PackageController extends Controller
     {
         $model = $this->model->find($id);
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_decode(serialize($model));
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -622,7 +651,7 @@ class PackageController extends Controller
             $model->update(['is_auto' => '0']);
         }
         $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
-        $to = base64_decode(serialize($model));
+        $to = base64_encode(serialize($model));
         $this->eventLog($name, '拆分包裹', $to, $from);
 
         return redirect($this->mainIndex);
@@ -842,11 +871,17 @@ class PackageController extends Controller
         $logistics = LogisticsModel::find($logistics_id);
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
         $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
-        if($is_auto) {
-            $job = new PlaceLogistics($model);
-            $job = $job->onQueue('placeLogistics');
-            $this->dispatch($job);
+        $orderRate = $model->order->calculateProfitProcess();
+        if($orderRate > 0) {
+            if($is_auto) {
+                $job = new PlaceLogistics($model);
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+            } 
+        } else {
+            $this->model->order->OrderCancle();
         }
+        
         return json_encode(true);
     }
 

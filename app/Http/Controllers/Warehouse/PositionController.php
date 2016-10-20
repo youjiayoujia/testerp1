@@ -18,8 +18,6 @@ use App\Models\UserModel;
 
 class PositionController extends Controller
 {
-    protected $warehouse;
-
     public function __construct(PositionModel $position)
     {
         $this->model = $position;

@@ -14,11 +14,11 @@ use App\Base\BaseModel;
 
 class CatalogModel extends BaseModel
 {
-    protected $table = 'logistics_catalogs';
+    public $table = 'logistics_catalogs';
 
     public $searchFields = ['name' => '物流分类名称'];
 
-    protected $fillable = [
+    public $fillable = [
         'id',
         'name',
     ];

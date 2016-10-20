@@ -29,7 +29,7 @@ Class AliexpressAdapter implements AdapterInterface
     private $_version = 1;
     private $_aliexpress_member_id;
 
-    public function __construct($config)
+                    public function __construct($config)
     {
         $this->_appkey = $config["appkey"];
         $this->_appsecret = $config["appsecret"];
@@ -1384,18 +1384,22 @@ Class AliexpressAdapter implements AdapterInterface
      * @param $currentPage 每页查询商品数量
      * @param $pageSize 需要商品的当前页数
      */
-    public function getOnlineProduct($productStatus = 'onSelling',$currentPage,$pageSize){
+    public function getOnlineProduct($productStatus = 'onSelling',$currentPage,$pageSize,$grounpId=''){
         $app_url  = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findProductInfoListQuery/" . $this->_appkey;
         $parameter['access_token'] = $this->_access_token;
         $parameter['pageSize'] = $pageSize;
         $parameter['currentPage'] = $currentPage;
         $parameter['productStatusType'] = $productStatus;
+        if($grounpId){
+            $parameter['groupId'] = $grounpId;
+        }
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);         
-       
+        
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);        
         return json_decode($result,true);
     }
+    
     
     /**
      * 根据商品id查询单个商品的详细信息
@@ -1537,6 +1541,14 @@ Class AliexpressAdapter implements AdapterInterface
 
        // $respon_ary = json_decode($this->getJsonData('api.addMsg','api.sellerRefuseIssue'));
 
+    }
+    
+    //根据交易订单获取线上发货物流服务列表
+    public function getOnlineLogisticsServiceListByOrderId($orderId){
+        $query = 'orderId='.$orderId;
+        $api = "api.getOnlineLogisticsServiceListByOrderId";
+        $result = json_decode($this->getJsonData($api,$query),true);
+        return $result;
     }
 
 }

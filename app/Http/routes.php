@@ -253,7 +253,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics', ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
     //缺货报表
-    Route::get('purchaseOrder/outOfStock', ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);    
+    Route::get('purchaseOrder/outOfStock', ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);  
+    Route::get('purchaseOrder/sevenPurchaseSku', ['uses' => 'Purchase\PurchaseOrderController@sevenPurchaseSku', 'as' => 'purchase.sevenPurchaseSku']);  
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
     Route::any('PurchaseOrder/trackingNoSearch',
         ['uses' => 'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
@@ -340,6 +341,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
     Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
     Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+    Route::resource('purchaseAccount','Purchase\AccountController');
 
     //品类路由
     Route::resource('catalog', 'CatalogController');
@@ -357,6 +359,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('itemUser/ajaxSupplierUser', ['uses' => 'ItemController@ajaxSupplierUser', 'as' => 'item.ajaxSupplierUser']);
     Route::any('item/changePurchaseAdmin/{id}', ['uses' => 'ItemController@changePurchaseAdmin', 'as' => 'changePurchaseAdmin']);
     Route::any('item/question/{id}', ['uses' => 'ItemController@question', 'as' => 'item.question']);
+    Route::any('item/addSupplier/{id}', ['uses' => 'ItemController@addSupplier', 'as' => 'item.addSupplier']);
     Route::any('item/questionStatus', ['uses' => 'ItemController@questionStatus', 'as' => 'item.questionStatus']);
     Route::any('item/extraQuestion', ['uses' => 'ItemController@extraQuestion', 'as' => 'item.extraQuestion']);
     Route::any('item/answer', ['uses' => 'ItemController@answer', 'as' => 'item.answer']);
@@ -451,6 +454,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('logisticsCatalog', 'Logistics\CatalogController');
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
+    Route::resource('logisticsTransport', 'Logistics\TransportController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
@@ -662,6 +666,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('package/flow',
         ['uses' => 'PackageController@flow', 'as' => 'package.flow']);
     Route::resource('package', 'PackageController');
+    
     Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);
     Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);
     Route::get('getChoiesOrder', ['uses' => 'OrderController@getChoiesOrder', 'as' => 'getChoiesOrder']);
@@ -811,7 +816,16 @@ Route::group(['middleware' => 'roleCheck'], function () {
         Route::get('freightManage',
             ['uses' => 'SmtProductController@freightManage', 'as' => 'smtProduct.freightManage']);
         Route::get('getFreightDetailById',
-            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);           
+            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);  
+        Route::post('showAccountProductGroup',
+            ['uses' => 'SmtProductController@showAccountProductGroup', 'as' => 'smtProduct.showAccountProductGroup']);
+        Route::post('SynchronousDataByAccount',
+            ['uses' => 'SmtProductController@SynchronousDataByAccount', 'as' => 'smtProduct.SynchronousDataByAccount']);
+        Route::post('copyAllAccountNew',
+            ['uses' => 'SmtProductController@copyAllAccountNew', 'as' => 'smtProduct.copyAllAccountNew']); 
+        Route::post('getCategoryInfo',
+            ['uses' => 'SmtProductController@getCategoryInfo', 'as' => 'smtProduct.getCategoryInfo']);       
+        
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     
@@ -877,6 +891,21 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@batchUpdate', 'as' => 'lazada.batchUpdate']);
     
     Route::resource('lazada', 'Publish\Lazada\LazadaOnlineMonitorController');
+	//joom Online Monitor
+    Route::resource('joomonline', 'Publish\Joom\JoomOnlineMonitorController');
+    Route::post('joomonline/setSellerinventory',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setSellerinventory', 'as' => 'joomonline.setSellerinventory']);
+    Route::post('joomonline/setPrice',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setPrice', 'as' => 'joomonline.setPrice']);
+    Route::post('joomonline/setshipping',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setshipping', 'as' => 'joomonline.setshipping']);
+    Route::get('setstatus',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setstatus', 'as' => 'joomonline.setstatus']);
+    Route::get('productBatchEdit',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@productBatchEdit', 'as' => 'joomonline.productBatchEdit']);
+    Route::any('batchUpdate',
+        ['uses' => 'Publish\Joom\JoomOnlineMonitorController@batchUpdate', 'as' => 'joomonline.batchUpdate']);
+
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
@@ -1022,6 +1051,7 @@ Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
 Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
 Route::any('getSmtIssue',['uses'=> 'TestController@getSmtIssue']);
-
+Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);
+Route::any('joomOrdersList', ['uses' => 'TestController@joomOrdersList']);
 
 

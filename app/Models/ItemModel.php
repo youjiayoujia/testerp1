@@ -119,6 +119,11 @@ class ItemModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'item_id');
     }
 
+    public function skuPrepareSupplier()
+    {
+        return $this->belongsToMany('App\Models\Product\SupplierModel', 'item_prepare_suppliers', 'item_id','supplier_id')->withTimestamps();
+    }
+
     public function updateItem($data)
     {
         $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',', $data['carriage_limit_arr']);
@@ -479,7 +484,7 @@ class ItemModel extends BaseModel
     //分配库存
     public function assignStock($quantity)
     {
-        $stocks = $this->stocks->sortByDesc('available_quantity');
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1;});
         if ($stocks->sum('available_quantity') >= $quantity) {
             $warehouseStocks = $stocks->groupBy('warehouse_id');
             //默认仓库
@@ -624,6 +629,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
+            if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -632,6 +638,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
+            if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -640,6 +647,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
+            if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
 
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {

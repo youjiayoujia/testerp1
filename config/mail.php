@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'from' => ['address' => '178069409@qq.com', 'name' => 'MC'],
+    'from' => ['address' => 'youjiatest@163.com', 'name' => 'smerp'],
 
     /*
     |--------------------------------------------------------------------------
@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'encryption' => env('MAIL_ENCRYPTION'),
+    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
 
     /*
     |--------------------------------------------------------------------------

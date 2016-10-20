@@ -26,6 +26,12 @@
                    data-url="{{ route('CatalogRatesChannel.destroy', ['id' => $channel->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $channel->table }}" data-id="{{$channel->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

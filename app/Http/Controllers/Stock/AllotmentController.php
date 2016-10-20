@@ -1,9 +1,9 @@
 <?php
 /**
  * 库存调拨控制器
- * 处理库存调整相关的Request与Response
+ * 处理库存调拨相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 15/1/11
  * Time: 11:09
  */
@@ -103,7 +103,7 @@ class AllotmentController extends Controller
             $item = ItemModel::find($buf['item_id']);
             $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ALLOTMENT', $obj->id);
         }
-        $to = $this->model->find($obj->id);
+        $to = $this->model->with('allotmentforms')->find($obj->id);
         $to = base64_encode(serialize($to));
         $this->eventLog($name, '新增调拨记录,id='.$obj->id, $to);
 
@@ -160,7 +160,7 @@ class AllotmentController extends Controller
     public function update($id)
     {
         request()->flash();
-        $model = $this->model->find($id);
+        $model = $this->model->with('allotmentforms')->find($id);
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
@@ -456,7 +456,7 @@ class AllotmentController extends Controller
         $arr = request()->all();
         $this->model->find($id)->update(['checkform_by'=>request()->user()->id]);
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_encode(serialize($this->model->find($id)));
+        $from = base64_encode(serialize($this->model->with('allotmentforms')->find($id)));
 
         $obj = $this->model->find($id)->allotmentforms;
         DB::beginTransaction();
@@ -512,7 +512,7 @@ class AllotmentController extends Controller
             DB::rollback();
         }
         DB::commit();
-        $to = base64_encode(serialize($this->model->find($id)));
+        $to = base64_encode(serialize($this->model->with('allotmentforms')->find($id)));
         $this->eventLog($name, '对单', $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '对单成功'));

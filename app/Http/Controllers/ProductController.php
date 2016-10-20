@@ -44,6 +44,7 @@ class ProductController extends Controller
             echo "没有权限";exit;
         }*/
     }
+
     public function create()
     {
         /*if (Gate::denies('check','product_admin,product_staff|add')) {
@@ -55,7 +56,7 @@ class ProductController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->find($requireModel->catalog_id),
-            'suppliers' => $this->supplier->all(),
+            //'suppliers' => $this->supplier->all(),
             'wrapLimit' => $this->wrapLimit->all(),
             'data' =>$data,
             'require_id' =>$require_id,
@@ -127,7 +128,7 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'product' => $product,
-            'suppliers' => $this->supplier->all(),
+            //'suppliers' => $this->supplier->all(),
             'features_input' => array_values($product->featureTextValues->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,
@@ -518,7 +519,7 @@ class ProductController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->with('catalog','supplier','purchaseAdminer')),
             'mixedSearchFields' => $this->model->mixed_search,
             'Compute_logistics_catalog'=> LogisticsCatalog::all(),
             'Compute_logistics'=> LogisticsModel::all(),

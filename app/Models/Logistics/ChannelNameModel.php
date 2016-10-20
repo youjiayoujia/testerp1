@@ -14,9 +14,9 @@ use App\Base\BaseModel;
 
 class ChannelNameModel extends BaseModel
 {
-    protected $table = 'logistics_channel_names';
+    public $table = 'logistics_channel_names';
 
-    protected $fillable = [
+    public $fillable = [
         'channel_id', 'name', 'logistics_key'
     ];
 

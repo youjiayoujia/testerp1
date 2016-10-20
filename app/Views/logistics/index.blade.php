@@ -55,6 +55,11 @@
                 <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 分区报价
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $logistics->table }}" data-id="{{$logistics->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

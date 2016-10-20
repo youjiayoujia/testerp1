@@ -4,20 +4,20 @@
     <input type='hidden' value='PUT' name="_method">
     <div class="row">
         <div class="form-group col-md-3">
-            <label for="size">item</label>
+            <label for="size">sku</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" disabled="disabled" id="name" placeholder="sku" name='sku' value="{{ old('sku') ?  old('sku') : $model->sku }}">
         </div>
 
         <div class="form-group col-md-3">
-            <label for="size">item英文</label>
+            <label for="size">英文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="name" placeholder="item英文" disabled="disabled" name='name' value="{{ old('name') ?  old('name') : $model->name }}">
+            <input class="form-control" id="name" placeholder="英文"  name='name' value="{{ old('name') ?  old('name') : $model->name }}">
         </div>
         <div class="form-group col-md-3">
-            <label for="color">item中文</label>
+            <label for="color">中文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="item中文" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+            <input class="form-control" id="c_name" placeholder="中文"  name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
         </div>
     </div>
     <div class="row">
@@ -32,7 +32,7 @@
             <label for="color">主供应商sku</label>
             <input class="form-control" id="supplier_sku" placeholder="主供应商sku" name='supplier_sku' value="{{ old('supplier_sku') ?  old('supplier_sku') : $model->supplier_sku }}">
         </div>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
+        <!-- <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select id="second_supplier_id" class="form-control supplier" name="second_supplier_id">
                <option value="{{$model->secondSupplier?$model->secondSupplier->id:0}}">{{$model->secondSupplier?$model->secondSupplier->name:''}}</option>
             </select>
@@ -40,7 +40,7 @@
         <div class="form-group col-md-3">
             <label for="color">辅供应商sku</label>
             <input class="form-control" id="second_supplier_sku" placeholder="辅供应商sku" name='second_supplier_sku' value="{{ old('second_supplier_sku') ?  old('second_supplier_sku') : $model->second_supplier_sku }}">
-        </div>
+        </div> -->
     </div>
     <div class="row">
         <div class="form-group col-md-4">
@@ -81,7 +81,7 @@
         </div>        
     </div>
 
-    <div class="row">
+    <!-- <div class="row">
         <div class="form-group col-md-3">
             <label for="length">长</label>
             <input class="form-control" id="length" placeholder="length" name='length' value="{{ old('length') ?  old('length') : $model->length }}">
@@ -94,7 +94,7 @@
             <label for="height">高</label>
             <input class="form-control" id="height" placeholder="height" name='height' value="{{ old('height') ?  old('height') : $model->height }}">
         </div>
-    </div>
+    </div> -->
 
     <div class="row">
         <div class="form-group col-md-3">
@@ -111,7 +111,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <!-- <div class="row">
         <div class="form-group col-md-1">
             <label for="color">库存</label>
             
@@ -123,24 +123,26 @@
             <input disabled="disabled" class="form-control" id="amount" placeholder="库存总金额" name='amount' value="{{ old('amount') ?  old('amount') :$model->all_quantity*$model->cost }}">
         </div>
 
-    </div>
+    </div> -->
 
 
     <div class="row">
         <div class="form-group col-md-12" style="">
-            <label for="color">物流限制</label>
+            <label for="color">物流限制：</label><br>
             @foreach($logisticsLimit as $carriage_limit)
                 <label>
                     <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, $logisticsLimit_arr)? 'checked' : '' }} >{{$carriage_limit->name}}
                 </label>
+                <br>
             @endforeach
         </div>
         <div class="form-group col-md-12" style="">
-            <label for="color">包装限制</label>
+            <label for="color">包装限制：</label><br>
             @foreach($wrapLimit as $wrap_limit)
                 <label>
                     <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, $wrapLimit_arr)? 'checked' : '' }} >{{$wrap_limit->name}}
                 </label>
+                <br>
             @endforeach
         </div>
         <div class="form-group col-md-3">
@@ -152,7 +154,7 @@
                 @endforeach
             </select>
         </div>
-        <div class=" warehouse_position form-group col-md-3">
+        <div class="form-group col-md-3">
             <label for="color">库位</label>
             <select id="warehouse_position" class="form-control" name="warehouse_position">
                 <option value="{{$model->warehousePosition?$model->warehousePosition->id:0}}">{{$model->warehousePosition?$model->warehousePosition->name:''}}</option>

@@ -158,6 +158,9 @@ return [
         'question_group' => '指定分组',
         'skuName.c_name' => '产品名',
         'messageSku.sku' => 'sku',
+		'joom_publish_product_detail.productID'=>'Joom产品ID',
+        'joom_publish_product_detail.sku'=>'Joom原始sku',
+        'enabled'=>'Joom平台状态',
 
     ],
 ];

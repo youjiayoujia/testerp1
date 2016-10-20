@@ -31,5 +31,17 @@ class PurchasePostageModel extends BaseModel
     {
         return $this->belongsTo('App\Models\UserModel', 'user_id');
     }
-	
+
+    public function purchaseOrder()
+    {
+        return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel','purchase_order_id','id');
+    }
+
+
+    
+
+
+
+
+
 }

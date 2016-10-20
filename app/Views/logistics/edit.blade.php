@@ -132,7 +132,7 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">承运商信息</div>
+        <div class="panel-heading">渠道回传编码</div>
         <div class="panel-body">
             @foreach($arr as $key1 => $singles)
             <div class='form-group col-lg-3'>
@@ -144,7 +144,7 @@
                     @endforeach
                 </select>
                 <input type='text' class='form-control' name='{{$key1}}_merchant_name' placeholder='备选框'>
-                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $single->channel_id }}>
+                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $singles->first()->channel_id }}>
             </div>
             @endforeach
         </div>

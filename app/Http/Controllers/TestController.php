@@ -31,6 +31,8 @@ use App\Models\LogisticsModel;
 use App\Models\Logistics\ChannelNameModel;
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
+use App\Models\Publish\Joom\JoomPublishProductModel;
+use App\Models\Publish\Joom\JoomPublishProductDetailModel;
 use App\Modules\Channel\ChannelModule;
 use App\Jobs\Job;
 use App\Jobs\DoPackage;
@@ -62,16 +64,69 @@ use BarcodeGen;
 class TestController extends Controller
 {
     private $itemModel;
+	private $orderModel;
 
     public function __construct(OrderModel $orderModel, ItemModel $itemModel)
     {
         $this->itemModel = $itemModel;
+		$this->orderModel = $orderModel;
     }
 
     public function test2()
     {
-        $package = OrderModel::find(184);
-        var_dump($package->calculateProfitProcess());
+        $a = [1,2,[3,4]];
+        var_dump(count($a));
+        var_dump(count($a,1));
+    }
+    // public function test2()
+    // {
+    //     $a = ['a' => 'b', 'c' => 'e', 'f' => ['f','g','i']];
+    //     $b = ['b' => 'c', 'a' => 'b', 'f' => ['f','k']];
+    //     $arr = $this->calctowarr($a,$b);
+    //     var_dump($a);
+    //     var_dump($b);
+    // }
+
+    public function calcTwoArr(&$a,&$b)
+    {
+        foreach($a as $key => $value) {
+            if(array_key_exists($key, $b)) {
+                if($this->valueequal($value,$b[$key])) {
+                    unset($a[$key]);
+                    unset($b[$key]);
+                } else {
+                    if(getType($value) == getType($b[$key]) && is_array($value)) {
+                        $this->calcTwoArr($a[$key],$b[$key]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function valueEqual($c,$d)
+    {
+        if(getType($c) == getType($d)) {
+            if(!is_array($c)) {
+                if($c == $d) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                foreach($c as $key => $value) {
+                    if(array_key_exists($key, $d)) {
+                        if(!$this->valueEqual($value, $d[$key])) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
     public function test3()
@@ -840,5 +895,109 @@ class TestController extends Controller
                 }
             }
         }
+    }
+	/*Synchronize joom platform data
+     *@model:joom
+     *@param $account_ids
+     */
+    public function getJoomProduct()
+    {
+        //$account_ids = 412;
+        $account_ids = request()->get('accountIDs');
+        $account_arr = explode(',',$account_ids);
+        foreach($account_arr as $account_id){
+        $account = AccountModel::find($account_id);
+        $begin = microtime(true);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $hasProduct = true;
+        $start = 0;
+        while ($hasProduct) {
+            $productList = $channel->getOnlineProduct($start, 50);
+            if ($productList) {
+                foreach ($productList as $product) {
+                    $is_add = true;
+                    $productInfo = $product['productInfo'];
+                    $variants = $product['variants'];
+                    foreach ($variants as $key => $variant) {
+                        $productInfo['sellerID'] = $variant['sellerID'];
+                        $variants[$key]['account_id'] = $account_id;     //request account id
+                    }
+                    $productInfo['account_id'] = $account_id;  //request account id
+                    $thisProduct = JoomPublishProductModel::where('productID', $productInfo['productID'])->first();
+
+                    if ($thisProduct) {
+                        $is_add = false;
+                        $mark_id = $thisProduct->id;
+                    }
+                    if ($is_add) {    //not data create
+                        $joom = JoomPublishProductModel::create($productInfo);
+                        foreach ($variants as $detail) {
+                            $detail['product_id'] = $joom->id;
+                            $joomDetail = JoomPublishProductDetailModel::create($detail);
+                        }
+                    } else {         //exist update data
+                        JoomPublishProductModel::where('productID', $productInfo['productID'])->update($productInfo);
+                        foreach ($variants as $key1 => $item) {
+                            $productDetail = JoomPublishProductModel::find($mark_id)->details;
+                            if (count($variants) == count($productDetail)) {
+                                foreach ($productDetail as $key2 => $productItem) {
+                                    if ($key1 == $key2) {
+                                        $productItem->update($item);
+                                    }
+                                }
+                            } else {
+                                foreach ($productDetail as $key2 => $orderItem) {
+                                    $orderItem->delete($item);
+                                }
+                                foreach ($variants as $value) {
+                                    $value['product_id'] = $mark_id;
+                                    JoomPublishProductDetailModel::create($value);
+                                }
+                            }
+                        }
+                    }
+                }
+                $start++;
+            } else {
+                $hasProduct = false;
+            }
+         }
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+    /*Time:2016-10-7
+     *get joom order
+     *@param $account_ids
+     */
+    public function joomOrdersList()
+    {
+        $begin = microtime(true);
+        $account_ids = request()->get('accountIDs');
+        $account = AccountModel::find($account_ids);
+        $startDate = date("Y-m-d",strtotime('-3 day'));
+        $endDate = date("Y-m-d H:i:s");
+        $status = $account->api_status;
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        for($i=0;$i>=0;$i++){
+            $pagesize = 50;
+            $orderList = $channel->listOrders($startDate, $endDate, $status, $i, $pagesize);
+            if(isset($orderList['orders'])){
+                foreach ($orderList['orders'] as $order) {
+                    $thisOrder = OrderModel::where('channel_ordernum', $order['channel_ordernum'])->first();
+                    $order['channel_id'] = $account->channel->id;
+                    $order['channel_account_id'] = $account->id;
+                    if ($thisOrder) {
+                        //$thisOrder->updateOrder($order);
+                    } else {
+                        $this->orderModel->createOrder($order);
+                    }
+                }
+            }else{   //over
+                break;
+            }
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 }

@@ -245,12 +245,12 @@
             <option value="between">区间</option>
         </select>
     </div>
-    -->
+    
       <div class="btn-group">
             <a class="btn btn-success export" href="javascript:" id="manual_update">
                手动更新
             </a>
-        </div>
+        </div>-->
 @stop
 @section('childJs')
 <link href="{{ asset('plugins/layer/skin/layer.css')}}" type="text/css" rel="stylesheet">

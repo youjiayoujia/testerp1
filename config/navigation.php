@@ -69,23 +69,6 @@ return [
                     'icon' => '',
                 ],
             ],
-            '通关报关' => [
-                [
-                    'name' => 'home',
-                    'url' => 'customsClearance.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '三宝产品',
-                    'url' => 'customsClearance.bao3index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '三宝package',
-                    'url' => 'bao3Package.index',
-                    'icon' => '',
-                ],
-            ],
         ],
     ],
     //订单导航
@@ -734,28 +717,13 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '添加用户',
-                'url' => 'user.create',
-                'icon' => '',
-            ],
-            [
                 'name' => '角色列表',
                 'url' => 'role.index',
                 'icon' => '',
             ],
             [
-                'name' => '添加角色',
-                'url' => 'role.create',
-                'icon' => '',
-            ],
-            [
                 'name' => '权限列表',
                 'url' => 'permission.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '添加权限',
-                'url' => 'permission.create',
                 'icon' => '',
             ],
             [

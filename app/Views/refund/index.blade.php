@@ -166,6 +166,11 @@
             <a href="javascript:void(0);" class="btn btn-danger btn-xs" data-id="7" data-url="" title="退款" data-toggle="modal" data-target="#myModal_{{$item->id}}">
                 <span class="glyphicon glyphicon-usd"></span>
             </a>
+            <button class="btn btn-primary btn-xs dialog"
+                    data-toggle="modal"
+                    data-target="#dialog" data-table="{{ $item->table }}" data-id="{{$item->id}}">
+                <span class="glyphicon glyphicon-road"></span>
+            </button>
         </td>
         <div class="modal fade" id="myModal_{{$item->id}}" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document" style="width:800px;">

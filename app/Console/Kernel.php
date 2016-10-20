@@ -32,6 +32,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetAliexpressProduct::class,
         \App\Console\Commands\GetJoomProduct::class,
         \App\Console\Commands\ProductImage::class,
+        \App\Console\Commands\ProductInsert::class,
         \App\Console\Commands\PickReport::class,
         \App\Console\Commands\PackReport::class,
         \App\Console\Commands\AllReport::class,

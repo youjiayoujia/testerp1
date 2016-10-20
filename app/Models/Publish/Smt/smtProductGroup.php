@@ -17,7 +17,8 @@ class smtProductGroup extends BaseModel
      * @return [type]           [description]
      */
     public function getProductGroupList($token_id){
-        $result = array();
+       $result = array();
+       $rs = array();
        if($token_id){
            $result = $this->where('token_id',$token_id)->get();
        }else{

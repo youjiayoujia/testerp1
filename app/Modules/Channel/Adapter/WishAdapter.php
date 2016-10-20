@@ -83,7 +83,14 @@ Class WishAdapter implements AdapterInterface
             }
             $nextToken++;
         } else {
-            var_dump($orderList);
+            if(isset($orderList['code'])&&$orderList['code'] !=0){
+                return  [
+                    'error' => [
+                        'code' => $orderList['code'],
+                        'message' =>isset($orderList['message'])?$orderList['message']:''
+                    ]
+                ];
+            }
             $nextToken='';
         }
         foreach ($orders as $key => $order) {

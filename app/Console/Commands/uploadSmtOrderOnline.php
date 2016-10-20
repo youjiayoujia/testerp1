@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use DB;
 use Channel;
 use Illuminate\Console\Command;
 use App\Models\PackageModel;
@@ -11,17 +12,16 @@ class uploadSmtOrderOnline extends Command
 {
     /**
      * The name and signature of the console command.
-     *
+     *  
      * @var string
      */
     protected $signature = 'uploadSmtOrderOnline:do{logistics_id}';
-
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = '速卖通线上标记发货';
+    protected $description = '速卖通线上发货下单';
     
     /**
      * SMT线上发货的发货地址
@@ -91,8 +91,16 @@ class uploadSmtOrderOnline extends Command
      */
     public function handle()
     {
-        $logistics_id = $this->argument('logistics_id');    //需要标记发货的SMT渠道ID
-        //获取速卖通、包裹状态为待分配、追踪号为空的包裹信息
+       $logistics_id = $this->argument('logistics_id');    //需要标记发货的SMT渠道ID：369,379,517,518,525,526,527,528,542,541
+        //获取速卖通、追踪号为空的、包裹状态为待分配的包裹信息
+       /*$package_list = PackageModel::where(['channel_id'=>2,'is_upload'=>0,'tracking_no'=>'','logistics_id'=>$logistics_id])
+            ->where(function($query){
+                $query->where('status','WAITASSIGN')
+                    ->orWhere(function($query){
+                        $query->where('status','NEED')
+                            ->where('updated_at','<=',date('Y-m-d H:i:s' , strtotime("-3 day")));
+                });
+            })->get();*/
        $package_list = PackageModel::where(['channel_id'=>2,'status'=>'WAITASSIGN','is_upload'=>0,'tracking_no'=>'','logistics_id'=>$logistics_id])->get();
        if(count($package_list)){
            foreach($package_list as $package){
@@ -101,14 +109,14 @@ class uploadSmtOrderOnline extends Command
                $commandLog = CommandLog::create([
                    'relation_id' => $account->id,
                    'signature' => __CLASS__,
-                   'description' => 'SMT线上标记发货!',
+                   'description' => 'SMT线上发下单!',
                    'lasting' => 0,
                    'total' => 0,
                    'result' => 'init',
                    'remark' => 'init',
                ]);
                $log = array();
-               $log['data'] = 'SMT线上标记发货';
+               $log['data'] = 'SMT线上发下单';
                $isMatch = false;
                $account = AccountModel::findOrFail($package->channel_account_id);
                $smtApi = Channel::driver($account->channel->driver, $account->api_config);
@@ -172,7 +180,7 @@ class uploadSmtOrderOnline extends Command
                            if(array_key_exists('intlTracking', $result['result']) && $result['result']['intlTracking']){//有挂号码就要返回，不然还得再调用API获取
                                PackageModel::where('id',$package->id)->update(['tracking_no'=>$result['result']['intlTracking'],'is_upload'=>1]);
                                $log['status'] = 'success';
-                               $log['remark'] = '标记发货成功!';
+                               $log['remark'] = '下单成功!';
                            }else{
                                PackageModel::where('id',$package->id)->update(['logistics_order_number'=>$result['result']['warehouseOrderId']]);
                                $log['status'] = 'success';
@@ -180,7 +188,7 @@ class uploadSmtOrderOnline extends Command
                            }
                        }else{
                            $log['status'] = 'fail';
-                           $log['remark'] = '订单号：'.$package->order->channel_ordernum.'标记发货失败, errorCode为：'.$result['result']['errorCode'];
+                           $log['remark'] = '订单号：'.$package->order->channel_ordernum.'下单失败, errorCode为：'.$result['result']['errorCode'];
                        }
                    }else{
                         $log['status'] = 'fail';

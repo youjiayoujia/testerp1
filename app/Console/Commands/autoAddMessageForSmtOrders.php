@@ -64,7 +64,7 @@ class autoAddMessageForSmtOrders extends Command
                                     Regards";
                 $result = $smtApi->addMessageNew($data);
                 if($result){
-                    OrderModel::where('id',$order->id)->update(['customer_remark'=>'自动留言成功!']);
+                    OrderModel::where('id',$order->id)->update(['customer_remark'=>'Add message success!']);
                 }
             }
             

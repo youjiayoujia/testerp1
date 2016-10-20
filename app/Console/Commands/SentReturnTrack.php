@@ -56,22 +56,23 @@ class SentReturnTrack extends Command
             foreach($result as $re){
                 $list = $packages->where('channel_id', $channel_id)->where('tracking_no','!=','' );
                 if($re->wish_upload_tracking_num==1){
-                    $list->where('is_mark',1);
+                    $list->where(['is_mark'=>1,'is_upload'=>0,]); //已标 未上传
                 }else{
-                    $list->where('is_mark',0);
+                    $list->where('is_mark',0); //未标记
                 }
 
                 if(!empty($re->order_status)){ //订单状态
                     $order_status = json_decode($re->order_status,true);
                     $order_create ='';
                     $order_pay ='';
+                    $expired_time = '';
                     if(!empty($re->order_create)){ //订单创建时间
                         $order_create = date('Y-m-d H;i:s',strtotime(- $re->order_create." hour"));
                     }
                     if(!empty($re->order_pay)){//订单付款时间
                         $order_pay = date('Y-m-d H;i:s',strtotime(- $re->order_pay." hour"));
                     }
-                    $list = $list->whereHas('order', function ($query) use ($order_status,$order_create,$order_pay) {
+                    $list = $list->whereHas('order', function ($query) use ($order_status,$order_create,$order_pay,$expired_time) {
                         $query = $query->whereIn('status', $order_status);
                         if(!empty($order_create)){
                             $query = $query->where('orders.created_at','>=' ,$order_create);
@@ -79,15 +80,19 @@ class SentReturnTrack extends Command
                         if(!empty($order_pay)){
                             $query = $query->where('payment_date','>=' ,$order_pay);
                         }
+                      /*  if(!empty($expired_time)){
+                            $query = $query->where('orders_expired_time','<=' ,$expired_time);
+                        }*/
+
+                        //$query = $query->where('created_at','<=' , date('Y-m-d H;i:s',strtotime(" -30 days"))); //30天以内的订单
+
                     });
                 }
-                $packages_result = $list->get();
-
-
-
-
-
+                $packages_result = $list->orderBy('id','desc')->get();
                 foreach($packages_result as $package){
+                    if(!empty($re->expired_time)){ //判断速卖通的最后发货时间
+                        $package->expired_time  = $re->expired_time;
+                    }
                     $job = new ReturnTrack($package,$re);
                     $job = $job->onQueue('returnTrack');
                     $this->dispatch($job);

@@ -322,13 +322,19 @@ class SmtOnlineMonitorController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('success',  '操作成功 !'));
     }
     
+    /**
+     * 批量调有货/无货
+     * @return multitype:boolean string multitype:boolean string
+     */
     public function ajaxOperateProductSkuStockStatus(){
         $product_id_str = Input::get('productIds');
         $type = Input::get('type');
         if($type == 'set_sku_stock_true'){
             $isStock = 1;
+            $stock_text = '有货';
         }else if($type == 'set_sku_stock_false'){
             $isStock = 0;
+            $stock_text = '无货';
         }
         $productArr = explode(' ', $product_id_str);
         foreach($productArr as $product){
@@ -338,7 +344,7 @@ class SmtOnlineMonitorController extends Controller
             $account = AccountModel::findOrFail($account_id);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             
-            /* //获取商品最新信息
+            //获取商品最新信息
             $lastest_product_Info = $channel->findAeProductById($productId);
             if(array_key_exists('success', $lastest_product_Info) && $lastest_product_Info['success']){
                 // 更新SKU的库存信息
@@ -347,22 +353,19 @@ class SmtOnlineMonitorController extends Controller
                 foreach ($lastest_product_Info['aeopAeProductSKUs'] as $key => $value) {
                     if (in_array($value['skuCode'], $sku)) {
                         $lastest_product_Info['aeopAeProductSKUs'][$key]['skuStock'] = $isStock;
-                        $lastest_product_Info['aeopAeProductSKUs'][$key]['ipmSkuStock'] = ($isStock == 'true' ? 999 : 0);
+                        $lastest_product_Info['aeopAeProductSKUs'][$key]['ipmSkuStock'] = ($isStock ? 999 : 0);
                     }
                 }
-            } */
-            $data['skuId'] = $skuInfo->sku_active_id;
-            $data['productId'] = $productId;
-            $data['impSkuStock'] = $isStock ? 999 : 0;
-            $result = $channel->editSingleSkuStock($data);
-            if(array_key_exists('success',$result) && $result['success']){
-                $where = ['productId' => $data['productId'], 'sku_active_id' => $data['skuId']];
-                $updateData = ['ipmSkuStock' => $data['ipmSkuStock'],'updated' => date('Y:m:d H:i:s',time()),'skuStock' => $isStock];
-                $this->model->where($where)->update($updateData);
-                $response[] = array('Status'=> true, 'Msg' => '设置成功');
-            }else{
-                $response[] = array('Status' => false, 'Msg' => '产品'.$productId.'操作失败!失败原因：'.$result['error_message']);
-            }
+                $result = $this->apiEditAeProduct($account,$lastest_product_Info);
+                if(array_key_exists('success',$result) && $result['success']){
+                    $where = ['productId' => $productId, 'smtSkuCode' =>$smtSkuCode];
+                    $updateData = ['updated' => date('Y:m:d H:i:s',time()),'skuStock' => $isStock];
+                    $this->model->where($where)->update($updateData);
+                    $response[] = array('Status'=> true, 'Msg' => $productId.'['.$sku.']调'.$stock_text.'成功! ');
+                }else{
+                    $response[] = array('Status' => false, 'Msg' => '产品'.$productId.'['.$sku.']调'.$stock_text.'失败原因：'.$result['error_message']);
+                }
+            }                  
         }
         return $response;
     }
@@ -391,8 +394,42 @@ class SmtOnlineMonitorController extends Controller
             smtProductSku::where(['productId'=>$data['productId'],'sku_active_id'=>$data['sku_active_id']])->update(['ipmSkuStock'=>$data['$data']]);
         }
        
+    }  
+    
+    /**
+     * 组装产品信息，修改SKU的库存状态
+     * @param AccountModel $accountModel
+     * @param unknown $product_info
+     * @return mixed
+     */
+    public function apiEditAeProduct(AccountModel $accountModel,$product_info){
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $arr['productId']              = $product_info['productId'];
+        $arr['subject']                = $product_info['subject'];
+        $arr['categoryId']             = $product_info['categoryId'];
+        $arr['detail']                 = $product_info['detail'];
+        $arr['deliveryTime']           = $product_info['deliveryTime'];
+        $arr['productPrice']           = $product_info['productPrice'];
+        $arr['freightTemplateId']      = $product_info['freightTemplateId'];
+        $arr['isImageDynamic']         = $product_info['isImageDynamic'] == 1 ? 'true' : 'false';
+        $arr['imageURLs']              = $product_info['imageURLs'];
+        $arr['productUnit']            = $product_info['productUnit'];
+        $arr['packageType']            = ($product_info['packageType'] ? 'true' : 'false');
+        $arr['packageLength']          = $product_info['packageLength'];
+        $arr['packageWidth']           = $product_info['packageWidth'];
+        $arr['packageHeight']          = $product_info['packageHeight'];
+        $arr['grossWeight']            = $product_info['grossWeight'];
+        $arr['wsValidNum']             = $product_info['wsValidNum'];
+        $arr['isPackSell']             = $product_info['isPackSell'];//新增必填字段
+        if($arr['packageType'])
+        {
+            $arr['lotNum']   = $product_info['lotNum'];
+        }
+        $arr['currencyCode']           = $product_info['currencyCode'];
+        $arr['aeopAeProductSKUs']      = json_encode( $product_info['aeopAeProductSKUs']);
+        $arr['aeopAeProductPropertys'] = json_encode($product_info['aeopAeProductPropertys']);
+        $result = $channel->getJsonDataUsePostMethod( "api.editAeProduct", $arr);
+        return json_decode($result,true);
     }
-    
-    
    
 }

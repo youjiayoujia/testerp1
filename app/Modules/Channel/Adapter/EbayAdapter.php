@@ -64,14 +64,25 @@ class EbayAdapter implements AdapterInterface
             }
             $nextToken++;
         } else {
-            //var_dump($response);
+            if(isset($response->Errors)){
+                return  [
+                    'error' => [
+                        'code' => isset($response->Errors->ErrorCode)?(string)$response->Errors->ErrorCode:'',
+                        'message' =>isset($response->Errors->ShortMessage)?(string)$response->Errors->ShortMessage:''
+                    ]
+                ];
+            }
+
+
             $nextToken = '';
+
+
         }
         return ['orders' => $returnOrders, 'nextToken' => $nextToken];
     }
 
 
-    public function getListOrdersXml($startDate, $endDate, $OrderStatus, $pageSizem, $page)
+    public function getListOrdersXml($startDate, $endDate, $OrderStatus, $pageSize, $page)
     {
         $returnMustBe = 'OrderArray.Order.OrderID,';
         $returnMustBe .= 'OrderArray.Order.ShippingAddress.Name,';
@@ -137,6 +148,79 @@ class EbayAdapter implements AdapterInterface
         $requestXmlBody .= '</Pagination>';
         $requestXmlBody .= '</GetOrdersRequest>';
         return $requestXmlBody;
+    }
+
+    public function testBuHuo(){
+        $this->siteID = 0;
+        $this->verb = 'GetOrders';
+        $returnMustBe = 'OrderArray.Order.OrderID,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.Name,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.Street1,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.Street2,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.CityName,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.StateOrProvince,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.Country,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.CountryName,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.Phone,';
+        $returnMustBe .= 'OrderArray.Order.ShippingAddress.PostalCode,';
+        $returnMustBe .= 'OrderArray.Order.CheckoutStatus.LastModifiedTime,';
+        $returnMustBe .= 'OrderArray.Order.CheckoutStatus.Status,';
+        $returnMustBe .= 'OrderArray.Order.CheckoutStatus.eBayPaymentStatus,';
+        $returnMustBe .= 'OrderArray.Order.BuyerCheckoutMessage,';
+        $returnMustBe .= 'OrderArray.Order.ExternalTransaction.ExternalTransactionID,';
+        $returnMustBe .= 'OrderArray.Order.ShippingDetails.SellingManagerSalesRecordNumber,';
+        $returnMustBe .= 'OrderArray.Order.Total,';
+        $returnMustBe .= 'OrderArray.Order.OrderStatus,';
+        $returnMustBe .= 'OrderArray.Order.PaymentMethods,';
+        $returnMustBe .= 'OrderArray.Order.CreatedTime,';
+        $returnMustBe .= 'OrderArray.Order.BuyerUserID,';
+        $returnMustBe .= 'OrderArray.Order.PaidTime,';
+        $returnMustBe .= 'OrderArray.Order.ShippedTime,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Buyer.Email,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Item.ItemID,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Item.SKU,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Item.Site,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Item.Title,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Variation.SKU,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Variation.VariationTitle,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Variation.VariationViewItemURL,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.QuantityPurchased,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Variation.VariationSpecifics.NameValueList,';//广告属性
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.Variation.VariationViewItemURL,';//广告地址
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.ShippingDetails.SellingManagerSalesRecordNumber,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.TransactionID,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.TransactionPrice,';
+        $returnMustBe .= 'OrderArray.Order.ShippingServiceSelected.ShippingService,';
+        $returnMustBe .= 'OrderArray.Order.ShippingServiceSelected.ShippingServiceCost,';
+        $returnMustBe .= 'PageNumber,';
+        $returnMustBe .= 'PaginationResult.TotalNumberOfEntries,';
+        $returnMustBe .= 'PaginationResult.TotalNumberOfPages';
+        $requestXmlBody = '<?xml version="1.0" encoding="utf-8">' . "\n";
+        $requestXmlBody .= '<GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">';
+        $requestXmlBody .= '<DetailLevel>ReturnAll</DetailLevel>';
+        $requestXmlBody .= '<RequesterCredentials>';
+        $requestXmlBody .= '<eBayAuthToken>' . $this->requestToken . '</eBayAuthToken>';
+        $requestXmlBody .= '</RequesterCredentials>';
+        $requestXmlBody .= '<ErrorLanguage>zh_CN</ErrorLanguage>';
+        //$requestXmlBody.= '<MessageID>' . $MessageID . '</MessageID>';
+        $requestXmlBody .= '<OutputSelector>' . $returnMustBe . '</OutputSelector>';
+        $requestXmlBody .= '<Version>745</Version>';
+        $requestXmlBody .= '<WarningLevel>High</WarningLevel>';
+        $requestXmlBody .= '<IncludeFinalValueFee>false</IncludeFinalValueFee>';
+        $requestXmlBody .= '<CreateTimeFrom>2016-10-17 0:00:00</CreateTimeFrom>';
+        $requestXmlBody .= '<CreateTimeTo>2016-10-17 10:00:00</CreateTimeTo>';
+        $requestXmlBody .= '<OrderRole>Seller</OrderRole>';
+        $requestXmlBody .= '<OrderStatus>All</OrderStatus>';
+        $requestXmlBody .= '<Pagination>';
+        $requestXmlBody .= '<EntriesPerPage>100</EntriesPerPage>';
+        $requestXmlBody .= '<PageNumber>1</PageNumber>';
+        $requestXmlBody .= '</Pagination>';
+        $requestXmlBody .= '</GetOrdersRequest>';
+        $result = $this->sendHttpRequest($requestXmlBody);
+        $response = simplexml_load_string($result);
+
+        var_dump($response);
+        exit;
     }
 
     public function getOrder($orderID)
@@ -246,7 +330,7 @@ class EbayAdapter implements AdapterInterface
         $reurnOrder['transaction_number'] = (string)$order->ExternalTransaction->ExternalTransactionID;
         $reurnOrder['payment_date'] = $paidTime;//支付时间
         $reurnOrder['aliexpress_loginId'] = (string)$order->BuyerUserID;
-        $reurnOrder['remark'] = isset($order->BuyerCheckoutMessage) ? (string)$order->BuyerCheckoutMessage : '';
+        $reurnOrder['customer_remark'] = isset($order->BuyerCheckoutMessage) ? (string)$order->BuyerCheckoutMessage : '';
         if (isset($order->TransactionArray->Transaction[0])) {
             foreach ($order->TransactionArray->Transaction as $sku) {
                 $reurnOrder['email'] = (string)$sku->Buyer->Email == 'Invalid Request' ? '' : (string)$sku->Buyer->Email;

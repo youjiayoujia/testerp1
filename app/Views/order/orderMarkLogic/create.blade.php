@@ -10,6 +10,18 @@
 @section('formAction') {{ route('orderMarkLogic.store') }} @stop
 @section('formBody')
 
+
+    <div class="row">
+        <div class="form-group col-lg-4">
+            <label for="name" class='control-label'>规则名称</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="name"  name='name' value="{{ old('name') }}">
+
+        </div>
+    </div>
+
+
+
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="name" class='control-label'>渠道</label>
@@ -54,7 +66,7 @@
 
     <div class="row">
         <div class="form-group col-lg-4">
-            <label for="name" class='control-label'>订单支付N小时</label>
+            <label for="name" class='control-label'>订单支付后N小时</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="order_pay">
                 <option value="" >==请选择==</option>
@@ -107,7 +119,7 @@
         </div>
     </div>
 
-    <div class="row hidden" id="wish_is_upload">
+    <div class="row " id="wish_is_upload">
         <div class="form-group col-lg-4">
             <label for="name" class='control-label'>wish 上传追踪号（针对已经标记发货,但未上传追踪号）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -115,6 +127,24 @@
 
         </div>
     </div>
+
+
+
+    <div class="row ">
+        <div class="form-group col-lg-4">
+            <label for="name" class='control-label'>速卖通最后标记发货天数（针对未发货订单）</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="expired_time">
+                <option value="" >==请选择==</option>
+                @for($i=1;$i<20;$i++)
+                    <option value="{{ $i }}" >{{ $i }}</option>
+                @endfor
+            </select>
+
+        </div>
+    </div>
+
+
 
     <div class="row">
         <div class="form-group col-lg-4">
@@ -150,7 +180,7 @@
 
     <script type="text/javascript">
 
-        $("#channel_id").change(function(){
+      /*  $("#channel_id").change(function(){
           var channel_text = $("#channel_id").find("option:selected").text();
             if(channel_text=='Wish'){
                 if($("#wish_is_upload").hasClass('hidden')){
@@ -161,16 +191,16 @@
                     $("#wish_is_upload").addClass('hidden');
                 }
             }
-        });
+        });*/
 
-        $("#wish_is_upload_num").click(function(){
+     /*   $("#wish_is_upload_num").click(function(){
             var is_upload= $('input[name="is_upload"]:checked').val();
             if(is_upload==2){
                 alert("无法选择");
                 return false;
             }
 
-        });
+        });*/
 
         function useLogisticsName(value){
             if(value==1){

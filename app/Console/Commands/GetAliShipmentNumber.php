@@ -28,7 +28,7 @@ class GetAliShipmentNumber extends Command
     public function __construct()
     {
         parent::__construct();
-        echo 123;
+       // echo 123;
     }
 
     /**

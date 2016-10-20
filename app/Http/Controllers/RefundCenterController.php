@@ -140,6 +140,14 @@ class RefundCenterController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update($form);
+
+
+
+        $name = UserModel::find(request()->user()->id)->name;
+        $to = $this->model->find($id);
+        $to = base64_encode(serialize($to));
+        $this->eventLog($name, '数据更新', $to, base64_encode(serialize($model)));
+
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功.'));
     }
 

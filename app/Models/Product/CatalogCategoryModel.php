@@ -14,14 +14,14 @@ class CatalogCategoryModel extends BaseModel{
      *
      * @var string
      */
-    protected $table = 'catalog_category';
+    public $table = 'catalog_category';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['id','cn_name','en_name'];
+    public $fillable = ['id','cn_name','en_name'];
 
     protected $rules = [
         'create' => [

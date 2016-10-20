@@ -253,7 +253,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics', ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
     //缺货报表
-    Route::get('purchaseOrder/outOfStock', ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);    
+    Route::get('purchaseOrder/outOfStock', ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);  
+    Route::get('purchaseOrder/sevenPurchaseSku', ['uses' => 'Purchase\PurchaseOrderController@sevenPurchaseSku', 'as' => 'purchase.sevenPurchaseSku']);  
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
     Route::any('PurchaseOrder/trackingNoSearch',
         ['uses' => 'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
@@ -340,6 +341,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
     Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
     Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+    Route::resource('purchaseAccount','Purchase\AccountController');
 
     //品类路由
     Route::resource('catalog', 'CatalogController');
@@ -452,6 +454,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('logisticsCatalog', 'Logistics\CatalogController');
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
+    Route::resource('logisticsTransport', 'Logistics\TransportController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常

@@ -16,7 +16,7 @@ class CatalogRatesModel extends BaseModel{
      *
      * @var string
      */
-    protected $table = 'catalog_rates_channels';
+    public $table = 'catalog_rates_channels';
 
     /**
      * The attributes that are mass assignable.

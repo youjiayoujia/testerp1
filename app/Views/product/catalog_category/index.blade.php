@@ -34,6 +34,11 @@
                    data-url="{{ route(request()->segment(1).'.destroy', ['id' => $item->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $item->table }}" data-id="{{$item->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

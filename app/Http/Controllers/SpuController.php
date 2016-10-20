@@ -111,7 +111,12 @@ class SpuController extends Controller
     public function saveRemark()
     {
         $data = request()->all();
-        $this->model->find($data['spu_id'])->update(['remark'=>$data['remark']]);
+        $model = $this->model->find($data['spu_id']);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
+        $model->update(['remark'=>$data['remark']]);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '备注更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备注添加成功'));
     }
 
@@ -152,7 +157,11 @@ class SpuController extends Controller
         //echo '<pre>';
         //print_r($data);exit;
         $spuModel = $this->model->find($data['spu_id']);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($spuModel));
         $spuModel->updateMulti($data);
+        $to = base64_encode(serialize($spuModel));
+        $this->eventLog($userName->name, '小语言信息更新,id='.$spuModel->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
     }
 

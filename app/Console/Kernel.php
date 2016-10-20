@@ -35,6 +35,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\PickReport::class,
         \App\Console\Commands\PackReport::class,
         \App\Console\Commands\AllReport::class,
+        \App\Console\Commands\GetBlacklists::class,
+        \App\Console\Commands\UpdateBlacklists::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
@@ -70,6 +72,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inspire')->hourly();
         $schedule->command('purchase:create')->cron('20 0,12 * * *');
+        //黑名单定时任务
+        $schedule->command('blacklists:get')->dailyAt('2:00');
+        $schedule->command('blacklists:update')->dailyAt('3:00');
         //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {

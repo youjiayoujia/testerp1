@@ -153,7 +153,7 @@ return [
         App\Modules\Channel\ChannelServiceProvider::class,
         App\Modules\Logistics\LogisticsServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-        Bluecode\Generator\GeneratorServiceProvider::class,
+        // Bluecode\Generator\GeneratorServiceProvider::class,
 
         /*
          * Debugbar

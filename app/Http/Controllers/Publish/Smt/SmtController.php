@@ -1735,7 +1735,6 @@ html;
             $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
         }
         $data = json_decode($result, true);
-        dd($data);
         if (isset($data['success']) && $data['total'] > 0) {
            $rs = $data['cateogryIds'];
         }
@@ -1934,7 +1933,6 @@ html;
        }
    
        $result =  $this->uploadBankImageNewAll($dirName,$type);
-
        if(empty($result))
        {
            $this->ajax_return('未找到改SKU图片信息', false);

@@ -145,6 +145,7 @@ class RuleController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateAll(request()->all());
+        $model = $this->model->with('rule_transports')->with('rule_limits')->with('rule_countries')->with('rule_accounts')->with('rule_channels')->with('rule_catalogs')->find($id);
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         return redirect($this->mainIndex);

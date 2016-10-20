@@ -70,7 +70,7 @@ class SupplierController extends Controller
         $data = request()->all();
         $this->validate(request(), $this->model->rules('update'));
         $this->model->updateSupplier($id, $data, request()->file('credentials'));
-        $to = base64_encode(serialize($model));
+        $to = base64_encode(serialize($this->model->find($id)));
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         return redirect($this->mainIndex);
     }

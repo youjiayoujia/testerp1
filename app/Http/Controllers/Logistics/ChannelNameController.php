@@ -20,7 +20,7 @@ class ChannelNameController extends Controller
     {
         $this->model = $channelName;
         $this->mainIndex = route('logisticsChannelName.index');
-        $this->mainTitle = '物流渠道名';
+        $this->mainTitle = '渠道回传编码';
         $this->viewPath = 'logistics.channelName.';
     }
 

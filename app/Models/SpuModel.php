@@ -113,7 +113,7 @@ class SpuModel extends BaseModel
         DB::table('products')->truncate();
         DB::table('spus')->truncate();
 
-        $erp_products_data_arr = DB::select('select * from erp_products_data where spu!=""');
+        $erp_products_data_arr = DB::select('select * from erp_products_data where spu!="" and products_id > 42301 limit 100 ');
         foreach ($erp_products_data_arr as $key => $erp_products_data) {
             //print_r($erp_products_data);exit;
                 //if($key==0)continue;
@@ -156,12 +156,35 @@ class SpuModel extends BaseModel
                 $productData['warehouse_id'] = $erp_products_data->product_warehouse_id==1000?'1':'2';
 
                 $volume = unserialize($erp_products_data->products_volume);
-                $productData['package_height'] = $volume['ap']['length'];
-                $productData['package_width'] = $volume['ap']['width'];
-                $productData['package_length'] = $volume['ap']['height'];
-                $productData['height'] = $volume['bp']['length'];
-                $productData['width'] = $volume['bp']['width'];
-                $productData['length'] = $volume['bp']['height'];
+
+                if($volume!=''){
+
+                    if(!array_key_exists('bp', $volume)){
+                        $volume['bp']['length'] = 0;
+                        $volume['bp']['width'] =0;
+                        $volume['bp']['height'] =0;
+                    }
+                    if(!array_key_exists('ap', $volume)){
+                        $volume['ap']['length'] = 0;
+                        $volume['ap']['width'] =0;
+                        $volume['ap']['height'] =0;
+                    }
+                    
+                    $productData['package_height'] = $volume['ap']['length'];
+                    $productData['package_width'] = $volume['ap']['width'];
+                    $productData['package_length'] = $volume['ap']['height'];
+                    $productData['height'] = $volume['bp']['length'];
+                    $productData['width'] = $volume['bp']['width'];
+                    $productData['length'] = $volume['bp']['height'];
+                }else{
+                    $productData['package_height'] = 0;
+                    $productData['package_width'] = 0;
+                    $productData['package_length'] = 0;
+                    $productData['height'] = 0;
+                    $productData['width'] = 0;
+                    $productData['length'] = 0;
+                }
+                
                 //创建model
                 if(count(ProductModel::where('model',$erp_products_data->model)->get())){
                     $product_id = ProductModel::where('model',$erp_products_data->model)->get()->toArray()[0]['id'];
@@ -188,12 +211,12 @@ class SpuModel extends BaseModel
                 //$skuData['purchase_adminer'] = $value['22'];
                 $skuData['cost'] = $erp_products_data->products_value;
 
-                $skuData['height'] = $volume['bp']['height'];
-                $skuData['width'] = $volume['bp']['width'];
-                $skuData['length'] = $volume['bp']['length'];
-                $skuData['package_height'] = $volume['ap']['height'];
-                $skuData['package_width'] = $volume['ap']['width'];
-                $skuData['package_length'] = $volume['ap']['length'];
+                $skuData['height'] = $productData['height'];
+                $skuData['width'] = $productData['width'];
+                $skuData['length'] = $productData['length'];
+                $skuData['package_height'] = $productData['package_height'];
+                $skuData['package_width'] = $productData['package_width'];
+                $skuData['package_length'] =$productData['package_length'];
                 
                 $skuData['status'] =$erp_products_data->products_status_2;
                 $skuData['is_available'] = $erp_products_data->productsIsActive; 

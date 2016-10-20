@@ -15,6 +15,7 @@ use App\Models\UserModel;
 use App\Models\ChannelModel;
 use App\Models\Spu\SpuMultiOptionModel;
 use Excel;
+use DB;
 
 class SpuController extends Controller
 {
@@ -111,7 +112,12 @@ class SpuController extends Controller
     public function saveRemark()
     {
         $data = request()->all();
-        $this->model->find($data['spu_id'])->update(['remark'=>$data['remark']]);
+        $model = $this->model->find($data['spu_id']);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
+        $model->update(['remark'=>$data['remark']]);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '备注更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备注添加成功'));
     }
 
@@ -152,7 +158,11 @@ class SpuController extends Controller
         //echo '<pre>';
         //print_r($data);exit;
         $spuModel = $this->model->find($data['spu_id']);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($spuModel));
         $spuModel->updateMulti($data);
+        $to = base64_encode(serialize($spuModel));
+        $this->eventLog($userName->name, '小语言信息更新,id='.$spuModel->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
@@ -203,11 +213,13 @@ class SpuController extends Controller
             'metas' => $this->metas(__FUNCTION__),
         ];
         return view($this->viewPath . 'insertindex', $response);
+
     }
 
     public function uploadSku()
     {
         set_time_limit(0);
+        ini_set('memory_limit', '2048M');
         $file = request()->file('upload');
         $path = config('setting.excelPath');
         !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
@@ -220,6 +232,19 @@ class SpuController extends Controller
             $data_array = $reader->all()->toArray();
             
             foreach ($data_array as $key => $value) {
+                $itemModel = ItemModel::where('sku',$value['1'])->first();
+                if(count($itemModel)){
+                    $catalogModel = CatalogModel::where('c_name',$value['3'])->first();
+
+                    if(count($catalogModel)){
+
+                        $itemModel->update(['catalog_id'=>$catalogModel->id]);
+                        $itemModel->product->update(['catalog_id'=>$catalogModel->id]);
+                    }
+                }
+                
+            }
+            /*foreach ($data_array as $key => $value) {
                 if($key==0)continue;
                 //print_r($value);exit;
                 if(count(ItemModel::where('sku',$value['3'])->get()))continue;
@@ -247,9 +272,9 @@ class SpuController extends Controller
                 $productData['spu_id'] = $spu_id;
                 $productData['name'] = $value['5'];
                 $productData['c_name'] = $value['4'];
-                $catalog_id = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
+                //$catalog_id = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
                 //print_r($catalog_id);exit;
-                $productData['catalog_id'] = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
+                //$productData['catalog_id'] = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
                 $productData['supplier_id'] = $value['7'];
                 $productData['purchase_url'] = $value['9'];
                 $productData['purchase_day'] = $value['10'];
@@ -269,12 +294,14 @@ class SpuController extends Controller
                 }else{
                     $productModel = ProductModel::create($productData);
                     $product_id = $productModel->id;
-                    $wrr['wrap_limits_id'] = $value['39'];
-                    $productModel->wrapLimit()->attach($wrr);
+                    if($value['39']!=''){
+                        $wrr['wrap_limits_id'] = $value['39'];
+                        $productModel->wrapLimit()->attach($wrr); 
+                    }
                 }
 
                 $skuData['product_id'] = $product_id;
-                $skuData['catalog_id'] = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
+                //$skuData['catalog_id'] = CatalogModel::where('c_name',$value['6'])->get(['id'])->first()->id;
                 $skuData['sku'] = $value['3'];
                 $skuData['name'] = $value['5'];
                 $skuData['c_name'] = $value['4'];
@@ -304,7 +331,7 @@ class SpuController extends Controller
                 }
 
                 
-            }
+            }*/
         },'gb2312');        
     }
 

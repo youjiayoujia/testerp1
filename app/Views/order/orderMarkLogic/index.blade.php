@@ -10,6 +10,7 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th>渠道</th>
+    <th>规则名称</th>
     <th>订单状态</th>
     <th>订单创建后N小时</th>
     <th>订单支付后N小时</th>
@@ -25,6 +26,7 @@
         <tr>
             <td>{{ $mark->id }}</td>
             <td>{{ $mark->channel->name }}</td>
+            <td>{{ $mark->name }}</td>
             <td>
                 <?php   $orderStatus = json_decode($mark->order_status);?>
                 @foreach($orderStatus as $st)

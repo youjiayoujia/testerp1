@@ -14,6 +14,7 @@ class OrderMarkLogicModel extends BaseModel{
     protected $table = 'order_mark_logic';
 
     protected $fillable = [
+        'name',
         'channel_id',
         'order_status',
         'order_create',
@@ -21,6 +22,7 @@ class OrderMarkLogicModel extends BaseModel{
         'assign_shipping_logistics',
         'shipping_logistics_name',
         'is_upload',
+        'expired_time',
         'user_id',
         'priority',
         'is_use',

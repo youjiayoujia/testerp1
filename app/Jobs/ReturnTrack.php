@@ -56,7 +56,7 @@ class ReturnTrack extends Job implements SelfHandling, ShouldQueue
         $IsUploadTrackingNumber = true;
         $logistics_channel_name = ChannelNameModel::where('channel_id', $package->channel_id)->whereHas('logistics', function ($query) use ($package) {
             $query = $query->where('logistics_id', $package->logistics_id);
-        })->first()->name;
+        })->first()->key;
 
         $tracking_no = $package->tracking_no;
         if ($this->orderMarkLogic->is_upload == 2) { //标记发货但不上传跟踪号
@@ -80,63 +80,73 @@ class ReturnTrack extends Job implements SelfHandling, ShouldQueue
                     case 'amazon':
                         break;
                     case 'aliexpress':
+                        $is_pass = false;
                         $item_array = [];
                         $order = OrderModel::where('id', $package->order_id)->first();
-                        $account = AccountModel::findOrFail($order->channel_account_id);
-                        $channel = Channel::driver($account->channel->driver, $account->api_config);
-                        $order_status = $channel->getOrder($order->channel_ordernum);
-                        if (isset($order_status['orderStatus']) && $order_status['orderStatus'] == "WAIT_BUYER_ACCEPT_GOODS") {//已经处于买家收货状态， 不需标记发货
-                            $remark = '平台状态为等待买家收货,因此变成已标记';
-                        } elseif (isset($order_status['orderStatus']) && ($order_status['orderStatus'] == "WAIT_SELLER_SEND_GOODS" || $order_status['orderStatus'] == "SELLER_PART_SEND_GOODS")) {
-                            foreach ($package_items as $item) {
-                                $item_array[$item->order_item_id] = $item->order_item_id;
+                        if(isset($this->package->expired_time)){
+                            if(strtotime($order->orders_expired_time)-time()> $this->package->expired_time*24*3600){ // 需要跳过
+                                $is_success = false;
+                                $is_pass = true;//跳过标记发货
+                                $remark ='未满足最后发货期'.$this->package->expired_time.'天，所以跳过发货';
                             }
-                            $tracking_info = [
-                                'serviceName' => $logistics_channel_name,
-                                'logisticsNo' => $tracking_no,
-                                'description' => 'Tracking website: ' . $package->tracking_link,
-                                'trackingWebsite' => $package->tracking_link,
-                            ];
-                            if (count($item_array) == $order->items->count()) { //包裹item 的sku种类数目==订单item的sku种类数目  意味着没有拆分订单
-                                $tracking_info['sendType'] = 'all';
-                            } else { //数量不等
-                                if ($order_status['orderStatus'] == "WAIT_SELLER_SEND_GOODS") { //说明没有进行标记发货。 sendType = part
-                                    $tracking_info['sendType'] = 'part';
-                                } else { //这个已经部分发货了。 但是要确定 这次还是部分发货  sendType = part  或者 是最后一次发货 sendType = all 那么查找这个订单 已经标记发货了的包裹 sku种类相加
-                                    $is_mark_item = [];
-                                    $is_mark_packages = PackageModel::where('is_mark', 1)->where('order_id', $package->order_id)->get();
-                                    foreach ($is_mark_packages as $is_mark_package) {
-                                        foreach ($is_mark_package->items as $item) {
-                                            $is_mark_item[$item->order_item_id] = $item->order_item_id;
+                        }
+                        if(!$is_pass){
+                            $account = AccountModel::findOrFail($order->channel_account_id);
+                            $channel = Channel::driver($account->channel->driver, $account->api_config);
+                            $order_status = $channel->getOrder($order->channel_ordernum);
+                            if (isset($order_status['orderStatus']) && $order_status['orderStatus'] == "WAIT_BUYER_ACCEPT_GOODS") {//已经处于买家收货状态， 不需标记发货
+                                $remark = '平台状态为等待买家收货,因此变成已标记';
+                            } elseif (isset($order_status['orderStatus']) && ($order_status['orderStatus'] == "WAIT_SELLER_SEND_GOODS" || $order_status['orderStatus'] == "SELLER_PART_SEND_GOODS")) {
+                                foreach ($package_items as $item) {
+                                    $item_array[$item->order_item_id] = $item->order_item_id;
+                                }
+                                $tracking_info = [
+                                    'serviceName' => $logistics_channel_name,
+                                    'logisticsNo' => $tracking_no,
+                                    'description' => 'Tracking website: ' . $package->tracking_link,
+                                    'trackingWebsite' => $package->tracking_link,
+                                ];
+                                if (count($item_array) == $order->items->count()) { //包裹item 的sku种类数目==订单item的sku种类数目  意味着没有拆分订单
+                                    $tracking_info['sendType'] = 'all';
+                                } else { //数量不等
+                                    if ($order_status['orderStatus'] == "WAIT_SELLER_SEND_GOODS") { //说明没有进行标记发货。 sendType = part
+                                        $tracking_info['sendType'] = 'part';
+                                    } else { //这个已经部分发货了。 但是要确定 这次还是部分发货  sendType = part  或者 是最后一次发货 sendType = all 那么查找这个订单 已经标记发货了的包裹 sku种类相加
+                                        $is_mark_item = [];
+                                        $is_mark_packages = PackageModel::where('is_mark', 1)->where('order_id', $package->order_id)->get();
+                                        foreach ($is_mark_packages as $is_mark_package) {
+                                            foreach ($is_mark_package->items as $item) {
+                                                $is_mark_item[$item->order_item_id] = $item->order_item_id;
+                                            }
+                                        }
+                                        if (count($is_mark_item) + count($item_array) == $order->items->count()) { //已经标记数量+本次标记数量 = 总数量 sendType = all
+                                            $tracking_info['sendType'] = 'all';
+                                        } else {
+                                            $tracking_info['sendType'] = 'part';
                                         }
                                     }
-                                    if (count($is_mark_item) + count($item_array) == $order->items->count()) { //已经标记数量+本次标记数量 = 总数量 sendType = all
-                                        $tracking_info['sendType'] = 'all';
-                                    } else {
-                                        $tracking_info['sendType'] = 'part';
-                                    }
                                 }
-                            }
-                            $tracking_info['outRef'] = $order->channel_ordernum;
-                            $result = $channel->returnTrack($tracking_info);
-                            if (!$result['status']) {
-                                $is_success = false;
-                            }
-                            $remark = $result['info'];
+                                $tracking_info['outRef'] = $order->channel_ordernum;
+                                $result = $channel->returnTrack($tracking_info);
+                                if (!$result['status']) {
+                                    $is_success = false;
+                                }
+                                $remark = $result['info'];
 
-                        } else {
-                            $remark = '未知错误' . var_export($order_status, true);
-                        }
-                        if ($is_success) {
-                            ItemModel::where('package_id', $package->id)->update(array(
-                                'is_mark' => 1,
-                                'is_upload' => 1
-                            ));
+                            } else {
+                                $remark = '未知错误' . var_export($order_status, true);
+                            }
+                            if ($is_success) {
+                                ItemModel::where('package_id', $package->id)->update(array(
+                                    'is_mark' => 1,
+                                    'is_upload' => 1
+                                ));
 
-                            PackageModel::where('id', $package->id)->update(array(
-                                'is_mark' => 1,
-                                'is_upload' => 1
-                            ));
+                                PackageModel::where('id', $package->id)->update(array(
+                                    'is_mark' => 1,
+                                    'is_upload' => 1
+                                ));
+                            }
                         }
                         break;
                     case 'wish':

@@ -22,6 +22,7 @@ class CatalogCategoryModel extends BaseModel{
      * @var array
      */
     public $fillable = ['id','cn_name','en_name'];
+    public $searchFields = ['cn_name'  => '中文名称','en_name' => '英文名称'];
 
     protected $rules = [
         'create' => [
@@ -33,6 +34,5 @@ class CatalogCategoryModel extends BaseModel{
             'en_name' => 'required|unique:catalog_category,en_name',
         ]
     ];
-    protected $searchFields = [];
 
 }

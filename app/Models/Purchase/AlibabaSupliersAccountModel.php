@@ -27,6 +27,9 @@ class AlibabaSupliersAccountModel extends BaseModel{
         'purchase_user_id'
     ];
 
+    public $searchFields = ['resource_owner'  => '账户名','memberId' => '账户ID'];
+
+
     public function user(){
 
         return $this->hasOne('App\Models\UserModel','id','purchase_user_id');

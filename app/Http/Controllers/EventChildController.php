@@ -55,17 +55,21 @@ class EventChildController extends Controller
                         <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
                         <div class='panel-body'>";
                 foreach($to as $key => $value) {
-                    $html .= "<div class='form-control col-lg-6'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
+                    $html .= "<div class='row'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                     if(is_array($value)) {
                         if(count($value) == count($value,1)) {
+                            $html .="<div class='row'>";
                             foreach($value as $k => $v) {
-                                $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>"+$v+"&nbsp;&nbsp;&nbsp;&nbsp;";
+                                $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
                             }
+                            $html .= '</div>';
                         } else {
                             foreach($value as $k => $v) {
+                                $html .="<div class='row'>";
                                 foreach($v as $k1 => $v1) {
-                                    $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>"+$v1+"&nbsp;&nbsp;&nbsp;&nbsp;";
+                                    $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
                                 }
+                                $html .="</div>";
                             }
                         }
                     } else {
@@ -84,12 +88,21 @@ class EventChildController extends Controller
             foreach($from as $key => $value) {
                 $html .= "<div class='row'>from['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                 if(is_array($value)) {
-                    foreach($value as $k => $v) {
+                    $html .="<div class='row'>";
+                    if(count($value) == count($value,1)) {
                         $html .="<div class='row'>";
-                        foreach($v as $k1 => $v1) {
-                            $html .= "from['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                        foreach($value as $k => $v) {
+                            $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
                         }
                         $html .="</div>";
+                    } else {
+                        foreach($value as $k => $v) {
+                            $html .="<div class='row'>";
+                            foreach($v as $k1 => $v1) {
+                                $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                            }
+                            $html .="</div>";
+                        }
                     }
                 } else {
                     $html .= $value;
@@ -100,12 +113,20 @@ class EventChildController extends Controller
             foreach($to as $key => $value) {
                 $html .= "<div class='row'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                 if(is_array($value)) {
-                    foreach($value as $k => $v) {
+                    if(count($value) == count($value,1)) {
                         $html .="<div class='row'>";
-                        foreach($v as $k1 => $v1) {
-                            $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                        foreach($value as $k => $v) {
+                            $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
                         }
                         $html .="</div>";
+                    } else {
+                        foreach($value as $k => $v) {
+                            $html .="<div class='row'>";
+                            foreach($v as $k1 => $v1) {
+                                $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                            }
+                            $html .="</div>";
+                        }
                     }
                 } else {
                     $html .= $value;
@@ -114,7 +135,6 @@ class EventChildController extends Controller
             }
             $html.= '</div></div>';
         }
-
         return $html;
     }
 }

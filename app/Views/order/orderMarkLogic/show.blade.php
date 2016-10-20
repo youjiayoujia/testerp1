@@ -53,7 +53,9 @@
                 </div>
             @endif
 
-
+            <div class="col-lg-12">
+                <strong>速卖通最后标记发货天数（针对未发货订单）</strong>: {{ $model->expired_time }}
+            </div>
 
             <div class="col-lg-12">
                 <strong>优先级</strong>: {{ $model->priority }}

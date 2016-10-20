@@ -720,31 +720,30 @@ class TestController extends Controller
 
     /*
      * 同步ebay信息
+     * 测试自动补货功能
      */
     public function getEbayProduct(){
-
-        $specificsModel = new EbaySpecificsModel();
-        $result = $specificsModel->getSiteCategorySpecifics(116743,0);
-        var_dump($result);exit;
         $account = AccountModel::find(378);
         if ($account) {
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $is_do =true;
-            $i=1;
-            while($is_do) {
-                $productList = $channel->getSellerEvents($i);
-                if ($productList) {
-                    foreach($productList as $key=> $itemId){
-                        $channel->getProductDetail($itemId);
-                        if($key==10){
-                            exit;
-                        }
-                    }
-                    $i++;
-                }else{
-                    $is_do=false;
-                }
-            }
+            $channel->testBuHuo();
+//            $is_do =true;
+//            $i=1;
+//            while($is_do) {
+//                $productList = $channel->getSellerEvents($i);
+//                if ($productList) {
+//                    foreach($productList as $key=> $itemId){
+//                        $channel->getProductDetail($itemId);
+//                        if($key==10){
+//                            exit;
+//                        }
+//                    }
+//                    $i++;
+//                }else{
+//                    $is_do=false;
+//                }
+//            }
+
 
         }
     }

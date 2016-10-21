@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Purchase\PurchaseOrderModel;
+use Mail;
+use App\Models\UserModel;
 
 class NotWarehouseInSendEmail extends Command
 {
@@ -11,7 +14,7 @@ class NotWarehouseInSendEmail extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'sendEmailToPurchase:notWarehouse';
 
     /**
      * The console command description.
@@ -37,26 +40,45 @@ class NotWarehouseInSendEmail extends Command
      */
     public function handle()
     {
+
+        $purchase_items_ary ='';
         //
+        $purchaseOrders = PurchaseOrderModel::whereIn('status',['1','2','3'])->get();
+        foreach($purchaseOrders as $purchaseOrder){
+            $items = $purchaseOrder->purchaseItem()->get();
+            if(!$items->isEmpty()){
+                foreach ($items as $key => $item){
+                    if($item->arrival_num > $item->storage_qty){
+                        $user = UserModel::find($item->user_id);
 
-    }
-    /**
-     * 下单7天未到货
-     *
-     * @param none
-     * @return obj
-     *
-     */
-    public function sevenPurchaseSku()
-    {
-        $time = date('Y-m-d H:i:s',time()-60*60*24*7);
-        $purchaseOrder = $this->model->where('created_at','<',$time)->whereIn('status',['1','2','3'])->get();
+                        $purchase_items_ary[] = [
+                            'id'                => $key+1,
+                            'purchase_order_id' => $item->purchase_order_id,
+                            'warehouse_name'    => isset($item->warehouse->name) ? $item->warehouse->name : '',
+                            'sku'               => $item->sku,
+                            'arrival_num'      => $item->arrival_num,
+                            'user_name'         => !empty($user) ? $user->name : '',
+                            'arrival_time'      => $item->arrival_time,
+                        ];
+                    }
+                }
 
-        //邮件模板数据
-        $data = ['email'=>'549991570@qq.com', 'name'=>'youjiatest@163.com','purchaseOrder'=>$purchaseOrder];
-        //发送邮件
-        Mail::send('purchase.purchaseOrder.mailSevenPurchase', $data, function($message) use($data){
-            $message->to($data['email'], $data['name'])->subject('采购单7天未到货');
-        });
+            }
+        }
+        if(!empty($purchase_items_ary)){
+            //邮件模板数据
+            $data = [
+                'email'              => '694929659@qq.com',
+                'name'               => env('MAIL_USERNAME'),
+                'purchase_items_ary' => $purchase_items_ary
+            ];
+            //发送邮件
+            Mail::send('purchase.purchaseOrder.notWarehouseIn', $data, function($message) use($data){
+                $message->to($data['email'], $data['name'])->subject('已收货未入库采购单');
+            });
+            $this->info('send');
+        }else{
+            $this->comment('no send');
+        }
     }
 }

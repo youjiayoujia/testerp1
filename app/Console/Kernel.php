@@ -65,6 +65,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomToken::class,
         \App\Console\Commands\SetJoomToshipping::class,
         \App\Console\Commands\SetJoomShelves::class,
+        \App\Console\Commands\NotWarehouseInSendEmail::class,
     ];
 
     /**
@@ -132,6 +133,8 @@ class Kernel extends ConsoleKernel
 
         //采购
         $schedule->command('aliShipmentName:get')->hourly();
+        $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
+
 
 
 

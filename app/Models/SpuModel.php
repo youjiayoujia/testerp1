@@ -8,6 +8,7 @@ use App\Models\SpuModel;
 use DB;
 use App\Models\ItemModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Spu\SpuMultiOptionModel;
 
 class SpuModel extends BaseModel
 {

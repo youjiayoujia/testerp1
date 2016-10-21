@@ -688,7 +688,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('wish/editOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
     Route::resource('wish','Publish\Wish\WishPublishController');
 
-
+    Route::resource('WishQuantityCheck','Publish\Wish\WishQuantityCheckController');
+    Route::post('wishQuantity/ajaxModifySku',['uses'=>'Publish\Wish\WishQuantityCheckController@ajaxModifySku','as'=>'wishQuantity.ajaxModifySku']);
+    Route::post('wishQuantity/BatchOperation',['uses'=>'Publish\Wish\WishQuantityCheckController@BatchOperation','as'=>'wishQuantity.BatchOperation']);
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 

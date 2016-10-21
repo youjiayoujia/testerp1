@@ -8,6 +8,7 @@ use App\Models\SpuModel;
 use DB;
 use App\Models\ItemModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Spu\SpuMultiOptionModel;
 
 class SpuModel extends BaseModel
 {
@@ -101,6 +102,22 @@ class SpuModel extends BaseModel
                 }   
             }
            
+        }
+    }
+
+    public function insertLan()
+    {
+        $spus = $this->all();
+        DB::table('spu_multi_options')->truncate();
+        foreach ($spus as $spu) {
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>1]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>2]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>3]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>4]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>5]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>6]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>7]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>8]);
         }
     }
 

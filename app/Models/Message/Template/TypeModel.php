@@ -16,14 +16,14 @@ class TypeModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'message_template_types';
+    public $table = 'message_template_types';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['parent_id', 'name'];
+    public $fillable = ['parent_id', 'name'];
 
     public $searchFields = ['id'=>'ID','name'=>'模板名称'];
 

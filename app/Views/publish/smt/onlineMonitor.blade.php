@@ -23,15 +23,15 @@
       @foreach($data as $item)
       <tr>
         <th><input type='checkbox' name='single[]' class='single' data-productId="{{$item->productId}}"   value="<?php echo $item->productId . ',' .  $item->smtSkuCode;?>"></th>
-        <th>{{$item->product->accounts->account}}</th>
+        <th>{{$item->product->accounts ? $item->product->accounts->account : ''}}</th>
         <th><a href="{{$item->product->product_url}}" target="_Blank">{{$item->productId}}</a></th>
         <th>{{$item->product->subject}}</th>
         <th>{{$item->skuCode}}</th>
         <th>{{$item->smtSkuCode}}</th>
-        <th><?php if($item->products) echo $item->products->c_name ?></th>
+        <th>{{$item->products ? $item->products->c_name : '' }}</th>
         <th>{{$item->product->quantitySold1}}</th>
         <th>{{$item->product->gmtCreate}}</th>
-        <th><?php if($item->product->userInfo) echo $item->product->userInfo->name ;?></th>
+        <th>{{$item->product->userInfo ? $item->product->userInfo->name : ''}}</th>
         <th>
             <?php 
                 $status = $item->productItem ? $item->productItem->status : '';

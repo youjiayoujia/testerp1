@@ -1055,5 +1055,7 @@ Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
 Route::any('getSmtIssue',['uses'=> 'TestController@getSmtIssue']);
 Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);
 Route::any('joomOrdersList', ['uses' => 'TestController@joomOrdersList']);
+Route::any('joomToShipping', ['uses' => 'TestController@joomToShipping']);
+Route::any('joomrefreshtoken', ['uses' => 'TestController@joomrefreshtoken']);
 
 

@@ -8,24 +8,18 @@
         <th>到货操作人</th>
         <th>到货时间</th>
     </tr>
-    @foreach($purchaseOrder as $key=>$purchase_order)
-        @foreach($purchase_order->purchaseItem as $purchase_item)
-            <tr>
-                <td>{{$key+1}}</td>
-                <td>{{$purchase_item->sku}}</td>
-                <td>{{$purchase_item->productItem->c_name}}</td>
-                <td>{{$purchase_item->purchase_num}}</td>
-                <td>{{$purchase_item->arrival_num}}</td>
-                <td>{{$purchase_item->storage_qty}}</td>
-                <td>{{$purchase_order->id}}</td>
-                <td>{{$purchase_order->post_coding}}</td>
-                <td>{{$purchase_order->purchaseUser->name}}</td>
-                <td>{{$purchase_order->supplier_id}}</td>
-                <td>{{$purchase_order->created_at}}</td>
-                <td>{{$purchase_item->purchase_num-$purchase_item->arrival_num}}</td>
-                <td>{{$purchase_item->productItem->available_quantity}}</td>
-            </tr>
-        @endforeach
+
+
+    @foreach($purchase_items_ary as $purchase_item)
+        <tr>
+            <td>{{$purchase_item['id']}}</td>
+            <td>{{$purchase_item['purchase_order_id']}}</td>
+            <td>{{$purchase_item['warehouse_name']}}</td>
+            <td>{{$purchase_item['sku']}}</td>
+            <td>{{$purchase_item['arrival_num']}}</td>
+            <td>{{$purchase_item['user_name']}}</td>
+            <td>{{$purchase_item['arrival_time']}}</td>
+        </tr>
     @endforeach
 </table>
 

@@ -401,6 +401,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => 'wish在线数量监控列表',
+                    'url' => 'WishQuantityCheck.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => 'Wish销售代码设置',
                     'url' => 'wishSellerCode.index',
                     'icon' => '',

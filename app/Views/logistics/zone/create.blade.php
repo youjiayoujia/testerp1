@@ -71,16 +71,16 @@
                     <input class="form-control" placeholder="首重" name="fixed_weight" value="{{ old('fixed_weight') }}">
                 </div>
                 <div class="form-group col-lg-3">
-                    <label for="fixed_price" class="control-label">首重价格/kg</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input class="form-control" placeholder="首重价格/kg" name="fixed_price" value="{{ old('fixed_price') }}">
+                    <label for="fixed_price" class="control-label">首重价格</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input class="form-control" placeholder="首重价格" name="fixed_price" value="{{ old('fixed_price') }}">
                 </div>
                 <div class="form-group col-lg-3">
                     <label for="continued_weight" class="control-label">续重</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input class="form-control" placeholder="续重" name="continued_weight" value="{{ old('continued_weight') }}">
                 </div>
                 <div class="form-group col-lg-3">
-                    <label for="continued_price" class="control-label">续重价格/kg</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input class="form-control" placeholder="续重价格/kg" name="continued_price" value="{{ old('continued_price') }}">
+                    <label for="continued_price" class="control-label">续重价格</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input class="form-control" placeholder="续重价格" name="continued_price" value="{{ old('continued_price') }}">
                 </div>
             </div>
             <div class='row'>

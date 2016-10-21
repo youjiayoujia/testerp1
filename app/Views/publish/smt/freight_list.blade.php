@@ -15,7 +15,7 @@
     @foreach($data as $item)
         <tr>
     		<td>{{$item->id}}</td>
-    		<td><?php $token[$item->token_id]['account']?></td>
+    		<td><?php echo $token[$item->token_id]['account'];?></td>
     		<td>{{$item->templateId}}</td>
     		<td>{{$item->templateName}}</td>
     		<td>

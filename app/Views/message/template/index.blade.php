@@ -21,7 +21,6 @@
                 <a href="{{ route('messageTemplate.show', ['id'=>$template->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if(request()->user()->group == 'leader')
                 <a href="{{ route('messageTemplate.edit', ['id'=>$template->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
@@ -30,7 +29,11 @@
                    data-url="{{ route('messageTemplate.destroy', ['id' => $template->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
-                @endif
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $template->table }}" data-id="{{$template->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

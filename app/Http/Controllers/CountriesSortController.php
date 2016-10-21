@@ -69,8 +69,7 @@ class CountriesSortController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->create(request()->all());
-        $arr = explode(',' , request('country_id'));
-        foreach($arr as $single) {
+        foreach(request('country_id') as $single) {
             $country = CountriesModel::find($single);
             $country->parent_id = $model->id;
             $country->save();
@@ -94,7 +93,7 @@ class CountriesSortController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'countries' => CountriesModel::where('parent_id', '0')->get(),
+            'countries' => CountriesModel::all(),
             'owns' => $model->countries,
         ];
         return view($this->viewPath . 'edit', $response);
@@ -121,8 +120,7 @@ class CountriesSortController extends Controller
             $country->parent_id = 0;
             $country->save();
         }
-        $arr = explode(',', request('country_id'));
-        foreach($arr as $single)
+        foreach(request('country_id') as $single)
         {
             $country = CountriesModel::find($single);
             $country->parent_id = $model->id;

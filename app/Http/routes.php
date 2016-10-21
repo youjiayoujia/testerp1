@@ -688,7 +688,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('wish/editOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
     Route::resource('wish','Publish\Wish\WishPublishController');
 
-
+    Route::resource('WishQuantityCheck','Publish\Wish\WishQuantityCheckController');
+    Route::post('wishQuantity/ajaxModifySku',['uses'=>'Publish\Wish\WishQuantityCheckController@ajaxModifySku','as'=>'wishQuantity.ajaxModifySku']);
+    Route::post('wishQuantity/BatchOperation',['uses'=>'Publish\Wish\WishQuantityCheckController@BatchOperation','as'=>'wishQuantity.BatchOperation']);
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
@@ -1053,5 +1055,7 @@ Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
 Route::any('getSmtIssue',['uses'=> 'TestController@getSmtIssue']);
 Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);
 Route::any('joomOrdersList', ['uses' => 'TestController@joomOrdersList']);
+Route::any('joomToShipping', ['uses' => 'TestController@joomToShipping']);
+Route::any('joomrefreshtoken', ['uses' => 'TestController@joomrefreshtoken']);
 
 

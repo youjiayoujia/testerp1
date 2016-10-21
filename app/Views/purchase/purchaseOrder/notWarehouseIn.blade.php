@@ -1,18 +1,12 @@
 <table class="gridtable" align="center" valign="center">
     <tr>
         <th>序号</th>
+        <th>采购单号</th>
+        <th>仓库</th>
         <th>SKU</th>
-        <th>名称</th>
-        <th>采购数量</th>
         <th>到货数量</th>
-        <th>入库数量</th>
-        <th>单据号</th>
-        <th>外部单号</th>
-        <th>采购负责人</th>
-        <th>供应商编号</th>
-        <th>下单时间</th>
-        <th>未到货数量</th>
-        <th>虚库存</th>
+        <th>到货操作人</th>
+        <th>到货时间</th>
     </tr>
     @foreach($purchaseOrder as $key=>$purchase_order)
         @foreach($purchase_order->purchaseItem as $purchase_item)

@@ -60,10 +60,11 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetAliShipmentNumber::class,
         \App\Console\Commands\AutoGetMessageAliexpress::class,
         \App\Console\Commands\AutoGetWishMessage::class,
+        \App\Console\Commands\inputCrmTemplate::class, //导入CRM分类和模板
+        \App\Console\Commands\inputPaypalList::class, //导入CRM分类和模板
         \App\Console\Commands\SetJoomToken::class,
         \App\Console\Commands\SetJoomToshipping::class,
         \App\Console\Commands\SetJoomShelves::class,
-
     ];
 
     /**

@@ -190,6 +190,7 @@ $(document).on('click', '#batch_post', function(){
 					}
 				});
 				layer.alert(str);
+				window.location.reload();
 			}
 		});	 
 

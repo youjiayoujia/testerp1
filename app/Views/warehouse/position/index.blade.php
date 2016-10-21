@@ -26,20 +26,20 @@
             <td>{{ $position->is_available == '1' ? '是' : '否'}}</td>
             <td>{{ $position->created_at }}</td>
             <td>
-                <a href="{{ route('warehousePosition.show', ['id'=>$position->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('warehousePosition.show', ['id'=>$position->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
-                <a href="{{ route('warehousePosition.edit', ['id'=>$position->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                <a href="{{ route('warehousePosition.edit', ['id'=>$position->id]) }}" class="btn btn-warning btn-xs" title='编辑'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $position->id }}"
-                   data-url="{{ route('warehousePosition.destroy', ['id' => $position->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                   data-url="{{ route('warehousePosition.destroy', ['id' => $position->id]) }}" title='删除'>
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
-                        data-target="#dialog" data-table="{{ $position->table }}" data-id="{{$position->id}}">
+                        data-target="#dialog" data-table="{{ $position->table }}" data-id="{{$position->id}}" title='日志'>
                     <span class="glyphicon glyphicon-road"></span>
                 </button>
             </td>

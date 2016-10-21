@@ -25,8 +25,8 @@
             <td>{{ $stockUnhold->remark }} </td>
             <td>{{ $stockUnhold->created_at }}</td>
             <td>
-                <a href="{{ route('stockUnhold.show', ['id'=>$stockUnhold->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stockUnhold.show', ['id'=>$stockUnhold->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
             </td>
         </tr>

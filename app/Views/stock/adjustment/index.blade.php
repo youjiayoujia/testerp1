@@ -24,23 +24,23 @@
             <td>{{ $adjust->check_time }}</td>
             <td>{{ $adjust->created_at }}</td>
             <td>
-                <a href="{{ route('stockAdjustment.show', ['id'=>$adjust->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stockAdjustment.show', ['id'=>$adjust->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
                 @if(!$adjust->status)
-                <a href="{{ route('stockAdjustment.edit', ['id'=>$adjust->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                <a href="{{ route('stockAdjustment.edit', ['id'=>$adjust->id]) }}" class="btn btn-warning btn-xs" title='编辑'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
-                <a href="{{ route('stockAdjustment.check', ['id'=>$adjust->id]) }}"  class="btn btn-info btn-xs">
+                <a href="{{ route('stockAdjustment.check', ['id'=>$adjust->id]) }}"  class="btn btn-info btn-xs" title='审核'>
                     <span class="glyphicon glyphicon-pencil"></span>
-                    审核
+                    
                 </a>
                 @endif
                 @if($adjust->status == '0')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $adjust->id }}"
-                   data-url="{{ route('stockAdjustment.destroy', ['id' => $adjust->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                   data-url="{{ route('stockAdjustment.destroy', ['id' => $adjust->id]) }}" title='删除'>
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
                 @endif
                 <button class="btn btn-primary btn-xs dialog"

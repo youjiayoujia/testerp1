@@ -32,11 +32,16 @@ class ZoneController extends Controller
      */
     public function create()
     {
+        $arr = explode('/', $_SERVER['HTTP_REFERER']);
+        $logistics_id = $arr[count($arr) - 1];
+        $logistics_name = LogisticsModel::where('id', $logistics_id)->first()->name;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses'=>LogisticsModel::all(),
             'countrySorts' => CountriesSortModel::all(),
             'model' => $this->model->where('logistics_id', LogisticsModel::first()->id)->first(),
+            'logistics_id' => $logistics_id,
+            'logistics_name' => $logistics_name,
         ];
         return view($this->viewPath . 'create', $response);
     }

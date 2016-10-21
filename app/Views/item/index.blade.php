@@ -352,7 +352,7 @@
 
                      <div class="modal-body">        
                         <select id="supplier_id" style="width:550px" class="form-control supplier" name="supplier_id">
-                           <option value="{{$item->supplier->id}}">{{$item->supplier->name}}</option>
+                           <option value="{{$item->supplier?$item->supplier->id:0}}">{{$item->supplier?$item->supplier->name:''}}</option>
                         </select>
                      </div>
                      

@@ -1745,7 +1745,8 @@ $template['name'].'</option>';
         var newLiStr = '';
         for (var i=0; i<count; i++){
             var imgUrl = $(li[i]).find('img').attr('src');
-            newLiStr += '<li><div><img src="' + imgUrl + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="'+picName+'[]" value="' + imgUrl + '" /><a href="javascript: void(0);" class="pic-del">删除</a>&nbsp;<a href="javascript: void(0);" class="pic-add-water">水印</a></div></li>';
+            var remoteUrl = $(li[i]).find('input').val();
+            newLiStr += '<li><div><img src="' + imgUrl + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="'+picName+'[]" value="' + remoteUrl + '" /><a href="javascript: void(0);" class="pic-del">删除</a>&nbsp;<a href="javascript: void(0);" class="pic-add-water">水印</a></div></li>';
         }
         $('.'+targetClass).append(newLiStr);
     }

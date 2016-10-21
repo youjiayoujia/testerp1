@@ -81,7 +81,7 @@
     function quanxuan(that)
     {
         var checkCountries = '@foreach($countries as $country)' +
-                '<option class="form-control thecountry" value="{{ $country->code }}" onclick="deleteCountry(this)">' +
+                '<option class="form-control thecountry" value="{{ $country->id }}" onclick="deleteCountry(this)">' +
                 '{{ $country->name }}' + '</option>' + '@endforeach';
         $("#dselectCountry").append(checkCountries);
         getPostCountry();

@@ -120,8 +120,6 @@ class SupplierModel extends BaseModel
                     }
                 }
             }
-        } else {
-            $data['credentials'] = '';
         }
         return $this->find($id)->update($data);
     }

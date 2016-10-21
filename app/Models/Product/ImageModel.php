@@ -30,7 +30,8 @@ class ImageModel extends BaseModel
      */
     protected $fillable = ['spu_id', 'product_id', 'type', 'path', 'name'];
 
-    protected $searchFields = ['type'];
+    protected $searchFields = ['id'=>'id'];
+    
     public $rules = [
         'create' => [
             //'model' => 'required',

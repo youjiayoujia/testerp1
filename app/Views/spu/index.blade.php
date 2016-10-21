@@ -41,7 +41,7 @@
             <td>{{ $spu->remark }}</td>
             <td>{{ $spu->updated_at }}</td>
             <td>
-                <?php if(count($spu->products)>0){ ?>
+                <?php if($spu->products->count()>0){ ?>
                 <a href="{{ route('createSpuImage', ['spu_id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-picture"></span> 编辑图片
                 </a>

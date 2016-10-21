@@ -133,8 +133,9 @@ class OrderController extends Controller
         unset($data['arr']);
         $data['priority'] = 0;
         $data['package_times'] = 0;
-        $this->model->createOrder($data);
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($this->model->createOrder($data))));
+        $model = $this->model->createOrder($data);
+        $model = $this->model->with('items')->find($model->id);
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
 
         return redirect($this->mainIndex);
     }
@@ -328,7 +329,7 @@ class OrderController extends Controller
     {
         request()->flash();
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($this->model->find($id)));
+        $from = base64_encode(serialize($this->model->with('items')->find($id)));
         $this->validate(request(), $this->model->updateRule(request()));
         $data = request()->all();
         $data['status'] = 'REVIEW';
@@ -373,7 +374,7 @@ class OrderController extends Controller
         $job->onQueue('doPackages');
         $this->dispatch($job);
 
-        $to = base64_encode(serialize($this->model->find($id)));
+        $to = base64_encode(serialize($this->model->with('items')->find($id)));
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
 
         return redirect($this->mainIndex);

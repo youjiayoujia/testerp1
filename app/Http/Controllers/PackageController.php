@@ -605,7 +605,7 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode(false);
         }
-        $items = $package->items;
+        $items = $package->items();
         foreach ($items as $item) {
             $item->update(['picked_quantity' => $item->quantity]);
             $item->item->out($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);

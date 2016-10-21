@@ -1059,7 +1059,7 @@ class PurchaseOrderController extends Controller
      * @return obj
      * 
      */
-/*    public function sevenPurchaseSku()
+/*    public function notWarehouseIn()
     {   
         echo '<pre>';
         

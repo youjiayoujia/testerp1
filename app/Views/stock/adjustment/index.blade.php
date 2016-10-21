@@ -45,7 +45,7 @@
                 @endif
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
-                        data-target="#dialog" data-table="{{ $adjust->table }}" data-id="{{$adjust->id}}">
+                        data-target="#dialog" data-table="{{ $adjust->table }}" data-id="{{$adjust->id}}" title='日志'>
                     <span class="glyphicon glyphicon-road"></span>
                 </button>
             </td>

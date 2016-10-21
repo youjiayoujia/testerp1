@@ -232,6 +232,11 @@
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $item->table }}" data-id="{{$item->id}}" title='日志'>
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
 

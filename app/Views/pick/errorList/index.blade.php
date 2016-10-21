@@ -24,8 +24,8 @@
             <td>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $model->id }}"
-                   data-url="{{ route('errorList.destroy', ['id' => $model->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                   data-url="{{ route('errorList.destroy', ['id' => $model->id]) }}" title='删除'>
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
             </td>
         </tr>

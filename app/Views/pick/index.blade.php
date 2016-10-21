@@ -31,39 +31,39 @@
             <td>{{ $pickList->pick_at }}</td>
             <td>{{ $pickList->created_at }}</td>
             <td>
-                <a href="{{ route('pickList.show', ['id'=>$pickList->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('pickList.show', ['id'=>$pickList->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
                 @if($pickList->status == 'NONE')
-                <a href="javascript:" class="btn btn-warning btn-xs print">
-                    <span class="glyphicon glyphicon-pencil"></span> 打印拣货单
+                <a href="javascript:" class="btn btn-warning btn-xs print" title='打印拣货单'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 @endif
-                <a href="javascript:" class="btn btn-warning btn-xs code">
-                    <span class="glyphicon glyphicon-pencil"></span> 条码
+                <a href="javascript:" class="btn btn-warning btn-xs code" title='条码'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 @if($pickList->type == 'MULTI' && $pickList->status == 'PICKING')
-                <a href="{{ route('pickList.inbox', ['id'=>$pickList->id])}}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 分拣
+                <a href="{{ route('pickList.inbox', ['id'=>$pickList->id])}}" class="btn btn-warning btn-xs" title='分拣'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 @endif
                 @if($pickList->status == 'PRINTED')
                 <button class="btn btn-info btn-xs pickBy"
                         data-toggle="modal"
-                        data-target="#pickBy">
-                        绑定拣货人员
+                        data-target="#pickBy" title='绑定拣货人员'>
+                        
                 </button>
                 @endif
                 @if(($pickList->status == 'PICKING' && $pickList->type != 'MULTI') || $pickList->status == 'PACKAGEING' || ($pickList->status == 'INBOXED' && $pickList->type == 'MULTI'))
-                <a href="{{ route('pickList.package', ['id'=>$pickList->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 包装
+                <a href="{{ route('pickList.package', ['id'=>$pickList->id]) }}" class="btn btn-warning btn-xs" title='包装'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 @endif
                 @if($pickList->status == 'NONE')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $pickList->id }}"
-                   data-url="{{ route('pickList.destroy', ['id' => $pickList->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                   data-url="{{ route('pickList.destroy', ['id' => $pickList->id]) }}" title='删除'>
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
                 @endif
             </td>

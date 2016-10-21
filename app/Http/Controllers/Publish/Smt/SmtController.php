@@ -1094,9 +1094,8 @@ class SmtController extends Controller{
                 unset($draft_skus);
                 if ($auto) {
                     return array('status' => true, 'info' => '产品:' . $id . ($isAdd ? '发布成功，新产品ID为:' . $realProductId : '修改成功'));
-                }else {
-                    return redirect($this->mainOnlineIndex)->with('alert', $this->alert('success', '操作成功!'));
-                    //$this->ajax_return('产品:' . $id . ($isAdd ? '发布成功，新产品ID为:' . $realProductId : '修改成功'), true);
+                }else {                
+                    $this->ajax_return('产品:' . $id . ($isAdd ? '发布成功，新产品ID为:' . $realProductId : '修改成功'), true);
                 }
             } else {
                 unset($product_arr);

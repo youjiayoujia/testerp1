@@ -106,4 +106,45 @@ class TypeController extends Controller
         return 'error';
     }
 
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+
+        if($model->parent_id == 0){//一级分类
+            $type_sec = $this->model->where('parent_id',$model->id)->get();
+            if(!$type_sec->isEmpty()){
+                foreach ($type_sec as $sec){
+                    $templates = $sec->templates()->get();
+                    if(!$templates->isEmpty()){
+                        foreach ($templates as $template){
+                            $template->delete();
+                        }
+                    }
+                    $sec->delete();
+                }
+
+            }
+            $model->destroy($id);
+
+        }else{
+            $templates = $model->templates()->get();
+            if(!$templates->isEmpty()){
+                foreach ($templates as $template){
+                    $template->delete();
+                }
+            }
+            $model->delete($id);
+        }
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功.') );
+    }
+
 }

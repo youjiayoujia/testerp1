@@ -60,6 +60,9 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetAliShipmentNumber::class,
         \App\Console\Commands\AutoGetMessageAliexpress::class,
         \App\Console\Commands\AutoGetWishMessage::class,
+        \App\Console\Commands\SetJoomToken::class,
+        \App\Console\Commands\SetJoomToshipping::class,
+        \App\Console\Commands\SetJoomShelves::class,
 
     ];
 
@@ -105,6 +108,11 @@ class Kernel extends ConsoleKernel
                     }
                     break;
                 case 'cdiscount':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
+                case 'joom':
                     foreach ($channel->accounts as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }

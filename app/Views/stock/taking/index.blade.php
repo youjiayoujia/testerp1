@@ -19,34 +19,34 @@
             <td>{{ $taking->check_status ? ($taking->check_status == '1' ? '审核未通过' : '审核通过') : '未审核'}}</td>
             <td>{{ $taking->created_at }}</td>
             <td>
-                <a href="{{ route('stockTaking.show', ['id'=>$taking->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stockTaking.show', ['id'=>$taking->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
                 @if(!$taking->check_status && !$taking->create_status)
-                    <a href="{{ route('stockTaking.edit', ['id'=>$taking->id]) }}" class="btn btn-warning btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 录入实盘
+                    <a href="{{ route('stockTaking.edit', ['id'=>$taking->id]) }}" class="btn btn-warning btn-xs" title='录入实盘'>
+                        <span class="glyphicon glyphicon-pencil"></span> 
                     </a>
                 @endif
                 @if(!$taking->check_status && !$taking->create_status && $taking->create_taking_adjustment == '1')
-                    <a href="javascript:" class='btn btn-info btn-xs create_form'>
-                        <span class="glyphicon glyphicon-eye-open"></span> 生成调整单
+                    <a href="javascript:" class='btn btn-info btn-xs create_form' title='生成调整单'>
+                        <span class="glyphicon glyphicon-eye-open"></span> 
                     </a>
                 @endif
                 @if(!$taking->check_status && $taking->create_status)
-                    <a href="{{ route('StockTaking.takingAdjustmentShow', ['id'=>$taking->id])}}" class='btn btn-info btn-xs'>
-                        <span class="glyphicon glyphicon-eye-open"></span> 调整单
+                    <a href="{{ route('StockTaking.takingAdjustmentShow', ['id'=>$taking->id])}}" class='btn btn-info btn-xs' title='调整单'>
+                        <span class="glyphicon glyphicon-eye-open"></span> 
                     </a>
                 @endif
                 @if($taking->check_status == '0' && $taking->create_status == '1')
-                    <a href="{{ route('stockTaking.takingCheck', ['id' => $taking->id])}}" class="btn btn-info btn-xs check">
-                        <span class="glyphicon glyphicon-eye-open"></span> 审核
+                    <a href="{{ route('stockTaking.takingCheck', ['id' => $taking->id])}}" class="btn btn-info btn-xs check" title='审核'>
+                        <span class="glyphicon glyphicon-eye-open"></span> 
                     </a>
                 @endif
                 @if(!$taking->check_status)
                     <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                        data-id="{{ $taking->id }}"
-                       data-url="{{ route('stockTaking.destroy', ['id' => $taking->id]) }}">
-                        <span class="glyphicon glyphicon-trash"></span> 删除
+                       data-url="{{ route('stockTaking.destroy', ['id' => $taking->id]) }}" title='删除'>
+                        <span class="glyphicon glyphicon-trash"></span> 
                     </a>
                 @endif
             </td>

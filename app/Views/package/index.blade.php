@@ -37,12 +37,12 @@
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
             <td>{{ $package->created_at }}</td>
             <td>
-                <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample">
+                <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
                   <span class="glyphicon glyphicon-eye-open"></span>
                 </button>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
-                        data-target="#dialog" data-table="{{ $package->table }}" data-id="{{$package->id}}">
+                        data-target="#dialog" data-table="{{ $package->table }}" data-id="{{$package->id}}" title='日志'>
                     <span class="glyphicon glyphicon-road"></span>
                 </button>
             </td>
@@ -70,16 +70,16 @@
             <td colspan='4'>拣货单:  {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>追踪号: {{ $package->tracking_no ? $package->tracking_no : '暂无追踪号信息'}}
             <td colspan='4'>
-                <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
-                <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 修改追踪号
+                <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 <button class="btn btn-primary btn-xs split"
                         data-toggle="modal"
-                        data-target="#split" data-id="{{ $package->id }}">
-                    <span class="glyphicon glyphicon-tasks"></span> 拆分包裹
+                        data-target="#split" data-id="{{ $package->id }}" title='拆分包裹'>
+                    <span class="glyphicon glyphicon-tasks"></span> 
                 </button>
             </td>
         </tr>

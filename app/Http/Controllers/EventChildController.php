@@ -53,23 +53,23 @@ class EventChildController extends Controller
             if(!$from) {
                 $html .= "<div class='panel panel-default'>
                         <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
-                        <div class='panel-body'>";
+                        <div class='panel-body'><div class='col-lg-12'>";
                 foreach($to as $key => $value) {
                     $html .= "<div class='row'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                     if(is_array($value)) {
                         if(count($value) == count($value,1)) {
-                            $html .="<div class='row'>";
+                            $html .="<div class='col-lg-12'><div class='row'>";
                             foreach($value as $k => $v) {
                                 $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
                             }
-                            $html .= '</div>';
+                            $html .= '</div></div>';
                         } else {
                             foreach($value as $k => $v) {
-                                $html .="<div class='row'>";
+                                $html .="<div class='col-lg-12'><div class='row'>";
                                 foreach($v as $k1 => $v1) {
                                     $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
                                 }
-                                $html .="</div>";
+                                $html .="</div></div>";
                             }
                         }
                     } else {
@@ -77,31 +77,31 @@ class EventChildController extends Controller
                     }
                     $html .= "</div>";
                 }  
-                $html .= "</div></div>";
+                $html .= "</div></div></div>";
                 continue;     
             }
             $html .= "<div class='panel panel-default'>
                         <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
-                        <div class='panel-body'>";
+                        <div class='panel-body'><div class='col-lg-12'>";
             $flag = 1;
             $this->calcTwoArr($from,$to);
             foreach($from as $key => $value) {
                 $html .= "<div class='row'>from['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                 if(is_array($value)) {
-                    $html .="<div class='row'>";
+                    $html .="<div class='col-lg-12'><div class='row'>";
                     if(count($value) == count($value,1)) {
                         $html .="<div class='row'>";
                         foreach($value as $k => $v) {
                             $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
                         }
-                        $html .="</div>";
+                        $html .="</div></div>";
                     } else {
                         foreach($value as $k => $v) {
-                            $html .="<div class='row'>";
+                            $html .="<div class='col-lg-12'><div class='row'>";
                             foreach($v as $k1 => $v1) {
                                 $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
                             }
-                            $html .="</div>";
+                            $html .="</div></div>";
                         }
                     }
                 } else {
@@ -114,18 +114,18 @@ class EventChildController extends Controller
                 $html .= "<div class='row'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                 if(is_array($value)) {
                     if(count($value) == count($value,1)) {
-                        $html .="<div class='row'>";
+                        $html .="<div class='col-lg-12'><div class='row'>";
                         foreach($value as $k => $v) {
                             $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
                         }
-                        $html .="</div>";
+                        $html .="</div></div>";
                     } else {
                         foreach($value as $k => $v) {
-                            $html .="<div class='row'>";
+                            $html .="<div class='col-lg-12'><div class='row'>";
                             foreach($v as $k1 => $v1) {
                                 $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
                             }
-                            $html .="</div>";
+                            $html .="</div></div>";
                         }
                     }
                 } else {
@@ -133,7 +133,7 @@ class EventChildController extends Controller
                 }
                 $html .= "</div>";
             }
-            $html.= '</div></div>';
+            $html.= '</div></div></div>';
         }
         return $html;
     }

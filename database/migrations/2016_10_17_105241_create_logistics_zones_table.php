@@ -18,12 +18,12 @@ class CreateLogisticsZonesTable extends Migration
 			$table->string('zone');
 			$table->integer('logistics_id');
 			$table->enum('type', array('first','second'))->default('first');
-			$table->decimal('fixed_weight', 6, 4)->nullable();
-			$table->decimal('fixed_price', 6, 4)->nullable();
-			$table->decimal('continued_weight', 6, 4)->nullable();
-			$table->decimal('continued_price', 6, 4)->nullable();
-			$table->decimal('other_fixed_price', 6, 4)->nullable();
-			$table->decimal('discount', 6, 4);
+			$table->decimal('fixed_weight', 7, 5)->nullable();
+			$table->decimal('fixed_price', 7, 5)->nullable();
+			$table->decimal('continued_weight', 7, 5)->nullable();
+			$table->decimal('continued_price', 7, 5)->nullable();
+			$table->decimal('other_fixed_price', 7, 5)->nullable();
+			$table->decimal('discount', 7, 5);
 			$table->enum('discount_weather_all', array('0','1'))->default('0');
 			$table->timestamps();
 			$table->softDeletes();

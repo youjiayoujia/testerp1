@@ -19,9 +19,11 @@ class CreateOrderBlacklistsTable extends Migration
 			$table->string('ordernum');
 			$table->string('name');
 			$table->string('email');
+			$table->string('by_id');
 			$table->string('zipcode');
+			$table->string('channel_account');
 			$table->enum('type', array('CONFIRMED','SUSPECTED','WHITE'))->default('SUSPECTED');
-			$table->text('remark', 65535)->nullable();
+			$table->text('remark')->nullable();
 			$table->integer('total_order');
 			$table->integer('refund_order');
 			$table->string('refund_rate');

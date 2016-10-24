@@ -314,6 +314,11 @@ return [
                     'url' => 'logisticsChannelName.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流分区',
+                    'url' => 'logisticsPartition.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],

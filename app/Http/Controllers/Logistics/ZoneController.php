@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
 use App\Models\CountriesModel;
+use App\Models\Logistics\PartitionModel;
 use App\Models\Logistics\ZoneModel;
 use App\Models\CountriesSortModel;
 use App\Models\LogisticsModel;
@@ -38,7 +39,7 @@ class ZoneController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses'=>LogisticsModel::all(),
-            'countrySorts' => CountriesSortModel::all(),
+            'partitions' => PartitionModel::all(),
             'model' => $this->model->where('logistics_id', LogisticsModel::first()->id)->first(),
             'logistics_id' => $logistics_id,
             'logistics_name' => $logistics_name,
@@ -138,7 +139,7 @@ class ZoneController extends Controller
             'model' => $model,
             'countries' => $model->logistics_zone_countries,
             'logisticses'=>LogisticsModel::all(),
-            'countrySorts' => CountriesSortModel::all(),
+            'partitions' => PartitionModel::all(),
             'sectionPrices' => $model->zone_section_prices,
             'len' =>  $model->zone_section_prices->count(),
         ];

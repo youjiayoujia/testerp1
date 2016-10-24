@@ -33,16 +33,16 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-body">
-                            @foreach($countrySorts as $countrySort)
+                            @foreach($partitions as $partition)
                             <div class='form-group'>
                                 <div class='col-lg-12'>
-                                    <font size='3px' color='blue'>{{$countrySort->name}}</font>
+                                    <font size='3px' color='blue'>{{$partition->name}}</font>
                                     <button type='button' class='btn btn-info all_select'>全选</button>
                                     <button type='button' class='btn btn-info opposite_select'>反选</button>
                                 </div>
-                                @foreach($countrySort->countries as $country)
+                                @foreach($partition->partitionSorts as $partitionSort)
                                 <div class='col-lg-4'>
-                                    <input type='checkbox' class='country' name='countrys[]' value="{{ $country->id }}" {{ $model->inZone($country->id) ? 'checked' : ($model->weatherAvailable($country->id) ? 'disabled' : '') }}><font size='3px'>{{ $country->cn_name }}</font>
+                                    <input type='checkbox' class='country' name='countrys[]' value="{{ $partitionSort->country_id }}" {{ $model->inZone($partitionSort->country_id) ? 'checked' : ($model->weatherAvailable($partitionSort->country_id) ? '' : '') }}><font size='3px'>{{ $partitionSort->country->cn_name }}</font>
                                 </div>
                                 @endforeach
                             </div>

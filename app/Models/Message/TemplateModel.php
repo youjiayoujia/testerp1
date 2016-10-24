@@ -16,14 +16,14 @@ class TemplateModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'message_templates';
+    public $table = 'message_templates';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
+    public $fillable = [
         'type_id',
         'name',
         'content',

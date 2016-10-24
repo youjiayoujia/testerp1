@@ -17,9 +17,9 @@
     @foreach($purchaseOrder as $key=>$purchase_order)
         @foreach($purchase_order->purchaseItem as $purchase_item)
             <tr>
-                <td>{{$key+1}}</td> 
+                <td>{{$key+1}}</td>
                 <td>{{$purchase_item->sku}}</td>
-                <td>{{$purchase_item->productItem->c_name}}</td> 
+                <td>{{$purchase_item->productItem->c_name}}</td>
                 <td>{{$purchase_item->purchase_num}}</td>
                 <td>{{$purchase_item->arrival_num}}</td>
                 <td>{{$purchase_item->storage_qty}}</td>
@@ -29,7 +29,7 @@
                 <td>{{$purchase_order->supplier_id}}</td>
                 <td>{{$purchase_order->created_at}}</td>
                 <td>{{$purchase_item->purchase_num-$purchase_item->arrival_num}}</td>
-                <td>{{$purchase_item->productItem->available_quantity}}</td>             
+                <td>{{$purchase_item->productItem->available_quantity}}</td>
             </tr>
         @endforeach
     @endforeach

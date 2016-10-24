@@ -28,20 +28,20 @@
             <td>{{ $warehouse->is_available == '1' ? '是' : '否'}}</td>
             <td>{{ $warehouse->created_at }}</td>
             <td>
-                <a href="{{ route('warehouse.show', ['id'=>$warehouse->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('warehouse.show', ['id'=>$warehouse->id]) }}" class="btn btn-info btn-xs" title="查看">
+                    <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
-                <a href="{{ route('warehouse.edit', ['id'=>$warehouse->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                <a href="{{ route('warehouse.edit', ['id'=>$warehouse->id]) }}" class="btn btn-warning btn-xs" title='编辑'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $warehouse->id }}"
-                   data-url="{{ route('warehouse.destroy', ['id' => $warehouse->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                   data-url="{{ route('warehouse.destroy', ['id' => $warehouse->id]) }}" title='删除'>
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
-                        data-target="#dialog" data-table="{{ $warehouse->table }}" data-id="{{$warehouse->id}}">
+                        data-target="#dialog" data-table="{{ $warehouse->table }}" data-id="{{$warehouse->id}}" title='日志'>
                     <span class="glyphicon glyphicon-road"></span>
                 </button>
             </td>

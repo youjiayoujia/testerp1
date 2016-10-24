@@ -54,9 +54,16 @@ Class LazadaAdapter implements AdapterInterface
         $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
 
         if (!isset($orders_data['Body']['Orders']['Order']) || empty($orders_data['Body']['Orders']['Order'])) {
-            $nextToken = '';
-            var_dump($orders_data);
 
+            if(isset($orders_data['Head']['ErrorCode'])){
+                return  [
+                    'error' => [
+                        'code' => $orders_data['Head']['ErrorCode'],
+                        'message' =>isset($orders_data['Head']['ErrorMessage'])?$orders_data['Head']['ErrorMessage']:''
+                    ]
+                ];
+            }
+            $nextToken = '';
         } else {
             //单订单情况
             if (!isset($orders_data['Body']['Orders']['Order'][0])) {

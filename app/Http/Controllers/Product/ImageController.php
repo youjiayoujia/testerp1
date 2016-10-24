@@ -154,7 +154,7 @@ class ImageController extends Controller
         
         $productModel = ProductModel::where("spu_id",$spu_id)->get();
         if (!count($productModel)) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'SPU不存在.'));
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'SPU不存在或者MODEL不存在.'));
         }
         
         $response = [

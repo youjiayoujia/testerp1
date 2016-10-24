@@ -232,6 +232,11 @@
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $item->table }}" data-id="{{$item->id}}" title='日志'>
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
 
@@ -352,7 +357,7 @@
 
                      <div class="modal-body">        
                         <select id="supplier_id" style="width:550px" class="form-control supplier" name="supplier_id">
-                           <option value="{{$item->supplier->id}}">{{$item->supplier->name}}</option>
+                           <option value="{{$item->supplier?$item->supplier->id:0}}">{{$item->supplier?$item->supplier->name:''}}</option>
                         </select>
                      </div>
                      

@@ -314,6 +314,11 @@ return [
                     'url' => 'logisticsChannelName.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流分区',
+                    'url' => 'logisticsPartition.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],
@@ -398,6 +403,11 @@ return [
                 [
                     'name' => 'Wish在线数据列表',
                     'url' => 'wish.indexOnlineProduct',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'wish在线数量监控列表',
+                    'url' => 'WishQuantityCheck.index',
                     'icon' => '',
                 ],
                 [

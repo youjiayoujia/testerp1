@@ -10,7 +10,9 @@
                 <div class="modal-content">
                     <div class='panel panel-default'>
                         <div class='panel-heading'>日志记录</div>
+                        <div style='overflow:scroll; width:590px; height:600px;'>
                         <div class='panel-body info_buf'>
+                        </div>
                         </div>
                     </div>
                 </div>

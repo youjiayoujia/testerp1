@@ -39,6 +39,7 @@
                 <label class="checkbox-inline">
                     <input type="checkbox" id="role" value="{{$role->id}}" name="user_role[]"> {{$role->role_name}}
                 </label>
+                <br>
             @endforeach
         </div>
     </div>

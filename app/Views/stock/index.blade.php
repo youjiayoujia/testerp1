@@ -26,13 +26,13 @@
             <td>{{ round($stock->all_quantity * $stock->unit_cost, 3) }}</td>
             <td>{{ $stock->created_at }}</td>
             <td>
-                <a href="{{ route('stock.show', ['id'=>$stock->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stock.show', ['id'=>$stock->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $stock->id }}"
-                   data-url="{{ route('stock.destroy', ['id' => $stock->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                   data-url="{{ route('stock.destroy', ['id' => $stock->id]) }}" title='删除'>
+                    <span class="glyphicon glyphicon-trash"></span> 
                 </a>
             </td>
         </tr>

@@ -801,7 +801,48 @@ Class JoomAdapter implements AdapterInterface
         $result = $this->postCurlHttpsData($url,$data,5);
         return json_decode($result,true);
     }
+    /*
+		* joom标记发货 API 请求
+		*id 			   => table:erp_orders -> orderlineitemid
+		*tracking_provider => $provider_arr
+						   ex:USPS
+		*tracking_number   => table:orders
+		*key 			   => $accInfo[0]['wish_key']
+	*/
+    public function joomApiOrdersToShipping($joomId,$trackingProvider,$trackingNumber,$status){
 
+        $url = "https://api-merchant.joom.it/api/v2/order/fulfill-one";
+        if($trackingNumber && $status == 'SHIPPED'){     //需求 订单状态发货才上传追踪号 否则只标记发货  后续订单状态变发货了再更新追踪号
+            $data = "tracking_provider=".$trackingProvider."&tracking_number=".$trackingNumber."&id=".$joomId."&access_token=".$this->access_token."&shipping_time=30-60";
+
+        }else if($trackingNumber && $status == 'upload'){  //是需要更新追踪号订单
+            $url = "https://api-merchant.joom.it/api/v2/order/modify-tracking";
+            $data = "tracking_provider=".$trackingProvider."&tracking_number=".$trackingNumber."&id=".$joomId."&access_token=".$this->access_token."&shipping_time=30-60";
+
+        }else{
+            $data = "tracking_provider=".$trackingProvider."&id=".$joomId."&access_token=".$this->access_token."&shipping_time=30-60";
+
+        }
+        $time = 200;
+        //joom请求API
+        $jsonCodeToArr = $this->postCurlHttpsData($url, $data,$time);
+        return json_decode($jsonCodeToArr,true);
+    }
+
+    /*Time:2016-10-15
+	*从erp_joom_shipping表中找出需要joom请求的数据
+	*拆单的，追踪号和erp_joom_shipping表中对应上一次请求完成的订单的追踪号不同的则为需要请求订单
+	*@hejiancheng
+	*/
+    public function joomApiOrdersmodifytracking($logistics_name,$code,$joomID){
+
+        $url = "https://api-merchant.joom.it/api/v2/order/modify-tracking";
+        $data = "tracking_provider=".$logistics_name."&tracking_number=".$code."&id=".$joomID."&access_token=".$this->access_token."&shipping_time=25-60";
+        $time = 200;
+        //joom请求API
+        $jsonCodeToArr = $this->postCurlHttpsData($url, $data,$time);
+        return json_decode($jsonCodeToArr,true);
+    }
 
 
 

@@ -21,16 +21,17 @@ class ImageModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'product_images';
+    public $table = 'product_images';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['spu_id', 'product_id', 'type', 'path', 'name'];
+    public $fillable = ['spu_id', 'product_id', 'type', 'path', 'name'];
 
-    protected $searchFields = ['type'];
+    public $searchFields = ['id'=>'id'];
+
     public $rules = [
         'create' => [
             //'model' => 'required',

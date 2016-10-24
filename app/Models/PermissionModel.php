@@ -22,7 +22,7 @@ class PermissionModel extends BaseModel
             
         ]
     ];
-    public $searchFields = ['name'=>'name', 'id'=>'id'];
+    public $searchFields = ['action_name'=>'角色名', 'id'=>'id'];
     /**
      * The attributes that are mass assignable.
      *

@@ -26,6 +26,7 @@ class PermissionController extends Controller
         
         $data = request()->all();
         $data['route'] = 'App\\Http\\Controllers\\'.$data['controller'].'Controller@'.$data['action'];
+        $data['controller_name'] = $data['controller'];
         PermissionModel::create($data);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }

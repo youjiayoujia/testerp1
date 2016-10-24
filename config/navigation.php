@@ -401,11 +401,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => 'wish在线数量监控列表',
-                    'url' => 'WishQuantityCheck.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => 'Wish销售代码设置',
                     'url' => 'wishSellerCode.index',
                     'icon' => '',
@@ -520,12 +515,12 @@ return [
             ],
             '数据监控'=>[
                 [
-                    'name' => 'Ebay在线数据监控',
+                    'name' => 'Ebay数据监控',
                     'url' => 'ebayProduct.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => 'SMT在线数据监控',
+                    'name' => 'SMT数据监控',
                     'url' => 'smtMonitor.index',
                     'icon' => '',
                 ],
@@ -536,10 +531,15 @@ return [
                     'icon' => '',
                 ],
 				[
-                'name' => 'Joom数量监控',
-                'url' => 'joomonline.index',
-                'icon' => '',
-            ],
+                    'name' => 'Joom数量监控',
+                    'url' => 'joomonline.index',
+                    'icon' => '',
+                 ],
+                [
+                    'name' => 'wish数量监控',
+                    'url' => 'WishQuantityCheck.index',
+                    'icon' => '',
+                ],
             ]
         ]
     ],

@@ -23,11 +23,35 @@
 
     <div class="row">
         <div class="form-group col-lg-12">
-            @foreach($permissions as $permission)
+            <!-- @foreach($permissions as $permission)
                 <label class="checkbox-inline">
                     <input type="checkbox" id="permission" value="{{$permission->id}}" name="role_permission[]" {{ in_array($permission->id, $select_permission)? 'checked' : '' }}> {{$permission->action_name}}
                 </label>
+            @endforeach -->
+
+            @foreach(config('permission.parent.name') as $key=>$name)
+                <ul >
+                    <li >
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="permission" value="" name=""> {{$name}}
+                        </label>
+                        <ul>
+                            @foreach($permissions->where('parent_id',$key) as $child_name)
+                            <li>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="permission" {{ in_array($child_name->id, $select_permission)? 'checked' : '' }} value="{{$child_name->id}}" name="role_permission[]"> {{$child_name->action_name}}
+                                </label>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </li>
+                </ul>
             @endforeach
         </div>
     </div>
 @stop
+
+<style type="text/css">  
+li {list-style-type:none;} 
+ul {list-style:none;}
+</style> 

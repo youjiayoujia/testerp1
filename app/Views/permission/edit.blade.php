@@ -14,4 +14,15 @@
             <input type='text' class="form-control" id="route" placeholder="route" name='route' value="{{ $model->route }}">
         </div>
     </div>
+
+    <div class="form-group col-lg-6">
+            <label for="parent_id" class='control-label'>权限所属类</label>
+                <select name="parent_id">
+                    @foreach(config('permission.parent.name') as $key=>$name)
+                        <option value="{{ $key }}" {{ $key == $model->parent_id ? 'selected' : '' }}>
+                            {{ $name }}
+                        </option>
+                    @endforeach
+                </select>
+        </div>
 @stop

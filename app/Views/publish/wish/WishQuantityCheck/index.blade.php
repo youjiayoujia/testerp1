@@ -249,7 +249,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="form-group col-lg-12">
-                                <label for="account" class='control-label obhidden' style="float:left;">SKU:{{ $detail->sku}}</label>
+                                {{--<label for="account" class='control-label obhidden' style="float:left;">SKU:{{ $detail->sku}}</label>--}}
                                 <small class="text-danger glyphicon glyphicon-asterisk obhidden"></small>
                                 <input type='text' class="form-control obhidden" placeholder="0~99999之间" name="ModifyDate" >
                                 <input type="hidden" name="BoAction" value="" id="BoAction">

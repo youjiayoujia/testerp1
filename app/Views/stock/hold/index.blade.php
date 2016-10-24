@@ -25,8 +25,8 @@
             <td>{{ $stockHold->remark }} </td>
             <td>{{ $stockHold->created_at }}</td>
             <td>
-                <a href="{{ route('stockHold.show', ['id'=>$stockHold->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stockHold.show', ['id'=>$stockHold->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
             </td>
         </tr>

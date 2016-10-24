@@ -44,6 +44,23 @@ class PositionController extends Controller
     }
 
     /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 跳转数据编辑页
      *
      * @param $id integer 记录id

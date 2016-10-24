@@ -33,16 +33,16 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-body">
-                            @foreach($countrySorts as $countrySort)
+                            @foreach($partitions as $partition)
                             <div class='form-group'>
                                 <div class='col-lg-12'>
-                                    <font size='3px' color='blue'>{{$countrySort->name}}</font>
+                                    <font size='3px' color='blue'>{{$partition->name}}</font>
                                     <button type='button' class='btn btn-info all_select'>全选</button>
                                     <button type='button' class='btn btn-info opposite_select'>反选</button>
                                 </div>
-                                @foreach($countrySort->countries as $country)
+                                @foreach($partition->partitionSorts as $partitionSort)
                                 <div class='col-lg-4'>
-                                    <input type='checkbox' class='country' name='countrys[]' value="{{ $country->id }}" {{ $model->inZone($country->id) ? 'checked' : ($model->weatherAvailable($country->id) ? 'disabled' : '') }}><font size='3px'>{{ $country->cn_name }}</font>
+                                    <input type='checkbox' class='country' name='countrys[]' value="{{ $partitionSort->country_id }}" {{ $model->inZone($partitionSort->country_id) ? 'checked' : ($model->weatherAvailable($partitionSort->country_id) ? '' : '') }}><font size='3px'>{{ $partitionSort->country->cn_name }}</font>
                                 </div>
                                 @endforeach
                             </div>
@@ -77,16 +77,16 @@
                     <input class="form-control" placeholder="首重" name="fixed_weight" value="{{ old('fixed_weight') ? old('fixed_weight') : $model->fixed_weight }}">
                 </div>
                 <div class="form-group col-lg-3">
-                    <label for="fixed_price" class="control-label">首重价格/kg</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input class="form-control" placeholder="首重价格/kg" name="fixed_price" value="{{ old('fixed_price') ? old('fixed_price') : $model->fixed_price }}">
+                    <label for="fixed_price" class="control-label">首重价格</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input class="form-control" placeholder="首重价格" name="fixed_price" value="{{ old('fixed_price') ? old('fixed_price') : $model->fixed_price }}">
                 </div>
                 <div class="form-group col-lg-3">
                     <label for="continued_weight" class="control-label">续重</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input class="form-control" placeholder="续重" name="continued_weight" value="{{ old('continued_weight') ? old('continued_weight') : $model->continued_weight }}">
                 </div>
                 <div class="form-group col-lg-3">
-                    <label for="continued_price" class="control-label">续重价格/kg</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input class="form-control" placeholder="续重价格/kg" name="continued_price" value="{{ old('continued_price') ? old('continued_price') : $model->continued_price }}">
+                    <label for="continued_price" class="control-label">续重价格</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input class="form-control" placeholder="续重价格" name="continued_price" value="{{ old('continued_price') ? old('continued_price') : $model->continued_price }}">
                 </div>
             </div>
             <div class='row'>

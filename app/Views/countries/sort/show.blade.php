@@ -18,7 +18,7 @@
     <div class="panel-body">
         @foreach($countries as $country)
         <div class='col-lg-2'>
-            <input type='text' class='form-control' value="{{ $country->code }}">
+            <input type='text' class='form-control' value="{{ $country->cn_name }}">
         </div>
         @endforeach
     </div>

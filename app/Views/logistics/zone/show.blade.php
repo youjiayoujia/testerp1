@@ -20,13 +20,13 @@
                 <strong>首重(kg)</strong>: {{ $model->fixed_weight }}
             </div>
             <div class="col-lg-2">
-                <strong>首重价格(/kg)</strong>: {{ $model->fixed_price }}
+                <strong>首重价格</strong>: {{ $model->fixed_price }}
             </div>
             <div class="col-lg-2">
                 <strong>续重(kg)</strong>: {{ $model->continued_weight }}
             </div>
             <div class="col-lg-2">
-                <strong>续重价格(/kg)</strong>: {{ $model->continued_price }}
+                <strong>续重价格</strong>: {{ $model->continued_price }}
             </div>
             <div class="col-lg-2">
                 <strong>其他固定费用</strong>: {{ $model->other_fixed_price }}

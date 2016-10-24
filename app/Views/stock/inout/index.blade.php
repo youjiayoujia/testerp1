@@ -28,8 +28,8 @@
             <td>{{ $stockin->remark }} </td>
             <td>{{ $stockin->created_at }}</td>
             <td>
-                <a href="{{ route('stockInOut.show', ['id'=>$stockin->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stockInOut.show', ['id'=>$stockin->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
             </td>
         </tr>

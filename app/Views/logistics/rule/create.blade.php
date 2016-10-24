@@ -51,7 +51,7 @@
                         <div class='form-group row'>
                         @foreach($catalogs as $catalog)
                             <div class='col-lg-4'>
-                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}"><font size='2px'>{{ $catalog->name }}</font>
+                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}"><font size='2px'>{{ $catalog->c_name }}</font>
                             </div>
                         @endforeach
                         </div>

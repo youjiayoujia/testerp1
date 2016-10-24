@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CountriesModel;
 use App\Models\Logistics\PartitionModel;
 use App\Models\Logistics\PartitionSortModel;
+use App\Models\UserModel;
 
 class PartitionController extends Controller
 {
@@ -75,6 +76,8 @@ class PartitionController extends Controller
             $data['logistics_partition_id'] = $model->id;
             PartitionSortModel::create($data);
         }
+        $model = $this->model->with('partitionSorts')->find($model->id);
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
 
         return redirect($this->mainIndex);
     }
@@ -113,6 +116,8 @@ class PartitionController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -128,6 +133,9 @@ class PartitionController extends Controller
             $data['logistics_partition_id'] = $id;
             PartitionSortModel::create($data);
         }
+        $model = $this->model->with('partitionSorts')->find($id);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
 
         return redirect($this->mainIndex);
     }

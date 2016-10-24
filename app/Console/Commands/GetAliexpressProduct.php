@@ -114,11 +114,14 @@ class GetAliexpressProduct extends Command
                 $product['multiattribute'] = count($productInfo['aeopAeProductSKUs']) > 1 ? 1 : 0;                
 
                 $res = smtProductList::where('productId', $productItem['productId'])->first();
+                if($res){
+                    $res = $res->toArray();
+                }
                 if(isset($productInfo['aeopAeProductSKUs'][0]) && $product['gmtCreate'] > '2014-09-01'){
-                    $oldUserId = $res ? $res->user_id : 0;
+                    $oldUserId = $res ? $res['user_id'] : 0;
                     if(!$oldUserId){
                         $tempSKU =($productInfo['aeopAeProductSKUs'][0]);
-                        $user_id = '';
+                        $user_id = '0';
                         //获取销售前缀
                         $sale_prefix = $smtProductsObj->get_skucode_prefix($tempSKU['skuCode']);
                         if ($sale_prefix) {
@@ -128,6 +131,8 @@ class GetAliexpressProduct extends Command
                             }
                         }
                         $product['user_id'] = $user_id;
+                    }else{
+                        $product['user_id'] = $res ? $res['user_id'] : 0;
                     }
                 }
                

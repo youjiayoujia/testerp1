@@ -9,7 +9,7 @@
     <th>邮编</th>
     <th>退款订单数</th>
     <th>订单总数</th>
-    <th>退款率</th>
+    {{--<th>退款率</th>--}}
     <th>类型</th>
     {{--<th>备注</th>--}}
     <th class="sort" data-field="created_at">创建时间</th>
@@ -37,7 +37,7 @@
                 <td>{{ $blacklist->zipcode }}</td>
                 <td>{{ $blacklist->refund_order }}</td>
                 <td>{{ $blacklist->total_order }}</td>
-                <td>{{ $blacklist->refund_rate }}</td>
+                {{--<td>{{ $blacklist->refund_rate }}</td>--}}
                 <td>{{ $blacklist->type_name }}</td>
                 {{--<td>{{ $blacklist->remark }}</td>--}}
                 <td>{{ $blacklist->updated_at }}</td>

@@ -68,7 +68,9 @@ class GetBlacklists extends Command
                     $data['ordernum'] = $obj->ordernum;
                     $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
                     $data['email'] = $obj->email;
+                    $data['by_id'] = $obj->by_id;
                     $data['zipcode'] = $obj->shipping_zipcode;
+                    $data['channel_account'] = $obj->channelAccount->account;
                     $data['type'] = 'SUSPECTED';
                     $data['remark'] = NULL;
                     $data['total_order'] = count($order);
@@ -115,7 +117,9 @@ class GetBlacklists extends Command
                         $data['ordernum'] = $obj->ordernum;
                         $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
                         $data['email'] = $obj->email;
+                        $data['by_id'] = $obj->by_id;
                         $data['zipcode'] = $obj->shipping_zipcode;
+                        $data['channel_account'] = $obj->channelAccount->account;
                         $data['type'] = 'SUSPECTED';
                         $data['remark'] = NULL;
                         $data['total_order'] = count($order2);

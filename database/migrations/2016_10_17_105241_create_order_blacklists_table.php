@@ -27,7 +27,7 @@ class CreateOrderBlacklistsTable extends Migration
 			$table->integer('total_order');
 			$table->integer('refund_order');
 			$table->string('refund_rate');
-			$table->enum('color', array('orange','green','white'))->default('white');
+			$table->string('color');
 			$table->timestamps();
 			$table->softDeletes();
         });

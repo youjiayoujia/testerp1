@@ -156,6 +156,34 @@ class ItemController extends Controller
         return redirect($this->mainIndex);
     }
 
+    public function skuHandleApi()
+    {
+        $data = request()->all();
+        $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
+        if($data['type']='edit'){
+            $skuModel->update($data);
+            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
+                $brr[] = $logistics_limits_id;         
+            }
+            $skuModel->product->logisticsLimit()->sync($brr);
+            foreach($data['package_limit_arr'] as $wrap_limits_id){
+                $arr[] = $wrap_limits_id;         
+            }
+            $skuModel->product->wrapLimit()->sync($arr);
+        }else{
+            $skuModel->create($data);
+            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
+                $brr[] = $logistics_limits_id;         
+            }
+            $skuModel->product->logisticsLimit()->attach($brr);
+            foreach($data['package_limit_arr'] as $wrap_limits_id){
+                $arr[] = $wrap_limits_id;         
+            }
+            $skuModel->product->wrapLimit()->attach($arr);
+        }
+
+    }
+
     /**
      * 详情
      *

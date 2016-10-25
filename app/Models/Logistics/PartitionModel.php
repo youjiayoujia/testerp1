@@ -14,9 +14,9 @@ use App\Base\BaseModel;
 
 class PartitionModel extends BaseModel
 {
-    protected $table = 'logistics_partitions';
+    public $table = 'logistics_partitions';
 
-    protected $fillable = ['name'];
+    public $fillable = ['name'];
 
     public $rules = [
         'create' => [

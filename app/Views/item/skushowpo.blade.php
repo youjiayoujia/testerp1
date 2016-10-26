@@ -1,6 +1,7 @@
 <html>
  <head>
   <title>打印SKU条码</title> 
+  <link href="{{ asset('css/print.css') }}" rel="stylesheet">
  </head> 
 <?php switch ($size) {
     case 'big':
@@ -30,7 +31,7 @@
     case 'small':
 ?>
 <body>
-    <div style="width:100%;height:29mm;margin-bottom:2px;">
+    <div style="width:100%;height:25mm;margin-bottom:2px;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td align="center" valign="middle">
@@ -100,7 +101,7 @@
         </div>
     </body> -->
     <body>
-    <div style="width:100%;height:29mm;margin-bottom:2px;">
+    <div style="width:100%;height:20mm;margin-bottom:5px;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td align="center" valign="middle">

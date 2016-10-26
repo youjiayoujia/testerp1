@@ -1,5 +1,6 @@
 <html>
  <head>
+    <link href="{{ asset('css/print.css') }}" rel="stylesheet">
   <title>打印SKU条码</title> 
  </head> 
 <?php switch ($size) {

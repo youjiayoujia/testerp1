@@ -1025,7 +1025,7 @@ class PackageController extends Controller
             return json_encode('error');
         }
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_decode(serialize($package));
+        $from = base64_encode(serialize($package));
         if($weight == '0') {
             $package->update([
                 'shipped_at' => date('Y-m-d h:i:s', time()),
@@ -1047,6 +1047,7 @@ class PackageController extends Controller
                 $buf = 0;
             }
         }
+
         if($buf) {
             foreach($package->items as $packageItem) {
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
@@ -1055,7 +1056,8 @@ class PackageController extends Controller
         } else {
             $order->update(['status' => 'PARTIAL']);
         }
-        $to = base64_decode(serialize($package));
+
+        $to = base64_encode(serialize($package));
         $this->eventLog($name, '发货', $to, $from);
         if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');

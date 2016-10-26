@@ -369,6 +369,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::any('item/uploadSku', ['uses' => 'ItemController@uploadSku', 'as' => 'item.uploadSku']);
     Route::any('item/batchDelete', ['uses' => 'ItemController@batchDelete', 'as' => 'item.batchDelete']);
+    Route::any('item/batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
+    Route::any('item/batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');
@@ -543,8 +545,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //订单管理路由
     Route::get('order/createVirtualPackage', ['uses' => 'OrderController@createVirtualPackage', 'as' => 'order.createVirtualPackage']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
-    Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
-    Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
+    
     Route::get('order/ajaxCountry', ['uses' => 'OrderController@ajaxCountry', 'as' => 'order.ajaxCountry']);
     Route::get('order/ajaxSku', ['uses' => 'OrderController@ajaxSku', 'as' => 'order.ajaxSku']);
     Route::get('orderStatistics', ['uses' => 'OrderController@orderStatistics', 'as' => 'orderStatistics']);

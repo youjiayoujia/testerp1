@@ -161,6 +161,9 @@ class ItemController extends Controller
     {
         $data = request()->all();
         $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
+        if(count($skuModel)==0){
+            return json_encode('no sku');
+        }
         if($data['type']='edit'){
             $skuModel->update($data);
             foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
@@ -182,6 +185,7 @@ class ItemController extends Controller
             }
             $skuModel->product->wrapLimit()->attach($arr);
         }
+        return json_encode('success');
 
     }
 

@@ -16,7 +16,7 @@
          {{$model->c_name}}
         </div> 
         <div>
-            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '0.75' ])}}">
+            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'38' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '0.7' ])}}">
         </div>
         <span style="font-size:10px;">
             {{date('m-d',time())}}[{{$model->warehousePosition?$model->warehousePosition->name:''}}][PO:{{$po_id}}]

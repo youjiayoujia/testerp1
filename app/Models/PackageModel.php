@@ -778,7 +778,7 @@ class PackageModel extends BaseModel
     public function canAssignLogistics()
     {
         //判断订单状态
-        if ($this->status != 'WAITASSIGN') {
+        if (!in_array($this->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
             return false;
         }
 

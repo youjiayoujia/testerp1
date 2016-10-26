@@ -45,6 +45,7 @@
                     </button>
                     <h4 class="modal-title" id="myModalLabel">
                        品类选择
+                       <input type='checkbox' class='catalog_all'>全选
                     </h4>
                 </div>
                 <div class="panel panel-default">
@@ -52,7 +53,7 @@
                         <div class='form-group row'>
                         @foreach($catalogs_outer as $catalog)
                             <div class='col-lg-4'>
-                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}" {{ $model->innerType('catalog', $catalog->id) ? 'checked' : ''}}><font size='2px'>{{ $catalog->name }}</font>
+                                <input type='checkbox' class='catalog' name='catalogs[]' value="{{ $catalog->id }}" {{ $model->innerType('catalog', $catalog->id) ? 'checked' : ''}}><font size='2px'>{{ $catalog->c_name }}</font>
                             </div>
                         @endforeach
                         </div>
@@ -339,6 +340,14 @@
                 $('.account_button').prop('disabled', false);
             } else {
                 $('.account_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.catalog_all', function(){
+            if($(this).prop('checked') == true) {
+                $('.catalog').prop('checked', true);
+            } else {
+                $('.catalog').prop('checked', false);
             }
         });
 

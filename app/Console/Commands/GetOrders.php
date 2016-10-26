@@ -54,6 +54,7 @@ class GetOrders extends Command
                 $endDate = date("Y-m-d H:i:s", time() - 300);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $nextToken = '';
+
                 do {
                     $start = microtime(true);
                     $total = 0;

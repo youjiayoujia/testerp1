@@ -1,12 +1,13 @@
 <html>
  <head>
+    <link href="{{ asset('css/print.css') }}" rel="stylesheet">
   <title>打印SKU条码</title> 
  </head> 
 <?php switch ($size) {
     case 'big':
 ?>
 <body>
-  <div style="width:100%;height:25mm;margin-bottom:2px;">
+  <div style="width:100%;height:24mm;margin-bottom:2px;">
    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0"> 
     <tbody>
      <tr> 
@@ -28,7 +29,7 @@
     case 'small':
 ?>
 <body onLoad="printpage_zzjs()">
-    <div style="width:100%;height:29mm;margin-bottom:2px;">
+    <div style="width:100%;height:24mm;margin-bottom:2px;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td align="center" valign="middle">

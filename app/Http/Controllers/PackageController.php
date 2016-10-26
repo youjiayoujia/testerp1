@@ -282,6 +282,18 @@ class PackageController extends Controller
         return view($this->viewPath . 'flow', $response);
     }
 
+    public function autoFailAssignLogistics()
+    {
+        $packages = $this->model->where('status', 'ASSIGNFAILED')->get();
+        foreach($packages as $package) {
+            $job = new AssignLogistics($package);
+            $job = $job->onQueue('assignLogistics');
+            $this->dispatch($job);
+        }
+
+        return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count().'个包裹放入队列'));
+    }
+
     public function allocateLogistics($id)
     {
         $response = [

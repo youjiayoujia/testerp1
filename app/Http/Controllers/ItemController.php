@@ -88,6 +88,7 @@ class ItemController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateItem($data);
@@ -160,27 +161,31 @@ class ItemController extends Controller
     {
         $data = request()->all();
         $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
+        if(count($skuModel)==0){
+            return json_encode('no sku');
+        }
         if($data['type']='edit'){
             $skuModel->update($data);
-            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
+            foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
                 $brr[] = $logistics_limits_id;         
             }
             $skuModel->product->logisticsLimit()->sync($brr);
-            foreach($data['package_limit_arr'] as $wrap_limits_id){
+            foreach(unserialize($data['package_limit_arr']) as $wrap_limits_id){
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->sync($arr);
         }else{
             $skuModel->create($data);
-            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
+            foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
                 $brr[] = $logistics_limits_id;         
             }
             $skuModel->product->logisticsLimit()->attach($brr);
-            foreach($data['package_limit_arr'] as $wrap_limits_id){
+            foreach(unserialize($data['package_limit_arr']) as $wrap_limits_id){
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->attach($arr);
         }
+        return json_encode('success');
 
     }
 
@@ -428,8 +433,9 @@ class ItemController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit')),
+            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit'),$field = ['*'],$pageSize='10'),
             'mixedSearchFields' => $this->model->mixed_search,
+
             'Compute_channels' => ChannelModel::all(),
 
         ];

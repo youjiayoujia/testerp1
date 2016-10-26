@@ -560,10 +560,10 @@ class OrderModel extends BaseModel
             $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
         }
         //黑名单需审核
-        if ($order->status != 'UNPAID' && $order->checkBlack()) {
-            $order->update(['status' => 'REVIEW']);
-            $order->remark('黑名单订单.');
-        }
+//        if ($order->status != 'UNPAID' && $order->checkBlack()) {
+//            $order->update(['status' => 'REVIEW']);
+//            $order->remark('黑名单订单.');
+//        }
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }

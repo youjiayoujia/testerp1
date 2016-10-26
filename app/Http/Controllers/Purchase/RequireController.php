@@ -81,7 +81,9 @@ class RequireController extends Controller
 				continue;	
 			}
 			$data['type']=0;
-			$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
+			//$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
+			//测试专用仓库
+			$data['warehouse_id']=3;
 			$data['sku']=$v->sku;
 			$data['item_id']=$v->id;
 			$data['purchase_cost']=$sumtrend->item->purchase_price;
@@ -114,7 +116,9 @@ class RequireController extends Controller
 		
 		if(isset($warehouse_supplier)){
 			foreach($warehouse_supplier as $key=>$v){
-				$data['warehouse_id']=$v['warehouse_id'] ? $v['warehouse_id'] : 0;		 
+				//$data['warehouse_id']=$v['warehouse_id'] ? $v['warehouse_id'] : 0;
+				//测试专用仓库
+				$data['warehouse_id']=3;		 
 				$data['supplier_id']=$v['supplier_id'] ? $v['supplier_id'] : 0;
 				$supplier=SupplierModel::find($v['supplier_id']);
 				$data['assigner']=$supplier->purchase_id ? $supplier->purchase_id : 0;

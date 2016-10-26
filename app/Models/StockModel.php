@@ -351,27 +351,25 @@ class StockModel extends BaseModel
         }
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
+        $i = 1;
         foreach ($arr as $key => $stock) {
             $stock['position'] = iconv('gb2312', 'utf-8', $stock['position']);
             if (!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
-                $error[] = $key;
+                $error[$i]['key'] = $key;
+                $error[$i]['remark'] = '库位不存在';
+                $i++;
                 continue;
             }
+            if($stock['sku'])
             $stock['sku'] = iconv('gb2312', 'utf-8', $stock['sku']);
             $tmp_position = PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->first();
             if (!ItemModel::where(['sku' => $stock['sku']])->count()) {
-                $error[] = $key;
+                $error[$i]['key'] = $key;
+                $error[$i]['remark'] = 'Item不存在';
+                $i++;
                 continue;
             }
             $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
-            if (StockModel::where([
-                'item_id' => $tmp_item->id,
-                'warehouse_position_id' => $tmp_position->id
-            ])->count()
-            ) {
-                $error[] = $key;
-                continue;
-            }
             DB::beginTransaction();
             try {
             $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $tmp_item->purchase_price,
@@ -381,6 +379,7 @@ class StockModel extends BaseModel
                 $error[] = $key;
             }
             DB::commit();
+            $i++;
         }
 
         return $error;

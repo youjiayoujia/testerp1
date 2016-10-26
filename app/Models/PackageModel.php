@@ -778,7 +778,7 @@ class PackageModel extends BaseModel
     public function canAssignLogistics()
     {
         //判断订单状态
-        if ($this->status != 'WAITASSIGN') {
+        if (!in_array($this->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
             return false;
         }
 
@@ -987,7 +987,6 @@ class PackageModel extends BaseModel
                             continue 2;
                         }
                     }
-                    
                 }
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {
@@ -1057,6 +1056,7 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
+
                 //查看对应的物流方式是否是所属仓库
                 $warehouse = WarehouseModel::find($this->warehouse_id);
                 if (!$warehouse->logisticsIn($rule->type_id)) {

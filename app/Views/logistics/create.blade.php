@@ -60,7 +60,7 @@
         </div>
         <div class="form-group col-lg-2">
             <label for="logistics_email_template_id" class="control-label">回邮模版</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            
             <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
                 <option value="0">==选择回邮模版==</option>
                 @foreach($emailTemplates as $emailTemplate)

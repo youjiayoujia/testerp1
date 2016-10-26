@@ -987,7 +987,6 @@ class PackageModel extends BaseModel
                             continue 2;
                         }
                     }
-                    
                 }
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {
@@ -1057,6 +1056,7 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
+
                 //查看对应的物流方式是否是所属仓库
                 $warehouse = WarehouseModel::find($this->warehouse_id);
                 if (!$warehouse->logisticsIn($rule->type_id)) {

@@ -928,7 +928,7 @@ class PackageModel extends BaseModel
                 $limits = $rule->rule_limits_through;
                 foreach ($limits as $limit) {
                     if (in_array($limit->id, $shipping_limits)) {
-                        if ($limit->pivot->type == '2') {
+                        if ($limit->pivot->type == '1') {
                             continue 2;
                         }
                     }
@@ -1051,7 +1051,7 @@ class PackageModel extends BaseModel
                     $limits = $rule->rule_limits_through;
                     foreach ($limits as $limit) {
                         if (in_array($limit->id, $shipping_limits)) {
-                            if ($limit->pivot->type == '3') {
+                            if ($limit->pivot->type == '1') {
                                 continue 2;
                             }
                         }

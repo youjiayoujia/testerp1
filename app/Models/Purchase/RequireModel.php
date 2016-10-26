@@ -166,7 +166,12 @@ class RequireModel extends BaseModel
             $itemModel = $purchases->item;
             $data['type']=0;
             //v3测试专用
-            $data['warehouse_id']=3;
+            if($v['warehouse_id']==1){
+                $data['warehouse_id']=3;
+            }
+            if($v['warehouse_id']==2){
+                $data['warehouse_id']=4;
+            }
             //$data['warehouse_id']=$itemModel->warehouse_id ? $itemModel->warehouse_id : 0;
             $data['sku']=$itemModel->sku;
             $data['item_id']=$itemModel->id;
@@ -203,7 +208,12 @@ class RequireModel extends BaseModel
         if(isset($warehouse_supplier)){
             foreach($warehouse_supplier as $key=>$v){
                 //v3测试专用仓库
-                $data['warehouse_id']=3;
+                if($v['warehouse_id']==1){
+                    $data['warehouse_id']=3;
+                }
+                if($v['warehouse_id']==2){
+                    $data['warehouse_id']=4;
+                }
                 //$data['warehouse_id']=$v['warehouse_id'] ? $v['warehouse_id'] : 0;       
                 $data['supplier_id']=$v['supplier_id'] ? $v['supplier_id'] : 0;
                 $supplier=SupplierModel::find($v['supplier_id']);

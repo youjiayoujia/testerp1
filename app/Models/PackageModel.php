@@ -750,9 +750,11 @@ class PackageModel extends BaseModel
     {
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
-            $packageLimit = $packageItem->item->product->carriage_limit;
-            if ($packageLimit) {
-                $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            $all = $packageItem->item->product->logisticsLimit;
+            foreach($all as $key => $packageLimit) {
+                if ($packageLimit) {
+                    $packageLimits = $packageLimits->merge(explode(",", $packageLimit->logistics_limits_id));
+                }
             }
         }
 
@@ -926,7 +928,7 @@ class PackageModel extends BaseModel
                 $limits = $rule->rule_limits_through;
                 foreach ($limits as $limit) {
                     if (in_array($limit->id, $shipping_limits)) {
-                        if ($limit->pivot->type == '3') {
+                        if ($limit->pivot->type == '2') {
                             continue 2;
                         }
                     }

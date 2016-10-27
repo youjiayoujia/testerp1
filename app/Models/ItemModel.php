@@ -824,16 +824,17 @@ class ItemModel extends BaseModel
     public function updateOldData()
     {
         set_time_limit(0);
-        $model = $this->where('sku','CA1205W')->get();
+        $model = $this->all();
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select pack_method,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder 
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
             
+            $arr = [];
             if($erp_products_data[0]->pack_method){
                 $arr[] = $erp_products_data[0]->pack_method;
                 $itemModel->product->wrapLimit()->sync($arr);
             }
-            $brr = [];
+           /* $brr = [];
             if($erp_products_data[0]->products_with_battery){
                 $brr[] = 1;
             }
@@ -846,7 +847,7 @@ class ItemModel extends BaseModel
             if($erp_products_data[0]->products_with_powder){
                 $brr[] = 2;
             }
-            $itemModel->product->logisticsLimit()->sync($brr);
+            $itemModel->product->logisticsLimit()->sync($brr);*/
         }
     }
     

@@ -1028,6 +1028,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
     Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
     Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
+    Route::get('spu/spuTemp', ['uses' => 'SpuController@spuTemp', 'as' => 'spuTemp']);
     Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
     //上传产品信息表格
     Route::get('spu/insertData', ['uses' => 'SpuController@insertData', 'as' => 'insertData']);

@@ -155,7 +155,7 @@ class ItemController extends Controller
         curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
         $buf = curl_exec($c);*/
 
-        $sync = new SyncApiModels;
+        $sync = new SyncApiModel;
         $sync->relations_id = $model->id;
         $sync->type = 'product';
         $sync->url  = 'http://120.24.100.157:60/api/products.php';

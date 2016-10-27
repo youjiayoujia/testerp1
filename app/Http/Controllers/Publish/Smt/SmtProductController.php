@@ -1065,16 +1065,17 @@ class SmtProductController extends Controller
         {                           
             $result = $channel->getOnlineProduct($type,1,100,$groupId); 
             if (array_key_exists('success', $result) && $result['success']) {
-                    $totalPage = $result['totalPage'];
-                    $this->_handleProductList($account,$result);
-    
-                    if($totalPage > 1){
-                        for ($i=2; $i <= $totalPage; $i++) {
-                            $product_list =  $channel->getOnlineProduct( $type, $i, 100,$groupId);
-                            $product_list['productStatusType'] = $type;
-                            $this->_handleProductList($account,$product_list);
-                        }
+                $totalPage = $result['totalPage'];
+                $result['productStatusType'] = $type;
+                $this->_handleProductList($account,$result);
+                
+                if($totalPage > 1){
+                    for ($i=2; $i <= $totalPage; $i++) {
+                        $product_list =  $channel->getOnlineProduct( $type, $i, 100,$groupId);
+                        $product_list['productStatusType'] = $type;
+                        $this->_handleProductList($account,$product_list);
                     }
+                }
              }else {
                     $this->ajax_return('同步失败!'.$result['error_code'] . ':' . $result['error_message']);                  
              }
@@ -1090,13 +1091,15 @@ class SmtProductController extends Controller
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         if (array_key_exists('aeopAEProductDisplayDTOList', $productList) && $productList['aeopAEProductDisplayDTOList']) {
             foreach ($productList['aeopAEProductDisplayDTOList'] as $productItem) {
+                $user_id = $channel->_operator_id;
                 $productInfo = $channel->findAeProductById($productItem['productId']);
                 $product['productId'] = $productItem['productId'];
+                $product['user_id'] = $user_id;
                 $product['product_url'] = 'http://www.aliexpress.com/item/-/' . $productItem['productId'] . '.html';
                 $product['token_id'] = $account->id;
                 $product['subject'] = array_key_exists('subject', $productInfo) ? $productInfo['subject'] : '';
                 $product['productPrice'] = array_key_exists('productPrice', $productInfo) ? $productInfo['productPrice'] : '';
-                $product['productStatusType'] = $productInfo['productStatusType'];
+                $product['productStatusType'] = $productList['productStatusType'];
                 $product['ownerMemberId'] = $productInfo['ownerMemberId'];
                 $product['ownerMemberSeq'] = $productInfo['ownerMemberSeq'];
                 $product['wsDisplay'] = array_key_exists('wsDisplay', $productInfo) ? $productInfo['wsDisplay'] : '';
@@ -1115,7 +1118,7 @@ class SmtProductController extends Controller
     
                 $res = smtProductList::where('productId', $productItem['productId'])->first();
                
-                $oldUserId = $res ? $res->user_id : 0;
+                /*$oldUserId = $res ? $res->user_id : 0;
                 if(!$oldUserId){
                     $tempSKU =($productInfo['aeopAeProductSKUs'][0]);
                     $user_id = '';
@@ -1128,8 +1131,24 @@ class SmtProductController extends Controller
                         }
                     }
                     $product['user_id'] = $user_id;
-                }             
-              
+                }*/
+                if(isset($productInfo['aeopAeProductSKUs'][0]) && $product['gmtCreate'] > '2014-09-01'){
+                    $oldUserId = $res ? $res->user_id : 0;
+                    if($res && $oldUserId > 0){ //listing已经存在，且负责人也已经存在，就不再变更负责人了
+                        unset($product['user_id']);
+                    }else{
+                        $product['user_id'] = '0';
+                        $tempSKU =($productInfo['aeopAeProductSKUs'][0]);
+                        //获取销售前缀
+                        $sale_prefix = $smtProductsObj->get_skucode_prefix($tempSKU['skuCode']);
+                        if ($sale_prefix) {
+                            $userInfo = smtUserSaleCode::where('sale_code', $sale_prefix)->first();
+                            if ($userInfo) {
+                                $product['user_id'] = $userInfo->user_id;
+                            }
+                        }
+                    }
+                }
     
                 $productDetail['productId'] = $productItem['productId'];
                 $productDetail['aeopAeProductPropertys'] = array_key_exists('aeopAeProductPropertys', $productInfo) ? serialize($productInfo['aeopAeProductPropertys']) : '';

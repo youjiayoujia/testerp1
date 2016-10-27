@@ -6,14 +6,14 @@ use Illuminate\Console\Command;
 use App\Models\SyncApiModels;
 use Tool;
 
-class syncSellmoreSuppliers extends Command
+class SyncSellmoreApi extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'syncSellmoreData:suppliers';
+    protected $signature = 'SyncSellmoreApi:all';
 
     /**
      * The console command description.
@@ -39,8 +39,7 @@ class syncSellmoreSuppliers extends Command
      */
     public function handle()
     {
-
-        $datas = SyncApiModels::where('type','supplier')->get();
+        $datas = SyncApiModels::where('status',0)->get(); //获取未同步记录
         if(!$datas->isEmpty()){
             foreach ($datas as $data){
                 $result = Tool::postCurlHttpsData($data->url,unserialize($data->data));
@@ -48,11 +47,11 @@ class syncSellmoreSuppliers extends Command
                 if($res_ary['status'] == 'success'){
                     $data->status = 1;
                     $data->save();
-                    $this->info('#'.$data->relations_id.'has sync to sellmore databsae');
+                    $this->info('#'.$data->relations_id.'has to sync sellmore databsae');
                 }else{
                     $data->times = $data->times +1;
                     $data->save();
-                    $this->comment('#'.$data->relations_id.'has not sync to sellmore database');
+                    $this->comment('#'.$data->relations_id.'has not to sync sellmore database');
                 }
             }
         }

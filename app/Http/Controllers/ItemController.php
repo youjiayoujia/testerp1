@@ -22,7 +22,7 @@ use App\Models\Warehouse\PositionModel;
 use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
-use App\Models\SyncApiModels;
+use App\Models\SyncApiModel;
 
 class ItemController extends Controller
 {

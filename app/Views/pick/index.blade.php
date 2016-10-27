@@ -10,6 +10,7 @@
     <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class='sort' data-field='id'>ID</th>
     <th>拣货单号</th>
+    <th>仓库</th>
     <th>类型</th>
     <th>物流</th>
     <th>未包装(包裹数)</th>
@@ -26,10 +27,11 @@
             <td><input type='checkbox' name='single[]' class='single'></td>
             <td>{{ $pickList->id }}</td>
             <td>{{ $pickList->picknum }}</td>
+            <td>{{ $pickList->warehouse ? $pickList->warehouse->name : '仓库信息有误'}}</td>
             <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
             <td>{{ $pickList->logistic ? $pickList->logistic->name : '混合物流'}}</td>
-            <td>{{ $pickList->package->where('status', 'PICKING')->count() }}</td>
-            <td>{{ $pickList->package->where('status', 'PACKED')->count() }}</td>
+            <td>{{ $pickList->package()->whereIn('status', ['PICKING', 'ERROR'])->count() }}</td>
+            <td>{{ $pickList->package()->whereIn('status', ['PACKED', 'SHIPPED'])->count() }}</td>
             <td>{{ $pickList->status_name }}</td>
             <td>{{ $pickList->pickByName ? $pickList->pickByName->name : ''}}</td>
             <td>{{ $pickList->pick_at }}</td>

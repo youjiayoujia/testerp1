@@ -234,7 +234,7 @@ class PickListController extends Controller
     public function indexPrintPickList($content)
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__,'包装'),
             'content' => $content,
         ];
 

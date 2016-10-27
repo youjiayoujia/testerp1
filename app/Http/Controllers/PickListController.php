@@ -527,6 +527,11 @@ class PickListController extends Controller
                 }
             }
             if($flag == 1) {
+                $order = $package->order;
+                if($order->status == 'REVIEW') {
+                    $package->update(['status' => 'ERROR']);
+                    return json_encode(false);
+                }
                 $package->status = 'PACKED';
                 $package->save();
                 $picklistItems = $package->picklistItems;
@@ -534,7 +539,6 @@ class PickListController extends Controller
                     $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
                     $picklistItem->save();
                 }
-                $order = $package->order;
                 $buf = 1;
                 foreach($order->packages as $childPackage) {
                     if($childPackage->status != 'PACKED') {

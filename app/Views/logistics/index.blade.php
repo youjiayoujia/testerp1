@@ -50,18 +50,18 @@
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
                 @if($logistics->docking == 'CODE')
-                    <a href="{{ route('logisticsCode.one', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 追踪号
+                    <a href="{{ route('logisticsCode.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-import"></span> 号码池
                     </a>
                 @endif
-                <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 分区报价
+                <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
+                    <span class="glyphicon glyphicon-usd"></span> 分区报价
                 </a>
-                <button class="btn btn-primary btn-xs dialog"
+                <a class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
                         data-target="#dialog" data-table="{{ $logistics->table }}" data-id="{{$logistics->id}}">
-                    <span class="glyphicon glyphicon-road"></span>
-                </button>
+                    <span class="glyphicon glyphicon-road"></span> 日志
+                </a>
             </td>
         </tr>
     @endforeach

@@ -66,6 +66,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomToshipping::class,
         \App\Console\Commands\SetJoomShelves::class,
         \App\Console\Commands\NotWarehouseInSendEmail::class,
+        \App\Console\Commands\syncSellmoreSuppliers::class,
     ];
 
     /**
@@ -133,5 +134,7 @@ class Kernel extends ConsoleKernel
         //采购
         $schedule->command('aliShipmentName:get')->hourly();
         $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
+        //API同步sellmore database
+        $schedule->command('syncSellmoreData:suppliers')->everyFiveMinutes();
     }
 }

@@ -797,5 +797,33 @@ class ItemModel extends BaseModel
         }
     }
 
+    public function updateOldData()
+    {
+        set_time_limit(0);
+        $model = $this->where('sku','CA1205W')->get();
+        foreach ($model as $key => $itemModel) {
+            $erp_products_data = DB::select('select pack_method,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder 
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            
+            if($erp_products_data[0]->pack_method){
+                $arr[] = $erp_products_data[0]->pack_method;
+                $itemModel->product->wrapLimit()->sync($arr);
+            }
+            $brr = [];
+            if($erp_products_data[0]->products_with_battery){
+                $brr[] = 1;
+            }
+            if($erp_products_data[0]->products_with_adapter){
+                $brr[] = 4;
+            }
+            if($erp_products_data[0]->products_with_fluid){
+                $brr[] = 5;
+            }
+            if($erp_products_data[0]->products_with_powder){
+                $brr[] = 2;
+            }
+            $itemModel->product->logisticsLimit()->sync($brr);
+        }
+    }
     
 }

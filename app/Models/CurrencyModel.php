@@ -40,4 +40,11 @@ class CurrencyModel extends BaseModel
         
         return false;
     }
+
+    public function getUsdToParamRate($param){
+        if(!empty($param)){
+           $currency =  1 / $this->where('code',$param)->first();
+            return $currency->rate;
+        }
+    }
 }

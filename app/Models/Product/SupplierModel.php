@@ -4,6 +4,7 @@ namespace App\Models\product;
 
 use App\Base\BaseModel;
 use Tool;
+use App\Models\SyncApiModels;
 
 class SupplierModel extends BaseModel
 {
@@ -159,7 +160,16 @@ class SupplierModel extends BaseModel
             $post['suppliers_qq']           = $create->qq;
 
             !empty($data['qualifications']) ? $post['attachment_url'] = request()->server()['HTTP_HOST'].'/'.$path . $data['qualifications'] : '';
-            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
+
+            $sync = new SyncApiModels;
+            $sync->relations_id = $post['suppliers_id'];
+            $sync->type = 'supplier';
+            $sync->url  = config('product.sellmore.api_url');
+            $sync->data = serialize($post);
+            $sync->status = 0;
+            $sync->times = 0;
+            $sync->save();
+           // $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
         }
         return $create;
     }
@@ -215,7 +225,17 @@ class SupplierModel extends BaseModel
             $post['suppliers_qq']           = $suplier->qq;
 
             !empty($suplier->qualifications) ? $post['attachment_url'] = request()->server()['HTTP_HOST'].'/'.$path . $suplier->qualifications : '';
-            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
+
+            $sync = new SyncApiModels;
+            $sync->relations_id = $post['suppliers_id'];
+            $sync->type = 'supplier';
+            $sync->url  = config('product.sellmore.api_url');
+            $sync->data = serialize($post);
+            $sync->status = 0;
+            $sync->times = 0;
+            $sync->save();
+
+            //$result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
         }
         return $res;
     }

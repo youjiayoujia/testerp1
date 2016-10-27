@@ -110,6 +110,7 @@ class ItemController extends Controller
             if(in_array('2', $data['carriage_limit_arr']))$data['products_with_powder'] = 1;
         }
 
+        $arr = [];
         if(array_key_exists('package_limit_arr', $data)){
             foreach($data['package_limit_arr'] as $wrap_limits_id){
                 $arr[] = $wrap_limits_id;         

@@ -67,9 +67,10 @@ class ZoneController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
+        $logistics_id = request('logistics_id');
         $this->model->createData(request()->all());
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex . '/one/' . $logistics_id);
     }
 
     /**
@@ -155,13 +156,15 @@ class ZoneController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $logistics_id = $model->logistics_id;
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateData(request()->all());
-        return redirect($this->mainIndex);
+
+        return redirect($this->mainIndex . '/one/' . $logistics_id);
     }
 
     /**

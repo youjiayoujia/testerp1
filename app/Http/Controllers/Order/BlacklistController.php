@@ -103,13 +103,14 @@ class BlacklistController extends Controller
                     $data['ordernum'] = $obj->ordernum;
                     $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
                     $data['email'] = $obj->email;
+                    $data['by_id'] = $obj->by_id;
                     $data['zipcode'] = $obj->shipping_zipcode;
+                    $data['channel_account'] = $obj->channelAccount->account;
                     $data['type'] = 'SUSPECTED';
                     $data['remark'] = NULL;
                     $data['total_order'] = count($order);
                     $data['refund_order'] = $count;
                     $data['refund_rate'] = round(($count / count($order)) * 100) . '%';
-                    $data['color'] = 'orange';
                     $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])
                         ->where('name', $data['name'])
                         ->where('channel_id', $channel_id)
@@ -150,13 +151,14 @@ class BlacklistController extends Controller
                         $data['ordernum'] = $obj->ordernum;
                         $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
                         $data['email'] = $obj->email;
+                        $data['by_id'] = $obj->by_id;
                         $data['zipcode'] = $obj->shipping_zipcode;
+                        $data['channel_account'] = $obj->channelAccount->account;
                         $data['type'] = 'SUSPECTED';
                         $data['remark'] = NULL;
                         $data['total_order'] = count($order2);
                         $data['refund_order'] = $count2;
                         $data['refund_rate'] = round(($count2 / count($order2)) * 100) . '%';
-                        $data['color'] = 'green';
                         $blacklist = BlacklistModel::where('email', $data['email'])->where('channel_id', $channel2)->count();
                         if($blacklist <= 0) {
                             $this->model->create($data);
@@ -271,7 +273,9 @@ class BlacklistController extends Controller
                 'ordernum' => '17905581340',
                 'name' => 'Thai Diane',
                 'email' => 'hannawysz@gmail.com',
+                'by_id' => '67718287515120',
                 'zipcode' => '210000',
+                'channel_account' => 'alimoonar@gmail.com',
                 'type' => 'SUSPECTED',
                 'remark' => '',
                 'refund_order' => '1',

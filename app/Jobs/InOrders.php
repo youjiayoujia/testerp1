@@ -63,10 +63,10 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $this->order['id'] = $oldOrder->id;
                 $order = $orderModel->updateOrder($this->order, $oldOrder);
                 if ($order) {
-                    if ($order->checkBlack()) {
-                        $order->update(['status' => 'REVIEW']);
-                        $order->remark('黑名单订单.');
-                    }
+//                    if ($order->checkBlack()) {
+//                        $order->update(['status' => 'REVIEW']);
+//                        $order->remark('黑名单订单.');
+//                    }
                     if ($order->status == 'PAID') {
                         $order->update(['status' => 'PREPARED']);
                     }

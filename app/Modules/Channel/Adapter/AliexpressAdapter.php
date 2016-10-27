@@ -55,6 +55,7 @@ Class AliexpressAdapter implements AdapterInterface
      */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
+
         if (empty($nextToken)) {
             $nextToken = 1;
         }
@@ -64,7 +65,9 @@ Class AliexpressAdapter implements AdapterInterface
             strtotime($startDate));
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
+
         $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
+        
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
         $orderList = json_decode($orderjson, true);
         unset($orderjson);
@@ -200,8 +203,6 @@ Class AliexpressAdapter implements AdapterInterface
      */
     public function parseOrder($list, $orderDetail)
     {
-
-
         $orderInfo = array();
         $productInfo = array();
 
@@ -226,14 +227,14 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];
         $orderInfo['customer_remark'] = $order_remark ? addslashes(implode('<br />', $order_remark)) : ''; //订单备注
-        $orderInfo['shipping_firstname'] =  $orderDetail ["receiptAddress"]["contactPerson"];
+        $orderInfo['shipping_firstname'] =  isset($orderDetail ["receiptAddress"]["contactPerson"])?$orderDetail ["receiptAddress"]["contactPerson"]:'';
         $orderInfo['shipping_lastname'] = '';
-        $orderInfo['shipping_address'] = $orderDetail ["receiptAddress"] ["detailAddress"];
+        $orderInfo['shipping_address'] = isset($orderDetail ["receiptAddress"] ["detailAddress"])?$orderDetail ["receiptAddress"] ["detailAddress"]:'';
         $orderInfo['shipping_address1'] = isset($orderDetail ["receiptAddress"] ["address2"]) ? $orderDetail ["receiptAddress"] ["address2"] : '';
-        $orderInfo['shipping_city'] = $orderDetail ["receiptAddress"]["city"];
-        $orderInfo['shipping_state'] = $orderDetail ["receiptAddress"] ["province"];
-        $orderInfo['shipping_country'] = $orderDetail ["receiptAddress"] ["country"];
-        $orderInfo['shipping_zipcode'] = $orderDetail ["receiptAddress"] ["zip"];
+        $orderInfo['shipping_city'] = isset($orderDetail ["receiptAddress"]["city"])?$orderDetail ["receiptAddress"]["city"]:'';
+        $orderInfo['shipping_state'] = isset($orderDetail ["receiptAddress"] ["province"])?$orderDetail ["receiptAddress"] ["province"]:'';
+        $orderInfo['shipping_country'] = isset($orderDetail ["receiptAddress"] ["country"])?$orderDetail ["receiptAddress"] ["country"]:'';
+        $orderInfo['shipping_zipcode'] = isset($orderDetail ["receiptAddress"] ["zip"])?$orderDetail ["receiptAddress"] ["zip"]:'';
         $orderInfo['status'] = 'PAID';
         $leftSendGoodDay = isset($list["leftSendGoodDay"])?(int)$list["leftSendGoodDay"]:0;
         $leftSendGoodHour = isset($list["leftSendGoodHour"])?(int)$list["leftSendGoodHour"]:0;

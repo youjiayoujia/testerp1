@@ -25,7 +25,9 @@ class BlacklistModel extends BaseModel
         'ordernum',
         'name',
         'email',
+        'by_id',
         'zipcode',
+        'channel_account',
         'type',
         'remark',
         'total_order',
@@ -103,7 +105,9 @@ class BlacklistModel extends BaseModel
                 'ordernum' => $model->ordernum,
                 'name' => $model->name,
                 'email' => $model->email,
+                'by_id' => $model->by_id,
                 'zipcode' => $model->zipcode,
+                'channel_account' => $model->channel_account,
                 'type' => $model->type,
                 'remark' => $model->remark,
                 'total_order' => $model->total_order,
@@ -125,7 +129,9 @@ class BlacklistModel extends BaseModel
                 'ordernum' => $model->ordernum,
                 'name' => $model->name,
                 'email' => $model->email,
+                'by_id' => $model->by_id,
                 'zipcode' => $model->zipcode,
+                'channel_account' => $model->channel_account,
                 'type' => $model->type_name,
                 'remark' => $model->remark,
                 'total_order' => $model->total_order,
@@ -171,13 +177,14 @@ class BlacklistModel extends BaseModel
             $blacklist['ordernum'] = iconv('gb2312','utf-8',$blacklist['ordernum']);
             $blacklist['name'] = iconv('gb2312','utf-8',$blacklist['name']);
             $blacklist['email'] = iconv('gb2312','utf-8',$blacklist['email']);
+            $blacklist['by_id'] = iconv('gb2312','utf-8',$blacklist['by_id']);
             $blacklist['zipcode'] = iconv('gb2312','utf-8',$blacklist['zipcode']);
+            $blacklist['channel_account'] = iconv('gb2312','utf-8',$blacklist['channel_account']);
             $blacklist['type'] = iconv('gb2312','utf-8',$blacklist['type']);
             $blacklist['remark'] = iconv('gb2312','utf-8',$blacklist['remark']);
             $blacklist['total_order'] = iconv('gb2312','utf-8',$blacklist['total_order']);
             $blacklist['refund_order'] = iconv('gb2312','utf-8',$blacklist['refund_order']);
             $blacklist['refund_rate'] = iconv('gb2312','utf-8',$blacklist['refund_rate']);
-            $blacklist['color'] = iconv('gb2312','utf-8','white');
             $channel = ChannelModel::where('id', $blacklist['channel_id'])->count();
             if($channel > 0) {
                 $this->create($blacklist);

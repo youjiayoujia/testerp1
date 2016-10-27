@@ -19,6 +19,7 @@ Route::get('test1', 'TestController@testYw');
 Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
 Route::post('api/curlApiChangeWarehousePositon', ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
+Route::any('api/skuHandleApi', ['uses' => 'ItemController@skuHandleApi', 'as' => 'item.skuHandleApi']);
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -368,6 +369,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::any('item/uploadSku', ['uses' => 'ItemController@uploadSku', 'as' => 'item.uploadSku']);
     Route::any('item/batchDelete', ['uses' => 'ItemController@batchDelete', 'as' => 'item.batchDelete']);
+    Route::any('item/batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
+    Route::any('item/batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');
@@ -543,8 +546,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //订单管理路由
     Route::get('order/createVirtualPackage', ['uses' => 'OrderController@createVirtualPackage', 'as' => 'order.createVirtualPackage']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
-    Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
-    Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
+    
     Route::get('order/ajaxCountry', ['uses' => 'OrderController@ajaxCountry', 'as' => 'order.ajaxCountry']);
     Route::get('order/ajaxSku', ['uses' => 'OrderController@ajaxSku', 'as' => 'order.ajaxSku']);
     Route::get('orderStatistics', ['uses' => 'OrderController@orderStatistics', 'as' => 'orderStatistics']);
@@ -593,6 +595,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/autoFailAssignLogistics',
+        ['uses' => 'PackageController@autoFailAssignLogistics', 'as' => 'package.autoFailAssignLogistics']);
     Route::get('package/bagInfo',
         ['uses' => 'PackageController@bagInfo', 'as' => 'package.bagInfo']);
     Route::get('package/packageReport',
@@ -1024,6 +1028,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
     Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
     Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
+    Route::get('spu/spuTemp', ['uses' => 'SpuController@spuTemp', 'as' => 'spuTemp']);
     Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
     //上传产品信息表格
     Route::get('spu/insertData', ['uses' => 'SpuController@insertData', 'as' => 'insertData']);

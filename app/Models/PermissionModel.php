@@ -22,13 +22,13 @@ class PermissionModel extends BaseModel
             
         ]
     ];
-    public $searchFields = ['name', 'id'];
+    public $searchFields = ['action_name'=>'角色名', 'id'=>'id'];
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['id', 'action_name','route','controller_name'];
+    protected $fillable = ['id', 'action_name','route','controller_name','parent_id'];
 
     public function role()
     {

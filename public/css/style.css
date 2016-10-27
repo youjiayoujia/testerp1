@@ -37,8 +37,6 @@ body,
 }
 
 .inboxNum {
-    width: 1150px;
-    height: 660px;
     background: #ddd;
     left: 15px;
 }
@@ -57,7 +55,7 @@ body,
 
 .inboxImage {
     width: 650px;
-    height: 660px;
+    height: 560px;
 }
 
 span.sign {

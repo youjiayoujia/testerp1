@@ -30,9 +30,17 @@
             <input class="form-control" id="email" placeholder="邮箱" name='email' value="{{ old('email') }}">
         </div>
         <div class="form-group col-lg-2">
+            <label for="by_id" class="control-label">买家ID</label>
+            <input class="form-control" id="by_id" placeholder="买家ID" name='by_id' value="{{ old('by_id') }}">
+        </div>
+        <div class="form-group col-lg-2">
             <label for="zipcode" class="control-label">邮编</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="zipcode" placeholder="邮编" name='zipcode' value="{{ old('zipcode') }}">
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="channel_account" class="control-label">销售账号</label>
+            <input class="form-control" id="channel_account" placeholder="销售账号" name='channel_account' value="{{ old('channel_account') }}">
         </div>
         <div class="form-group col-lg-2">
             <label for="refund_order" class="control-label">退款订单数</label>
@@ -60,7 +68,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-6">
+        <div class="form-group col-lg-10">
             <label for="remark" class="control-label">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
         </div>

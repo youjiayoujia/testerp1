@@ -1,12 +1,13 @@
 <html>
  <head>
   <title>打印SKU条码</title> 
+  <link href="{{ asset('css/print.css') }}" rel="stylesheet">
  </head> 
 <?php switch ($size) {
     case 'big':
 ?>
 <body>
-  <div style="width:100%;height:25mm;margin-bottom:2px;">
+  <div style="width:100%;height:24mm;margin-bottom:2px;">
    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0"> 
     <tbody>
      <tr> 
@@ -30,7 +31,7 @@
     case 'small':
 ?>
 <body>
-    <div style="width:100%;height:29mm;margin-bottom:2px;">
+    <div style="width:100%;height:24mm;margin-bottom:2px;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td align="center" valign="middle">
@@ -80,27 +81,9 @@
     <?php  break;
     case 'middleSmall':
     ?>
-    <!-- <body>
-        <div style="width:100%;height:29mm;margin-bottom:2px;">
-            <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td align="left" valign="middle"><b><span style="font-size:3.2mm;">{{$model->sku}}</span>
-                    </b>
-                    <div style="font-weight:bold; font-size:2mm; text-align:left; width:190px;">
-                        {{$model->c_name}}
-                    </div>
-                    <div>
-                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '0.75' ])}}">
-                    </div>
-                    <?php //echo Tool::barcodePrint($model->sku,$type = 'C128', $width = '0.835', $height='30') ?>
-                    <span style="font-size:8px;">{{date('m-d',time())}}[{{$model->warehousePosition?$model->warehousePosition->name:''}}][PO:{{$po_id}}]</span>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </body> -->
+
     <body>
-    <div style="width:100%;height:29mm;margin-bottom:2px;">
+    <div style="width:100%;height:20mm;margin-bottom:5px;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td align="center" valign="middle">

@@ -49,7 +49,8 @@ class SyncSellmoreApi extends Command
                     $data->save();
                     $this->info('#'.$data->relations_id.'has to sync sellmore databsae');
                 }else{
-                    $data->times = $data->times +1;
+                    $data->times     = $data->times +1;
+                    $data->error_msg = isset($res_ary['message']) ? $res_ary['message'] : '';
                     $data->save();
                     $this->comment('#'.$data->relations_id.'has not to sync sellmore database');
                 }

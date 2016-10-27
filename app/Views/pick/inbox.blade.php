@@ -14,15 +14,12 @@
             <font color='red' size='7px' class='notFindSku'></font>
         </div>
         <div class='form-group col-lg-2'>
-            <label>ID</label>
             <input type='text' class='form-control' value={{ $model->picknum }}>
         </div>
         <div class='form-group col-lg-2'>
-            <label>类型</label>
             <input type='text' class='form-control' value={{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多') }}>
         </div>
         <div class='form-group col-lg-2'>
-            <label>状态</label>
             <input type='text' class='form-control' value={{ $model->status_name }}>
         </div>
     </div>

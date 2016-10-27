@@ -18,7 +18,7 @@
             <td>{{ $api->type }}</td>
             <td>{{ $api->url }}</td>
             <td class="bg-{{ $api->color }}">{{ $api->text }}</td>
-            <td>{{ $api->time }}</td>
+            <td>{{ $api->times }}</td>
             <td>{{ $api->error_msg }}</td>
             <td>{{ $api->created_at }}</td>
             <td>

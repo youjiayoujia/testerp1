@@ -109,7 +109,6 @@ class ProductModel extends BaseModel
         'length',
         'package_weight',
         'competition_url',
-        'warehouse_position',
     ];
 
     public function getMixedSearchAttribute()

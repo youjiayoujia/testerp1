@@ -118,6 +118,7 @@ class ItemController extends Controller
         }
 
         //回传老系统
+        $old_data['product_wrap_limit'] = serialize($arr);
         $old_data['products_name_en'] = $model->name;
         $old_data['products_name_cn'] = $model->c_name;
         $old_data['products_sku'] = $model->sku;

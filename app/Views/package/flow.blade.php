@@ -31,9 +31,12 @@
                     自动分配物流 <span class="badge">{{ $assignNum }}</span>
                 </a>
             </div>
-            <div class="col-lg-2 text-left">
+            <div class="col-lg-4 text-left">
                 <a type="button" class="btn btn-default" href="{{ route('package.manualLogistics') }}">
                     手动分配物流 <span class="badge">{{ $assignFailed }}</span>
+                </a>
+                <a type="button" class="btn btn-default" href="{{ route('package.autoFailAssignLogistics') }}">
+                    自动全部放入匹配物流
                 </a>
             </div>
         </div>

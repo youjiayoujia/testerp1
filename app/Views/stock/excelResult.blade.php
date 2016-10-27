@@ -13,13 +13,15 @@
                 <div class='col-lg-2'><label>sku</label></div>
                 <div class='col-lg-2'><label>库位</label></div>
                 <div class='col-lg-2'><label>总数量</label></div>
+                <div class='col-lg-2'><label>出错原因</label></div>
             </div>
             @foreach($errors as $key => $value)
             @if($key != 0)
             <div class='row'>
-                <div class='col-lg-2'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value]['sku']) }}"></div>
-                <div class='col-lg-2'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value]['position']) }}"></div>
-                <div class='col-lg-2'><input type='text' class='form-control' value="{{ $errors[0][$value]['all_quantity']}}"></div>
+                <div class='col-lg-2'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value['key']]['sku']) }}"></div>
+                <div class='col-lg-2'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value['key']]['position']) }}"></div>
+                <div class='col-lg-2'><input type='text' class='form-control' value="{{ $errors[0][$value['key']]['all_quantity']}}"></div>
+                <div class='col-lg-2'><input type='text' class='form-control' value="{{ $value['remark'] }}"></div>
             </div>
             @endif
             @endforeach

@@ -797,6 +797,30 @@ class ItemModel extends BaseModel
         }
     }
 
+    public function updateUser()
+    {
+        $url="http://120.24.100.157:60/api/skuInfoApi.php";
+        $itemModel = $this->all();
+        foreach ($itemModel as $key => $model) {
+            $old_data['sku'] = $model->sku;
+            $c = curl_init(); 
+            curl_setopt($c, CURLOPT_URL, $url); 
+            curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
+            curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
+            $buf = curl_exec($c);
+            $user_array = json_decode($buf);
+            $dev_id = UserModel::where('name',$user_array->dev_name)->get(['id'])->first();
+            $purchase_id = UserModel::where('name',$user_array->purchase_name)->get(['id'])->first();
+            $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';
+            $brr['developer'] = $dev_id?$dev_id->id:'';
+            $model->update($arr);
+            $model->product->spu->update($brr);
+        }
+        
+    }
+
     public function updateOldData()
     {
         set_time_limit(0);

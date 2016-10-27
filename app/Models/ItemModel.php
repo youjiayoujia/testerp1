@@ -799,6 +799,8 @@ class ItemModel extends BaseModel
 
     public function updateUser()
     {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
         $url="http://120.24.100.157:60/api/skuInfoApi.php";
         $itemModel = $this->all();
         foreach ($itemModel as $key => $model) {
@@ -823,6 +825,7 @@ class ItemModel extends BaseModel
 
     public function updateOldData()
     {
+        ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $model = $this->all();
         foreach ($model as $key => $itemModel) {
@@ -834,7 +837,7 @@ class ItemModel extends BaseModel
                 $arr[] = $erp_products_data[0]->pack_method;
                 $itemModel->product->wrapLimit()->sync($arr);
             }
-           /* $brr = [];
+            $brr = [];
             if($erp_products_data[0]->products_with_battery){
                 $brr[] = 1;
             }
@@ -847,7 +850,7 @@ class ItemModel extends BaseModel
             if($erp_products_data[0]->products_with_powder){
                 $brr[] = 2;
             }
-            $itemModel->product->logisticsLimit()->sync($brr);*/
+            $itemModel->product->logisticsLimit()->sync($brr);
         }
     }
     

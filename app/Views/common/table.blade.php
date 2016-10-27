@@ -36,7 +36,7 @@
                                         </a>
                                         @if(isset($mixedSearchFields))
                                             <a class="btn btn-primary" role="button" data-toggle="collapse"
-                                               href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                               href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
                                                 更多查询
                                             </a>
                                         @endif

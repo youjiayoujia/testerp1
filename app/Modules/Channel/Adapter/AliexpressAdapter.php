@@ -60,6 +60,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderStatus = $status[0];
         $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
             strtotime($startDate));
+        $startDate = $startDate>'2016-10-27 17:00:00'?$startDate:'2016-10-27 17:00:00';
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
 

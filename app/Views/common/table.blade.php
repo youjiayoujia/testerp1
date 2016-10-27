@@ -34,12 +34,12 @@
                                         <a class="btn btn-default" href="{{ request()->url() }}">
                                             <i class="glyphicon glyphicon-remove"></i>
                                         </a>
-                                        @if(isset($mixedSearchFields))
-                                            <a class="btn btn-primary" role="button" data-toggle="collapse"
-                                               href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
-                                                更多查询
-                                            </a>
-                                        @endif
+                                        {{--@if(isset($mixedSearchFields))--}}
+                                            {{--<a class="btn btn-primary" role="button" data-toggle="collapse"--}}
+                                               {{--href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">--}}
+                                                {{--更多查询--}}
+                                            {{--</a>--}}
+                                        {{--@endif--}}
                                     </div>
                                 </div>
                             </div>
@@ -55,16 +55,16 @@
                         </div>
                     </div>
                     @if(isset($mixedSearchFields))
-                        <div class="col-lg-12 row">
-                            <div class="collapse" id="collapseExample">
+                        {{--<div class="col-lg-12">--}}
+                            {{--<div class="collapse" id="collapseExample">--}}
                                 <form action="" method="get">
-                                    <div class="well row">
+                                    <div class="searchDiv row">
                                         @foreach($mixedSearchFields as $type => $value)
                                             @if($type == 'doubleRelatedSearchFields')
                                                 @foreach($value as $relation_ship1 => $value1)
                                                     @foreach($value1 as $relation_ship2 => $value2)
                                                         @foreach($value2 as $key => $name)
-                                                            <div class="col-lg-2 form-group">
+                                                            <div class="col-lg-2 form-group searchItem">
                                                                 <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
@@ -75,7 +75,7 @@
                                                 @if(count($value))
                                                     @foreach($value as $relation_ship => $name_arr)
                                                         @foreach($name_arr as $name)
-                                                            <div class="col-lg-2 form-group">
+                                                            <div class="col-lg-2 form-group searchItem">
                                                                 <input type="text" value="{{request()->has('mixedSearchFields'.$type.$relation_ship.$name)?request('mixedSearchFields'.$type.$relation_ship.$name) : ''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
@@ -84,14 +84,14 @@
                                             @endif
                                             @if($type == 'filterFields')
                                                 @foreach($value as $name1)
-                                                    <div class="col-lg-2 form-group">
+                                                    <div class="col-lg-2 form-group searchItem">
                                                         <input type="text" value="{{request()->has('mixedSearchFields'.$type.$name1)?request('mixedSearchFields'.$type.$name1):''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name1 }}]" placeholder="{{ config('setting.transfer_search')[$name1] }}"/>
                                                     </div>
                                                 @endforeach
                                             @endif
                                             @if($type == 'filterSelects')
                                                 @foreach($value as $name => $content)
-                                                    <div class="col-lg-2 form-group">
+                                                    <div class="col-lg-2 form-group searchItem">
                                                         <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                             <option value=''>{{config('setting.transfer_search')[$name]}}</option>
                                                             @foreach($content as $k => $v)
@@ -104,7 +104,7 @@
                                             @if($type == 'selectRelatedSearchs')
                                                 @foreach($value as $relation_ship => $contents)
                                                     @foreach($contents as $name => $single)
-                                                        <div class='col-lg-2 form-group'>
+                                                        <div class='col-lg-2 form-group searchItem'>
                                                             <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                                 <option value=''>{{config('setting.transfer_search')[$relation_ship.'.'.$name]}}</option>
                                                                 @foreach($single as $key => $value1)
@@ -119,18 +119,18 @@
                                                 @foreach($value as $kind => $contents)
                                                     @foreach($contents as $content)
                                                         @if($kind == 'time')
-                                                            <div class='col-lg-2 form-group'>
+                                                            <div class='col-lg-2 form-group searchItem'>
                                                                 <input type='text' value="{{request()->has('mixedSearchFields'.$type.$content.'begin')?request()->input()['mixedSearchFields'][$type][$content]['begin']:''}}" class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
-                                                            <div class='col-lg-2 form-group'>
+                                                            <div class='col-lg-2 form-group searchItem'>
                                                                 <input type='text' value="{{request()->has('mixedSearchFields'.$type.$content.'end')?request()->input()['mixedSearchFields'][$type][$content]['end']:''}}" class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif
                                                         @if($kind == 'price')
-                                                            <div class='col-lg-2 form-group'>
+                                                            <div class='col-lg-2 form-group searchItem'>
                                                                 <input type='text' value="{{request()->has('mixedSearchFields'.$type.$content.'begin')?request()->input()['mixedSearchFields'][$type][$content]['begin']:''}}" class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
-                                                            <div class='col-lg-2 form-group'>
+                                                            <div class='col-lg-2 form-group searchItem'>
                                                                 <input type='text' value="{{request()->has('mixedSearchFields'.$type.$content.'end')?request()->input()['mixedSearchFields'][$type][$content]['end']:''}}" class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif
@@ -138,12 +138,13 @@
                                                 @endforeach
                                             @endif
                                         @endforeach
-                                        <div class="col-lg-1">
-                                            <button class="btn btn-success" type="submit">提交</button>
+                                        <div class="col-lg-2">
+                                            <button class="btn btn-success" type="submit">查询</button>
+                                            <button class="btn btn-default" type="reset">取消</button>
                                         </div>
                                     </div>
                                 </form>
-                            </div>
+                            {{--</div>--}}
                         </div>
                     @endif
                 @show{{-- 列表工具栏 --}}

@@ -22,6 +22,7 @@ use App\Models\Warehouse\PositionModel;
 use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
+use App\Models\SyncApiModels;
 
 class ItemController extends Controller
 {
@@ -117,6 +118,7 @@ class ItemController extends Controller
         }
 
         //回传老系统
+        $old_data['pack_method'] = serialize($arr);
         $old_data['products_name_en'] = $model->name;
         $old_data['products_name_cn'] = $model->c_name;
         $old_data['products_sku'] = $model->sku;
@@ -143,14 +145,23 @@ class ItemController extends Controller
         $old_data['dev_uid'] = $model->product->spu->developer;
         $old_data['type'] = 'edit';
 
-        $url="http://120.24.100.157:60/api/products.php";
+        /*$url="http://120.24.100.157:60/api/products.php";
         $c = curl_init(); 
         curl_setopt($c, CURLOPT_URL, $url); 
         curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
-        $buf = curl_exec($c);
+        $buf = curl_exec($c);*/
+
+        $sync = new SyncApiModels;
+        $sync->relations_id = $model->id;
+        $sync->type = 'product';
+        $sync->url  = 'http://120.24.100.157:60/api/products.php';
+        $sync->data = serialize($old_data);
+        $sync->status = 0;
+        $sync->times = 0;
+        $sync->save();
 
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, 'item信息更新,id='.$model->id, $to, $from);

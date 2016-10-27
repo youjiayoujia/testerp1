@@ -12,7 +12,6 @@ namespace App\Http\Controllers;
 
 use App\Jobs\Job;
 use App\Jobs\DoPackages;
-use App\Jobs\DoPackage;
 use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
@@ -484,7 +483,11 @@ class OrderController extends Controller
         $order_id = request()->input('order_id');
         $userName = UserModel::find(request()->user()->id);
         $from = base64_encode(serialize($this->model->find($order_id)));
-        $this->model->find($order_id)->update(['status' => 'PREPARED']);
+        $model = $this->model->find($order_id);
+        $model->update(['status' => 'PREPARED']);
+        $job = new DoPackages($model);
+        $job->onQueue('doPackages');
+        $this->dispatch($job);
         $to = base64_encode(serialize($this->model->find($order_id)));
         $this->eventLog($userName->name, '审核更新,id='.$order_id, $to, $from);
 

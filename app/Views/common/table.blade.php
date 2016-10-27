@@ -55,7 +55,7 @@
                         </div>
                     </div>
                     @if(isset($mixedSearchFields))
-                        <div class="col-lg-12 row">
+                        {{--<div class="col-lg-12">--}}
                             {{--<div class="collapse" id="collapseExample">--}}
                                 <form action="" method="get">
                                     <div class="well row">

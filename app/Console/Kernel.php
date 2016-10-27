@@ -66,6 +66,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomToshipping::class,
         \App\Console\Commands\SetJoomShelves::class,
         \App\Console\Commands\NotWarehouseInSendEmail::class,
+        \App\Console\Commands\SyncSellmoreApi::class,
     ];
 
     /**
@@ -130,14 +131,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
         $schedule->command('getEbayCases')->cron('8,12,13,14,16,30 17 * * *');
         $schedule->command('getFeedBack:account')->everyTenMinutes();
-
         //采购
         $schedule->command('aliShipmentName:get')->hourly();
         $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
-
-
-
-
+        //API同步sellmore database
+        $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
 
     }
 }

@@ -8,7 +8,7 @@
 namespace App\Models;
 use App\Base\BaseModel;
 
-class SyncApiModels extends BaseModel {
+class SyncApiModel extends BaseModel {
     public $table = 'sync_api';
     public $guarded = [];
 

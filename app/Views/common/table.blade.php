@@ -34,12 +34,12 @@
                                         <a class="btn btn-default" href="{{ request()->url() }}">
                                             <i class="glyphicon glyphicon-remove"></i>
                                         </a>
-                                        @if(isset($mixedSearchFields))
-                                            <a class="btn btn-primary" role="button" data-toggle="collapse"
-                                               href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
-                                                更多查询
-                                            </a>
-                                        @endif
+                                        {{--@if(isset($mixedSearchFields))--}}
+                                            {{--<a class="btn btn-primary" role="button" data-toggle="collapse"--}}
+                                               {{--href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">--}}
+                                                {{--更多查询--}}
+                                            {{--</a>--}}
+                                        {{--@endif--}}
                                     </div>
                                 </div>
                             </div>
@@ -56,7 +56,7 @@
                     </div>
                     @if(isset($mixedSearchFields))
                         <div class="col-lg-12 row">
-                            <div class="collapse" id="collapseExample">
+                            {{--<div class="collapse" id="collapseExample">--}}
                                 <form action="" method="get">
                                     <div class="well row">
                                         @foreach($mixedSearchFields as $type => $value)
@@ -143,7 +143,7 @@
                                         </div>
                                     </div>
                                 </form>
-                            </div>
+                            {{--</div>--}}
                         </div>
                     @endif
                 @show{{-- 列表工具栏 --}}

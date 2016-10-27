@@ -135,11 +135,11 @@ return [
                     'url' => 'pickList.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '效能统计',
-                    'url' => 'pickList.performanceStatistics',
-                    'icon' => '',
-                ],
+                // [
+                //     'name' => '效能统计',
+                //     'url' => 'pickList.performanceStatistics',
+                //     'icon' => '',
+                // ],
                 [
                     'name' => '拣货单异常',
                     'url' => 'errorList.index',

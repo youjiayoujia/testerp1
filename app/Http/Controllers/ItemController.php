@@ -348,10 +348,8 @@ class ItemController extends Controller
         if(!$item) {
             return json_encode(false);
         }
-        $image = $item->product->image->path;
-        $name = $item->product->image->name;
-        if($image)
-            return ('/'.$image.'/'.$name);
+        if($item)
+            return ('/'.$item->product->dimage);
         else 
             return json_encode(false);
     }

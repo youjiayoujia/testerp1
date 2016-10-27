@@ -480,8 +480,10 @@ Class AliexpressAdapter implements AdapterInterface
     }
     public function checkToken($data){
         $data = json_decode($data,true);
-        if($data['error_code']==401&&$data['error_message']='Request need user authorized'){
-            $this->isResetAccesstoken(true);
+        if(isset($data['error_code'])&&isset($data['error_message'])){
+            if($data['error_code']==401&&$data['error_message']='Request need user authorized'){
+                $this->isResetAccesstoken(true);
+            }
         }
     }
     /**

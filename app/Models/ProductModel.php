@@ -178,6 +178,16 @@ class ProductModel extends BaseModel
         return $this->belongsToMany('App\Models\WrapLimitsModel','product_wrap_limits','product_id','wrap_limits_id')->withTimestamps();
     }
 
+    public function geteWrapLimitAttribute()
+    {
+        $str = '';
+        foreach($this->wrapLimit as $limit) {
+            $str .= $limit->name . ' ';
+        }
+
+        return $str;
+    }
+
     public function variationValues()
     {
         return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id',

@@ -175,40 +175,28 @@ $(document).ready(function(){
                         extern_flag = 1;
                         package_id = tmp.data('id');
                         tmp.find('.picked_quantity').text(picked_quantity + 1);
-                        if(parseInt(tmp.find('.picked_quantity').text()) == quantity) {
-                            needId = tmp.data('id');
-                            flag = 1;
-                            $.each($('.new tr'), function(){
-                                innerNeedId = $(this).data('id');
-                                if(innerNeedId == needId) {
-                                    if(parseInt($(this).find('.picked_quantity').text()) != parseInt($(this).find('.quantity').text())) {
-                                        flag = 0;
-                                    }
+                        needId = tmp.data('id');
+                        out_js = 1;
+                        id = tmp.data('id');
+                        sku = tmp.find('.sku').text();
+                        $.ajax({
+                            url:"{{ route('pickList.packageItemUpdate')}}",
+                            data:{package_id:package_id, sku:sku},
+                            dataType:'json',
+                            type:'get',
+                            success:function(result) {
+                                if(!result) {
+                                    return false;
                                 }
-                            });
-                            if(flag) {
-                                out_js = 1;
-                                id = tmp.data('id');
-                                sku = tmp.find('.sku').text();
-                                $.ajax({
-                                    url:"{{ route('pickList.packageItemUpdate')}}",
-                                    data:{package_id:package_id, sku:sku},
-                                    dataType:'json',
-                                    type:'get',
-                                    success:function(result) {
-                                        if(!result) {
-                                            return false;
-                                        }
-                                    }
-                                });
-                                $("."+id).find('.status').text('已包装');
-                                $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
-                                $('#barcode').load(function(){
-                                    $('#barcode')[0].contentWindow.focus();
-                                    $('#barcode')[0].contentWindow.print();
-                                });
                             }
-                            
+                        });
+                        if(parseInt(tmp.find('.picked_quantity').text()) == quantity) {
+                            $("."+id).find('.status').text('已包装');
+                            $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                            $('#barcode').load(function(){
+                                $('#barcode')[0].contentWindow.focus();
+                                $('#barcode')[0].contentWindow.print();
+                            });
                         }
                     }
                 }
@@ -235,11 +223,6 @@ $(document).ready(function(){
                             }
                         }
                     });
-                    $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
-                    $('#barcode').load(function(){
-                        $('#barcode')[0].contentWindow.focus();
-                        $('#barcode')[0].contentWindow.print();
-                    });
                     if(parseInt(tmp.find('.picked_quantity').text()) == parseInt(tmp.find('.quantity').text())) {
                         needId = tmp.data('id');
                         flag = 1;
@@ -255,6 +238,11 @@ $(document).ready(function(){
                             out_js = 1;
                             tmp.find('.status').text('已包装');
                         }
+                        $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                        $('#barcode').load(function(){
+                            $('#barcode')[0].contentWindow.focus();
+                            $('#barcode')[0].contentWindow.print();
+                        });
                     }
                     needId = tmp.data('id');
                     arr = new Array();

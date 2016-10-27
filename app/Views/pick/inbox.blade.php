@@ -29,7 +29,7 @@
         </div>
     </div>
     <div class='row'>
-        <div class='col-lg-9 inboxNum text-center'>
+        <div class='col-lg-6 inboxNum text-center'>
             <div class='form-group'>
                 <font class='result'></font>
             </div>
@@ -38,7 +38,7 @@
                 <font class='result_sku'></font>
             </div>
         </div>
-        <div class='col-lg-3 inboxImage image'>
+        <div class='col-lg-6 inboxImage image'>
             
         </div>
     </div>

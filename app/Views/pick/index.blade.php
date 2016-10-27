@@ -39,9 +39,6 @@
                     <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 @endif
-                <a href="javascript:" class="btn btn-warning btn-xs code" title='条码'>
-                    <span class="glyphicon glyphicon-pencil"></span> 
-                </a>
                 @if($pickList->type == 'MULTI' && $pickList->status == 'PICKING')
                 <a href="{{ route('pickList.inbox', ['id'=>$pickList->id])}}" class="btn btn-warning btn-xs" title='分拣'>
                     <span class="glyphicon glyphicon-pencil"></span> 
@@ -51,7 +48,7 @@
                 <button class="btn btn-info btn-xs pickBy"
                         data-toggle="modal"
                         data-target="#pickBy" title='绑定拣货人员'>
-                        
+                        <span class="glyphicon glyphicon-pencil"></span> 
                 </button>
                 @endif
                 @if(($pickList->status == 'PICKING' && $pickList->type != 'MULTI') || $pickList->status == 'PACKAGEING' || ($pickList->status == 'INBOXED' && $pickList->type == 'MULTI'))
@@ -134,15 +131,23 @@ $(document).ready(function(){
     })
 
     $('.multiPrint').click(function(){
-        $.each($('.single'), function(){
-            id = $(this).parent().next().text();
-            src = "{{ route('pickList.print', ['id'=>'']) }}/" + id;
+        arr = new Array();
+        i = 0;
+        $.each($('.single:checked'), function () {
+            tmp = $(this).parent().next().text();
+            arr[i] = tmp;
+            i++;
+        })
+        if (arr.length) {
+            src = "{{ route('pickList.print', ['id'=>'']) }}/" + arr;
             $('#iframe_print').attr('src', src);
             $('#iframe_print').load(function(){
                 $('#iframe_print')[0].contentWindow.focus();
                 $('#iframe_print')[0].contentWindow.print();
             });
-        });
+        } else {
+            alert('未选择拣货单信息信息');
+        }
     });
 
     $(document).on('click', '.print', function () {

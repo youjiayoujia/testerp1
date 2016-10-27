@@ -853,5 +853,41 @@ class ItemModel extends BaseModel
             $itemModel->product->logisticsLimit()->sync($brr);
         }
     }
+
+    public function updateBasicData()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $model = $this->where('sku','B012_Blue')->get();
+        foreach ($model as $key => $itemModel) {
+            $erp_products_data = DB::select('select products_name_en,products_name_cn,products_declared_en,products_declared_cn,
+                    products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
+                    product_warehouse_id,products_location,products_more_img,productsPhotoStandard,products_remark_2
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            
+            $old_data['name'] = $erp_products_data[0]->products_name_en;
+            $old_data['c_name'] = $erp_products_data[0]->products_name_cn;
+            //$old_data['products_sku'] = $model->sku;
+            //$old_data['products_sort'] = $model->product->catalog?$model->product->catalog->name:'异常';
+            $old_data['declared_en'] = $erp_products_data[0]->products_declared_en;
+            $old_data['declared_cn'] = $erp_products_data[0]->products_declared_cn;
+            $old_data['purchase_price'] = $erp_products_data[0]->products_value;
+            $old_data['weight'] = $erp_products_data[0]->products_weight;
+            $old_data['package_weight'] = $erp_products_data[0]->weightWithPacket;
+            $old_data['supplier_id'] = $erp_products_data[0]->products_suppliers_id;
+            $old_data['quality_standard'] = $erp_products_data[0]->products_check_standard;
+            $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id==1000?1:2;
+            $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
+            $old_data['purchase_url'] = $erp_products_data[0]->products_more_img;
+            $old_data['competition_url'] = $erp_products_data[0]->productsPhotoStandard;
+            $old_data['notify'] = $erp_products_data[0]->products_remark_2;
+            $arr =[];
+            $arr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+
+            $itemModel->update($old_data);
+            $itemModel->product->update($old_data);
+            $itemModel->skuPrepareSupplier()->sync($arr);
+        }
+    }
     
 }

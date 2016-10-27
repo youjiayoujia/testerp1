@@ -356,7 +356,7 @@ class PickListController extends Controller
             $model->update(['status' => 'PACKAGEING']);
         }
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__,'包装'),
             'model' => $model,
             'pickListItems' => $model->pickListItem,
             'packages' => $model->package,

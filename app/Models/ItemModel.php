@@ -797,5 +797,33 @@ class ItemModel extends BaseModel
         }
     }
 
+    public function updateOldData()
+    {
+        $model = $this->where('id','<',100)->get();
+        foreach ($model as $key => $itemModel) {
+            $erp_products_data = DB::select('select pack_method,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder 
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            echo '<pre>';
+            print_r($erp_products_data[0]->pack_method);exit;
+            if($erp_products_data[0]->pack_method){
+                $arr[] = $erp_products_data[0]->pack_method;
+                $itemModel->product->wrapLimit()->attach($arr);
+            }
+            $brr = [];
+            if($erp_products_data[0]->products_with_battery){
+                $brr[] = 1;
+            }
+            if($erp_products_data[0]->products_with_adapter){
+                $brr[] = 4;
+            }
+            if($erp_products_data[0]->products_with_fluid){
+                $brr[] = 5;
+            }
+            if($erp_products_data[0]->products_with_powder){
+                $brr[] = 2;
+            }
+            $itemModel->product->logisticsLimit()->attach($brr);
+        }
+    }
     
 }

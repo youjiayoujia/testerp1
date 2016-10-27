@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'print_at', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'quantity', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'warehouse_id', 'status', 'logistic_id', 'pick_by', 'print_at', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'quantity', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -54,6 +54,11 @@ class PickListModel extends BaseModel
     public function printRecords()
     {
         return $this->hasMany('App\Models\Pick\PrintRecordModel', 'picklist_id', 'id');
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo("App\Models\WarehouseModel", 'warehouse_id', 'id');
     }
 
     //拣货单item关联关系
@@ -114,6 +119,7 @@ class PickListModel extends BaseModel
      */
     public function createPickListItems($packages)
     {
+
         foreach($packages as $package)
         {
             if($package->type != 'MULTI') {
@@ -182,14 +188,14 @@ class PickListModel extends BaseModel
      *
      * @return none
      */
-    public function createPickList($listItemQuantity, $multiQuantity, $logistic_id)
+    public function createPickList($listItemQuantity, $multiQuantity, $logistic_id, $warehouse_id)
     {
         srand(time());
         $query = ListItemModel::where(['picklist_id'=>'0', 'type'=>'SINGLE']);
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'logistic_id'=>$logistic_id, 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'1'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -207,7 +213,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'logistic_id'=>$logistic_id, 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'2'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -225,7 +231,7 @@ class PickListModel extends BaseModel
         if($query->count()) {            
             $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
             foreach($packageScores as $packageScore) {
-                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'logistic_id'=>$logistic_id, 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'3'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($packageScore as $score)
                 {
@@ -250,14 +256,14 @@ class PickListModel extends BaseModel
      *
      * @return none
      */
-    public function createPickListFb($listItemQuantity, $multiQuantity)
+    public function createPickListFb($listItemQuantity, $multiQuantity, $warehouse_id)
     {
         srand(time());
         $query = ListItemModel::where(['picklist_id'=>'0', 'type'=>'SINGLE']);
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>'0']);
+                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'logistic_id'=>'0', 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'1'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -275,7 +281,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>'0']);
+                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'logistic_id'=>'0', 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'2'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -293,7 +299,7 @@ class PickListModel extends BaseModel
         if($query->count()) {            
             $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
             foreach($packageScores as $packageScore) {
-                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>'0']);
+                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'logistic_id'=>'0', 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'3'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($packageScore as $score)
                 {

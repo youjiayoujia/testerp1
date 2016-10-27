@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 use App\Models\ProductModel;
-use App\Models\SpuModel;
 use DB;
 use App\Models\ItemModel;
 use App\Models\Warehouse\PositionModel;

@@ -36,7 +36,7 @@
                                         </a>
                                         @if(isset($mixedSearchFields))
                                             <a class="btn btn-primary" role="button" data-toggle="collapse"
-                                               href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                               href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
                                                 更多查询
                                             </a>
                                         @endif
@@ -55,7 +55,7 @@
                         </div>
                     </div>
                     @if(isset($mixedSearchFields))
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 row">
                             <div class="collapse" id="collapseExample">
                                 <form action="" method="get">
                                     <div class="well row">
@@ -64,7 +64,7 @@
                                                 @foreach($value as $relation_ship1 => $value1)
                                                     @foreach($value1 as $relation_ship2 => $value2)
                                                         @foreach($value2 as $key => $name)
-                                                            <div class="col-lg-2">
+                                                            <div class="col-lg-2 form-group">
                                                                 <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
@@ -75,7 +75,7 @@
                                                 @if(count($value))
                                                     @foreach($value as $relation_ship => $name_arr)
                                                         @foreach($name_arr as $name)
-                                                            <div class="col-lg-2">
+                                                            <div class="col-lg-2 form-group">
                                                                 <input type="text" value="{{request()->has('mixedSearchFields'.$type.$relation_ship.$name)?request('mixedSearchFields'.$type.$relation_ship.$name) : ''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
@@ -84,7 +84,7 @@
                                             @endif
                                             @if($type == 'filterFields')
                                                 @foreach($value as $name1)
-                                                    <div class="col-lg-2">
+                                                    <div class="col-lg-2 form-group">
                                                         <input type="text" value="{{request()->has('mixedSearchFields'.$type.$name1)?request('mixedSearchFields'.$type.$name1):''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name1 }}]" placeholder="{{ config('setting.transfer_search')[$name1] }}"/>
                                                     </div>
                                                 @endforeach

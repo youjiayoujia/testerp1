@@ -138,8 +138,9 @@
                                                 @endforeach
                                             @endif
                                         @endforeach
-                                        <div class="col-lg-1">
-                                            <button class="btn btn-success" type="submit"><i class="glyphicon glyphicon-search"></i> 查询</button>
+                                        <div class="col-lg-2">
+                                            <button class="btn btn-success" type="submit">查询</button>
+                                            <button class="btn btn-default" type="reset">取消</button>
                                         </div>
                                     </div>
                                 </form>

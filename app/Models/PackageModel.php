@@ -965,6 +965,7 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
+
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
@@ -975,7 +976,7 @@ class PackageModel extends BaseModel
             })->where(['is_clearance' => $isClearance])
               ->get()
               ->sortBy(function($single,$key){
-                return $single->logistics->priority;
+                return $single->logistics ? $single->logistics->priority : 1;
               });
             foreach ($rules as $rule) {
                 //是否在物流方式产品分类中
@@ -994,6 +995,7 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
+
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {
                     $channels = $rule->rule_channels_through;
@@ -1022,6 +1024,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+
                 //是否在物流方式账号中
                 if ($rule->account_section) {
                     $accounts = $rule->rule_accounts_through;
@@ -1036,6 +1039,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+
                 //是否在物流方式运输方式中
                 if ($rule->transport_section) {
                     $transports = $rule->rule_transports_through;
@@ -1050,6 +1054,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+                
                 //是否有物流限制
                 if ($rule->limit_section && $this->shipping_limits) {
                     $shipping_limits = $this->shipping_limits->toArray();
@@ -1062,7 +1067,6 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
-
                 //查看对应的物流方式是否是所属仓库
                 $warehouse = WarehouseModel::find($this->warehouse_id);
                 if (!$warehouse->logisticsIn($rule->type_id)) {

@@ -38,10 +38,10 @@ class PackageController extends Controller
     }
 
     /**
-     *  将包裹need放到匹配队列中 
+     *  将包裹need放到匹配队列中
      *
-     *  @param none
-     *  @return redirect
+     * @param none
+     * @return redirect
      *
      */
     public function putNeedQueue()
@@ -73,25 +73,25 @@ class PackageController extends Controller
     public function index()
     {
         $buf = '';
-        if(request()->has('outer')) {
+        if (request()->has('outer')) {
             $outer = request('outer');
             $channelId = request('id');
-            if($outer == 'all') {
+            if ($outer == 'all') {
                 $buf = $this->model->where('status', 'PICKING')
-                                   ->where('channel_id', $channelId)
-                                   ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
+                    ->where('channel_id', $channelId)
+                    ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
             } else {
                 $flag = request('flag');
-                if($flag == 'less') {
+                if ($flag == 'less') {
                     $buf = $this->model->where('status', 'PICKING')
-                                   ->where('channel_id', $channelId)
-                                   ->where('warehouse_id', $outer)
-                                   ->where('created_at', '>', date('Y-m-d H:i:s', strtotime('-3 days')));
+                        ->where('channel_id', $channelId)
+                        ->where('warehouse_id', $outer)
+                        ->where('created_at', '>', date('Y-m-d H:i:s', strtotime('-3 days')));
                 } else {
                     $buf = $this->model->where('status', 'PICKING')
-                                   ->where('channel_id', $channelId)
-                                   ->where('warehouse_id', $outer)
-                                   ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
+                        ->where('channel_id', $channelId)
+                        ->where('warehouse_id', $outer)
+                        ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
                 }
             }
         }
@@ -110,7 +110,7 @@ class PackageController extends Controller
     {
         $start = request()->input('start');
         $end = request()->input('end');
-        if(!$start && !$end) {
+        if (!$start && !$end) {
             $start = date('Y-m-d');
             $end = date('Y-m-d');
         }
@@ -121,7 +121,7 @@ class PackageController extends Controller
             ->count();
         $totalWeight = 0;
         $logisticses = LogisticsModel::where('is_enable', 1)->get();
-        foreach($logisticses as $key => $logistics) {
+        foreach ($logisticses as $key => $logistics) {
             $data[$key]['logisticsName'] = $logistics->name;
             $data[$key]['logisticsId'] = $logistics->id;
             $data[$key]['logisticsPriority'] = $logistics->priority;
@@ -131,12 +131,12 @@ class PackageController extends Controller
                 ->where('logistics_id', $logistics->id)
                 ->where('shipped_at', '>=', $start . ' 00:00:00')
                 ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00');
-            foreach($packages->get() as $package) {
+            foreach ($packages->get() as $package) {
                 $data[$key]['weight'] += $package->weight;
             }
             $data[$key]['quantity'] = $packages->count();
             $totalWeight += $data[$key]['weight'];
-            if($count) {
+            if ($count) {
                 $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
             }
         }
@@ -158,23 +158,23 @@ class PackageController extends Controller
     }
 
     /**
-     *  批量修改包裹物流方式 
+     *  批量修改包裹物流方式
      *
-     *  @param $arr  packageId数组    $id     物流id
-     *  @return redirect
+     * @param $arr  packageId数组    $id     物流id
+     * @return redirect
      *
      */
-    public function changeLogistics($arr, $id) 
+    public function changeLogistics($arr, $id)
     {
         $arr = explode(',', $arr);
         $name = UserModel::find(request()->user()->id)->name;
-        foreach($arr as $packageId) {
+        foreach ($arr as $packageId) {
             $model = $this->model->find($packageId);
             $from = base64_ecode(serialize($model));
             if (!$model) {
                 continue;
             }
-            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+            if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
             $model->update(['logistics_id' => $id]);
@@ -186,27 +186,27 @@ class PackageController extends Controller
     }
 
     /**
-     * 批量删除包裹 
+     * 批量删除包裹
      *
-     *  @param $array  packageId
-     *  @return redirect
+     * @param $array  packageId
+     * @return redirect
      *
      */
     public function removePackages($arr)
     {
         $arr = explode(',', $arr);
-        foreach($arr as $packageId) {
+        foreach ($arr as $packageId) {
             $model = $this->model->find($packageId);
             if (!$model) {
                 continue;
             }
-            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+            if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            foreach($model->items as $packageItem) {
+            foreach ($model->items as $packageItem) {
                 $packageItem->delete();
             }
-            if($model->order->packages->count() == 1) {
+            if ($model->order->packages->count() == 1) {
                 $model->order->update(['status' => 'CANCEL']);
             }
             $model->delete();
@@ -216,23 +216,23 @@ class PackageController extends Controller
     }
 
     /**
-     * 批量清空物流方式 
+     * 批量清空物流方式
      *
-     *  @param arr packageId 数组
-     *  @return redirect
+     * @param arr packageId 数组
+     * @return redirect
      *
      */
-    public function removeLogistics($arr) 
+    public function removeLogistics($arr)
     {
         $arr = explode(',', $arr);
         $name = UserModel::find(request()->user()->id)->name;
-        foreach($arr as $packageId) {
+        foreach ($arr as $packageId) {
             $model = $this->model->find($packageId);
             $from = base64_encode(serialize($model));
             if (!$model) {
                 continue;
             }
-            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+            if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
             $model->update(['tracking_no' => '']);
@@ -270,7 +270,9 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
-            'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function($single){return $single->packages()->count() == 0;})->count(),
+            'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function ($single) {
+                return $single->packages()->count() == 0;
+            })->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
@@ -293,13 +295,13 @@ class PackageController extends Controller
     public function autoFailAssignLogistics()
     {
         $packages = $this->model->where('status', 'ASSIGNFAILED')->get();
-        foreach($packages as $package) {
+        foreach ($packages as $package) {
             $job = new AssignLogistics($package);
             $job = $job->onQueue('assignLogistics');
             $this->dispatch($job);
         }
 
-        return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count().'个包裹放入队列'));
+        return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count() . '个包裹放入队列'));
     }
 
     public function recycle()
@@ -351,7 +353,7 @@ class PackageController extends Controller
             'logisticses' => LogisticsModel::all(),
         ];
 
-        return view($this->viewPath.'returnGoods', $response);
+        return view($this->viewPath . 'returnGoods', $response);
     }
 
     public function processReturnGoods()
@@ -360,67 +362,75 @@ class PackageController extends Controller
         $arr = $this->model->processGoods($file);
         $errors = [];
         $warehouse_id = request('stock_warehouse_id');
-        if(request('type') == 'only') {
+        if (request('type') == 'only') {
             DB::beginTransaction();
             try {
-                foreach($arr as $key => $tracking_no) {
+                foreach ($arr as $key => $tracking_no) {
                     $model = $this->model->where('tracking_no', $tracking_no)->first();
-                    if(!$model) {
+                    if (!$model) {
                         $errors[$key]['id'] = $tracking_no;
                         $errors[$key]['remark'] = '对应包裹不存在';
                         continue;
                     }
-                    foreach($model->items as $packageItem) {
-                        $stock = StockModel::where(['item_id' => $packageItem->item_id, 'warehouse_id' => $warehouse_id])->first();
-                        if(!$stock) {
+                    foreach ($model->items as $packageItem) {
+                        $stock = StockModel::where([
+                            'item_id' => $packageItem->item_id,
+                            'warehouse_id' => $warehouse_id
+                        ])->first();
+                        if (!$stock) {
                             $errors[$key]['id'] = $tracking_no;
                             $errors[$key]['remark'] = '仓库对应库位有问题';
                             continue;
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
+                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity,
+                            $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
                     }
                     $model->delete();
                 }
-                if(count($errors)) {
+                if (count($errors)) {
                     throw new Exception('导入数据有问题');
                 }
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 DB::rollback();
             }
             DB::commit();
         } else {
             DB::beginTransaction();
             try {
-                foreach($arr as $key => $tracking_no) {
+                foreach ($arr as $key => $tracking_no) {
                     $model = $this->model->where('tracking_no', $tracking_no)->first();
-                    if(!$model) {
+                    if (!$model) {
                         $errors[$key]['id'] = $tracking_no;
                         $errors[$key]['remark'] = '对应包裹不存在';
                         continue;
                     }
-                    foreach($model->items as $packageItem) {
-                        $stock = StockModel::where(['item_id' => $packageItem->item_id, 'warehouse_id' => $warehouse_id])->first();
-                        if(!$stock) {
+                    foreach ($model->items as $packageItem) {
+                        $stock = StockModel::where([
+                            'item_id' => $packageItem->item_id,
+                            'warehouse_id' => $warehouse_id
+                        ])->first();
+                        if (!$stock) {
                             $errors[$key]['id'] = $tracking_no;
-                            $errors[$key]['remark'] = '仓库对应库位有问题'; 
+                            $errors[$key]['remark'] = '仓库对应库位有问题';
                             continue;
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
+                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity,
+                            $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
                     }
-                    if(request('trackingNo') == 'on') {
+                    if (request('trackingNo') == 'on') {
                         $model->update(['tracking_no' => '']);
                     }
-                    if(request('logistics_id') != 'auto') {
+                    if (request('logistics_id') != 'auto') {
                         $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
                     } else {
                         $model->update(['status' => 'NEW']);
                     }
                     $model->update(['warehouse_id' => request('from_warheouse_id')]);
                 }
-                if(count($errors)) {
+                if (count($errors)) {
                     throw new Exception('导入数据有问题');
                 }
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 DB::rollback();
             }
             DB::commit();
@@ -431,8 +441,8 @@ class PackageController extends Controller
             'returnErrors' => $errors,
         ];
 
-        return view($this->viewPath.'returnErrors', $response);
-        
+        return view($this->viewPath . 'returnErrors', $response);
+
     }
 
     public function returnSplitPackage()
@@ -440,7 +450,7 @@ class PackageController extends Controller
         $quantity = request('quantity');
         $id = request('id');
         $model = $this->model->find($id);
-        if(!$model) {
+        if (!$model) {
             return json_encode(false);
         }
         $response = [
@@ -449,9 +459,9 @@ class PackageController extends Controller
             'quantity' => $quantity,
         ];
 
-        return view($this->viewPath.'splitPackage', $response);
+        return view($this->viewPath . 'splitPackage', $response);
     }
-    
+
     public function editTrackingNo($id)
     {
         $model = $this->model->find($id);
@@ -463,7 +473,7 @@ class PackageController extends Controller
             'model' => $model,
         ];
 
-        return view($this->viewPath.'editTrackingNo', $response);
+        return view($this->viewPath . 'editTrackingNo', $response);
     }
 
     public function implodePackage($tmp)
@@ -472,23 +482,23 @@ class PackageController extends Controller
         $buf = explode(',', $tmp);
         $name = UserModel::find(request()->user()->id)->name;
         $orderId = $this->model->find($buf[0])->order->id;
-        foreach($buf as $key => $packageId) {
+        foreach ($buf as $key => $packageId) {
             $model = $this->model->find($packageId);
             if (!$model) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
             }
-            if($model->order->id != $orderId) {
+            if ($model->order->id != $orderId) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', '要合并的包裹不是来自于一个订单'));
             }
         }
 
-        foreach($buf as $key => $packageId) {
+        foreach ($buf as $key => $packageId) {
             $model = $this->model->find($packageId);
             if (!$model) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
             }
-            foreach($model->items as $packageItem) {
-                if(!array_key_exists($packageItem->item_id, $arr)) {
+            foreach ($model->items as $packageItem) {
+                if (!array_key_exists($packageItem->item_id, $arr)) {
                     $arr[$packageItem->item_id]['quantity'] = $packageItem->quantity;
                     $arr[$packageItem->item_id]['warehouse_position_id'] = $packageItem->warehouse_position_id;
                     $arr[$packageItem->item_id]['order_item_id'] = $packageItem->order_item_id;
@@ -500,7 +510,7 @@ class PackageController extends Controller
                 }
                 $packageItem->delete();
             }
-            if($key) {
+            if ($key) {
                 $model->delete();
             }
         }
@@ -508,8 +518,8 @@ class PackageController extends Controller
         $from = base64_encode(serialize($model));
         $model->update(['status' => 'NEW']);
         $model->order->update(['status' => 'REVIEW']);
-        if($model) {
-            foreach($arr as $itemId => $info) {
+        if ($model) {
+            foreach ($arr as $itemId => $info) {
                 $info['item_id'] = $itemId;
                 $model->items()->create($info);
             }
@@ -543,16 +553,16 @@ class PackageController extends Controller
         $name = UserModel::find(request()->user()->id)->name;
         $tmp = $this->processArr($arr, $model);
         sort($tmp);
-        if(count($tmp) == 1) {
+        if (count($tmp) == 1) {
             return redirect($this->mainIndex)->with('alert', $this->alert('warning', $this->mainTitle . '拆后包裹个数还是1.'));
         } else {
-            foreach($model->items as $item) {
+            foreach ($model->items as $item) {
                 $item->delete();
             }
-            foreach($tmp as $packageId => $info) {
-                if(!$packageId) {
+            foreach ($tmp as $packageId => $info) {
+                if (!$packageId) {
                     $from = base64_encode(serialize($model));
-                    foreach($info as $itemId => $packageItem) {
+                    foreach ($info as $itemId => $packageItem) {
                         $packageItem['item_id'] = $itemId;
                         $model->items()->create($packageItem);
                     }
@@ -563,14 +573,14 @@ class PackageController extends Controller
                 } else {
                     $newPackage = $this->model->create($model->toArray());
                     $to = base64_encode(serialize($newPackage));
-                    foreach($info as $itemId => $packageItem) {
+                    foreach ($info as $itemId => $packageItem) {
                         $packageItem['item_id'] = $itemId;
                         $newPackage->items()->create($packageItem);
                     }
                     $newPackage->update(['status' => 'NEW']);
                     $this->eventLog($name, '拆分包裹', $to);
                     $newPackage->order->update(['status' => 'REVIEW']);
-                } 
+                }
             }
         }
 
@@ -581,15 +591,15 @@ class PackageController extends Controller
     public function processArr($arr, $model)
     {
         $tmp = [];
-        foreach(explode(',', $arr) as $key => $value) {
+        foreach (explode(',', $arr) as $key => $value) {
             $buf = explode('.', $value);
-            if(!array_key_exists($buf[0], $tmp)) {
+            if (!array_key_exists($buf[0], $tmp)) {
                 $tmp[$buf[0]] = [];
             }
-            if(!array_key_exists($buf[1], $tmp[$buf[0]])) {
+            if (!array_key_exists($buf[1], $tmp[$buf[0]])) {
                 $tmp[$buf[0]][$buf[1]]['quantity'] = 0;
                 $item = $model->items()->where('item_id', $buf[1])->first();
-                if($item) {
+                if ($item) {
                     $tmp[$buf[0]][$buf[1]]['warehouse_position_id'] = $item->warehouse_position_id;
                     $tmp[$buf[0]][$buf[1]]['order_item_id'] = $item->order_item_id;
                     $tmp[$buf[0]][$buf[1]]['remark'] = $item->remark;
@@ -661,7 +671,7 @@ class PackageController extends Controller
             return json_encode(false);
         }
         $order = $package->order;
-        if($order->status == 'REVIEW') {
+        if ($order->status == 'REVIEW') {
             $package->update(['status' => 'ERROR']);
             return json_encode(false);
         }
@@ -672,18 +682,18 @@ class PackageController extends Controller
         $package->update(['status' => 'PACKED']);
         DB::beginTransaction();
         try {
-            foreach($package->items as $packageItem) {
+            foreach ($package->items as $packageItem) {
                 $packageItem->item->holdOut($packageItem->warehouse_position_id,
-                                            $packageItem->quantity,
-                                            'PACKAGE',
-                                            $packageItem->id);
+                    $packageItem->quantity,
+                    'PACKAGE',
+                    $packageItem->id);
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
             }
         } catch (Exception $e) {
             DB::rollback();
             return json_encode('unhold');
         }
-        DB::commit();       
+        DB::commit();
 
         return json_encode(true);
     }
@@ -715,11 +725,11 @@ class PackageController extends Controller
             $package->update(['status' => 'SHIPPED']);
             DB::beginTransaction();
             try {
-                foreach($package->items as $packageItem) {
+                foreach ($package->items as $packageItem) {
                     $packageItem->item->holdOut($packageItem->warehouse_position_id,
-                                                $packageItem->quantity,
-                                                'PACKAGE',
-                                                $packageItem->id);
+                        $packageItem->quantity,
+                        'PACKAGE',
+                        $packageItem->id);
                     $packageItem->orderItem->update(['status' => 'SHIPPED']);
                 }
             } catch (Exception $e) {
@@ -757,7 +767,8 @@ class PackageController extends Controller
                 ->where('is_auto', '1')
                 ->skip($start)->take($len)->get();
         }
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [ASSIGN LOGISTICS] 队列成功'));
+        return redirect(route('dashboard.index'))->with('alert',
+            $this->alert('success', '添加至 [ASSIGN LOGISTICS] 队列成功'));
     }
 
     /**
@@ -769,17 +780,17 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->whereIn('status', ['ASSIGNED','TRACKINGFAILED'])
+            ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {
             foreach ($packages as $package) {
-                $orderRate = $package->order->calculateProfitProcess();
-                if ($orderRate > 0) {
-                    $job = new PlaceLogistics($package);
-                    $job = $job->onQueue('placeLogistics');
-                    $this->dispatch($job);
-                }
+//                $orderRate = $package->order->calculateProfitProcess();
+//                if ($orderRate > 0) {
+                $job = new PlaceLogistics($package);
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+//                }
             }
             $start += $len;
             unset($packages);
@@ -936,16 +947,16 @@ class PackageController extends Controller
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
         $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
         $orderRate = $model->order->calculateProfitProcess();
-        if($orderRate > 0) {
-            if($is_auto) {
+        if ($orderRate > 0) {
+            if ($is_auto) {
                 $job = new PlaceLogistics($model);
                 $job = $job->onQueue('placeLogistics');
                 $this->dispatch($job);
-            } 
+            }
         } else {
             $this->model->order->OrderCancle();
         }
-        
+
         return json_encode(true);
     }
 
@@ -980,7 +991,8 @@ class PackageController extends Controller
         foreach ($items as $item) {
             $item->picked_quantity = 0;
             $item->save();
-            $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost, 'CANCEL', $item->id);
+            $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost,
+                'CANCEL', $item->id);
             $item->item->hold($item->warehouse_position_id, $item->quantity);
         }
         return json_encode(true);
@@ -1043,21 +1055,21 @@ class PackageController extends Controller
     {
         $trackno = request('trackno');
         $model = $this->model->where('tracking_no', $trackno)->first();
-        if(!$model) {
+        if (!$model) {
             return json_encode(false);
         }
         $number = NumberModel::first();
-        if(!count($number)) {
+        if (!count($number)) {
             $number = NumberModel::create(['number' => 1]);
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logistics' => $model->logistics ? $model->logistics->code : '',
-            'number' => 'S'.substr($number->number+100000000, 1),
+            'number' => 'S' . substr($number->number + 100000000, 1),
         ];
         $number->update(['number' => $number->number + 1]);
 
-        return view($this->viewPath.'bagInfo', $response);
+        return view($this->viewPath . 'bagInfo', $response);
     }
 
     /**
@@ -1078,7 +1090,7 @@ class PackageController extends Controller
         }
         $name = UserModel::find(request()->user()->id)->name;
         $from = base64_encode(serialize($package));
-        if($weight == '0') {
+        if ($weight == '0') {
             $package->update([
                 'shipped_at' => date('Y-m-d h:i:s', time()),
                 'shipper_id' => request()->user()->id,
@@ -1094,14 +1106,14 @@ class PackageController extends Controller
         }
         $order = $package->order;
         $buf = 1;
-        foreach($order->packages as $childPackage) {
-            if($childPackage->status != 'SHIPPED') {
+        foreach ($order->packages as $childPackage) {
+            if ($childPackage->status != 'SHIPPED') {
                 $buf = 0;
             }
         }
 
-        if($buf) {
-            foreach($package->items as $packageItem) {
+        if ($buf) {
+            foreach ($package->items as $packageItem) {
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
             }
             $order->update(['status' => 'SHIPPED']);
@@ -1240,7 +1252,7 @@ class PackageController extends Controller
 
             return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
         }
-        
+
         return false;
     }
 

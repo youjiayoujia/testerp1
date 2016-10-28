@@ -174,6 +174,8 @@ class ItemController extends Controller
     {
         $data = request()->all();
         if($data['type']=='edit'){
+            $arr = [];
+            $brr = [];
             $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
             if(count($skuModel)==0){
                 echo json_encode('no sku');exit;
@@ -188,6 +190,8 @@ class ItemController extends Controller
             }
             $skuModel->product->wrapLimit()->sync($arr);
         }else{
+            $arr = [];
+            $brr = [];
             $spuModel = SpuModel::create($data);
             $data['spu_id'] = $spuModel->id;
             $productModel = ProductModel::create($data);

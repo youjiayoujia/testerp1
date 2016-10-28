@@ -46,6 +46,7 @@ class ItemModel extends BaseModel
         'supplier_info',
         'purchase_url',
         'purchase_price',
+        'sku_history_values',
         'purchase_carriage',
         'package_height',
         'package_width',

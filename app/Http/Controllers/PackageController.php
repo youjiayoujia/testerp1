@@ -783,14 +783,16 @@ class PackageController extends Controller
             ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
+        $packageIds = [];
         while ($packages->count()) {
             foreach ($packages as $package) {
-//                $orderRate = $package->order->calculateProfitProcess();
-//                if ($orderRate > 0) {
-                $job = new PlaceLogistics($package);
-                $job = $job->onQueue('placeLogistics');
-                $this->dispatch($job);
-//                }
+                $orderRate = $package->order->calculateProfitProcess();
+                if ($orderRate > 0) {
+                    $job = new PlaceLogistics($package);
+                    $job = $job->onQueue('placeLogistics');
+                    $this->dispatch($job);
+                    $packageIds[] = $package->id;
+                }
             }
             $start += $len;
             unset($packages);
@@ -799,7 +801,8 @@ class PackageController extends Controller
                 ->where('is_auto', '1')
                 ->skip($start)->take($len)->get();
         }
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [PLACE LOGISTICS] 队列成功'));
+        return redirect(route('dashboard.index'))->with('alert',
+            $this->alert('success', '包裹[' . implode(',', $packageIds) . ']添加至 [PLACE LOGISTICS] 队列成功'));
     }
 
     public function create()

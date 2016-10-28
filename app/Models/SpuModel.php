@@ -124,12 +124,7 @@ class SpuModel extends BaseModel
     {   
         set_time_limit(0);
         ini_set('memory_limit', '1024M');
-        echo '<pre>';
-        DB::table('items')->truncate();
-        DB::table('products')->truncate();
-        DB::table('spus')->truncate();
-
-        $erp_products_data_arr = DB::select('select * from erp_products_data where spu!="" and products_id > 42301 limit 100 ');
+        $erp_products_data_arr = DB::select('select * from erp_products_data where spu!="" and products_id > 107842');
         foreach ($erp_products_data_arr as $key => $erp_products_data) {
             //print_r($erp_products_data);exit;
                 //if($key==0)continue;

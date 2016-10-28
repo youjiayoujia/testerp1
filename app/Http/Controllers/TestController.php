@@ -75,10 +75,13 @@ class TestController extends Controller
 
     public function test2()
     {
-        $a = [1,2,[3,4]];
-        var_dump(count($a));
-        var_dump(count($a,1));
+        $package = PackageModel::where('id', '>', '0')->get()->sortBy(function($a,$b){
+            return $a->warehouse->created_at;
+        });
+
+        var_dump($package->toarray());exit;
     }
+
     // public function test2()
     // {
     //     $a = ['a' => 'b', 'c' => 'e', 'f' => ['f','g','i']];

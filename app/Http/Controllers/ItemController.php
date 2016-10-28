@@ -22,7 +22,7 @@ use App\Models\Warehouse\PositionModel;
 use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
-use App\Models\SyncApiModels;
+use App\Models\SyncApiModel;
 
 class ItemController extends Controller
 {
@@ -110,6 +110,7 @@ class ItemController extends Controller
             if(in_array('2', $data['carriage_limit_arr']))$data['products_with_powder'] = 1;
         }
 
+        $arr = [];
         if(array_key_exists('package_limit_arr', $data)){
             foreach($data['package_limit_arr'] as $wrap_limits_id){
                 $arr[] = $wrap_limits_id;         
@@ -154,7 +155,7 @@ class ItemController extends Controller
         curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
         $buf = curl_exec($c);*/
 
-        $sync = new SyncApiModels;
+        $sync = new SyncApiModel;
         $sync->relations_id = $model->id;
         $sync->type = 'product';
         $sync->url  = 'http://120.24.100.157:60/api/products.php';

@@ -13,6 +13,12 @@ namespace App\Http\Controllers\Logistics;
 use App\Http\Controllers\Controller;
 use App\Models\Channel\AccountModel;
 use App\Models\CountriesModel;
+use App\Models\Logistics\Rule\LimitModel as ruleLimit;
+use App\Models\Logistics\Rule\AccountModel as ruleAccount;
+use App\Models\Logistics\Rule\CatalogModel as ruleCatalog;
+use App\Models\Logistics\Rule\CountryModel as ruleCountry;
+use App\Models\Logistics\Rule\ChannelModel as ruleChannel;
+use App\Models\Logistics\Rule\TransportModel as ruleTransport;
 use App\Models\Logistics\RuleModel;
 use App\Models\Logistics\TransportModel;
 use App\Models\LogisticsModel;
@@ -50,6 +56,99 @@ class RuleController extends Controller
         ];
 
         return view($this->viewPath . 'create', $response);
+    }
+
+    /**
+     * 复制信息
+     */
+    public function createData()
+    {
+        $ruleId = request()->input('rule_id');
+        $model = $this->model->find($ruleId);
+        $data = $model->toArray();
+        $data['name'] = $model->name . '[复制]';
+        unset($model->id);
+        $rule = $this->model->create($data);
+        if($model->catalog_section) {
+            $ruleCatalog = ruleCatalog::where('logistics_rule_id', $ruleId)->get();
+            if($ruleCatalog->count() > 0) {
+                foreach($ruleCatalog as $limit) {
+                    unset($limit->id);
+                    $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
+                    $ruleCatalog = new ruleCatalog();
+                    $ruleCatalog->create($limit->toArray());
+                }
+            }
+        }
+        if($model->account_section) {
+            $ruleAccount = ruleAccount::where('logistics_rule_id', $ruleId)->get();
+            if($ruleAccount->count() > 0) {
+                foreach($ruleAccount as $limit) {
+                    unset($limit->id);
+                    $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
+                    $ruleAccount = new ruleAccount();
+                    $ruleAccount->create($limit->toArray());
+                }
+            }
+        }
+        if($model->country_section) {
+            $ruleCountry = ruleCountry::where('logistics_rule_id', $ruleId)->get();
+            if($ruleCountry->count() > 0) {
+                foreach($ruleCountry as $limit) {
+                    unset($limit->id);
+                    $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
+                    $ruleCountry = new ruleCountry();
+                    $ruleCountry->create($limit->toArray());
+                }
+            }
+        }
+        if($model->limit_section) {
+            $ruleLimit = ruleLimit::where('logistics_rule_id', $ruleId)->get();
+            if($ruleLimit->count() > 0) {
+                foreach($ruleLimit as $limit) {
+                    unset($limit->id);
+                    $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
+                    $ruleLimit = new ruleLimit();
+                    $ruleLimit->create($limit->toArray());
+                }
+            }
+        }
+        if($model->channel_section) {
+            $ruleChannel = ruleChannel::where('logistics_rule_id', $ruleId)->get();
+            if($ruleChannel->count() > 0) {
+                foreach($ruleChannel as $limit) {
+                    unset($limit->id);
+                    $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
+                    $ruleChannel = new ruleChannel();
+                    $ruleChannel->create($limit->toArray());
+                }
+            }
+        }
+        if($model->transport_section) {
+            $ruleTransport = ruleTransport::where('logistics_rule_id', $ruleId)->get();
+            if($ruleTransport->count() > 0) {
+                foreach($ruleTransport as $limit) {
+                    unset($limit->id);
+                    $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
+                    $ruleTransport = new ruleTransport();
+                    $ruleTransport->create($limit->toArray());
+                }
+            }
+        }
+
+        return 1;
     }
 
     /**

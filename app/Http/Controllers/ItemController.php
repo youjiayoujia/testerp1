@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use App\Models\ProductModel;
+use App\Models\SpuModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
@@ -174,7 +175,7 @@ class ItemController extends Controller
         $data = request()->all();
         $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
         if(count($skuModel)==0){
-            return json_encode('no sku');
+            echo json_encode('no sku');exit;
         }
         if($data['type']='edit'){
             $skuModel->update($data);
@@ -187,6 +188,10 @@ class ItemController extends Controller
             }
             $skuModel->product->wrapLimit()->sync($arr);
         }else{
+            $spuModel = SpuModel::create($data);
+            $data['spu_id'] = $spuModel->id;
+            $productModel = ProductModel::create($data);
+            $data['product_id'] = $productModel->id; 
             $skuModel->create($data);
             foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
                 $brr[] = $logistics_limits_id;         
@@ -197,7 +202,7 @@ class ItemController extends Controller
             }
             $skuModel->product->wrapLimit()->attach($arr);
         }
-        return json_encode('success');
+        echo json_encode('success');exit;
 
     }
 

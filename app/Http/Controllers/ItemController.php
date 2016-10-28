@@ -173,11 +173,12 @@ class ItemController extends Controller
     public function skuHandleApi()
     {
         $data = request()->all();
-        $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
-        if(count($skuModel)==0){
-            echo json_encode('no sku');exit;
-        }
+        
         if($data['type']='edit'){
+            $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
+            if(count($skuModel)==0){
+                echo json_encode('no sku');exit;
+            }
             $skuModel->update($data);
             foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
                 $brr[] = $logistics_limits_id;         

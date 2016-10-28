@@ -90,7 +90,6 @@ class GetEbayProduct extends Job implements SelfHandling, ShouldQueue
                     $sku['seller_id'] = isset($sellerIdInfo[$sell_code])?$sellerIdInfo[$sell_code]:'';
                     $sku['erp_sku'] = Tool::getErpSkuBySku($sku['sku']);
                     $erp_item = ItemModel::where('sku',$sku['erp_sku'])->first();
-                    var_dump($erp_item);
                     if(!empty($erp_item)){
                         $sku['product_id'] =$erp_item->id;
                     }else{

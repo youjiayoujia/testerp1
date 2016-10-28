@@ -67,6 +67,7 @@ class ItemModel extends BaseModel
         'cost',
         'package_weight',
         'competition_url',
+        'products_history_values'
     ];
 
     public function product()
@@ -797,14 +798,44 @@ class ItemModel extends BaseModel
         }
     }
 
+    public function updateUser()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $url="http://120.24.100.157:60/api/skuInfoApi.php";
+        //$itemModel = $this->all();
+        $itemModel = $this->where('id','>','65279')->get();
+        foreach ($itemModel as $key => $model) {
+            $old_data['sku'] = $model->sku;
+            $c = curl_init(); 
+            curl_setopt($c, CURLOPT_URL, $url); 
+            curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
+            curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
+            $buf = curl_exec($c);
+            $user_array = json_decode($buf);
+            $dev_id = UserModel::where('name',$user_array->dev_name)->get(['id'])->first();
+            $purchase_id = UserModel::where('name',$user_array->purchase_name)->get(['id'])->first();
+            $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';
+            $brr['developer'] = $dev_id?$dev_id->id:'';
+            $model->update($arr);
+            $model->product->spu->update($brr);
+        }
+        
+    }
+
     public function updateOldData()
     {
+        ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        $model = $this->where('sku','CA1205W')->get();
+        //$model = $this->all();
+        $model = $this->where('id','>','65279')->get();
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select pack_method,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder 
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
             
+            $arr = [];
             if($erp_products_data[0]->pack_method){
                 $arr[] = $erp_products_data[0]->pack_method;
                 $itemModel->product->wrapLimit()->sync($arr);
@@ -823,6 +854,43 @@ class ItemModel extends BaseModel
                 $brr[] = 2;
             }
             $itemModel->product->logisticsLimit()->sync($brr);
+        }
+    }
+
+    public function updateBasicData()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        //$model = $this->all();
+        $model = $this->where('id','>','65279')->get();
+        foreach ($model as $key => $itemModel) {
+            $erp_products_data = DB::select('select products_name_en,products_name_cn,products_declared_en,products_declared_cn,
+                    products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
+                    product_warehouse_id,products_location,products_more_img,productsPhotoStandard,products_remark_2
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            
+            $old_data['name'] = $erp_products_data[0]->products_name_en;
+            $old_data['c_name'] = $erp_products_data[0]->products_name_cn;
+            //$old_data['products_sku'] = $model->sku;
+            //$old_data['products_sort'] = $model->product->catalog?$model->product->catalog->name:'异常';
+            $old_data['declared_en'] = $erp_products_data[0]->products_declared_en;
+            $old_data['declared_cn'] = $erp_products_data[0]->products_declared_cn;
+            $old_data['purchase_price'] = $erp_products_data[0]->products_value;
+            $old_data['weight'] = $erp_products_data[0]->products_weight;
+            $old_data['package_weight'] = $erp_products_data[0]->weightWithPacket;
+            $old_data['supplier_id'] = $erp_products_data[0]->products_suppliers_id;
+            $old_data['quality_standard'] = $erp_products_data[0]->products_check_standard;
+            $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id==1000?1:2;
+            $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
+            $old_data['purchase_url'] = $erp_products_data[0]->products_more_img;
+            $old_data['competition_url'] = $erp_products_data[0]->productsPhotoStandard;
+            $old_data['notify'] = $erp_products_data[0]->products_remark_2;
+            $arr =[];
+            $arr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+
+            $itemModel->update($old_data);
+            $itemModel->product->update($old_data);
+            $itemModel->skuPrepareSupplier()->sync($arr);
         }
     }
     

@@ -192,15 +192,15 @@ class ItemController extends Controller
             $data['spu_id'] = $spuModel->id;
             $productModel = ProductModel::create($data);
             $data['product_id'] = $productModel->id; 
-            $this->model->create($data);
+            $skuModel = $this->model->create($data);
             foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
                 $brr[] = $logistics_limits_id;         
             }
-            $this->model->product->logisticsLimit()->attach($brr);
+            $skuModel->product->logisticsLimit()->attach($brr);
             foreach(unserialize($data['package_limit_arr']) as $wrap_limits_id){
                 $arr[] = $wrap_limits_id;         
             }
-            $this->model->product->wrapLimit()->attach($arr);
+            $skuModel->product->wrapLimit()->attach($arr);
         }
         echo json_encode('success');exit;
 

@@ -703,8 +703,22 @@ class PackageController extends Controller
     {
         $buf = request()->input('buf');
         foreach ($buf as $v) {
-            $model = $this->model->find($v);
-            $model->update(['status' => 'SHIPPED']);
+            $package = $this->model->find($v);
+            $package->update(['status' => 'SHIPPED']);
+            DB::beginTransaction();
+            try {
+                foreach($package->items as $packageItem) {
+                    $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                                                $packageItem->quantity,
+                                                'PACKAGE',
+                                                $packageItem->id);
+                    $packageItem->orderItem->update(['status' => 'SHIPPED']);
+                }
+            } catch (Exception $e) {
+                DB::rollback();
+                return json_encode('unhold');
+            }
+            DB::commit();
         }
 
         return json_encode(true);

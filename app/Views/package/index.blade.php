@@ -64,14 +64,14 @@
                         </button>
                 </td>
                 <td>库位</td><td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
-                <td>数量</td><td colspan='2'>{{ $packageItem->quantity }}</td>
+                <td>数量</td><td colspan='3'>{{ $packageItem->quantity }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道:  {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单:  {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>追踪号: {{ $package->tracking_no ? $package->tracking_no : '暂无追踪号信息'}}
-            <td colspan='4'>
+            <td colspan='5'>
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>

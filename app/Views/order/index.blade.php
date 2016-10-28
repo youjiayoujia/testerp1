@@ -70,7 +70,7 @@
             <td colspan="3">
                 <address>
                     <strong>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</strong><br>
-                    {{ $order->shipping_address }}<br>
+                    {{ $order->shipping_address }} {{ $order->shipping_address1 }}<br>
                     {{ $order->shipping_city . ', ' . $order->shipping_state.' '.$order->shipping_zipcode }}<br>
                     {{ $order->country ? $order->country->name.' '.$order->country->cn_name : '' }}<br>
                     <abbr title="ZipCode">Z:</abbr> {{ $order->shipping_zipcode }}

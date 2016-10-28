@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\product;
+namespace App\Models\Product;
 
 use App\Base\BaseModel;
 use Tool;

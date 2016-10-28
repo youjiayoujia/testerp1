@@ -67,6 +67,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomShelves::class,
         \App\Console\Commands\NotWarehouseInSendEmail::class,
         \App\Console\Commands\SyncSellmoreApi::class,
+        \App\Console\Commands\AutoGetEbayMessage::class,
     ];
 
     /**

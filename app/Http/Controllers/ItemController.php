@@ -173,8 +173,9 @@ class ItemController extends Controller
     public function skuHandleApi()
     {
         $data = request()->all();
-        
-        if($data['type']='edit'){
+        echo '<pre>';
+        print_r($data);exit;
+        if(unserialize($data['type'])=='edit'){
             $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
             if(count($skuModel)==0){
                 echo json_encode('no sku');exit;

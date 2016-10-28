@@ -121,6 +121,7 @@ class ShunfengAdapter extends BasicAdapter
             $products_declared_en = $item->item->product->declared_en;
         }
         $amount = $amount > 20 ? 20 : $amount;
+        $amount = $amount=0?0.02:$amount;
         $product_str .= '<Cargo name="' . htmlspecialchars($products_declared_en) . '" count="1" unit="u" weight="' . $package->weight . '" amount="' . $amount . '" currency="USD" source_area="CN"></Cargo>';
 
         $order_str = '<?xml version="1.0" encoding="UTF-8"?>
@@ -142,7 +143,6 @@ class ShunfengAdapter extends BasicAdapter
    	    </Body>
         </Request>';
 
-        var_dump($order_str);exit;
         $call = $this->SoapClient->sfexpressService(array('arg0' => $order_str));
         $responseXml = $call->return;//返回的xml信息，数据很小
         $result = simplexml_load_string($responseXml);

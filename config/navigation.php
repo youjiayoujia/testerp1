@@ -692,10 +692,10 @@ return [
                     'icon' => '',
                 ],
             ],
-            '事件历史' => [
+            '接口' => [
                 [
-                    'name' => '历史记录',
-                    'url' => 'eventChild.index',
+                    'name' => '同步接口',
+                    'url' => 'syncApi.index',
                     'icon' => '',
                 ],
             ],

@@ -60,6 +60,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderStatus = $status[0];
         $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
             strtotime($startDate));
+        $startDate = $startDate>'2016-10-27 17:00:00'?$startDate:'2016-10-27 17:00:00';
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
 
@@ -480,8 +481,10 @@ Class AliexpressAdapter implements AdapterInterface
     }
     public function checkToken($data){
         $data = json_decode($data,true);
-        if($data['error_code']==401&&$data['error_message']='Request need user authorized'){
-            $this->isResetAccesstoken(true);
+        if(isset($data['error_code'])&&isset($data['error_message'])){
+            if($data['error_code']==401&&$data['error_message']='Request need user authorized'){
+                $this->isResetAccesstoken(true);
+            }
         }
     }
     /**

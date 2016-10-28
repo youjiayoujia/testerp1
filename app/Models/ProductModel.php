@@ -109,7 +109,6 @@ class ProductModel extends BaseModel
         'length',
         'package_weight',
         'competition_url',
-        'warehouse_position',
     ];
 
     public function getMixedSearchAttribute()
@@ -762,7 +761,7 @@ class ProductModel extends BaseModel
         set_time_limit(0);
         //$imageModel = new ImageModel();
         //$model = $this->all();
-        $model = $this->where('id','<','508')->get();
+        $model = $this->where('id','>','20035')->get();
         foreach($model as $_item){
             $sku = $_item->item[0]->sku;
             $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;

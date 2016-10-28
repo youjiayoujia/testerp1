@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\SyncApiModels;
+use App\Models\SyncApiModel;
 use Tool;
 
 class SyncSellmoreApi extends Command
@@ -39,7 +39,7 @@ class SyncSellmoreApi extends Command
      */
     public function handle()
     {
-        $datas = SyncApiModels::where('status',0)->get(); //获取未同步记录
+        $datas = SyncApiModel::where('status',0)->get(); //获取未同步记录
         if(!$datas->isEmpty()){
             foreach ($datas as $data){
                 $result = Tool::postCurlHttpsData($data->url,unserialize($data->data));
@@ -49,7 +49,8 @@ class SyncSellmoreApi extends Command
                     $data->save();
                     $this->info('#'.$data->relations_id.'has to sync sellmore databsae');
                 }else{
-                    $data->times = $data->times +1;
+                    $data->times     = $data->times +1;
+                    $data->error_msg = isset($res_ary['message']) ? $res_ary['message'] : '';
                     $data->save();
                     $this->comment('#'.$data->relations_id.'has not to sync sellmore database');
                 }

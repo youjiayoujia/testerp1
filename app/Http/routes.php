@@ -1039,6 +1039,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
     Route::any('spu/insertLan', ['uses' => 'SpuController@insertLan', 'as' => 'spu.insertLan']);
     Route::resource('spu', 'SpuController');
+    //接口路由
+    Route::resource('syncApi','SyncApiController');
 });
 
 

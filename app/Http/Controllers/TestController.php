@@ -729,7 +729,11 @@ class TestController extends Controller
      * 测试自动补货功能
      */
     public function getEbayProduct(){
-
+        //$package = PackageModel::findOrFail(3113);
+        $package =  PackageModel::where('id',1)->first();
+        $result = $package->placeLogistics();
+        var_dump($result);exit;
+        exit;
         $page = 2;
         $pageSize = 2000;
         $status = ['saleOutStopping', 'stopping', 'cleaning'];

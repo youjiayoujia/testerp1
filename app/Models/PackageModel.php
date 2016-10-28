@@ -1114,7 +1114,7 @@ class PackageModel extends BaseModel
         if ($this->canPlaceLogistics()) {
             $result  = $this->logistics->placeOrder($this->id);
             if (isset($result['status'])&&$result['status']) {
-                return $this->update([
+                 $this->update([
                     'status' => 'PROCESSING',
                     'tracking_no' => $result['tracking_no'],
                     'logistics_order_at' => date('Y-m-d H:i:s')

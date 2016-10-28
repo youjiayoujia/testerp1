@@ -452,6 +452,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('scanAddTrCode/{logistic_id}',
         ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
     Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
+    Route::get('logisticsRule/createData', ['uses' => 'Logistics\RuleController@createData', 'as' => 'logisticsRule.createData']);
     Route::resource('logisticsRule', 'Logistics\RuleController');
     Route::get('bhw', ['uses' => 'Logistics\RuleController@bhw', 'as' => 'bhw']);
     Route::resource('logisticsCatalog', 'Logistics\CatalogController');

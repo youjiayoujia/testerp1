@@ -75,6 +75,8 @@ class RuleController extends Controller
                 foreach($ruleCatalog as $limit) {
                     unset($limit->id);
                     $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
                     $ruleCatalog = new ruleCatalog();
                     $ruleCatalog->create($limit->toArray());
                 }
@@ -86,6 +88,8 @@ class RuleController extends Controller
                 foreach($ruleAccount as $limit) {
                     unset($limit->id);
                     $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
                     $ruleAccount = new ruleAccount();
                     $ruleAccount->create($limit->toArray());
                 }
@@ -97,6 +101,8 @@ class RuleController extends Controller
                 foreach($ruleCountry as $limit) {
                     unset($limit->id);
                     $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
                     $ruleCountry = new ruleCountry();
                     $ruleCountry->create($limit->toArray());
                 }
@@ -108,6 +114,8 @@ class RuleController extends Controller
                 foreach($ruleLimit as $limit) {
                     unset($limit->id);
                     $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
                     $ruleLimit = new ruleLimit();
                     $ruleLimit->create($limit->toArray());
                 }
@@ -119,6 +127,8 @@ class RuleController extends Controller
                 foreach($ruleChannel as $limit) {
                     unset($limit->id);
                     $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
                     $ruleChannel = new ruleChannel();
                     $ruleChannel->create($limit->toArray());
                 }
@@ -130,6 +140,8 @@ class RuleController extends Controller
                 foreach($ruleTransport as $limit) {
                     unset($limit->id);
                     $limit->logistics_rule_id = $rule->id;
+                    $limit->created_at = date("Y-m-d H:i:s");
+                    $limit->updated_at = date("Y-m-d H:i:s");
                     $ruleTransport = new ruleTransport();
                     $ruleTransport->create($limit->toArray());
                 }

@@ -138,6 +138,11 @@ class PackageController extends Controller
                 $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
             }
         }
+        $arr = array();
+        foreach ($data as $value) {
+            $arr[] = $value['logisticsPriority'];
+        }
+        array_multisort($arr, SORT_ASC, $data);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'datas' => $data,

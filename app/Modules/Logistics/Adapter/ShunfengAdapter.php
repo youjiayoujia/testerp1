@@ -142,6 +142,7 @@ class ShunfengAdapter extends BasicAdapter
    	    </Body>
         </Request>';
 
+        var_dump($order_str);exit;
         $call = $this->SoapClient->sfexpressService(array('arg0' => $order_str));
         $responseXml = $call->return;//返回的xml信息，数据很小
         $result = simplexml_load_string($responseXml);

@@ -77,7 +77,7 @@
         <div class="panel-heading"> 库存信息:</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>仓库</strong>: {{ $warehouse->name }}
+                <strong>仓库</strong>: {{ count($warehouse)?$warehouse->name:'' }}
             </div>
             <div class="col-lg-1">
                 <strong>库位</strong>: {{ $model->warehouse_position }}

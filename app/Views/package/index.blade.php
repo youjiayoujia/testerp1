@@ -73,6 +73,9 @@
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
+                <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-info btn-xs recycle" title='重新匹配物流'>
+                    <span class="glyphicon glyphicon-pencil"></span> 
+                </a>
                 <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
                     <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
@@ -232,6 +235,11 @@
             $('.multiEditTracking').click(function () {
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
+            })
+
+            $(document).on('click', '.recycle', function(){
+                id = $(this).data('id');
+                location.href="{{ route('package.recycle') }}?id=" + id;
             })
 
             $(document).on('click', '.submit_logistics', function(){

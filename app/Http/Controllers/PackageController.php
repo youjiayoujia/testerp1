@@ -294,6 +294,21 @@ class PackageController extends Controller
         return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count().'个包裹放入队列'));
     }
 
+    public function recycle()
+    {
+        $id = request('id');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
+        }
+        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0']);
+        $job = new AssignLogistics($model);
+        $job->onQueue('assignLogistics');
+        $this->dispatch($job);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹已重新匹配物流'));
+    }
+
     public function allocateLogistics($id)
     {
         $response = [

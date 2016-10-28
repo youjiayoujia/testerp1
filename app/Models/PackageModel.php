@@ -848,7 +848,10 @@ class PackageModel extends BaseModel
             $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
         })->where(['is_clearance' => $isClearance])
-            ->get();
+            ->get()
+            ->sortBy(function($single,$key){
+                return $single->logistics->priority;
+              });
         foreach ($rules as $rule) {
             if ($rule->catalog_section) {
                 $catalogs = $rule->rule_catalogs_through;
@@ -970,7 +973,10 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
-              ->get();
+              ->get()
+              ->sortBy(function($single,$key){
+                return $single->logistics->priority;
+              });
             foreach ($rules as $rule) {
                 //是否在物流方式产品分类中
                 if ($rule->catalog_section) {

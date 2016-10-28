@@ -1083,7 +1083,7 @@ class PackageModel extends BaseModel
     /**
      * 判断包裹是否能物流下单
      */
-    public function canPlaceLogistics()
+    public function canplaceLogistics()
     {
         //判断订单状态
         if ($this->status != 'ASSIGNED') {

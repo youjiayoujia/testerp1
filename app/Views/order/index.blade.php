@@ -583,7 +583,7 @@
                                         <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                                     </div>
                                     <div class="col-lg-3">
-                                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
+                                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->name : '' }}
                                     </div>
                                     <div class="col-lg-3">
                                         <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>

@@ -135,11 +135,11 @@ return [
                     'url' => 'pickList.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '效能统计',
-                    'url' => 'pickList.performanceStatistics',
-                    'icon' => '',
-                ],
+                // [
+                //     'name' => '效能统计',
+                //     'url' => 'pickList.performanceStatistics',
+                //     'icon' => '',
+                // ],
                 [
                     'name' => '拣货单异常',
                     'url' => 'errorList.index',
@@ -692,10 +692,10 @@ return [
                     'icon' => '',
                 ],
             ],
-            '事件历史' => [
+            '接口' => [
                 [
-                    'name' => '历史记录',
-                    'url' => 'eventChild.index',
+                    'name' => '同步接口',
+                    'url' => 'syncApi.index',
                     'icon' => '',
                 ],
             ],

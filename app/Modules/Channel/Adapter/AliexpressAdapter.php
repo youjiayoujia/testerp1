@@ -60,6 +60,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderStatus = $status[0];
         $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
             strtotime($startDate));
+        $startDate = $startDate>'2016-10-27 17:00:00'?$startDate:'2016-10-27 17:00:00';
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
 
@@ -345,6 +346,7 @@ Class AliexpressAdapter implements AdapterInterface
             die(curl_error($ch)); //异常错误
         }
         curl_close($ch);
+        $this->checkToken($output);
         return $output;
     }
 
@@ -368,6 +370,7 @@ Class AliexpressAdapter implements AdapterInterface
             die(curl_error($ch)); //异常错误
         }
         curl_close($ch);
+        $this->checkToken($data);
         return $data;
     }
 
@@ -444,23 +447,46 @@ Class AliexpressAdapter implements AdapterInterface
      * 获取acees_token
      * 判断access_token是否过期(10小时)
      */
-    public function isResetAccesstoken()
+    public function isResetAccesstoken($is_now=false)
     {
         $now = date("Y-m-d H:i:s");
         $hours = (strtotime($now) - strtotime($this->_access_token_date)) / 60 / 60;
-        if ($hours > 9.5) { //大于10小时(提前半小时)
+        if($is_now){
             $json = $this->resetAccessToken(); //获取最新的access_token
             $data = json_decode($json, true);
             DB::table('channel_accounts')->where('aliexpress_member_id', $this->_aliexpress_member_id)->update([
                 'aliexpress_access_token' => $data["access_token"],
                 'aliexpress_access_token_date' => date('Y-m-d H:i:s')
             ]);
-            return $data["access_token"];
-        } else {
-            return false;
+            $this->sendToSlme($data["access_token"],$this->_aliexpress_member_id);
+        }else{
+            if ($hours > 9.5) { //大于10小时(提前半小时)
+                $json = $this->resetAccessToken(); //获取最新的access_token
+                $data = json_decode($json, true);
+                DB::table('channel_accounts')->where('aliexpress_member_id', $this->_aliexpress_member_id)->update([
+                    'aliexpress_access_token' => $data["access_token"],
+                    'aliexpress_access_token_date' => date('Y-m-d H:i:s')
+                ]);
+                $this->sendToSlme($data["access_token"],$this->_aliexpress_member_id);
+                return $data["access_token"];
+            } else {
+                return false;
+            }
+        }
+
+    }
+    public function sendToSlme($access_token,$member_id){
+        $url = 'http://v2.erp.moonarstore.com/admin/auto/auto_smt_refresh_access_token/get_v3_access_token?key=SLME5201314&access_token='.$access_token.'&member_id='.$member_id;
+        $this-> getCurlData($url);
+    }
+    public function checkToken($data){
+        $data = json_decode($data,true);
+        if(isset($data['error_code'])&&isset($data['error_message'])){
+            if($data['error_code']==401&&$data['error_message']='Request need user authorized'){
+                $this->isResetAccesstoken(true);
+            }
         }
     }
-
     /**
      *
      * refreshToken换取accessToken  POST https

@@ -29,6 +29,8 @@ use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\ChannelNameModel;
+use App\Models\Publish\Ebay\EbayPublishProductModel;
+use App\Models\Publish\Ebay\EbayPublishProductDetailModel;
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\Publish\Joom\JoomPublishProductModel;
@@ -727,10 +729,70 @@ class TestController extends Controller
      * 测试自动补货功能
      */
     public function getEbayProduct(){
-        $account = AccountModel::find(378);
-        if ($account) {
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $channel->testBuHuo();
+
+        $page = 2;
+        $pageSize = 2000;
+        $status = ['saleOutStopping', 'stopping', 'cleaning'];
+        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status', $status)->Offset($pageSize * $page)->limit($pageSize)->get();
+
+        foreach ($product_data as $product) {
+            if ($product->AvailableQuantity + $product->NormalTransitQuantity > 0) {
+                continue;
+            }
+            $ebay_sku_arr = EbayPublishProductDetailModel::where(['erp_sku' => trim($product->sku), 'status' => '1'])->get();
+            foreach ($ebay_sku_arr as $ebay_sku) {
+                if ($ebay_sku->ebayProduct->multi_attribute == 0) { //直接下架
+                    echo 'single  down';
+                } else {
+                    $all_ebay_sku = EbayPublishProductDetailModel::where(['item_id' => $ebay_sku->item_id,])->where('id', '!=', $ebay_sku->id)->get(); //这个广告下的全部sku 不包括这个
+                    $is_down = true; //下架改广告
+                    foreach ($all_ebay_sku as $ebay_sku_item) {
+                        if ($ebay_sku_item->status == 1) { //sku 在线
+                            echo $ebay_sku_item->erp_sku;
+                            if (in_array($ebay_sku_item->erpProduct->status, $status)) { //其他sku  不满足状态天剑
+                                if ($ebay_sku_item->erpProduct->AvailableQuantity + $ebay_sku_item->erpProduct->NormalTransitQuantity > 0) { //其他sku 虚库存+在途 > 0
+                                    $is_down = false;
+                                }
+                            } else {
+                                $is_down = false;
+                            }
+                        }
+                    }
+                    if ($is_down) { //下架这个listting
+                        echo 'mul  down';
+                    } else { //将这个sku的在线数量调成0
+                        echo 'set zero';
+
+                    }
+                }
+            }
+        }
+
+
+        //货源待定SKU 在线数量设置为0
+
+        $page = 2;
+        $pageSize = 2000;
+        $status = ['unSellTemp'];
+        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status', $status)->Offset($pageSize * $page)->limit($pageSize)->get();
+        foreach($product_data as $product){
+            if ($product->AvailableQuantity + $product->NormalTransitQuantity > 0) {
+                continue;
+            }
+            $ebay_sku_arr = EbayPublishProductDetailModel::where(['erp_sku' => trim($product->sku), 'status' => '1'])->get();
+            foreach ($ebay_sku_arr as $ebay_sku) { //设置在线数量为0
+                echo 'set zero';
+            }
+        }
+
+
+
+
+
+           /* $account = AccountModel::find(378);
+            if ($account) {
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $channel->testBuHuo();*/
 //            $is_do =true;
 //            $i=1;
 //            while($is_do) {
@@ -749,7 +811,7 @@ class TestController extends Controller
 //            }
 
 
-        }
+        //}
     }
     public function getCurlData($remote_server)
     {

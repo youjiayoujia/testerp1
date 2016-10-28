@@ -108,14 +108,16 @@ class PackageController extends Controller
 
     public function logisticsDelivery()
     {
-        $date = request()->input('date');
-        if(!$date) {
-            $date = date('Y-m-d');
+        $start = request()->input('start');
+        $end = request()->input('end');
+        if(!$start && !$end) {
+            $start = date('Y-m-d');
+            $end = date('Y-m-d');
         }
         $data = [];
         $count = $this->model->where('logistics_id', '!=', 0)
-            ->where('shipped_at', '>=', $date . ' 00:00:00')
-            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00')
+            ->where('shipped_at', '>=', $start . ' 00:00:00')
+            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00')
             ->count();
         $totalWeight = 0;
         $logisticses = LogisticsModel::where('is_enable', 1)->get();
@@ -127,8 +129,8 @@ class PackageController extends Controller
             $data[$key]['percent'] = 0 . '%';
             $packages = $this->model
                 ->where('logistics_id', $logistics->id)
-                ->where('shipped_at', '>=', $date . ' 00:00:00')
-                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00');
+                ->where('shipped_at', '>=', $start . ' 00:00:00')
+                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00');
             foreach($packages->get() as $package) {
                 $data[$key]['weight'] += $package->weight;
             }
@@ -138,11 +140,17 @@ class PackageController extends Controller
                 $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
             }
         }
+        $arr = array();
+        foreach ($data as $value) {
+            $arr[] = $value['logisticsPriority'];
+        }
+        array_multisort($arr, SORT_ASC, $data);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'datas' => $data,
             'count' => $count,
-            'date' => $date,
+            'start' => $start,
+            'end' => $end,
             'totalWeight' => $totalWeight,
         ];
 
@@ -261,7 +269,7 @@ class PackageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
-            'packageNum' => $this->model->where('status', 'NEED')->count(),
+            'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
             'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function($single){return $single->packages()->count() == 0;})->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
@@ -301,9 +309,10 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
         }
-        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0']);
-        $job = new AssignLogistics($model);
-        $job->onQueue('assignLogistics');
+        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0', 'is_auto' => '1']);
+        $package = $this->model->find($id);
+        $job = new AssignLogistics($package);
+        $job = $job->onQueue('assignLogistics');
         $this->dispatch($job);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹已重新匹配物流'));
@@ -702,8 +711,22 @@ class PackageController extends Controller
     {
         $buf = request()->input('buf');
         foreach ($buf as $v) {
-            $model = $this->model->find($v);
-            $model->update(['status' => 'SHIPPED']);
+            $package = $this->model->find($v);
+            $package->update(['status' => 'SHIPPED']);
+            DB::beginTransaction();
+            try {
+                foreach($package->items as $packageItem) {
+                    $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                                                $packageItem->quantity,
+                                                'PACKAGE',
+                                                $packageItem->id);
+                    $packageItem->orderItem->update(['status' => 'SHIPPED']);
+                }
+            } catch (Exception $e) {
+                DB::rollback();
+                return json_encode('unhold');
+            }
+            DB::commit();
         }
 
         return json_encode(true);

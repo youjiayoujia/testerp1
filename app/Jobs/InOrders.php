@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Jobs\Job;
 use App\Jobs\DoPackages;
+use App\Jobs\AutoAddProduct;
 use App\Models\OrderModel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -34,6 +35,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
      */
     public function handle(OrderModel $orderModel)
     {
+        $channel = ChannelModel::where('name', 'Ebay')->first();
         $start = microtime(true);
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
         if (!$oldOrder) {

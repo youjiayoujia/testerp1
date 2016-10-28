@@ -3,6 +3,7 @@
     <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class="sort" data-field="id">ID</th>
     <th>订单号</th>
+    <th>订单金额</th>
     <th>仓库</th>
     <th>收货人</th>
     <th>国家</th>
@@ -26,6 +27,7 @@
             </td>
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+            <td>{{ $package->order ? $package->order->amount : '订单金额有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->shipping_firstname . $package->shipping_lastname }}</td>
             <td>{{ $package->shipping_country }}</td>
@@ -62,14 +64,14 @@
                         </button>
                 </td>
                 <td>库位</td><td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
-                <td>数量</td><td colspan='2'>{{ $packageItem->quantity }}</td>
+                <td>数量</td><td colspan='3'>{{ $packageItem->quantity }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道:  {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单:  {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>追踪号: {{ $package->tracking_no ? $package->tracking_no : '暂无追踪号信息'}}
-            <td colspan='4'>
+            <td colspan='5'>
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>

@@ -25,7 +25,7 @@
             <label for="size">主供应商</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select id="supplier_id" class="form-control supplier" name="supplier_id">
-               <option value="{{$model->supplier->id}}">{{$model->supplier->name}}</option>
+               <option value="{{$model->supplier?$model->supplier->id:0}}">{{$model->supplier?$model->supplier->name:''}}</option>
             </select>
         </div>
         <div class="form-group col-md-3">

@@ -76,24 +76,8 @@
     <div class="panel panel-default">
         <div class="panel-heading"> 库存信息:</div>
         <div class="panel-body">
-            <?php 
-                $baoque="false";
-                $baodeng = "false";
-                $tuhuobuyi = "false";
-                $canci = "false";
-                $purchaseArray = $model->purchase->toArray();
-                //$purchase_day = 0;
-                foreach ($purchaseArray as $arr) {
-                    if($arr['active']==1&&$arr['active_status']>0)$baoque="true";
-                    if($arr['active']==2&&$arr['active_status']>0)$baodeng="true";
-                    if($arr['active']==3&&$arr['active_status']>0)$canci="true";
-                    if($arr['active']==4&&$arr['active_status']>0)$tuhuobuyi="true";
-
-                    //$purchase_day = (strtotime($arr['arrival_time']) - strtotime($arr['start_buying_time']))/86400;
-                }
-            ?>
             <div class="col-lg-2">
-                <strong>仓库</strong>: {{ $warehouse->name }}
+                <strong>仓库</strong>: {{ count($warehouse)?$warehouse->name:'' }}
             </div>
             <div class="col-lg-1">
                 <strong>库位</strong>: {{ $model->warehouse_position }}
@@ -106,18 +90,6 @@
             </div>
             <div class="col-lg-1">
                 <strong>采购天数</strong>: {{ $model->product->purchase_day}} 天
-            </div>
-            <div class="col-lg-1">
-                <strong>报缺状态</strong>: {{$baoque}}
-            </div>
-            <div class="col-lg-1">
-                <strong>报等状态</strong>: {{$baodeng}}
-            </div>
-            <div class="col-lg-1">
-                <strong>残次品</strong>: {{$canci}}
-            </div>
-            <div class="col-lg-1">
-                <strong>图货不一</strong>: {{$tuhuobuyi}}
             </div>
         </div>
     </div>

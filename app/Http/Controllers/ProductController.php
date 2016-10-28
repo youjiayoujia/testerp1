@@ -138,7 +138,6 @@ class ProductController extends Controller
             'logisticsLimit' => $this->logisticsLimit->all(),
             'wrapLimit_arr' => $wrapLimit_arr,
             'logisticsLimit_arr' => $logisticsLimit_arr,
-            'all_second_suppliers' =>SupplierModel::where('examine_status','currentData')->get(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

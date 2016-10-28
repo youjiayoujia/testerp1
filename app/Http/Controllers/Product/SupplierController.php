@@ -204,7 +204,7 @@ class SupplierController extends Controller
     {
         if(request()->ajax()) {
             $supplier = trim(request()->input('supplier'));
-            $buf = SupplierModel::where('name', 'like', '%'.$supplier.'%')->get();
+            $buf = SupplierModel::where('name', 'like', '%'.$supplier.'%')->where('examine_status','currentData')->get();
             $total = $buf->count();
             $arr = [];
             foreach($buf as $key => $value) {

@@ -108,14 +108,16 @@ class PackageController extends Controller
 
     public function logisticsDelivery()
     {
-        $date = request()->input('date');
-        if(!$date) {
-            $date = date('Y-m-d');
+        $start = request()->input('start');
+        $end = request()->input('end');
+        if(!$start && !$end) {
+            $start = date('Y-m-d');
+            $end = date('Y-m-d');
         }
         $data = [];
         $count = $this->model->where('logistics_id', '!=', 0)
-            ->where('shipped_at', '>=', $date . ' 00:00:00')
-            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00')
+            ->where('shipped_at', '>=', $start . ' 00:00:00')
+            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00')
             ->count();
         $totalWeight = 0;
         $logisticses = LogisticsModel::where('is_enable', 1)->get();
@@ -127,8 +129,8 @@ class PackageController extends Controller
             $data[$key]['percent'] = 0 . '%';
             $packages = $this->model
                 ->where('logistics_id', $logistics->id)
-                ->where('shipped_at', '>=', $date . ' 00:00:00')
-                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00');
+                ->where('shipped_at', '>=', $start . ' 00:00:00')
+                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00');
             foreach($packages->get() as $package) {
                 $data[$key]['weight'] += $package->weight;
             }
@@ -138,11 +140,17 @@ class PackageController extends Controller
                 $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
             }
         }
+        $arr = array();
+        foreach ($data as $value) {
+            $arr[] = $value['logisticsPriority'];
+        }
+        array_multisort($arr, SORT_ASC, $data);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'datas' => $data,
             'count' => $count,
-            'date' => $date,
+            'start' => $start,
+            'end' => $end,
             'totalWeight' => $totalWeight,
         ];
 

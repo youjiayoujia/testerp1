@@ -5,7 +5,10 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-2">
-                    <input class="form-control date" id="date" placeholder="" value="{{ $date }}" name="date">
+                    <input class="form-control start" id="start" placeholder="开始日期" value="{{ $start }}" name="start">
+                </div>
+                <div class="col-lg-2">
+                    <input class="form-control end" id="end" placeholder="结束日期" value="{{ $end }}" name="end">
                 </div>
                 <div class="col-lg-1">
                     <button class="filter">筛选</button>
@@ -51,13 +54,15 @@
 <script src="{{ asset('js/jquery.min.js') }}"></script>
 <script type='text/javascript'>
     $(document).ready(function(){
-        $('#date').cxCalendar();
+        $('#start').cxCalendar();
+        $('#end').cxCalendar();
     });
 
     $(document).on('click', '.filter', function () {
-        var date = $('#date').val();
-        if (date) {
-            location.href="{{route('package.logisticsDelivery')}}/?date="+date;
+        var start = $('#start').val();
+        var end = $('#end').val();
+        if (start && end) {
+            location.href="{{route('package.logisticsDelivery')}}/?start="+start+"&end="+end;
         }
     });
 </script>

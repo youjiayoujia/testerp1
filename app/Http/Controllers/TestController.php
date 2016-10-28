@@ -35,6 +35,7 @@ use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\Publish\Joom\JoomPublishProductModel;
 use App\Models\Publish\Joom\JoomPublishProductDetailModel;
+use App\Models\Publish\Joom\JoomShippingModel;
 use App\Modules\Channel\ChannelModule;
 use App\Jobs\Job;
 use App\Jobs\DoPackage;
@@ -76,10 +77,13 @@ class TestController extends Controller
 
     public function test2()
     {
-        $a = [1,2,[3,4]];
-        var_dump(count($a));
-        var_dump(count($a,1));
+        $package = PackageModel::where('id', '>', '0')->get()->sortBy(function($a,$b){
+            return $a->warehouse->created_at;
+        });
+
+        var_dump($package->toarray());exit;
     }
+
     // public function test2()
     // {
     //     $a = ['a' => 'b', 'c' => 'e', 'f' => ['f','g','i']];
@@ -1058,6 +1062,80 @@ class TestController extends Controller
             }else{   //over
                 break;
             }
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+/*Time:2016-10-14
+     *joom_OrdersToShipping 标记发货
+     *@param $order_id $id
+     */
+    public function joomToShipping()
+    {
+        $begin = microtime(true);
+        $id = request()->get('id');
+        $orders = OrderModel::where('id',$id)->first();
+        if(!$orders){
+            echo "Parameter error！";exit;
+        }
+        if($orders->channel_id !== 9){
+            echo "Parameter error！";exit;
+        }
+        $account = AccountModel::where('channel_id',$orders->channel_id)->first();
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $channel_arr = explode("+",$orders->channel_ordernum);
+        $provider = '';   //joom承运商承认物流
+        if(!$provider){
+            $provider = 'SFExpress';
+        }
+        foreach($channel_arr as $item){
+            foreach($orders->packages as $track){
+                $order_shipping = JoomShippingModel::where(['joomID'=>$item,'shipping_code'=>$track->tracking_no])->get();
+                $orderList = $channel->joomApiOrdersToShipping($item,$provider,$track->tracking_no,$orders->status);
+                if($orderList['code'] == 0 || isset($orderList['data']['success'])){
+                    if($orders->status == 'SHIPPED'){
+
+                    }
+                }else if(strpos($orderList['message'],"has been shipped already")){
+
+                    echo "".$orderList->id."在joom平台上已经标记发货成功！不需重新发货！api返回信息为".$orderList['message']."<br>";
+                }else{
+
+                    echo "发生错误，错误信息为".$orderList["message"]."<br>";
+                }
+            }
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+    /*
+     * Time:2016-10-17
+     * joomordersshelves  refure token
+     * @param $order_id $id
+     */
+    public function joomrefreshtoken(){
+        $begin = microtime(true);
+        $account = request()->get('account');
+        if(!$account){
+            echo "Parameter error！";exit;  //参数不能为空
+        }
+        $account = AccountModel::where('account',$account)->first();
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $url = "https://api-merchant.joom.it/api/v2/oauth/refresh_token";
+        $post_data = "client_id=".$account->client_id."&client_secret=".$account->client_secret."&refresh_token=".$account->refresh_token."&grant_type=refresh_token";
+        //$json_data = $channel->postCurlHttpsData($url,$post_data);   //刷新token返回的信息
+        if(isset($json_data)){
+            $ret = DB::table('channel_accounts')->where('id', $account->id)->update([
+                'joom_access_token' => $json_data->data->access_token,
+                'joom_refresh_token' => $json_data->data->refresh_token,
+                'joom_expiry_time' => $json_data->data->expiry_time]);
+            if($ret){
+                echo "系统刷新token成功!请检查！刷新后token信息为".$json_data->data->access_token."<br>";
+            }else{
+                echo "系统刷新token失败!请检查！<br>";
+            }
+        }else{
+            echo "系统刷新token失败!请检查！<br>";
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

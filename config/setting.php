@@ -89,6 +89,7 @@ return [
         'order.ordernum' => '订单号',
         'productID'=>'Wish产品ID',
         'details.erp_sku'=>'erpSKU',
+        'details.wish_sku'=>'WISH-SKU',
         'account_id' =>'账号',
         'sellerID' =>'销售人员',
         'price.number_sold' =>'产品销量',

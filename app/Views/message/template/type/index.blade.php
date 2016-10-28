@@ -21,18 +21,19 @@
                 <a href="{{ route('messageTemplateType.show', ['id'=>$type->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if(request()->user()->group == 'leader')
                 <a href="{{ route('messageTemplateType.edit', ['id'=>$type->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                @if($type->templates()->count() < 1)
-                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                       data-id="{{ $type->id }}"
-                       data-url="{{ route('messageTemplateType.destroy', ['id' => $type->id]) }}">
-                        <span class="glyphicon glyphicon-trash"></span> 删除
-                    </a>
-                @endif
-                @endif
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $type->id }}"
+                   data-url="{{ route('messageTemplateType.destroy', ['id' => $type->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span> 删除
+                </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $type->table }}" data-id="{{$type->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

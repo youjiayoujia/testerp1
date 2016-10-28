@@ -6,9 +6,9 @@
     <th>物流方式简码</th>
     <th>计算方式</th>
     <th>首重(kg)</th>
-    <th>首重价格(/kg)</th>
+    <th>首重价格</th>
     <th>续重(kg)</th>
-    <th>续重价格(/kg)</th>
+    <th>续重价格</th>
     <th>其他固定费用</th>
     <th>最后折扣</th>
     <th>是否通折</th>
@@ -24,12 +24,12 @@
             <td>{{ $zone->logistics ? $zone->logistics->name : '' }}</td>
             <td>{{ $zone->logistics ? $zone->logistics->code : '' }}</td>
             <td>{{ $zone->type == 'first' ? '方式一' : '方式二' }}</td>
-            <td>{{ $zone->fixed_weight }}</td>
-            <td>{{ $zone->fixed_price }}</td>
-            <td>{{ $zone->continued_weight }}</td>
-            <td>{{ $zone->continued_price }}</td>
-            <td>{{ $zone->other_fixed_price }}</td>
-            <td>{{ $zone->discount }}</td>
+            <td>{{ sprintf("%.3f", $zone->fixed_weight) }}</td>
+            <td>{{ sprintf("%.3f", $zone->fixed_price) }}</td>
+            <td>{{ sprintf("%.3f", $zone->continued_weight) }}</td>
+            <td>{{ sprintf("%.3f", $zone->continued_price) }}</td>
+            <td>{{ sprintf("%.3f", $zone->other_fixed_price) }}</td>
+            <td>{{ sprintf("%.3f", $zone->discount) }}</td>
             <td>{{ $zone->discount_weather_all ? '是' : '否'}}</td>
             <td>{{ $zone->created_at }}</td>
             <td>{{ $zone->updated_at }}</td>

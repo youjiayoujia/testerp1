@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
 use App\Models\CountriesModel;
+use App\Models\Logistics\PartitionModel;
 use App\Models\Logistics\ZoneModel;
 use App\Models\CountriesSortModel;
 use App\Models\LogisticsModel;
@@ -32,11 +33,16 @@ class ZoneController extends Controller
      */
     public function create()
     {
+        $arr = explode('/', $_SERVER['HTTP_REFERER']);
+        $logistics_id = $arr[count($arr) - 1];
+        $logistics_name = LogisticsModel::where('id', $logistics_id)->first()->name;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses'=>LogisticsModel::all(),
-            'countrySorts' => CountriesSortModel::all(),
+            'partitions' => PartitionModel::all(),
             'model' => $this->model->where('logistics_id', LogisticsModel::first()->id)->first(),
+            'logistics_id' => $logistics_id,
+            'logistics_name' => $logistics_name,
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -61,9 +67,10 @@ class ZoneController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
+        $logistics_id = request('logistics_id');
         $this->model->createData(request()->all());
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex . '/one/' . $logistics_id);
     }
 
     /**
@@ -133,7 +140,7 @@ class ZoneController extends Controller
             'model' => $model,
             'countries' => $model->logistics_zone_countries,
             'logisticses'=>LogisticsModel::all(),
-            'countrySorts' => CountriesSortModel::all(),
+            'partitions' => PartitionModel::all(),
             'sectionPrices' => $model->zone_section_prices,
             'len' =>  $model->zone_section_prices->count(),
         ];
@@ -149,13 +156,15 @@ class ZoneController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $logistics_id = $model->logistics_id;
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateData(request()->all());
-        return redirect($this->mainIndex);
+
+        return redirect($this->mainIndex . '/one/' . $logistics_id);
     }
 
     /**

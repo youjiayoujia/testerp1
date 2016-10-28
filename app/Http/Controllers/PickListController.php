@@ -131,25 +131,30 @@ class PickListController extends Controller
      */
     public function printPickList($id)
     {
-        $model = $this->model->find($id);
-        $from = base64_encode(serialize($model));
-        $name = UserModel::find(request()->user()->id)->name;
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        $ids = explode(",", $id);
+        $html = '';
+        foreach($ids as $id) {
+            $model = $this->model->find($id);
+            $from = base64_encode(serialize($model));
+            $name = UserModel::find(request()->user()->id)->name;
+            if (!$model) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            }
+            $model->printRecords()->create(['user_id' => request()->user()->id]);
+            if($model->status == 'NONE') {
+                $model->update(['status' => 'PRINTED', 'print_at' => date('Y-m-d H:i:s', time())]);
+            }
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'model' => $model,
+                'size' => $model->logistics ? ($model->logistics->template ? $model->logistics->template->size : '暂无面单尺寸信息') : '暂无面单尺寸信息',
+                'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
+            ];
+            $this->eventLog($name, '打印拣货单,id='.$model->id, $from, $from);
+            $html .= view($this->viewPath.'print', $response);
         }
-        $model->printRecords()->create(['user_id' => request()->user()->id]);
-        if($model->status == 'NONE') {
-            $model->update(['status' => 'PRINTED', 'print_at' => date('Y-m-d H:i:s', time())]);
-        }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'size' => $model->logistics ? ($model->logistics->template ? $model->logistics->template->size : '暂无面单尺寸信息') : '暂无面单尺寸信息',
-            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
-        ];
-        $this->eventLog($name, '打印拣货单,id='.$model->id, $from, $from);
-
-        return view($this->viewPath.'print', $response);
+        
+        return $html;
     }
 
     public function confirmPickBy()
@@ -229,7 +234,7 @@ class PickListController extends Controller
     public function indexPrintPickList($content)
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__,'包装'),
             'content' => $content,
         ];
 
@@ -263,14 +268,14 @@ class PickListController extends Controller
                 return $this->printPickList($model->id);
                 break;
             case 'single':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PACKAGEING', 'PICKING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->pickListPackage($model->id);
                 break;
             case 'singleMulti':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PACKAGEING', 'PICKING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
@@ -351,7 +356,7 @@ class PickListController extends Controller
             $model->update(['status' => 'PACKAGEING']);
         }
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__,'包装'),
             'model' => $model,
             'pickListItems' => $model->pickListItem,
             'packages' => $model->package,
@@ -437,7 +442,7 @@ class PickListController extends Controller
         }
         $this->eventLog($name, '分拣完成,id='.$obj->id, $from, $from);
 
-        return redirect($this->mainIndex);
+        return redirect(route('package.flow'));
     }
 
     /**
@@ -489,7 +494,7 @@ class PickListController extends Controller
                             'quantity' => $sum]);
         }
 
-        return redirect($this->mainIndex);
+        return redirect(route('package.flow'));
     }
 
     /**
@@ -522,6 +527,11 @@ class PickListController extends Controller
                 }
             }
             if($flag == 1) {
+                $order = $package->order;
+                if($order->status == 'REVIEW') {
+                    $package->update(['status' => 'ERROR']);
+                    return json_encode(false);
+                }
                 $package->status = 'PACKED';
                 $package->save();
                 $picklistItems = $package->picklistItems;
@@ -529,7 +539,6 @@ class PickListController extends Controller
                     $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
                     $picklistItem->save();
                 }
-                $order = $package->order;
                 $buf = 1;
                 foreach($order->packages as $childPackage) {
                     if($childPackage->status != 'PACKED') {
@@ -556,9 +565,7 @@ class PickListController extends Controller
                     return json_encode('unhold');
                 }
                 DB::commit();
-
             }
-
             return json_encode('1');
         }
 
@@ -617,10 +624,14 @@ class PickListController extends Controller
     public function createPickStore()
     {
         $sum = 0;
+        $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
+        if(!$warehouse_id) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '人员没有所属仓库'));
+        }
         if(!request()->has('mixed') && request()->has('logistics')) {
             foreach(request()->input('logistics') as $logistic_id) {
                 foreach(request('package') as $key => $type) {
-                    $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type])->where(function($query){
+                    $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])->where(function($query){
                         if(request()->has('channel')) {
                             $query =$query->whereIn('channel_id', request('channel'));
                         }
@@ -629,14 +640,14 @@ class PickListController extends Controller
                     if($packages->count()) {
                         $this->model->createPickListItems($packages);
                         $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
-                                                     (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);
+                                                     (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id, $warehouse_id);
 
                     }
                 }
             }
         } elseif(request()->has('mixed') && request()->has('logistics')) {
             foreach(request('package') as $key => $type) {
-               $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'type' => $type])->
+               $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])->
                 where(function($query){
                     if(request()->has('logistics')) {
                         $query = $query->whereIn('logistics_id', request('logistics'));
@@ -650,7 +661,7 @@ class PickListController extends Controller
                 if($packages->count()) {
                     $this->model->createPickListItems($packages);
                     $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
-                                                 (request()->has('multitext') ? request()->input('multitext') : '20'));
+                                                 (request()->has('multitext') ? request()->input('multitext') : '20'), $warehouse_id);
                 } 
             }
         }

@@ -38,52 +38,52 @@
             <td>{{ $allotment->checkform_time }}</td>
             <td>{{ $allotment->created_at }}</td>
             <td>
-                <a href="{{ route('stockAllotment.show', ['id'=>$allotment->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stockAllotment.show', ['id'=>$allotment->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
                 @if($allotment->check_status == '0')
-                    <a href="{{ route('stockAllotment.edit', ['id'=>$allotment->id]) }}" class="btn btn-warning btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 编辑
+                    <a href="{{ route('stockAllotment.edit', ['id'=>$allotment->id]) }}" class="btn btn-warning btn-xs" title='编辑'>
+                        <span class="glyphicon glyphicon-pencil"></span> 
                     </a>
                 @endif
                 @if($allotment->allotment_status == 'new' && $allotment->check_status == '0')
-                    <a href="{{ route('allotment.check', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
+                    <a href="{{ route('allotment.check', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs" title='审核调拨单'>
                         <span class="glyphicon glyphicon-pencil"></span>
-                        审核调拨单
+                        
                     </a>
                 @endif
                 @if($allotment->check_status == '2')
-                    <a href="javascript:" class="btn btn-success btn-xs print">
-                        <span class="glyphicon glyphicon-pencil"></span>生成拣货单
+                    <a href="javascript:" class="btn btn-success btn-xs print" title='生成拣货单'>
+                        <span class="glyphicon glyphicon-pencil"></span>
                     </a>
                 @endif
                 @if($allotment->allotment_status == 'pick')
-                    <a href="javascript:" class="btn btn-success btn-xs new" data-id="{{ $allotment->id }}">
+                    <a href="javascript:" class="btn btn-success btn-xs new" data-id="{{ $allotment->id }}" title='重置'>
                         <span class="glyphicon glyphicon-pencil"></span>
-                        重置
+                        
                     </a>
-                    <a href="{{ route('allotment.checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}">
+                    <a href="{{ route('allotment.checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}" title='确认出库'>
                         <span class="glyphicon glyphicon-pencil"></span>
-                        确认出库
+                        
                     </a>
                 @endif
                 @if($allotment->check_status == '2' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
                     @if($allotment->allotment_status != 'over')
-                        <a href="{{ route('allotment.checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
-                            <span class="glyphicon glyphicon-eye-open"></span> 对单
+                        <a href="{{ route('allotment.checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs" title='对单'>
+                            <span class="glyphicon glyphicon-eye-open"></span> 
                         </a>
                     @endif
                 @endif
                 @if($allotment->check_status != '2')
                     <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                        data-id="{{ $allotment->id }}"
-                       data-url="{{ route('stockAllotment.destroy', ['id' => $allotment->id]) }}">
-                        <span class="glyphicon glyphicon-trash"></span> 删除
+                       data-url="{{ route('stockAllotment.destroy', ['id' => $allotment->id]) }}" title='删除'>
+                        <span class="glyphicon glyphicon-trash"></span> 
                     </a>
                 @endif
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
-                        data-target="#dialog" data-table="{{ $allotment->table }}" data-id="{{$allotment->id}}">
+                        data-target="#dialog" data-table="{{ $allotment->table }}" data-id="{{$allotment->id}}" title='日志'>
                     <span class="glyphicon glyphicon-road"></span>
                 </button>
             </td>

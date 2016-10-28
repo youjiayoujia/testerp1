@@ -261,7 +261,7 @@ class PackageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
-            'packageNum' => $this->model->where('status', 'NEED')->count(),
+            'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
             'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function($single){return $single->packages()->count() == 0;})->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
@@ -280,6 +280,34 @@ class PackageController extends Controller
         ];
 
         return view($this->viewPath . 'flow', $response);
+    }
+
+    public function autoFailAssignLogistics()
+    {
+        $packages = $this->model->where('status', 'ASSIGNFAILED')->get();
+        foreach($packages as $package) {
+            $job = new AssignLogistics($package);
+            $job = $job->onQueue('assignLogistics');
+            $this->dispatch($job);
+        }
+
+        return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count().'个包裹放入队列'));
+    }
+
+    public function recycle()
+    {
+        $id = request('id');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
+        }
+        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0', 'is_auto' => '1']);
+        $package = $this->model->find($id);
+        $job = new AssignLogistics($package);
+        $job = $job->onQueue('assignLogistics');
+        $this->dispatch($job);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹已重新匹配物流'));
     }
 
     public function allocateLogistics($id)
@@ -605,7 +633,7 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode(false);
         }
-        $items = $package->items;
+        $items = $package->items();
         foreach ($items as $item) {
             $item->update(['picked_quantity' => $item->quantity]);
             $item->item->out($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);
@@ -634,6 +662,20 @@ class PackageController extends Controller
             $item->update(['picked_quantity' => $item->quantity]);
         }
         $package->update(['status' => 'PACKED']);
+        DB::beginTransaction();
+        try {
+            foreach($package->items as $packageItem) {
+                $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                                            $packageItem->quantity,
+                                            'PACKAGE',
+                                            $packageItem->id);
+                $packageItem->orderItem->update(['status' => 'SHIPPED']);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return json_encode('unhold');
+        }
+        DB::commit();       
 
         return json_encode(true);
     }
@@ -1013,7 +1055,7 @@ class PackageController extends Controller
             return json_encode('error');
         }
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_decode(serialize($package));
+        $from = base64_encode(serialize($package));
         if($weight == '0') {
             $package->update([
                 'shipped_at' => date('Y-m-d h:i:s', time()),
@@ -1035,6 +1077,7 @@ class PackageController extends Controller
                 $buf = 0;
             }
         }
+
         if($buf) {
             foreach($package->items as $packageItem) {
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
@@ -1043,7 +1086,8 @@ class PackageController extends Controller
         } else {
             $order->update(['status' => 'PARTIAL']);
         }
-        $to = base64_decode(serialize($package));
+
+        $to = base64_encode(serialize($package));
         $this->eventLog($name, '发货', $to, $from);
         if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');

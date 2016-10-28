@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use App\Models\ProductModel;
+use App\Models\SpuModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
@@ -22,6 +23,7 @@ use App\Models\Warehouse\PositionModel;
 use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
+use App\Models\SyncApiModel;
 
 class ItemController extends Controller
 {
@@ -83,9 +85,12 @@ class ItemController extends Controller
     {
         $data = request()->all();
         $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateItem($data);
@@ -106,6 +111,7 @@ class ItemController extends Controller
             if(in_array('2', $data['carriage_limit_arr']))$data['products_with_powder'] = 1;
         }
 
+        $arr = [];
         if(array_key_exists('package_limit_arr', $data)){
             foreach($data['package_limit_arr'] as $wrap_limits_id){
                 $arr[] = $wrap_limits_id;         
@@ -114,6 +120,7 @@ class ItemController extends Controller
         }
 
         //回传老系统
+        $old_data['pack_method'] = serialize($arr);
         $old_data['products_name_en'] = $model->name;
         $old_data['products_name_cn'] = $model->c_name;
         $old_data['products_sku'] = $model->sku;
@@ -140,15 +147,65 @@ class ItemController extends Controller
         $old_data['dev_uid'] = $model->product->spu->developer;
         $old_data['type'] = 'edit';
 
-        $url="http://120.24.100.157:60/api/products.php";
+        /*$url="http://120.24.100.157:60/api/products.php";
         $c = curl_init(); 
         curl_setopt($c, CURLOPT_URL, $url); 
         curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
-        $buf = curl_exec($c);
+        $buf = curl_exec($c);*/
+
+        $sync = new SyncApiModel;
+        $sync->relations_id = $model->id;
+        $sync->type = 'product';
+        $sync->url  = 'http://120.24.100.157:60/api/products.php';
+        $sync->data = serialize($old_data);
+        $sync->status = 0;
+        $sync->times = 0;
+        $sync->save();
+
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, 'item信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex);
+    }
+
+    public function skuHandleApi()
+    {
+        $data = request()->all();
+        echo '<pre>';
+        print_r($data);exit;
+        if(unserialize($data['type'])=='edit'){
+            $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
+            if(count($skuModel)==0){
+                echo json_encode('no sku');exit;
+            }
+            $skuModel->update($data);
+            foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
+                $brr[] = $logistics_limits_id;         
+            }
+            $skuModel->product->logisticsLimit()->sync($brr);
+            foreach(unserialize($data['package_limit_arr']) as $wrap_limits_id){
+                $arr[] = $wrap_limits_id;         
+            }
+            $skuModel->product->wrapLimit()->sync($arr);
+        }else{
+            $spuModel = SpuModel::create($data);
+            $data['spu_id'] = $spuModel->id;
+            $productModel = ProductModel::create($data);
+            $data['product_id'] = $productModel->id; 
+            $skuModel->create($data);
+            foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
+                $brr[] = $logistics_limits_id;         
+            }
+            $skuModel->product->logisticsLimit()->attach($brr);
+            foreach(unserialize($data['package_limit_arr']) as $wrap_limits_id){
+                $arr[] = $wrap_limits_id;         
+            }
+            $skuModel->product->wrapLimit()->attach($arr);
+        }
+        echo json_encode('success');exit;
+
     }
 
     /**
@@ -223,15 +280,23 @@ class ItemController extends Controller
         $user_name = request()->input('manual_name');
         $user_id = request()->input('purchase_adminer');
         $model = $this->model->find($item_id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if($user_id){
             $model->update(['purchase_adminer'=>$user_id]);
+            $to = base64_encode(serialize($model));
+            $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
         }else{
             $userModel = UserModel::where('name',$user_name)->first();
             if($userModel){
                 $model->update(['purchase_adminer'=>$userModel->id]);
+                $to = base64_encode(serialize($model));
+                $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
                 return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
             }else{
+                $to = base64_encode(serialize($model));
+                $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
             }
         }
@@ -302,10 +367,8 @@ class ItemController extends Controller
         if(!$item) {
             return json_encode(false);
         }
-        $image = $item->product->image->path;
-        $name = $item->product->image->name;
-        if($image)
-            return ('/'.$image.'/'.$name);
+        if($item)
+            return ('/'.$item->product->dimage);
         else 
             return json_encode(false);
     }
@@ -387,8 +450,9 @@ class ItemController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit')),
+            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit'),$field = ['*'],$pageSize='10'),
             'mixedSearchFields' => $this->model->mixed_search,
+
             'Compute_channels' => ChannelModel::all(),
 
         ];
@@ -464,9 +528,13 @@ class ItemController extends Controller
     public function addSupplier($item_id)
     {
         $supplier_id = request()->input('supplier_id');
-        $model = $this->model->find($item_id);
+        $model = $this->model->with('skuPrepareSupplier')->find($item_id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         $arr['supplier_id'] = $supplier_id;
         $model->skuPrepareSupplier()->attach($arr);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '添加供应商,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备选供应商添加成功.'));
     }
 

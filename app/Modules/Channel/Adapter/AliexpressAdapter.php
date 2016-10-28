@@ -52,6 +52,7 @@ Class AliexpressAdapter implements AdapterInterface
      */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
+
         if (empty($nextToken)) {
             $nextToken = 1;
         }
@@ -62,7 +63,9 @@ Class AliexpressAdapter implements AdapterInterface
         $startDate = $startDate>'2016-10-27 17:00:00'?$startDate:'2016-10-27 17:00:00';
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
+
         $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
+        
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
         $orderList = json_decode($orderjson, true);
         unset($orderjson);
@@ -198,8 +201,6 @@ Class AliexpressAdapter implements AdapterInterface
      */
     public function parseOrder($list, $orderDetail)
     {
-
-
         $orderInfo = array();
         $productInfo = array();
 

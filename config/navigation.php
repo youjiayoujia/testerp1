@@ -135,11 +135,11 @@ return [
                     'url' => 'pickList.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '效能统计',
-                    'url' => 'pickList.performanceStatistics',
-                    'icon' => '',
-                ],
+                // [
+                //     'name' => '效能统计',
+                //     'url' => 'pickList.performanceStatistics',
+                //     'icon' => '',
+                // ],
                 [
                     'name' => '拣货单异常',
                     'url' => 'errorList.index',
@@ -312,6 +312,11 @@ return [
                 [
                     'name' => '渠道回传编码',
                     'url' => 'logisticsChannelName.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '物流分区',
+                    'url' => 'logisticsPartition.index',
                     'icon' => '',
                 ],
             ]
@@ -515,12 +520,12 @@ return [
             ],
             '数据监控'=>[
                 [
-                    'name' => 'Ebay在线数据监控',
+                    'name' => 'Ebay数据监控',
                     'url' => 'ebayProduct.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => 'SMT在线数据监控',
+                    'name' => 'SMT数据监控',
                     'url' => 'smtMonitor.index',
                     'icon' => '',
                 ],
@@ -531,10 +536,15 @@ return [
                     'icon' => '',
                 ],
 				[
-                'name' => 'Joom数量监控',
-                'url' => 'joomonline.index',
-                'icon' => '',
-            ],
+                    'name' => 'Joom数量监控',
+                    'url' => 'joomonline.index',
+                    'icon' => '',
+                 ],
+                [
+                    'name' => 'wish数量监控',
+                    'url' => 'WishQuantityCheck.index',
+                    'icon' => '',
+                ],
             ]
         ]
     ],
@@ -682,10 +692,10 @@ return [
                     'icon' => '',
                 ],
             ],
-            '事件历史' => [
+            '接口' => [
                 [
-                    'name' => '历史记录',
-                    'url' => 'eventChild.index',
+                    'name' => '同步接口',
+                    'url' => 'syncApi.index',
                     'icon' => '',
                 ],
             ],

@@ -14,8 +14,8 @@
             <td>{{ $model->warehouse ? $model->warehouse->name : '' }}</td>
             <td>{{ $model->created_at }}</td>
             <td>
-                <a href="{{ route('stockCarryOver.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                <a href="{{ route('stockCarryOver.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                    <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
             </td>
         </tr>

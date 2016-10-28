@@ -18,7 +18,7 @@ class GetJoomProduct extends Command
      *
      * @var string
      */
-    protected $signature = 'joomProduct:get {accountID}';
+    protected $signature = 'joomProduct:account{accountID}';
 
     /**
      * The console command description.
@@ -44,12 +44,11 @@ class GetJoomProduct extends Command
      */
     public function handle()
     {
-        //$account_ids = 412;
-        $account_ids = request()->get('accountIDs');
+        $account_ids = $this->argument('accountID');
+        $begin = microtime(true);
         $account_arr = explode(',',$account_ids);
         foreach($account_arr as $account_id){
             $account = AccountModel::find($account_id);
-            $begin = microtime(true);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $hasProduct = true;
             $start = 0;

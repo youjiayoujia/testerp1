@@ -44,6 +44,7 @@
                     </button>
                     <h4 class="modal-title" id="myModalLabel">
                        品类选择
+                       <input type='checkbox' class='catalog_all'>全选
                     </h4>
                 </div>
                 <div class="panel panel-default">
@@ -51,7 +52,7 @@
                         <div class='form-group row'>
                         @foreach($catalogs as $catalog)
                             <div class='col-lg-4'>
-                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}"><font size='2px'>{{ $catalog->name }}</font>
+                                <input type='checkbox' class='catalog' name='catalogs[]' value="{{ $catalog->id }}"><font size='2px'>{{ $catalog->c_name }}</font>
                             </div>
                         @endforeach
                         </div>
@@ -278,7 +279,13 @@
 
         $(document).on('click', '.opposite_select', function(){
             block = $(this).parent().parent();
-            block.find("input[type='checkbox']").prop('checked', false);
+            $.each(block.find("input[type='checkbox']"), function(){
+                if($(this).prop('checked') == true) {
+                    $(this).prop('checked', false);
+                } else {
+                    $(this).prop('checked', true);
+                }
+            });
         });
 
         $(document).on('click', '.weight_section', function(){
@@ -336,6 +343,14 @@
                 $('.account_button').prop('disabled', false);
             } else {
                 $('.account_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.catalog_all', function(){
+            if($(this).prop('checked') == true) {
+                $('.catalog').prop('checked', true);
+            } else {
+                $('.catalog').prop('checked', false);
             }
         });
 

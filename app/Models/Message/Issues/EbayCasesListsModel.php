@@ -11,7 +11,7 @@ use App\Models\Order\ItemModel;
 class EbayCasesListsModel extends BaseModel{
     protected $table = 'ebay_cases_lists';
     public $rules = [];
-    public $searchFields =[];
+    public $searchFields =['id' => 'ID' , 'buyer_id' => '买家ID' , 'seller_id' => '卖家ID' ,'transaction_id' => '交易号'];
     protected $guarded = [];
 
     public function account()

@@ -169,7 +169,8 @@ class PurchaseOrderController extends Controller
         if ($model->status ==5 ) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已取消.'));
         }
-
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         $data=request()->all();
         if(isset($data['arr'])){
             if(isset($data['post'])){
@@ -226,9 +227,10 @@ class PurchaseOrderController extends Controller
         if($num ==0){
             $data['costExamineStatus']=2;
         }
-        
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
         $model->update($data);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
         return redirect( route('purchaseOrder.edit', $id));     
     }
     
@@ -259,9 +261,13 @@ class PurchaseOrderController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         $data['examineStatus']=$examineStatus;
         $data['status'] = 1;
         $model->update($data);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '采购单审核,id='.$model->id, $to, $from);
         return redirect( route('purchaseOrder.edit', $id));
     }
     /**
@@ -339,6 +345,8 @@ class PurchaseOrderController extends Controller
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在.'));
         }
         $model=$this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         $num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
         $Inum=ItemModel::where('sku',$data['sku'])->where('is_available','<>',1)->where('status',"selling")->count();
         if($num > 0 || $Inum > 0){
@@ -355,6 +363,8 @@ class PurchaseOrderController extends Controller
         if($model->examineStatus >0){
         $model->update(['examineStatus'=>2]);
         }
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '创建采购条目,id='.$model->id, $to, $from);
         return redirect( route('purchaseOrder.edit', $id)); 
         }
     /**
@@ -432,7 +442,12 @@ class PurchaseOrderController extends Controller
     */
     public function changePrintStatus(){
         $id = request()->input('id');
-        $this->model->find($id)->update(['print_status'=>1]);
+        $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
+        $model->update(['print_status'=>1]);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '修改打印状态,id='.$model->id, $to, $from);
     }
 
     /**
@@ -1044,7 +1059,7 @@ class PurchaseOrderController extends Controller
      * @return obj
      * 
      */
-/*    public function sevenPurchaseSku()
+/*    public function notWarehouseIn()
     {   
         echo '<pre>';
         

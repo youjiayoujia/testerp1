@@ -68,7 +68,6 @@
         </div>
         <div class="form-group col-lg-2">
             <label for="logistics_email_template_id">回邮模版</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
                 <option value="0">==选择回邮模版==</option>
                 @foreach($emailTemplates as $emailTemplate)
@@ -144,7 +143,7 @@
                     @endforeach
                 </select>
                 <input type='text' class='form-control' name='{{$key1}}_merchant_name' placeholder='备选框'>
-                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $singles->first()->channel_id }}>
+                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $singles->first() ? $singles->first()->channel_id : '' }}>
             </div>
             @endforeach
         </div>

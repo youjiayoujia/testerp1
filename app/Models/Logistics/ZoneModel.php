@@ -69,7 +69,7 @@ class ZoneModel extends BaseModel
         foreach(explode(",", $country) as $value) {
             $countries = CountriesModel::where(['code' => $value])->get();
             foreach($countries as $country) {
-                $val = $country['name'];
+                $val = $country->cn_name;
                 $str = $str.$val.',';
             }
         }

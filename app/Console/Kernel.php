@@ -36,6 +36,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\PickReport::class,
         \App\Console\Commands\PackReport::class,
         \App\Console\Commands\AllReport::class,
+        \App\Console\Commands\GetBlacklists::class,
+        \App\Console\Commands\UpdateBlacklists::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
@@ -58,7 +60,13 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetAliShipmentNumber::class,
         \App\Console\Commands\AutoGetMessageAliexpress::class,
         \App\Console\Commands\AutoGetWishMessage::class,
-
+        \App\Console\Commands\inputCrmTemplate::class, //导入CRM分类和模板
+        \App\Console\Commands\inputPaypalList::class, //导入CRM分类和模板
+        \App\Console\Commands\SetJoomToken::class,
+        \App\Console\Commands\SetJoomToshipping::class,
+        \App\Console\Commands\SetJoomShelves::class,
+        \App\Console\Commands\NotWarehouseInSendEmail::class,
+        \App\Console\Commands\SyncSellmoreApi::class,
     ];
 
     /**
@@ -71,6 +79,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inspire')->hourly();
         $schedule->command('purchase:create')->cron('20 0,12 * * *');
+        //黑名单定时任务
+        $schedule->command('blacklists:get')->dailyAt('2:00');
+        $schedule->command('blacklists:update')->dailyAt('3:00');
         //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {
@@ -104,6 +115,11 @@ class Kernel extends ConsoleKernel
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
+                case 'joom':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
             }
         }
         $schedule->command('pick:report')->hourly();
@@ -115,12 +131,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
         $schedule->command('getEbayCases')->cron('8,12,13,14,16,30 17 * * *');
         $schedule->command('getFeedBack:account')->everyTenMinutes();
-
         //采购
         $schedule->command('aliShipmentName:get')->hourly();
-
-
-
+        $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
+        //API同步sellmore database
+        $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
 
     }
 }

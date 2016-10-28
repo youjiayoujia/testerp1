@@ -7,9 +7,10 @@
     <th>仓库</th>
     <th>物流商</th>
     <th>物流商物流方式</th>
+    <th>面单</th>
     <th>驱动名</th>
     <th>对接方式</th>
-    <th class="sort" data-field="pool_quantity">号码池数量(未用/已用/总数)</th>
+    {{--<th class="sort" data-field="pool_quantity">号码池数量(未用/已用/总数)</th>--}}
     <th>物流限制</th>
     <th>物流编码</th>
     <th>是否启用</th>
@@ -27,9 +28,10 @@
             <td>{{ $logistics->warehouse ? $logistics->warehouse->name : '' }}</td>
             <td>{{ $logistics->supplier ? $logistics->supplier->name : '' }}</td>
             <td>{{ $logistics->type }}</td>
+            <td>{{ $logistics->template ? $logistics->template->name : '未选择' }}</td>
             <td>{{ $logistics->driver }}</td>
-            <td>{{ $logistics->docking_name }}</td>
-            <td>{{ $logistics->pool_quantity }}</td>
+            <td>{{ $logistics->docking == 'CODE' ? $logistics->docking_name . '(' . explode('/', $logistics->pool_quantity)[0] . ')' : $logistics->docking_name }}</td>
+            {{--<td>{{ $logistics->pool_quantity }}</td>--}}
             <td>{{ $logistics->limit($logistics->limit) }}</td>
             <td>{{ $logistics->logistics_code }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
@@ -48,18 +50,18 @@
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
                 @if($logistics->docking == 'CODE')
-                    <a href="{{ route('logisticsCode.one', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 追踪号
+                    <a href="{{ route('logisticsCode.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-import"></span> 号码池
                     </a>
                 @endif
-                <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 分区报价
+                <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
+                    <span class="glyphicon glyphicon-usd"></span> 分区报价
                 </a>
-                <button class="btn btn-primary btn-xs dialog"
+                <a class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
                         data-target="#dialog" data-table="{{ $logistics->table }}" data-id="{{$logistics->id}}">
-                    <span class="glyphicon glyphicon-road"></span>
-                </button>
+                    <span class="glyphicon glyphicon-road"></span> 日志
+                </a>
             </td>
         </tr>
     @endforeach

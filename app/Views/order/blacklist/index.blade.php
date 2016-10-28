@@ -9,131 +9,23 @@
     <th>邮编</th>
     <th>退款订单数</th>
     <th>订单总数</th>
-    <th>退款率</th>
+    {{--<th>退款率</th>--}}
     <th>类型</th>
-    <th>备注</th>
+    {{--<th>备注</th>--}}
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $blacklist)
-        @if($blacklist->color == 'white' && $blacklist->type != 'CONFIRMED')
-            <tr style="background: white">
-                <td>
-                    <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">
-                </td>
-                <td>{{ $blacklist->id }}</td>
-                <td>{{ $blacklist->channel->name }}</td>
-                <td>{{ $blacklist->ordernum }}</td>
-                <td>{{ $blacklist->name }}</td>
-                <td>{{ $blacklist->email }}</td>
-                <td>{{ $blacklist->zipcode }}</td>
-                <td>{{ $blacklist->refund_order }}</td>
-                <td>{{ $blacklist->total_order }}</td>
-                <td>{{ $blacklist->refund_rate }}</td>
-                <td>{{ $blacklist->type_name }}</td>
-                <td>{{ $blacklist->remark }}</td>
-                <td>{{ $blacklist->updated_at }}</td>
-                <td>{{ $blacklist->created_at }}</td>
-                <td>
-                    <a href="{{ route('orderBlacklist.show', ['id'=>$blacklist->id]) }}" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 查看
-                    </a>
-                    <a href="{{ route('orderBlacklist.edit', ['id'=>$blacklist->id]) }}" class="btn btn-warning btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 编辑
-                    </a>
-                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                       data-id="{{ $blacklist->id }}"
-                       data-url="{{ route('orderBlacklist.destroy', ['id' => $blacklist->id]) }}">
-                        <span class="glyphicon glyphicon-trash"></span> 删除
-                    </a>
-                    <button class="btn btn-primary btn-xs dialog"
-                            data-toggle="modal"
-                            data-target="#dialog" data-table="{{ $blacklist->table }}" data-id="{{$blacklist->id}}">
-                        <span class="glyphicon glyphicon-road"></span>
-                    </button>
-                </td>
-            </tr>
-        @endif
-        @if($blacklist->color == 'green' && $blacklist->type != 'CONFIRMED')
-            <tr style="background: #90EE90">
-                <td>
-                    <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">
-                </td>
-                <td>{{ $blacklist->id }}</td>
-                <td>{{ $blacklist->channel->name }}</td>
-                <td>{{ $blacklist->ordernum }}</td>
-                <td>{{ $blacklist->name }}</td>
-                <td>{{ $blacklist->email }}</td>
-                <td>{{ $blacklist->zipcode }}</td>
-                <td>{{ $blacklist->refund_order }}</td>
-                <td>{{ $blacklist->total_order }}</td>
-                <td>{{ $blacklist->refund_rate }}</td>
-                <td>{{ $blacklist->type_name }}</td>
-                <td>{{ $blacklist->remark }}</td>
-                <td>{{ $blacklist->updated_at }}</td>
-                <td>{{ $blacklist->created_at }}</td>
-                <td>
-                    <a href="{{ route('orderBlacklist.show', ['id'=>$blacklist->id]) }}" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 查看
-                    </a>
-                    <a href="{{ route('orderBlacklist.edit', ['id'=>$blacklist->id]) }}" class="btn btn-warning btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 编辑
-                    </a>
-                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                       data-id="{{ $blacklist->id }}"
-                       data-url="{{ route('orderBlacklist.destroy', ['id' => $blacklist->id]) }}">
-                        <span class="glyphicon glyphicon-trash"></span> 删除
-                    </a>
-                    <button class="btn btn-primary btn-xs dialog"
-                            data-toggle="modal"
-                            data-target="#dialog" data-table="{{ $blacklist->table }}" data-id="{{$blacklist->id}}">
-                        <span class="glyphicon glyphicon-road"></span>
-                    </button>
-                </td>
-            </tr>
-        @endif
-        @if($blacklist->color == 'orange' && $blacklist->type != 'CONFIRMED')
-            <tr style="background: #FFCC99">
-                <td>
-                    <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">
-                </td>
-                <td>{{ $blacklist->id }}</td>
-                <td>{{ $blacklist->channel->name }}</td>
-                <td>{{ $blacklist->ordernum }}</td>
-                <td>{{ $blacklist->name }}</td>
-                <td>{{ $blacklist->email }}</td>
-                <td>{{ $blacklist->zipcode }}</td>
-                <td>{{ $blacklist->refund_order }}</td>
-                <td>{{ $blacklist->total_order }}</td>
-                <td>{{ $blacklist->refund_rate }}</td>
-                <td>{{ $blacklist->type_name }}</td>
-                <td>{{ $blacklist->remark }}</td>
-                <td>{{ $blacklist->updated_at }}</td>
-                <td>{{ $blacklist->created_at }}</td>
-                <td>
-                    <a href="{{ route('orderBlacklist.show', ['id'=>$blacklist->id]) }}" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 查看
-                    </a>
-                    <a href="{{ route('orderBlacklist.edit', ['id'=>$blacklist->id]) }}" class="btn btn-warning btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 编辑
-                    </a>
-                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                       data-id="{{ $blacklist->id }}"
-                       data-url="{{ route('orderBlacklist.destroy', ['id' => $blacklist->id]) }}">
-                        <span class="glyphicon glyphicon-trash"></span> 删除
-                    </a>
-                    <button class="btn btn-primary btn-xs dialog"
-                            data-toggle="modal"
-                            data-target="#dialog" data-table="{{ $blacklist->table }}" data-id="{{$blacklist->id}}">
-                        <span class="glyphicon glyphicon-road"></span>
-                    </button>
-                </td>
-            </tr>
-        @endif
         @if($blacklist->type == 'CONFIRMED')
             <tr style="background: #D9FFFF">
+        @elseif($blacklist->type == 'SUSPECTED')
+            <tr style="background: #90EE90">
+        @elseif($blacklist->type == 'WHITE')
+            <tr style="background: white">
+            {{--<tr style="background: #FFCC99">--}}
+        @endif
                 <td>
                     <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">
                 </td>
@@ -145,9 +37,9 @@
                 <td>{{ $blacklist->zipcode }}</td>
                 <td>{{ $blacklist->refund_order }}</td>
                 <td>{{ $blacklist->total_order }}</td>
-                <td>{{ $blacklist->refund_rate }}</td>
+                {{--<td>{{ $blacklist->refund_rate }}</td>--}}
                 <td>{{ $blacklist->type_name }}</td>
-                <td>{{ $blacklist->remark }}</td>
+                {{--<td>{{ $blacklist->remark }}</td>--}}
                 <td>{{ $blacklist->updated_at }}</td>
                 <td>{{ $blacklist->created_at }}</td>
                 <td>
@@ -169,7 +61,6 @@
                     </button>
                 </td>
             </tr>
-        @endif
     @endforeach
     <div class="panel panel-default">
         <div class="panel-heading"><strong>批量导入操作</strong></div>

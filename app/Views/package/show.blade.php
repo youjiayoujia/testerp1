@@ -41,7 +41,7 @@
                 <tbody>
                 @foreach($model->items as $item)
                     <tr>
-                        <td><img src="{{ asset($item->item ? $item->item->image : '') }}" width="100"></td>
+                        <td><img src="{{ $item->item->product->dimage }}" width="100"></td>
                         <td>{{ $item->item ? $item->item->sku : '' }}</td>
                         <td>{{ $item->warehousePosition ? $item->warehousePosition->name : '' }}</td>
                         <td>{{ $item->quantity }}</td>

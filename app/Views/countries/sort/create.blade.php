@@ -8,32 +8,23 @@
         </div>
     </div>
     <div class='row'>
-        <div class="form-group col-lg-4" style="clear:left;">
-            <label for="country_id" class="control-label">已有国家</label>
+        <div class='form-group col-lg-6'>
+            <label for="country_id">选择国家</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <button type="button" class="btn btn-success btn-xs" onclick="quanxuan()">全选</button>
-            <select name="country_id" class="form-control" multiple style="height:300px;width:400px;">
-                @foreach($countries as $country)
-                    <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
-                        {{ $country->cn_name }}
-                    </option>
-                @endforeach
+            <select class='form-control country_id' name='country_id[]' multiple>
+                <option value=''></option>
+                    @foreach($countries as $country)
+                        <option value="{{ $country->id }}">{{$country->cn_name}}</option>
+                    @endforeach
             </select>
-        </div>
-        <div class="form-group col-lg-4" style="clear:right;">
-            <label for="country_id" class="control-label">已选国家</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class="form-control" id="dselectCountry" multiple  style="height:300px;width:400px;">
-
-            </select>
-        </div>
-        <div style="display:none">
-            <textarea class="form-control" rows="3" type="hidden" id="country_id" placeholder="国家" name='country_id' readonly>{{ old('country_id') }}</textarea>
         </div>
     </div>
 @stop
 @section('pageJs')
 <script type="text/javascript">
+    $(document).ready(function () {
+        $('.country_id').select2();
+    });
     function getPostCountry(){
         var selectCountry = "";
         $(".thecountry").each(function(){
@@ -75,7 +66,7 @@
     function quanxuan(that)
     {
         var checkCountries = '@foreach($countries as $country)' +
-                '<option class="form-control thecountry" value="{{ $country->code }}" onclick="deleteCountry(this)">' +
+                '<option class="form-control thecountry" value="{{ $country->id }}" onclick="deleteCountry(this)">' +
                 '{{ $country->name }}' + '</option>' + '@endforeach';
         $("#dselectCountry").append(checkCountries);
         getPostCountry();

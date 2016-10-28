@@ -17,7 +17,7 @@ class LogisticsModel extends BaseModel
 {
     public $table = 'logisticses';
 
-    public $searchFields = ['code' => '物流方式简码', 'name' => '物流方式名称'];
+    public $searchFields = ['code' => '物流方式简码', 'name' => '物流方式名称', 'logistics_code' => '物流编码'];
 
     public $fillable = [
         'id',
@@ -47,11 +47,11 @@ class LogisticsModel extends BaseModel
             'type' => 'required',
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
-            'logistics_email_template_id' => 'required',
+            //'logistics_email_template_id' => 'required',
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
-            'priority' => 'required|unique:logisticses,priority',
+            'priority' => 'required',
         ],
         'update' => [
             'code' => 'required',
@@ -61,11 +61,11 @@ class LogisticsModel extends BaseModel
             'type' => 'required',
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
-            'logistics_email_template_id' => 'required',
+            //'logistics_email_template_id' => 'required',
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
-            'priority' => 'required|unique:logisticses,priority',
+            'priority' => 'required',
         ],
     ];
 
@@ -168,14 +168,24 @@ class LogisticsModel extends BaseModel
      */
     public function placeOrder($packageId)
     {
-        $code = $this->codes->where('status', '0')->first();
-        if ($code) {
-            $code->update([
-                'status' => 1,
-                'package_id' => $packageId,
-                'used_at' => date('y-m-d', time())
-            ]);
-            return $code->code;
+        switch ($this->docking) {
+            case 'CODE':
+                $code = $this->codes->where('status', '0')->first();
+                if ($code) {
+                    $code->update([
+                        'status' => 1,
+                        'package_id' => $packageId,
+                        'used_at' => date('y-m-d', time())
+                    ]);
+                    return $code->code;
+                }
+                break;
+            case 'API':
+                break;
+            case 'MANUAL':
+                break;
+            case 'SELFAPI':
+                break;
         }
         return false;
 

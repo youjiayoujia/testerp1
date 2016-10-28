@@ -261,8 +261,12 @@ class ProductController extends Controller
         $data = request()->all();
         //echo '<pre>';
         //print_r($data);exit;
-        $productModel = $this->model->find($data['product_id']);
+        $productModel = $this->model->with('productMultiOption')->find($data['product_id']);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($productModel));
         $productModel->updateMulti($data);
+        $to = base64_encode(serialize($productModel));
+        $this->eventLog($userName->name, '小语言信息更新,id='.$productModel->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
     }
     /**
@@ -398,10 +402,10 @@ class ProductController extends Controller
                                 $channel_fee = 2;
                             }
                             //售价=（采购成本+平台费用+物流成本）（1-利润率）
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) /(1 / $USD_obj->rate);
                             $sale_price_small = 0;
                         }else{
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /(1 / $USD_obj->rate);
                             $sale_price_small = 0;
                         }
                         break;
@@ -409,19 +413,19 @@ class ProductController extends Controller
                         //AMZ英国站平台费小于0.5英镑，按0.5英镑计算(珠宝及手表分类下，该条件用1.25英镑计算)
                         $channel_fee = $product_obj->purchase_price * $item_channel->pivot->rate / 100; // 平台费USD
                         $GBP_obj = CurrencyModel::where('code','=','GBP')->first(); //美元英镑汇率
-                        $channel_fee = $GBP_obj->rate * $channel_fee; //平台费 GBP
+                        $channel_fee = (1 / $GBP_obj->rate) * $channel_fee; //平台费 GBP
                         if($channel_fee < 0.5){
                             $channel_fee = 0.5;
                             if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 1.25;
                             }
-                            $channel_fee = $channel_fee / $GBP_obj->rate; // 平台费USD
+                            $channel_fee = $channel_fee / (1 / $GBP_obj->rate); // 平台费USD
                             //售价=（采购成本+平台费用+物流成本）（1-利润率）
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
                         }else{
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
                         }
@@ -430,20 +434,20 @@ class ProductController extends Controller
                     case '亚马逊欧洲':
                         $channel_fee = $product_obj->purchase_price * $item_channel->pivot->rate / 100; // 平台费USD
                         $EUR_obj = CurrencyModel::where('code','=','EUR')->first(); //美元欧元汇率
-                        $channel_fee = $EUR_obj->rate * $channel_fee; //平台费 EUR
+                        $channel_fee = (1 / $EUR_obj->rate) * $channel_fee; //平台费 EUR
                         if($channel_fee < 0.5){
                             $channel_fee = 0.5;
                             if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 1.5;
                             }
                             //兑换美元
-                            $channel_fee = $channel_fee / $EUR_obj->rate; // 平台费USD
+                            $channel_fee = $channel_fee / (1 / $EUR_obj->rate); // 平台费USD
                             //售价=（采购成本+平台费用+物流成本）（1-利润率）
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
                         }else{
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
                         }
                         break;
@@ -451,19 +455,19 @@ class ProductController extends Controller
                         //AMZ日本站平台费小于30日元，按30日元计算(珠宝及手表分类下，该条件用50日元计算)
                         $channel_fee = $product_obj->purchase_price * $item_channel->pivot->rate / 100; // 平台费USD
                         $JPY_obj = CurrencyModel::where('code','=','JPY')->first(); //美元日元汇率
-                        $channel_fee = $JPY_obj->rate * $channel_fee; //平台费 JPY
+                        $channel_fee = (1 / $JPY_obj->rate) * $channel_fee; //平台费 JPY
                         if($channel_fee < 30){
                             $channel_fee = 30;
                             if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 50;
                             }
                             //兑换美元
-                            $channel_fee = $channel_fee / $JPY_obj->rate; // 平台费USD
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $channel_fee = $channel_fee / (1 / $JPY_obj->rate); // 平台费USD
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
                         }else{
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /(1 / $USD_obj->rate);
                             $sale_price_small = 0;
                         }
                         break;
@@ -476,13 +480,13 @@ class ProductController extends Controller
                      * EBAY售价=（采购成本+物流成本+PP固定费用0.3美金）/（1-利润率-分类费率-小PP成交费率3%）
                      * 如果是大PP计算，则小PP成交费率为0
                      */
-                        $sale_price_big   = ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / $USD_obj->rate;
-                        $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100) / $USD_obj->rate;
+                        $sale_price_big   = ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / (1 /$USD_obj->rate);
+                        $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100) / (1 / $USD_obj->rate);
                         break;
                     default:
                         //其他渠道统一计算
                         //售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
-                        $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                        $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /(1 / $USD_obj->rate);
                         $sale_price_small = 0;
                         break;
 

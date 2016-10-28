@@ -18,5 +18,16 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control col-xs-2" id="action" placeholder="action" name='action' value="{{ old('action') }}">
         </div>
+        <div class="form-group col-lg-6">
+            <label for="parent_id" class='control-label'>权限所属类</label>
+                <select name="parent_id">
+                    @foreach(config('permission.parent.name') as $key=>$name)
+                        <option value="{{ $key }}">
+                            {{ $name }}
+                        </option>
+                    @endforeach
+                </select>
+        </div>
     </div>
+
 @stop

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 use App\Models\ProductModel;
-use App\Models\SpuModel;
 use DB;
 use App\Models\ItemModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Spu\SpuMultiOptionModel;
 
 class SpuModel extends BaseModel
 {
@@ -16,15 +16,14 @@ class SpuModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'spus';
+    public $table = 'spus';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    //protected $fillable = ['id', 'spu','product_require_id','status','edit_user','image_user'];
-    protected $guarded = [];
+    protected $fillable = ['id', 'spu','product_require_id','status','edit_user','image_edit','developer','purchase','remark'];
 
     public $searchFields = ['id' =>'ID','spu'=>'spu'];
 
@@ -104,16 +103,27 @@ class SpuModel extends BaseModel
         }
     }
 
+    public function insertLan()
+    {
+        $spus = $this->all();
+        DB::table('spu_multi_options')->truncate();
+        foreach ($spus as $spu) {
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>1]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>2]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>3]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>4]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>5]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>6]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>7]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>8]);
+        }
+    }
+
     public function test()
     {   
         set_time_limit(0);
         ini_set('memory_limit', '1024M');
-        echo '<pre>';
-        DB::table('items')->truncate();
-        DB::table('products')->truncate();
-        DB::table('spus')->truncate();
-
-        $erp_products_data_arr = DB::select('select * from erp_products_data where spu!="" and products_id > 42301 limit 100 ');
+        $erp_products_data_arr = DB::select('select * from erp_products_data where spu!="" and products_id > 107842');
         foreach ($erp_products_data_arr as $key => $erp_products_data) {
             //print_r($erp_products_data);exit;
                 //if($key==0)continue;

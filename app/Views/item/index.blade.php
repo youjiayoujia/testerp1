@@ -20,7 +20,6 @@
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
-    <th class="sort" data-field="id">ID</th>
     <th>图片</th>
     <th class="sort" data-field="sku">产品名称</th>
     <th class="sort" data-field="c_name">sku</th>
@@ -32,10 +31,7 @@
     <th>状态</th>
     <th>采购负责人</th>
     <th>开发负责人</th>
-    <th>供应商</th>
     <th>售价</th>
-    <th>体积系数</th>
-    <th>税率</th>
     <th>操作</th>
 @stop
 
@@ -44,7 +40,6 @@
     @foreach($data as $item)
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
-            <td>{{ $item->id }}</td>
             <td>
                 <!-- 100条sql -->
                 <img src="{{ asset($item->product->dimage) }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;">
@@ -87,7 +82,6 @@
             <td>{{ config('item.status')[$item->status]}}</td>
             <td>{{ $item->purchaseAdminer?$item->purchaseAdminer->name:''}}</td>
             <td>{{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}</td>
-            <td>{{ $item->supplier ? $item->supplier->name :''}}</td>
             <td>{{--<button class ="btn btn-success" >计算</button>--}}
                 <a href="javascript:" class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModal_{{$item->id}}">
                     计算
@@ -206,8 +200,7 @@
                     </div>
                 </div>
             </td>
-            <td>1</td>
-            <td>1</td>
+            
             <td>
                 <a href="{{ route('item.show', ['id'=>$item->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span>
@@ -232,6 +225,11 @@
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $item->table }}" data-id="{{$item->id}}" title='日志'>
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
 
@@ -352,7 +350,7 @@
 
                      <div class="modal-body">        
                         <select id="supplier_id" style="width:550px" class="form-control supplier" name="supplier_id">
-                           <option value="{{$item->supplier->id}}">{{$item->supplier->name}}</option>
+                           <option value="{{$item->supplier?$item->supplier->id:0}}">{{$item->supplier?$item->supplier->name:''}}</option>
                         </select>
                      </div>
                      

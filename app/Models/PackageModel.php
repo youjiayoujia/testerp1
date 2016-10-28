@@ -750,9 +750,11 @@ class PackageModel extends BaseModel
     {
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
-            $packageLimit = $packageItem->item->product->carriage_limit;
-            if ($packageLimit) {
-                $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            $all = $packageItem->item->product->logisticsLimit;
+            foreach($all as $key => $packageLimit) {
+                if ($packageLimit) {
+                    $packageLimits = $packageLimits->merge(explode(",", $packageLimit->logistics_limits_id));
+                }
             }
         }
 
@@ -776,7 +778,7 @@ class PackageModel extends BaseModel
     public function canAssignLogistics()
     {
         //判断订单状态
-        if ($this->status != 'WAITASSIGN') {
+        if (!in_array($this->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
             return false;
         }
 
@@ -846,7 +848,10 @@ class PackageModel extends BaseModel
             $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
         })->where(['is_clearance' => $isClearance])
-            ->get();
+            ->get()
+            ->sortBy(function($single,$key){
+                return $single->logistics ? $single->logistics->priority : 1;
+              });
         foreach ($rules as $rule) {
             if ($rule->catalog_section) {
                 $catalogs = $rule->rule_catalogs_through;
@@ -926,7 +931,7 @@ class PackageModel extends BaseModel
                 $limits = $rule->rule_limits_through;
                 foreach ($limits as $limit) {
                     if (in_array($limit->id, $shipping_limits)) {
-                        if ($limit->pivot->type == '3') {
+                        if ($limit->pivot->type == '1') {
                             continue 2;
                         }
                     }
@@ -960,6 +965,7 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
+
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
@@ -968,7 +974,10 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
-              ->get();
+              ->get()
+              ->sortBy(function($single,$key){
+                return $single->logistics ? $single->logistics->priority : 1;
+              });
             foreach ($rules as $rule) {
                 //是否在物流方式产品分类中
                 if ($rule->catalog_section) {
@@ -985,8 +994,8 @@ class PackageModel extends BaseModel
                             continue 2;
                         }
                     }
-                    
                 }
+
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {
                     $channels = $rule->rule_channels_through;
@@ -1015,6 +1024,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+
                 //是否在物流方式账号中
                 if ($rule->account_section) {
                     $accounts = $rule->rule_accounts_through;
@@ -1029,6 +1039,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+
                 //是否在物流方式运输方式中
                 if ($rule->transport_section) {
                     $transports = $rule->rule_transports_through;
@@ -1043,13 +1054,14 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+                
                 //是否有物流限制
                 if ($rule->limit_section && $this->shipping_limits) {
                     $shipping_limits = $this->shipping_limits->toArray();
                     $limits = $rule->rule_limits_through;
                     foreach ($limits as $limit) {
                         if (in_array($limit->id, $shipping_limits)) {
-                            if ($limit->pivot->type == '3') {
+                            if ($limit->pivot->type == '1') {
                                 continue 2;
                             }
                         }

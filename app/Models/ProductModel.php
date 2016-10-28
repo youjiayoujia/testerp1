@@ -109,7 +109,6 @@ class ProductModel extends BaseModel
         'length',
         'package_weight',
         'competition_url',
-        'warehouse_position',
     ];
 
     public function getMixedSearchAttribute()
@@ -176,6 +175,16 @@ class ProductModel extends BaseModel
     public function wrapLimit()
     {
         return $this->belongsToMany('App\Models\WrapLimitsModel','product_wrap_limits','product_id','wrap_limits_id')->withTimestamps();
+    }
+
+    public function geteWrapLimitAttribute()
+    {
+        $str = '';
+        foreach($this->wrapLimit as $limit) {
+            $str .= $limit->name . ' ';
+        }
+
+        return $str;
     }
 
     public function variationValues()
@@ -752,7 +761,7 @@ class ProductModel extends BaseModel
         set_time_limit(0);
         //$imageModel = new ImageModel();
         //$model = $this->all();
-        $model = $this->where('id','<','508')->get();
+        $model = $this->where('id','>','20035')->get();
         foreach($model as $_item){
             $sku = $_item->item[0]->sku;
             $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;

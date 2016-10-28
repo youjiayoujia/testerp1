@@ -74,7 +74,7 @@
                     <span class="glyphicon glyphicon-eye-open"></span> 
                 </a>
                 <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-info btn-xs recycle" title='重新匹配物流'>
-                    <span class="glyphicon glyphicon-pencil"></span> 
+                    <span class="glyphicon glyphicon-random"></span>
                 </a>
                 <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
                     <span class="glyphicon glyphicon-pencil"></span> 

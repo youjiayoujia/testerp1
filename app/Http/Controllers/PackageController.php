@@ -261,7 +261,7 @@ class PackageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
-            'packageNum' => $this->model->where('status', 'NEED')->count(),
+            'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
             'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function($single){return $single->packages()->count() == 0;})->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
@@ -301,9 +301,10 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
         }
-        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0']);
-        $job = new AssignLogistics($model);
-        $job->onQueue('assignLogistics');
+        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0', 'is_auto' => '1']);
+        $package = $this->model->find($id);
+        $job = new AssignLogistics($package);
+        $job = $job->onQueue('assignLogistics');
         $this->dispatch($job);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹已重新匹配物流'));

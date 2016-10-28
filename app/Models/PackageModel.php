@@ -850,7 +850,7 @@ class PackageModel extends BaseModel
         })->where(['is_clearance' => $isClearance])
             ->get()
             ->sortBy(function($single,$key){
-                return $single->logistics->priority;
+                return $single->logistics ? $single->logistics->priority : 1;
               });
         foreach ($rules as $rule) {
             if ($rule->catalog_section) {

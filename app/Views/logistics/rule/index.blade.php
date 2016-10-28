@@ -51,7 +51,7 @@
         </tr>
     @endforeach
 @stop
-@section('pageJs')
+@section('childJs')
     <script type="text/javascript">
         //复制
         $('.copy').click(function () {
@@ -69,5 +69,4 @@
             }
         });
     </script>
-@section('childJs')@show
 @stop

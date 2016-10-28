@@ -1095,7 +1095,7 @@ class PackageModel extends BaseModel
     /**
      * 判断包裹是否能物流下单
      */
-    public function canPlaceLogistics()
+    public function canplaceLogistics()
     {
         //判断订单状态
         if ($this->status != 'ASSIGNED') {
@@ -1112,16 +1112,17 @@ class PackageModel extends BaseModel
     public function placeLogistics()
     {
         if ($this->canPlaceLogistics()) {
-            $trackingNo = $this->logistics->placeOrder($this->id);
-            if ($trackingNo) {
+            $result  = $this->logistics->placeOrder($this->id);
+            if (isset($result['status'])&&$result['status']) {
                 return $this->update([
                     'status' => 'PROCESSING',
-                    'tracking_no' => $trackingNo,
+                    'tracking_no' => $result['tracking_no'],
                     'logistics_order_at' => date('Y-m-d H:i:s')
                 ]);
             }
+            return $result;
         }
-        return false;
+        return ['status'=>false,'tracking_no'=>'Fail to place logistics order'];
     }
 
     /**

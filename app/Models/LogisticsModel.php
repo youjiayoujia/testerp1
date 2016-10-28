@@ -9,9 +9,10 @@
  */
 
 namespace App\Models;
-
+use Logistics;
 use App\Base\BaseModel;
 use App\Models\Logistics\LimitsModel;
+use App\Models\PackageModel;
 
 class LogisticsModel extends BaseModel
 {
@@ -168,6 +169,8 @@ class LogisticsModel extends BaseModel
      */
     public function placeOrder($packageId)
     {
+        $return['status'] = false;
+        $return['tracking_no'] = '';
         switch ($this->docking) {
             case 'CODE':
                 $code = $this->codes->where('status', '0')->first();
@@ -177,17 +180,29 @@ class LogisticsModel extends BaseModel
                         'package_id' => $packageId,
                         'used_at' => date('y-m-d', time())
                     ]);
-                    return $code->code;
+                    $return['status'] = true;
+                    $return['tracking_no'] = $code->code;
                 }
                 break;
             case 'API':
+                $package =  PackageModel::where('id',$packageId)->first();
+                $apiResult = Logistics::driver($package->logistics->driver, $package->logistics->api_config)->getTracking($package);
+                if(isset($apiResult['code'])&&$apiResult['code']=='success'){
+                    $return['status'] = true;
+                    $return['tracking_no'] = $apiResult['result'];
+                }else{
+                    $return['tracking_no'] = isset($apiResult['result'])?$apiResult['result']:'api unknown error';
+                }
                 break;
             case 'MANUAL':
+                $return['tracking_no'] = 'manual';
                 break;
             case 'SELFAPI':
+                $return['status'] = true;
+                $return['tracking_no'] = 'S'.$packageId;  //slme 为S+内单号， 现在改为S+包裹id  防止 1个订单对应多个包裹 出现重复追踪号情况
                 break;
         }
-        return false;
+        return $return;
 
     }
 

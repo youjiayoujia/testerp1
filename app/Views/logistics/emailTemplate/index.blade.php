@@ -1,6 +1,7 @@
 @extends('common.table')
 @section('tableHeader')
     <th class="sort" data-field="id">编号</th>
+    <th>类型</th>
     <th>名称</th>
     <th>协议客户</th>
     <th>邮编</th>
@@ -20,6 +21,7 @@
     @foreach($data as $emailTemplate)
         <tr>
             <td>{{ $emailTemplate->id }}</td>
+            <td>{{ $emailTemplate->type == 'default' ? '默认' : 'EUB'}}</td>
             <td>{{ $emailTemplate->name }}</td>
             <td>{{ $emailTemplate->customer }}</td>
             <td>{{ $emailTemplate->zipcode }}</td>

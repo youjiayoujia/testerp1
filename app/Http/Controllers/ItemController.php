@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use App\Models\ProductModel;
+use App\Models\SpuModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
@@ -172,11 +173,11 @@ class ItemController extends Controller
     public function skuHandleApi()
     {
         $data = request()->all();
-        $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
-        if(count($skuModel)==0){
-            return json_encode('no sku');
-        }
-        if($data['type']='edit'){
+        if($data['type']=='edit'){
+            $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
+            if(count($skuModel)==0){
+                echo json_encode('no sku');exit;
+            }
             $skuModel->update($data);
             foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
                 $brr[] = $logistics_limits_id;         
@@ -187,17 +188,21 @@ class ItemController extends Controller
             }
             $skuModel->product->wrapLimit()->sync($arr);
         }else{
-            $skuModel->create($data);
+            $spuModel = SpuModel::create($data);
+            $data['spu_id'] = $spuModel->id;
+            $productModel = ProductModel::create($data);
+            $data['product_id'] = $productModel->id; 
+            $this->model->create($data);
             foreach(unserialize($data['carriage_limit_arr']) as $logistics_limits_id){
                 $brr[] = $logistics_limits_id;         
             }
-            $skuModel->product->logisticsLimit()->attach($brr);
+            $this->model->product->logisticsLimit()->attach($brr);
             foreach(unserialize($data['package_limit_arr']) as $wrap_limits_id){
                 $arr[] = $wrap_limits_id;         
             }
-            $skuModel->product->wrapLimit()->attach($arr);
+            $this->model->product->wrapLimit()->attach($arr);
         }
-        return json_encode('success');
+        echo json_encode('success');exit;
 
     }
 

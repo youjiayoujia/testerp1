@@ -168,14 +168,24 @@ class LogisticsModel extends BaseModel
      */
     public function placeOrder($packageId)
     {
-        $code = $this->codes->where('status', '0')->first();
-        if ($code) {
-            $code->update([
-                'status' => 1,
-                'package_id' => $packageId,
-                'used_at' => date('y-m-d', time())
-            ]);
-            return $code->code;
+        switch ($this->docking) {
+            case 'CODE':
+                $code = $this->codes->where('status', '0')->first();
+                if ($code) {
+                    $code->update([
+                        'status' => 1,
+                        'package_id' => $packageId,
+                        'used_at' => date('y-m-d', time())
+                    ]);
+                    return $code->code;
+                }
+                break;
+            case 'API':
+                break;
+            case 'MANUAL':
+                break;
+            case 'SELFAPI':
+                break;
         }
         return false;
 

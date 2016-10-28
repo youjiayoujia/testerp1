@@ -16,15 +16,14 @@ class SpuModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'spus';
+    public $table = 'spus';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    //protected $fillable = ['id', 'spu','product_require_id','status','edit_user','image_user'];
-    protected $guarded = [];
+    protected $fillable = ['id', 'spu','product_require_id','status','edit_user','image_edit','developer','purchase','remark'];
 
     public $searchFields = ['id' =>'ID','spu'=>'spu'];
 

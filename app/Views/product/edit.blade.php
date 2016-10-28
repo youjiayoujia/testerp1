@@ -83,19 +83,8 @@
 
     <div class='row'>  
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select id="second_supplier_id" class="form-control" name="second_supplier_id">
-
-                @foreach($all_second_suppliers as $supplier)
-                    <option>--请选择--</option>
-                    <option value="{{$supplier->id}}" @if($product->second_supplier_id == $supplier->id) selected @endif()>{{$supplier->name}}</option>
-                @endforeach
-
-
-{{--
-
+            <select id="second_supplier_id" class="form-control supplier" name="second_supplier_id">
                <option value="{{$product->second_supplier?$product->second_supplier->id:0}}">{{$product->second_supplier?$product->second_supplier->name:''}}</option>
-           --}}
-
             </select>
         </div>
         <div class="form-group col-md-3">
@@ -261,10 +250,7 @@
 
 @section('pageJs')
     <script type="text/javascript">
-        $(document).ready(function () {
-            $('#second_supplier_id').select2();
-        });
-/*        $('.supplier').select2({
+        $('.supplier').select2({
                 ajax: {
                     url: "{{ route('ajaxSupplier') }}",
                     dataType: 'json',
@@ -278,7 +264,7 @@
                         
                     }
                 },
-            });*/
+            });
 
             $('.purchase_adminer').select2({
                 ajax: {

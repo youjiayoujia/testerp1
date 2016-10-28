@@ -27,7 +27,7 @@
             </td>
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
-            <td>{{ $package->order ? $package->order->amount : '订单金额有误' }}</td>
+            <td>{{ $package->order ? $package->order->amount . $package->order->currency : '订单金额有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->shipping_firstname . $package->shipping_lastname }}</td>
             <td>{{ $package->shipping_country }}</td>

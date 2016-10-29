@@ -71,15 +71,25 @@ class PartitionController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->create(request()->all());
-        foreach(request('country_id') as $value) {
-            $data['country_id'] = $value;
-            $data['logistics_partition_id'] = $model->id;
-            PartitionSortModel::create($data);
+        $countries = explode(',', request('country_id'));
+        $remark = '';
+        foreach($countries as $country) {
+            $obj = CountriesModel::where('cn_name', $country)->first();
+            if($obj) {
+                $data['country_id'] = $obj->id;
+                $data['logistics_partition_id'] = $model->id;
+                PartitionSortModel::create($data);
+            }else {
+                $remark = $remark . $country . ' ';
+            }
         }
         $model = $this->model->with('partitionSorts')->find($model->id);
         $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
-
-        return redirect($this->mainIndex);
+        if($remark == null) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
+        }else {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $remark . '未匹配上'));
+        }
     }
 
     /**

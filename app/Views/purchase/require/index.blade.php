@@ -29,7 +29,8 @@
     <th class="sort" data-field="refund_rate">退款率</th>
     <th>SKU状态</th>
     <th>采购状态</th>
-    <th>采购采购员</th>
+    <th>采购员</th>
+    <th>缺货</th>
 @stop
 @section('tableBody')
     @foreach($data as $item)
@@ -69,6 +70,7 @@
             <td>{{config('item.status')[$item->status]}}</td>
             <td>{{config('purchase.require')[$item->require_create]}}</td>
             <td>{{$item->user?$item->user->name:''}}</td>
+            <td>{{$item->need_total_num}}</td>
         </tr>
     @endforeach
  <script type="text/javascript">		 

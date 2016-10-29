@@ -139,9 +139,9 @@ class SmtAdapter extends BasicAdapter
         $shipId = $package->logistics_id; //物流
         $channel_account_id = $package->channel_account_id;
         
-        list($name, $channel) = explode(',',$package->logistics->logistics_code);
+        list($name, $channel) = explode(',',$package->logistics->type);
         //$warehouseCarrierService = $this->getWarehouseCarrierService($channel,$warehouseId);
-        $warehouseCarrierService = $package->logistics->type;  //物流方式
+        $warehouseCarrierService = $channel;  //物流方式
         $totalWeight = 0;
         $productData = array();
         foreach($package->items as $key => $item){

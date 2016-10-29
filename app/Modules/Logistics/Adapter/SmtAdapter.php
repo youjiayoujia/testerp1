@@ -157,7 +157,7 @@ class SmtAdapter extends BasicAdapter
         $data['declareProductDTOs']         = json_encode($productData);
         $data['addressDTOs']                = json_encode($addressArray);
  
-        $api = 'api.createWarehouseOrder';    
+        $api = 'api.createWarehouseOrder';  
         $result = json_decode($smtApi->getJsonDataUsePostMethod($api,$data),true);
         if(array_key_exists('success', $result)){
             if ($result['result']['success']){
@@ -235,9 +235,9 @@ class SmtAdapter extends BasicAdapter
         }
         
         $productData = array(
-            'categoryCnDesc'       => $products_declared_cn,
-            'categoryEnDesc'       => $products_declared_en,
-            'productDeclareAmount' => $products_declared_value,
+            'categoryCnDesc'       => $package->decleared_cname,
+            'categoryEnDesc'       => $package->decleared_ename,
+            'productDeclareAmount' => $package->decleared_value,
             'productId'            => $productId,
             'productNum'           => $productNum,
             'productWeight'        => $totalWeight,
@@ -251,7 +251,7 @@ class SmtAdapter extends BasicAdapter
                 'city'          => $package->shipping_city, //城市
                 'streetAddress' => $package->shipping_address . ' ' . $package->shipping_address1, //街道 ,（必填，长度限制1-90字节）
                 'phone'         => $package->shipping_phone, //phone（长度限制1- 54字节）,phone,mobile两者二选一
-                'name'          => $package->order->billing_firstname . " " . $package->order->billing_lastname, //姓名,（必填，长度限制1-90字节）
+                'name'          => $package->shipping_firstname . " " . $package->shipping_lastname, //姓名,（必填，长度限制1-90字节）
                 'postcode'      => $package->shipping_zipcode  //邮编
             ),
         );        
@@ -263,10 +263,20 @@ class SmtAdapter extends BasicAdapter
         $data['domesticLogisticsCompanyId'] = '-1'; //国内快递ID;(物流公司是other时,ID为-1)
         $data['domesticLogisticsCompany']   = '上门揽收'; //国内快递公司名称;(物流公司Id为-1时,必填)
         $data['domesticTrackingNo']         = 'None'; //国内快递运单号,长度1-32
-        $addressArray = array_merge($addressArray, $this->_senderAddress['5']);
         
-        $data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
-        $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);
+        //获取SMT平台线上发货地址
+        $address_api = "alibaba.ae.api.getLogisticsSellerAddresses";
+        $address_smt = array(
+            'request'=>'["sender","pickup"]'
+        );
+        $address_result = parent::getJsonDataUsePostMethod($address_api, $address_smt);
+        $address_result = json_decode($address_result, true);
+        
+        $addressArray = array_merge($addressArray, $this->_senderAddress['5']);
+        $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
+        $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
+        $data['declareProductDTOs']         = json_encode($productData);
+        $data['addressDTOs']                = json_encode($addressArray);
         
        $api = 'api.createWarehouseOrder';
        //获取渠道帐号资料

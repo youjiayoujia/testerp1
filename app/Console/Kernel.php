@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetOrders::class,
         \App\Console\Commands\CreatePurchase::class,
         \App\Console\Commands\PurchaseStaticstics::class,
+        \App\Console\Commands\Test::class,
         \App\Console\Commands\TransferProduct::class,
         \App\Console\Commands\TransferChannelAccount::class,
         \App\Console\Commands\TransferSupplier::class,

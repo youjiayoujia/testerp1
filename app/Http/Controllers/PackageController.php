@@ -98,7 +98,7 @@ class PackageController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model->with('order')->with('warehouse')->with('logistics')->with('items')->with('channel')->with('picklist')),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => LogisticsModel::all(),
         ];

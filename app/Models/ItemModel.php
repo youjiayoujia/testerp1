@@ -901,5 +901,22 @@ class ItemModel extends BaseModel
             $itemModel->skuPrepareSupplier()->sync($arr);
         }
     }
+
+    public function updateWarehouse()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $model = $this->all();
+        //$model = $this->where('warehouse_id','=','33333')->get();
+        foreach ($model as $key => $itemModel) {
+            $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            
+            $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id==1000?1:2;
+            $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
+            //print_r($old_data);exit;
+            $itemModel->update($old_data);
+        }
+    }
     
 }

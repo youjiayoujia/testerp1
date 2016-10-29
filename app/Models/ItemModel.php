@@ -907,12 +907,19 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $model = $this->all();
-        //$model = $this->where('warehouse_id','=','33333')->get();
+        //$model = $this->where('id','<','3333')->get();
         foreach ($model as $key => $itemModel) {
+            $old_data = [];
             $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            //print_r(count($erp_products_data));exit;
             if(count($erp_products_data)){
-                $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id==1000?1:2;
+                if($erp_products_data[0]->product_warehouse_id==1025){
+                    $warehouse_id = 2;
+                }else{
+                    $warehouse_id = 1;
+                }
+                $old_data['warehouse_id'] = $warehouse_id;
                 $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
                 //print_r($old_data);exit;
                 $itemModel->update($old_data);

@@ -90,7 +90,78 @@ class SmtAdapter extends BasicAdapter
      * @see \App\Modules\Logistics\Adapter\BasicAdapter::getTracking()
      */
     public function getTracking($package){
-        $logistics_id =  $package->logistics_id;
+        $orderId     = $package->order->channel_ordernum; //内单号
+        $warehouseId = $package->warehouse_id; //仓库
+        $shipId = $package->logistics_id; //物流
+        $channel_account_id = $package->channel_account_id;
+        
+        list($name, $channel) = explode(',',$package->logistics->type);
+        //$warehouseCarrierService = $this->getWarehouseCarrierService($channel,$warehouseId);
+        $warehouseCarrierService = $channel;  //物流方式
+        $totalWeight = 0;
+        $productData = array();
+        foreach($package->items as $key => $item){
+            $totalWeight += $item->item->weight;
+            $products_declared_cn = $item->item->product->declared_cn;
+            $products_declared_en = $item->item->product->declared_en;
+            $products_declared_value = $item->item->product->declared_value;
+            $productId = $item->item->product->id;
+            $productNum =  $item->quantity;
+        }
+        
+        $productData = array(
+            'categoryCnDesc'       => $products_declared_cn,
+            'categoryEnDesc'       => $products_declared_en,
+            'productDeclareAmount' => $products_declared_value,
+            'productId'            => $productId,
+            'productNum'           => $productNum,
+            'productWeight'        => $totalWeight,
+            'isContainsBattery'    => 0
+        );
+        
+        $addressArray = array(
+            'receiver' => array( //收件人地址
+                'country'       => $package->shipping_country, //国家简称, 速卖通下单下来应该就是吧
+                'province'      => $package->shipping_state, //省/州,（必填，长度限制1-48字节）
+                'city'          => $package->shipping_city, //城市
+                'streetAddress' => $package->shipping_address . ' ' . $package->shipping_address1, //街道 ,（必填，长度限制1-90字节）
+                'phone'         => $package->shipping_phone, //phone（长度限制1- 54字节）,phone,mobile两者二选一
+                'name'          => $package->order->billing_firstname . " " . $package->order->billing_lastname, //姓名,（必填，长度限制1-90字节）
+                'postcode'      => $package->shipping_zipcode  //邮编
+            ),
+        );
+        
+        $data = array();
+        $data['tradeOrderId'] = $orderId;
+        $data['tradeOrderFrom'] = 'SOURCING';
+        $data['warehouseCarrierService'] = $warehouseCarrierService;
+        $data['domesticLogisticsCompanyId'] = '-1'; //国内快递ID;(物流公司是other时,ID为-1)
+        $data['domesticLogisticsCompany']   = '上门揽收'; //国内快递公司名称;(物流公司Id为-1时,必填)
+        $data['domesticTrackingNo']         = 'None'; //国内快递运单号,长度1-32
+        $addressArray = array_merge($addressArray, $this->_senderAddress['5']);
+        
+        $data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
+        $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);
+        
+        $api = 'api.createWarehouseOrder';
+        //获取渠道帐号资料
+        dd($data);
+        $account = AccountModel::findOrFail($channel_account_id);
+        $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+        $result = json_decode($smtApi->getJsonDataUsePostMethod($api,$data));
+        if(array_key_exists('success', $result)){
+            if ($result['result']['success']){
+                if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
+                    $data['channel_listnum'] = $result['result']['intlTracking'];
+                    $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
+                    //OrderModel::where('id',$package->order->id)->update($data);
+                    return array('code' => 'success', 'result' => $result['result']['intlTracking'] );
+                }
+            }
+        }else{
+            return array('code' => 'error','result' => 'error description.');
+        }
+        /*$logistics_id =  $package->logistics_id;
         $orderId = $package->order->channel_ordernum; 
         $channel_account_id = $package->channel_account_id;
        // $channel = explode(',',$package->logistics->logistics_code);
@@ -113,7 +184,7 @@ class SmtAdapter extends BasicAdapter
             }           
         }else{
             return array('code' =>'error','result' => 'Get tarck number is failure !');
-        }
+        }*/
     }
     
     /**
@@ -192,6 +263,7 @@ class SmtAdapter extends BasicAdapter
        $account = AccountModel::findOrFail($channel_account_id);
        $smtApi = Channel::driver($account->channel->driver, $account->api_config);
        $result = json_decode($smtApi->getJsonDataUsePostMethod($api,$data));
+
        if(array_key_exists('success', $result)){
            if ($result['result']['success']){
                if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取

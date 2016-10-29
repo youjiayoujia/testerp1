@@ -711,7 +711,77 @@ class TestController extends Controller
         exit;*/
     }
 
+
+    /**
+     * Curl Post JSON 数据
+     */
+    public function postCurlHttpsData($url, $data)
+    { // 模拟提交数据函数
+        $curl = curl_init(); // 启动一个CURL会话
+        curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
+        // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
+        curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
+        curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data); // Post提交的数据包
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30); // 设置超时限制防止死循环
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
+        /*        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($data))
+                );*/
+        $tmpInfo = curl_exec($curl); // 执行操作
+        if (curl_errno($curl)) {
+            // $this->setCurlErrorLog(curl_error ( $curl ));
+            die(curl_error($curl)); //异常错误
+        }
+        curl_close($curl); // 关闭CURL会话
+        return $tmpInfo; // 返回数据
+    }
     public function testEbayCases(){
+
+
+        $url = 'jiangdi.zserp.com/api/SyncSellmoreData';
+        $data = [
+            'secretKey'               => 'VSxtAts2fQlTLc1KCLaM',
+            'type'                   => 'add',
+            //'id'                     => 30000,
+            'suppliers_id'           => 40110,
+            'suppliers_company'      => '',
+            'suppliers_website'      => '',
+            'suppliers_address'      => '',
+            'suppliers_type'         => '0',
+            'supplierArrivalMinDays' => '',
+            'suppliers_bank'        => '招商',
+            'suppliers_card_number' => '23543456345',
+            'suppliers_name'        => '160000',
+            'suppliers_mobile'      => '13016937924',
+            'suppliers_wangwang'    => '23456edg',
+            'suppliers_qq'          => '3563456',
+            'pay_method'            => '1',
+            'attachment_url'        => 'http://erp.moonarstore.com/upload/suppliers/2014/0410/13971223945484.jpg',
+        ];
+        $result = $this->postCurlHttpsData($url,$data);
+
+        echo ($result);exit;
+
+
+
+/*        'sellmore' => [
+            'pay_type' => [
+                1 => 'ONLINE',
+                2 => 'BANK_PAY',
+                3 => 'CASH_PAY',
+                4 => 'OTHER_PAY',
+            ],
+            'api_url' => 'http://120.24.100.157:60/api/api_suppliers.php',
+        ],*/
+
+
+
         foreach (AccountModel::all() as $account) {
             if($account->account == 'ebay@licn2011'){ //测试diver
 

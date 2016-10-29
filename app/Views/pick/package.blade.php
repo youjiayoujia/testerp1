@@ -53,9 +53,9 @@
                                 @endif
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                                 <td class='col-lg-3'>
-                                        @foreach($packageitem->item->product->wrapLimit as $limit)  
-                                            {{ $limit->name }} . ' '
-                                        @endforeach
+                                    @foreach($packageitem->item->product->wrapLimit as $limit)  
+                                        {{ $limit->name }} . ' '
+                                    @endforeach
                                 </td>
                                 <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
                                 <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>

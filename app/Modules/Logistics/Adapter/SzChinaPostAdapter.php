@@ -46,7 +46,7 @@ class SzChinaPostAdapter extends BasicAdapter
         
         $countryCode = $package->shipping_country;
         $countryName = $package->country->cn_name;
-        $buyer_name = $package->order->billing_firstname . " " . $package->order->billing_lastname;  //不确定字段在哪个表中
+        $buyer_name = $package->shipping_firstname . " " . $package->shipping_lastname;  //不确定字段在哪个表中
         $totalCount = 0;
         $totalWeight = 0;
         $totalValue = 0;
@@ -108,22 +108,9 @@ class SzChinaPostAdapter extends BasicAdapter
         
         $re = json_decode($result->out,true);
         
-        if($re['status']==0){//数据推送成功
-          $msg = '<span style="color:green;">订单号'.$orderID.'推送成功，批次号：'.$re['orderId'].',包裹号:'.$re['packageNo'].'</span><br/>';
-          
-          $sqlOp = "INSERT INTO erp_operate_log(operateUser,operateType,operateMod,operateKey,operateText) VALUES('".$_COOKIE[ 'id' ]."','update','ordersManage','". $orderID ."','推送数据到深圳邮政成功')";
-          $this->doSql->query($sqlOp);
-          
-          //将推送的批次号和包裹号记录下来（当天第一次推送数据，批次和包裹可以为空，第二次推送不能为空）
-          $sqlin = "insert into erp_china_post_detail(erp_orders_id,orderId,packageNo,status,createTime,remark,updateTime) values ('".$orderID."','".$re['orderId']."','".$re['packageNo']."','1','".date('Y-m-d')."','','".date('Y-m-d H:i:s')."')";
+        if($re['status']==0){//数据推送成功          
         
-          $this->doSql->query($sqlin);
-        
-        }else{
-          $msg = '<span style="color:red;">订单号'.$orderID.'推送失败，原因'.$re['failMailList'].'</span><br/>';
-          //将推送的批次号和包裹号记录下来（当天第一次推送数据，批次和包裹可以为空，第二次推送不能为空）
-          $sqlin = "insert into erp_china_post_detail(erp_orders_id,orderId,packageNo,status,createTime,remark,updateTime) values ('".$orderID."','".$re['orderId']."','".$re['packageNo']."','2','".date('Y-m-d')."','".$re['failMailList']."','".date('Y-m-d H:i:s')."')";
-          $this->doSql->query($sqlin);
+        }else{    
         }
         
         return $msg;

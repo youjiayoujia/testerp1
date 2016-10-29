@@ -39,12 +39,7 @@
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
-<<<<<<< HEAD
             <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
-=======
-            <td>{{ $package->logistics ? $package->logistics->code : '' }}
-                <font color='gray'>{{ $package->realTimeLogistics()}}</font></td>
->>>>>>> master
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
             <td>{{ $package->created_at }}</td>

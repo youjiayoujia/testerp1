@@ -101,21 +101,21 @@ class SmtAdapter extends BasicAdapter
         $totalWeight = 0;
         $productData = array();
         foreach($package->items as $key => $item){
-            $totalWeight += $item->item->weight;
-            $products_declared_cn = $item->item->product->declared_cn;
-            $products_declared_en = $item->item->product->declared_en;
-            $products_declared_value = $item->item->product->declared_value;
+            //$totalWeight += $item->item->weight;
+            //$products_declared_cn = $item->item->product->declared_cn;
+            //$products_declared_en = $item->item->product->declared_en;
+            //$products_declared_value = $item->item->product->declared_value;
             $productId = $item->item->product->id;
             $productNum =  $item->quantity;
         }
         
         $productData = array(
-            'categoryCnDesc'       => $products_declared_cn,
-            'categoryEnDesc'       => $products_declared_en,
-            'productDeclareAmount' => $products_declared_value,
+            'categoryCnDesc'       => $package->decleared_cname,
+            'categoryEnDesc'       => $package->decleared_ename,
+            'productDeclareAmount' => $package->decleared_value,
             'productId'            => $productId,
             'productNum'           => $productNum,
-            'productWeight'        => $totalWeight,
+            'productWeight'        => $package->totalweight,
             'isContainsBattery'    => 0
         );
         
@@ -156,7 +156,7 @@ class SmtAdapter extends BasicAdapter
         
         $data['declareProductDTOs']         = json_encode($productData);
         $data['addressDTOs']                = json_encode($addressArray);
-        
+ 
         $api = 'api.createWarehouseOrder';    
         $result = json_decode($smtApi->getJsonDataUsePostMethod($api,$data),true);
         if(array_key_exists('success', $result)){

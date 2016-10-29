@@ -10,14 +10,9 @@
     </div>
     <div class='row'>
         <div class='form-group col-lg-6'>
-            <label for="country_id">选择国家</label>
+            <label for="country_id" class='control-label'>国家</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class='form-control country_id' name='country_id[]' multiple>
-                <option value=''></option>
-                    @foreach($countries as $country)
-                        <option value="{{ $country->id }}">{{$country->cn_name}}</option>
-                    @endforeach
-            </select>
+            <textarea class="form-control" rows="10" id="country_id" name='country_id'>{{ old('country_id') }}</textarea>
         </div>
     </div>
 @stop

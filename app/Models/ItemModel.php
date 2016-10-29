@@ -911,11 +911,13 @@ class ItemModel extends BaseModel
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            if(count($erp_products_data)){
+                $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id==1000?1:2;
+                $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
+                //print_r($old_data);exit;
+                $itemModel->update($old_data);
+            }
             
-            $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id==1000?1:2;
-            $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
-            //print_r($old_data);exit;
-            $itemModel->update($old_data);
         }
     }
     

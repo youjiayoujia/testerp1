@@ -25,7 +25,7 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td>{{ $package->id }}</td>
+            <td class='packageId' data-id="{{ $package->id }}">{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
             <td>{{ $package->order ? $package->order->amount . $package->order->currency : '订单金额有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
@@ -39,8 +39,12 @@
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
+<<<<<<< HEAD
+            <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
+=======
             <td>{{ $package->logistics ? $package->logistics->code : '' }}
                 <font color='gray'>{{ $package->realTimeLogistics()}}</font></td>
+>>>>>>> master
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
             <td>{{ $package->created_at }}</td>
@@ -79,10 +83,9 @@
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
-            <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
-            <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='2'>追踪号: {{ $package->tracking_no ? $package->tracking_no : '暂无追踪号信息'}}
-            <td colspan='5'>
+            <td colspan='4'>渠道:  {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
+            <td colspan='4'>拣货单:  {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
+            <td colspan='7'>
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
@@ -236,6 +239,27 @@
         });
 
         $(document).ready(function () {
+
+            arr = new Array();
+            i=0;
+            $.each($('.packageId'), function(){
+                arr[i] = $(this).data('id');
+                i++;
+            })
+            $.get(
+                "{{ route('package.ajaxRealTime')}}",
+                {'arr':arr},
+                function(result){
+                    j=0;
+                    $.each($('.packageId'), function(){
+                        block = $(this).parent();
+                        logisticsReal = block.children('.logisticsReal');
+                        logisticsReal.html(logisticsReal.text() + "   <font color='gray'>" + result[j] + "</font>");
+                        j++;
+                    })
+                }
+            )
+
             $('.returnTrackno').click(function () {
                 location.href = "{{ route('package.returnTrackno')}}";
             });

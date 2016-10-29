@@ -177,7 +177,7 @@ class ProductModel extends BaseModel
         return $this->belongsToMany('App\Models\WrapLimitsModel','product_wrap_limits','product_id','wrap_limits_id')->withTimestamps();
     }
 
-    public function geteWrapLimitAttribute()
+    public function getWrapLimitAttribute()
     {
         $str = '';
         foreach($this->wrapLimit as $limit) {

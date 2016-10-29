@@ -848,6 +848,8 @@ class PackageModel extends BaseModel
             $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
         })->where(['is_clearance' => $isClearance])
+            ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
+            ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
             ->get()
             ->sortBy(function($single,$key){
                 return $single->logistics ? $single->logistics->priority : 1;
@@ -948,7 +950,7 @@ class PackageModel extends BaseModel
             
             return $rule->logistics->code;
         }
-        return '&nbsp;&nbsp;&nbsp;&nbsp;虚拟匹配未匹配到';
+        return '虚拟匹配未匹配到';
     }
 
     public function assignLogistics()
@@ -974,8 +976,10 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
-              ->get()
-              ->sortBy(function($single,$key){
+                ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
+                ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
+                ->get()
+                ->sortBy(function($single,$key){
                 return $single->logistics ? $single->logistics->priority : 1;
               });
             foreach ($rules as $rule) {

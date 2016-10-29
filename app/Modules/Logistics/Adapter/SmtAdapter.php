@@ -235,9 +235,9 @@ class SmtAdapter extends BasicAdapter
         }
         
         $productData = array(
-            'categoryCnDesc'       => $products_declared_cn,
-            'categoryEnDesc'       => $products_declared_en,
-            'productDeclareAmount' => $products_declared_value,
+            'categoryCnDesc'       => $package->decleared_cname,
+            'categoryEnDesc'       => $package->decleared_ename,
+            'productDeclareAmount' => $package->decleared_value,
             'productId'            => $productId,
             'productNum'           => $productNum,
             'productWeight'        => $totalWeight,

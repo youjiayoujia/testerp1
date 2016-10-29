@@ -927,5 +927,21 @@ class ItemModel extends BaseModel
             
         }
     }
+
+    public function insertWarehousePosition()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
+                    from erp_products_data where product_warehouse_id = 1025');
+       
+        foreach($erp_products_data as $data){
+            $arr = [];
+            $arr['warehouse_id'] = 2;
+            $arr['name'] = $data->products_location;
+            PositionModel::create($arr);
+        }
+        
+    }
     
 }

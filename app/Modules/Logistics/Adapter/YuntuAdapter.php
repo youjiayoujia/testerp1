@@ -103,7 +103,7 @@ Class YuntuAdapter extends BasicAdapter
 								  ], 
 								  "OrderNumber": "SLM'.$ordersinfo->id.'",
 								  "TrackingNumber": "'.$ordersinfo->tracking_no.'",
-								  "ShippingMethodCode": "TWYZA",	    
+								  "ShippingMethodCode": "'.$ordersinfo->logistics->type.'",
 								  "ApplicationType": 4,
 								  "Weight": 1,
 								  "PackageNumber": 1,

@@ -31,16 +31,26 @@
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->shipping_firstname . $package->shipping_lastname }}</td>
             <td>{{ $package->shipping_country }}</td>
-            <td>{{ $package->status_name }}</td>
+            <td>
+                <button class="btn btn-{{ $package->status_color }} btn-xs">
+                    {{ $package->status_name }}
+                </button>
+
+            </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
+<<<<<<< HEAD
             <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
+=======
+            <td>{{ $package->logistics ? $package->logistics->code : '' }}
+                <font color='gray'>{{ $package->realTimeLogistics()}}</font></td>
+>>>>>>> master
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
             <td>{{ $package->created_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
-                  <span class="glyphicon glyphicon-eye-open"></span>
+                    <span class="glyphicon glyphicon-eye-open"></span>
                 </button>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
@@ -52,19 +62,24 @@
         @foreach($package->items as $key => $packageItem)
             <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
                 @if($key == 0)
-                <td colspan='2' rowspan="{{$package->items->count()}}"><p>{{ $package->shipping_firstname . $package->shipping_lastname }}</p>
-                                <p>{{ $package->shipping_shipping_address . ' ' .$package->shipping_city . ' ' . $package->shiping_state . ' ' . $package->shipping_country }}</td>
-                <td colspan='3' rowspan="{{$package->items->count()}}">包裹item信息</td>
+                    <td colspan='2' rowspan="{{$package->items->count()}}">
+                        <p>{{ $package->shipping_firstname . $package->shipping_lastname }}</p>
+                        <p>{{ $package->shipping_shipping_address . ' ' .$package->shipping_city . ' ' . $package->shiping_state . ' ' . $package->shipping_country }}
+                    </td>
+                    <td colspan='3' rowspan="{{$package->items->count()}}">包裹item信息</td>
                 @endif
-                <td>sku</td><td colspan='2'>
-                            <button class="btn btn-warning btn-xs sku_search"
-                                data-toggle="modal"
-                                data-target="#sku_search">
-                            {{ $packageItem->item ? $packageItem->item->sku : '' }}
-                        </button>
+                <td>sku</td>
+                <td colspan='2'>
+                    <button class="btn btn-warning btn-xs sku_search"
+                            data-toggle="modal"
+                            data-target="#sku_search">
+                        {{ $packageItem->item ? $packageItem->item->sku : '' }}
+                    </button>
                 </td>
-                <td>库位</td><td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
-                <td>数量</td><td colspan='3'>{{ $packageItem->quantity }}</td>
+                <td>库位</td>
+                <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
+                <td>数量</td>
+                <td colspan='3'>{{ $packageItem->quantity }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
@@ -72,18 +87,18 @@
             <td colspan='4'>拣货单:  {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='7'>
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
-                    <span class="glyphicon glyphicon-eye-open"></span> 
+                    <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
                     <span class="glyphicon glyphicon-random"></span>
                 </a>
                 <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
-                    <span class="glyphicon glyphicon-pencil"></span> 
+                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
                 <button class="btn btn-primary btn-xs split"
                         data-toggle="modal"
                         data-target="#split" data-id="{{ $package->id }}" title='拆分包裹'>
-                    <span class="glyphicon glyphicon-tasks"></span> 
+                    <span class="glyphicon glyphicon-tasks"></span>
                 </button>
             </td>
         </tr>
@@ -169,7 +184,7 @@
             <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
             <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
             <li><a data-toggle="modal"
-                        data-target="#change_logistics">
+                   data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
             <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
@@ -194,9 +209,9 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
-        $(document).on('click', '.easy', function(){
+        $(document).on('click', '.easy', function () {
             type = $(this).data('type');
-            if(type == 'easy') {
+            if (type == 'easy') {
                 $('.fb').hide();
             } else {
                 $('.fb').show();
@@ -205,20 +220,20 @@
 
         $('.change_logistics').select2();
 
-        $(document).on('click', '.sku_search', function(){
+        $(document).on('click', '.sku_search', function () {
             sku = $.trim($(this).text());
-            if(sku) {
+            if (sku) {
                 $.get(
-                    "{{ route('stock.getSingleSku')}}",
-                    {sku:sku, type:'1'},
-                    function(result){
-                        if(result == 'false') {
-                            alert('sku不存在');
-                            return false;
+                        "{{ route('stock.getSingleSku')}}",
+                        {sku: sku, type: '1'},
+                        function (result) {
+                            if (result == 'false') {
+                                alert('sku不存在');
+                                return false;
+                            }
+                            $('.buf').html('');
+                            $('.buf').html(result);
                         }
-                        $('.buf').html('');
-                        $('.buf').html(result);
-                    }
                 );
             }
         });
@@ -259,13 +274,13 @@
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
             })
 
-            $(document).on('click', '.recycle', function(){
+            $(document).on('click', '.recycle', function () {
                 id = $(this).data('id');
-                location.href="{{ route('package.recycle') }}?id=" + id;
+                location.href = "{{ route('package.recycle') }}?id=" + id;
             })
 
-            $(document).on('click', '.submit_logistics', function(){
-                if(confirm('确认修改物流方式?')) {
+            $(document).on('click', '.submit_logistics', function () {
+                if (confirm('确认修改物流方式?')) {
                     arr = new Array();
                     i = 0;
                     $.each($('.single:checked'), function () {
@@ -274,7 +289,7 @@
                         i++;
                     })
                     logistics_id = $('.change_logistics').val();
-                    if(arr.length) {
+                    if (arr.length) {
                         location.href = "{{ route('package.changeLogistics', ['arr' => '']) }}/" + arr + '/' + logistics_id;
                     } else {
                         alert('请选择包裹信息');
@@ -282,8 +297,8 @@
                 }
             });
 
-            $(document).on('click', '.remove_packages', function(){
-                if(confirm('确认删除包裹?')) {
+            $(document).on('click', '.remove_packages', function () {
+                if (confirm('确认删除包裹?')) {
                     arr = new Array();
                     i = 0;
                     $.each($('.single:checked'), function () {
@@ -291,7 +306,7 @@
                         arr[i] = tmp;
                         i++;
                     })
-                    if(arr.length) {
+                    if (arr.length) {
                         location.href = "{{ route('package.removePackages', ['arr' => '']) }}/" + arr;
                     } else {
                         alert('请选择包裹信息');
@@ -299,8 +314,8 @@
                 }
             });
 
-            $(document).on('click', '.remove_logistics', function(){
-                if(confirm('确认清空挂号码?')) {
+            $(document).on('click', '.remove_logistics', function () {
+                if (confirm('确认清空挂号码?')) {
                     arr = new Array();
                     i = 0;
                     $.each($('.single:checked'), function () {
@@ -308,7 +323,7 @@
                         arr[i] = tmp;
                         i++;
                     })
-                    if(arr.length) {
+                    if (arr.length) {
                         location.href = "{{ route('package.removeLogistics', ['arr' => '']) }}/" + arr;
                     } else {
                         alert('请选择包裹信息');
@@ -316,36 +331,36 @@
                 }
             });
 
-            $(document).on('click', '.split_button', function(){
-                if(confirm('确认拆分')) {
+            $(document).on('click', '.split_button', function () {
+                if (confirm('确认拆分')) {
                     id = $(this).parent().prev().find('.confirm_quantity').attr('name');
                     arr = new Array();
                     i = 0;
                     j = 0;
-                    $.each($(this).parent().find('table'), function(k,v){
-                        $.each($(v).find('tr'), function(k1, v1){
-                            if($(v1).find(':radio').prop('checked')) {
+                    $.each($(this).parent().find('table'), function (k, v) {
+                        $.each($(v).find('tr'), function (k1, v1) {
+                            if ($(v1).find(':radio').prop('checked')) {
                                 arr[i] = j + '.' + $(v1).find('.item_id').data('itemid');
                                 i += 1;
                             }
                         })
                         j += 1;
                     })
-                    location.href="{{ route('package.actSplitPackage', ['arr' => '']) }}/" + arr + "/" + id;
+                    location.href = "{{ route('package.actSplitPackage', ['arr' => '']) }}/" + arr + "/" + id;
                 }
             })
 
-            $(document).on('click', '.confirm_quantity', function(){
+            $(document).on('click', '.confirm_quantity', function () {
                 quantity = $(this).parent().prev().find(':input').val();
                 id = $(this).attr('name');
-                if(quantity > 1) {
+                if (quantity > 1) {
                     $.get(
-                        "{{ route('package.returnSplitPackage')}}",
-                        {quantity:quantity, id:id},
-                        function(result) {
-                            $('.split_package').html('');
-                            $('.split_package').html(result);
-                        },'html'
+                            "{{ route('package.returnSplitPackage')}}",
+                            {quantity: quantity, id: id},
+                            function (result) {
+                                $('.split_package').html('');
+                                $('.split_package').html(result);
+                            }, 'html'
                     );
                 } else {
                     alert('数量不能小于1');
@@ -353,14 +368,14 @@
 
             })
 
-            $(document).on('click', '.split', function(){
+            $(document).on('click', '.split', function () {
                 id = $(this).data('id');
                 $('.confirm_quantity').attr('name', id);
                 $('.package_num').val('');
                 $('.split_package').html('');
             })
 
-            $(document).on('click', '.implodePackage', function(){
+            $(document).on('click', '.implodePackage', function () {
                 arr = new Array();
                 i = 0;
                 $.each($('.single:checked'), function () {
@@ -369,7 +384,7 @@
                     i++;
                 })
                 if (arr.length) {
-                    if(confirm('确认合并包裹')) {
+                    if (confirm('确认合并包裹')) {
                         location.href = "{{ route('package.implodePackage', ['arr' => '']) }}/" + arr;
                     }
                 } else {

@@ -138,16 +138,26 @@ class SmtAdapter extends BasicAdapter
         $data['domesticLogisticsCompanyId'] = '-1'; //国内快递ID;(物流公司是other时,ID为-1)
         $data['domesticLogisticsCompany']   = '上门揽收'; //国内快递公司名称;(物流公司Id为-1时,必填)
         $data['domesticTrackingNo']         = 'None'; //国内快递运单号,长度1-32
+        
+        //获取渠道帐号资料
+        $account = AccountModel::findOrFail($channel_account_id);
+        $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+        //获取SMT平台线上发货地址
+        $address_api = "alibaba.ae.api.getLogisticsSellerAddresses";
+        $address_smt = array(
+            'request'=>'["sender","pickup"]'
+        );
+        $address_result = $smtApi->getJsonDataUsePostMethod($address_api, $address_smt);
+        $address_result = json_decode($address_result, true);
+        
         $addressArray = array_merge($addressArray, $this->_senderAddress['5']);
+        $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
+        $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
         
         $data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
         $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);
         
-        $api = 'api.createWarehouseOrder';
-        //获取渠道帐号资料
-        dd($data);
-        $account = AccountModel::findOrFail($channel_account_id);
-        $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+        $api = 'api.createWarehouseOrder';    
         $result = json_decode($smtApi->getJsonDataUsePostMethod($api,$data));
         if(array_key_exists('success', $result)){
             if ($result['result']['success']){

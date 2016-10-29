@@ -101,7 +101,7 @@ Class YuntuAdapter extends BasicAdapter
 								$request_json .= implode(",",$sku_json);
 								$request_json.='    
 								  ], 
-								  "OrderNumber": "SLM'.$ordersinfo->num.'",	  
+								  "OrderNumber": "SLM'.$ordersinfo->id.'",
 								  "TrackingNumber": "'.$ordersinfo->tracking_no.'",
 								  "ShippingMethodCode": "TWYZA",	    
 								  "ApplicationType": 4,

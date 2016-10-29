@@ -126,7 +126,7 @@ class SmtAdapter extends BasicAdapter
                 'city'          => $package->shipping_city, //城市
                 'streetAddress' => $package->shipping_address . ' ' . $package->shipping_address1, //街道 ,（必填，长度限制1-90字节）
                 'phone'         => $package->shipping_phone, //phone（长度限制1- 54字节）,phone,mobile两者二选一
-                'name'          => $package->shipping_firstname . " " . $package->shipping_firstname, //姓名,（必填，长度限制1-90字节）
+                'name'          => $package->shipping_firstname . " " . $package->shipping_lastname, //姓名,（必填，长度限制1-90字节）
                 'postcode'      => $package->shipping_zipcode  //邮编
             ),
         );

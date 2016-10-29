@@ -708,7 +708,7 @@ class ItemModel extends BaseModel
             }
 
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id')[0]->num;
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
 
             $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';

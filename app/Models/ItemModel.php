@@ -809,8 +809,8 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url="http://120.24.100.157:60/api/skuInfoApi.php";
-        //$itemModel = $this->all();
-        $itemModel = $this->where('sku','M001_black')->get();
+        $itemModel = $this->all();
+        //$itemModel = $this->where('sku','M001_black')->get();
         foreach ($itemModel as $key => $model) {
             $old_data['sku'] = $model->sku;
             //print_r($old_data);exit;

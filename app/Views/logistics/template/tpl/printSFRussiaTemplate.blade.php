@@ -85,7 +85,7 @@
     </style>
 </head>
 <body>
-<div id="main_frame_box" style="height:400px;">
+<div id="main_frame_box">
     <div style="width:100%;height:90px;">
         <p style="width:230px;height:100%;border:2px solid #000;float:left;">
             From:SLME<br/><br/>
@@ -95,7 +95,7 @@
             POSTIMAKS TASUTUD TAXE PERÇUE ESTONIE No. 199
         </p>
     </div>
-    <div style="width:100%;height:215px;">
+    <div style="width:100%;height:185px;">
         <div style="width:130px;height:105px;float:left;margin-top:5px;font-weight:bold;text-align:center;">
             <p style="border:2px solid #000;line-height:85px;font-size:25px;">
                 PRIORITY

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Console\Commands;
-set_time_limit(0);
 use Channel;
 use Illuminate\Console\Command;
 use App\Http\Controllers\Publish\Smt\SmtProductsController;
@@ -46,6 +45,7 @@ class GetAliexpressProduct extends Command
      */
     public function handle()
     {
+        set_time_limit(0);
         $account = AccountModel::find($this->argument('accountID'));
         $start = microtime(true);
         $currentPage = 1;
@@ -88,13 +88,14 @@ class GetAliexpressProduct extends Command
         if (array_key_exists('aeopAEProductDisplayDTOList', $productList) && $productList['aeopAEProductDisplayDTOList']) {
             foreach ($productList['aeopAEProductDisplayDTOList'] as $productItem) {
                 $productInfo = $channel->findAeProductById($productItem['productId']);
-              
+                $user_id = $channel->_operator_id;
                 $product['productId'] = $productItem['productId'];
+                $product['user_id'] = $user_id;
                 $product['product_url'] = 'http://www.aliexpress.com/item/-/' . $productItem['productId'] . '.html';
                 $product['token_id'] = $account->id;
                 $product['subject'] = array_key_exists('subject', $productInfo) ? $productInfo['subject'] : '';
                 $product['productPrice'] = array_key_exists('productPrice', $productInfo) ? $productInfo['productPrice'] : '';
-                $product['productStatusType'] = $productInfo['productStatusType'];
+                $product['productStatusType'] = $productList['productStatusType'];
                 $product['ownerMemberId'] = $productInfo['ownerMemberId'];
                 $product['ownerMemberSeq'] = $productInfo['ownerMemberSeq'];                
                 $product['wsDisplay'] = array_key_exists('wsDisplay', $productInfo) ? $productInfo['wsDisplay'] : '';
@@ -114,21 +115,23 @@ class GetAliexpressProduct extends Command
                 $product['multiattribute'] = count($productInfo['aeopAeProductSKUs']) > 1 ? 1 : 0;                
 
                 $res = smtProductList::where('productId', $productItem['productId'])->first();
+              
                 if(isset($productInfo['aeopAeProductSKUs'][0]) && $product['gmtCreate'] > '2014-09-01'){
                     $oldUserId = $res ? $res->user_id : 0;
-                    if(!$oldUserId){
+                    if($res && $oldUserId > 0){ //listing已经存在，且负责人也已经存在，就不再变更负责人了
+                        unset($product['user_id']);
+                    }else{
+                        $product['user_id'] = '0';
                         $tempSKU =($productInfo['aeopAeProductSKUs'][0]);
-                        $user_id = '';
                         //获取销售前缀
                         $sale_prefix = $smtProductsObj->get_skucode_prefix($tempSKU['skuCode']);
                         if ($sale_prefix) {
                             $userInfo = smtUserSaleCode::where('sale_code', $sale_prefix)->first();
                             if ($userInfo) {
-                                $user_id = $userInfo->user_id;
+                                $product['user_id'] = $userInfo->user_id;
                             }
-                        }
-                        $product['user_id'] = $user_id;
-                    }
+                        }                                          
+                    }                      
                 }
                
                 if ($res) {

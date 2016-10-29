@@ -101,21 +101,21 @@ class SmtAdapter extends BasicAdapter
         $totalWeight = 0;
         $productData = array();
         foreach($package->items as $key => $item){
-            $totalWeight += $item->item->weight;
-            $products_declared_cn = $item->item->product->declared_cn;
-            $products_declared_en = $item->item->product->declared_en;
-            $products_declared_value = $item->item->product->declared_value;
+            //$totalWeight += $item->item->weight;
+            //$products_declared_cn = $item->item->product->declared_cn;
+            //$products_declared_en = $item->item->product->declared_en;
+            //$products_declared_value = $item->item->product->declared_value;
             $productId = $item->item->product->id;
             $productNum =  $item->quantity;
         }
         
         $productData = array(
-            'categoryCnDesc'       => $products_declared_cn,
-            'categoryEnDesc'       => $products_declared_en,
-            'productDeclareAmount' => $products_declared_value,
+            'categoryCnDesc'       => $package->decleared_cname,
+            'categoryEnDesc'       => $package->decleared_ename,
+            'productDeclareAmount' => $package->decleared_value,
             'productId'            => $productId,
             'productNum'           => $productNum,
-            'productWeight'        => $totalWeight,
+            'productWeight'        => $package->totalweight,
             'isContainsBattery'    => 0
         );
         
@@ -126,7 +126,7 @@ class SmtAdapter extends BasicAdapter
                 'city'          => $package->shipping_city, //城市
                 'streetAddress' => $package->shipping_address . ' ' . $package->shipping_address1, //街道 ,（必填，长度限制1-90字节）
                 'phone'         => $package->shipping_phone, //phone（长度限制1- 54字节）,phone,mobile两者二选一
-                'name'          => $package->shipping_firstname . " " . $package->shipping_firstname, //姓名,（必填，长度限制1-90字节）
+                'name'          => $package->shipping_firstname . " " . $package->shipping_lastname, //姓名,（必填，长度限制1-90字节）
                 'postcode'      => $package->shipping_zipcode  //邮编
             ),
         );
@@ -156,7 +156,7 @@ class SmtAdapter extends BasicAdapter
         
         $data['declareProductDTOs']         = json_encode($productData);
         $data['addressDTOs']                = json_encode($addressArray);
-        
+ 
         $api = 'api.createWarehouseOrder';    
         $result = json_decode($smtApi->getJsonDataUsePostMethod($api,$data),true);
         if(array_key_exists('success', $result)){

@@ -23,4 +23,24 @@ class EmailTemplateController extends Controller
         $this->viewPath = 'logistics.emailTemplate.';
     }
 
+    /**
+     * 存储
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $arr = request()->all();
+        foreach($arr as $key => $value) {
+        	if(empty($value)) {
+        		unset($arr[$key]);
+        	}
+        }
+        //var_dump($arr);exit;
+        $model = $this->model->create($arr);
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
+        return redirect($this->mainIndex);
+    }
 }

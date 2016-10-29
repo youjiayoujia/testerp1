@@ -20,6 +20,8 @@ Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
 Route::post('api/curlApiChangeWarehousePositon', ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
 Route::any('api/skuHandleApi', ['uses' => 'ItemController@skuHandleApi', 'as' => 'item.skuHandleApi']);
+Route::any('api/skuSupplierApi', ['uses' => 'ItemController@skuSupplierApi', 'as' => 'item.skuSupplierApi']);
+
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -596,6 +598,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/ajaxRealTime',
+        ['uses' => 'PackageController@ajaxRealTime', 'as' => 'package.ajaxRealTime']);
+    Route::get('package/recycle',
+        ['uses' => 'PackageController@recycle', 'as' => 'package.recycle']);
     Route::get('package/autoFailAssignLogistics',
         ['uses' => 'PackageController@autoFailAssignLogistics', 'as' => 'package.autoFailAssignLogistics']);
     Route::get('package/bagInfo',

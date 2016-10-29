@@ -848,7 +848,12 @@ class PackageModel extends BaseModel
             $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
         })->where(['is_clearance' => $isClearance])
-            ->get();
+            ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
+            ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
+            ->get()
+            ->sortBy(function($single,$key){
+                return $single->logistics ? $single->logistics->priority : 1;
+              });
         foreach ($rules as $rule) {
             if ($rule->catalog_section) {
                 $catalogs = $rule->rule_catalogs_through;
@@ -945,7 +950,7 @@ class PackageModel extends BaseModel
             
             return $rule->logistics->code;
         }
-        return '&nbsp;&nbsp;&nbsp;&nbsp;虚拟匹配未匹配到';
+        return '虚拟匹配未匹配到';
     }
 
     public function assignLogistics()
@@ -962,6 +967,7 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
+
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
@@ -970,7 +976,12 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
-              ->get();
+                ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
+                ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
+                ->get()
+                ->sortBy(function($single,$key){
+                return $single->logistics ? $single->logistics->priority : 1;
+              });
             foreach ($rules as $rule) {
                 //是否在物流方式产品分类中
                 if ($rule->catalog_section) {
@@ -988,6 +999,7 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
+
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {
                     $channels = $rule->rule_channels_through;
@@ -1016,6 +1028,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+
                 //是否在物流方式账号中
                 if ($rule->account_section) {
                     $accounts = $rule->rule_accounts_through;
@@ -1030,6 +1043,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+
                 //是否在物流方式运输方式中
                 if ($rule->transport_section) {
                     $transports = $rule->rule_transports_through;
@@ -1044,6 +1058,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+                
                 //是否有物流限制
                 if ($rule->limit_section && $this->shipping_limits) {
                     $shipping_limits = $this->shipping_limits->toArray();
@@ -1056,7 +1071,6 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
-
                 //查看对应的物流方式是否是所属仓库
                 $warehouse = WarehouseModel::find($this->warehouse_id);
                 if (!$warehouse->logisticsIn($rule->type_id)) {
@@ -1085,7 +1099,7 @@ class PackageModel extends BaseModel
     /**
      * 判断包裹是否能物流下单
      */
-    public function canPlaceLogistics()
+    public function canplaceLogistics()
     {
         //判断订单状态
         if ($this->status != 'ASSIGNED') {
@@ -1102,16 +1116,17 @@ class PackageModel extends BaseModel
     public function placeLogistics()
     {
         if ($this->canPlaceLogistics()) {
-            $trackingNo = $this->logistics->placeOrder($this->id);
-            if ($trackingNo) {
-                return $this->update([
+            $result  = $this->logistics->placeOrder($this->id);
+            if (isset($result['status'])&&$result['status']) {
+                 $this->update([
                     'status' => 'PROCESSING',
-                    'tracking_no' => $trackingNo,
+                    'tracking_no' => $result['tracking_no'],
                     'logistics_order_at' => date('Y-m-d H:i:s')
                 ]);
             }
+            return $result;
         }
-        return false;
+        return ['status'=>false,'tracking_no'=>'Fail to place logistics order'];
     }
 
     /**

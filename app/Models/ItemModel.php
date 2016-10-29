@@ -46,6 +46,7 @@ class ItemModel extends BaseModel
         'supplier_info',
         'purchase_url',
         'purchase_price',
+        'sku_history_values',
         'purchase_carriage',
         'package_height',
         'package_width',
@@ -705,6 +706,11 @@ class ItemModel extends BaseModel
                 }
 
             }
+
+            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id')[0]->num;
+            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+
             $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
             //退款率
             $data['refund_rate'] = $refund_rate;
@@ -803,10 +809,11 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url="http://120.24.100.157:60/api/skuInfoApi.php";
-        //$itemModel = $this->all();
-        $itemModel = $this->where('id','>','65279')->get();
+        $itemModel = $this->all();
+        //$itemModel = $this->where('sku','M003')->get();
         foreach ($itemModel as $key => $model) {
             $old_data['sku'] = $model->sku;
+            //print_r($old_data);exit;
             $c = curl_init(); 
             curl_setopt($c, CURLOPT_URL, $url); 
             curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
@@ -815,6 +822,8 @@ class ItemModel extends BaseModel
             curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
             $buf = curl_exec($c);
             $user_array = json_decode($buf);
+            //echo '<pre>';
+            //print_r($user_array);exit;
             $dev_id = UserModel::where('name',$user_array->dev_name)->get(['id'])->first();
             $purchase_id = UserModel::where('name',$user_array->purchase_name)->get(['id'])->first();
             $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';

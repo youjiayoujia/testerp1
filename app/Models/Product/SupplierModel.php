@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\product;
+namespace App\Models\Product;
 
 use App\Base\BaseModel;
 use Tool;
@@ -136,6 +136,7 @@ class SupplierModel extends BaseModel
                 }
             }
         }
+        $data['examine_status'] = 'newData'; //新创建
         $create = $this->create($data);
 
         $post = [];

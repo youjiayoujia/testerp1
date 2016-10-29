@@ -59,6 +59,31 @@ class SmtAdapter extends BasicAdapter
             )
         )
     );
+    public function __construct($config){
+        //寄件人信息
+        $this->_sender = 'HUANGCHAOYUN';
+        $this->_senderZip = '518129';
+        $this->_senderMobile = '18565631099';
+        $this->_senderProvinceCode = '440000';
+        $this->_senderCityCode = '440300';
+        $this->_senderAreaCode = '440307';
+        $this->_senderCompany = ' Salamoer Tech';
+        $this->_senderStreet = 'B3-4 Hekan Industrial Zone, No.41, Wuhe Road South';
+        $this->_senderEmail = 'wuliu@moonarstore.com';
+
+        //揽收人信息
+        $this->_contacter = '黄超云';
+        $this->_zipCode = '518129';
+        $this->_phone = '18565631099';
+        $this->_mobilePhone = '18565631099';
+        $this->_provinceCode = '440000';
+        $this->_cityCode = '440300';
+        $this->_areaCode = '440307';
+        $this->_company = '深圳市萨拉摩尔科技有限公司';
+        $this->_street = '坂田五和大道南41号 和堪工业区B3栋4楼';
+        $this->_email = 'wuliu@moonarstore.com';
+    }
+    
     
     /**
      * 获取物流跟踪号
@@ -115,10 +140,8 @@ class SmtAdapter extends BasicAdapter
         $channel_account_id = $package->channel_account_id;
         
         list($name, $channel) = explode(',',$package->logistics->logistics_code);
-        $warehouseCarrierService = $this->getWarehouseCarrierService($channel,$warehouseId);
-//         $channel = 'YANWENJYT_WLB_CPAMNJ';
-//         $warehouseCarrierService = $channel;
-        dd($warehouseCarrierService);
+        //$warehouseCarrierService = $this->getWarehouseCarrierService($channel,$warehouseId);
+        $warehouseCarrierService = $package->logistics->type;  //物流方式
         $totalWeight = 0;
         $productData = array();
         foreach($package->items as $key => $item){
@@ -159,7 +182,7 @@ class SmtAdapter extends BasicAdapter
         $data['domesticLogisticsCompanyId'] = '-1'; //国内快递ID;(物流公司是other时,ID为-1)
         $data['domesticLogisticsCompany']   = '上门揽收'; //国内快递公司名称;(物流公司Id为-1时,必填)
         $data['domesticTrackingNo']         = 'None'; //国内快递运单号,长度1-32
-        $addressArray = array_merge($addressArray, $this->_senderAddress[$warehouseId]);
+        $addressArray = array_merge($addressArray, $this->_senderAddress['5']);
         
         $data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
         $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);
@@ -174,7 +197,7 @@ class SmtAdapter extends BasicAdapter
                if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
                    $data['channel_listnum'] = $result['result']['intlTracking'];
                    $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
-                   OrderModel::where('id',$package->order->id)->update($data);
+                   //OrderModel::where('id',$package->order->id)->update($data);
                    return array('code' => 'success', 'result' => $result['result']['intlTracking'] );                                     
                }               
            }

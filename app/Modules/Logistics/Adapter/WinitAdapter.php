@@ -57,9 +57,16 @@ class WinitAdapter extends BasicAdapter
         'WP-DEP103'=>'万邑邮选-德国渠道（平邮上海）-ebay IDSE',
     );
     
+    public function __construct($config){
+        $this->userName = $config['userId'];
+        $this->passWord = $config['userPassword'];
+        $this->token = $config['key'];
+        $this->server_url = $config['url'];
+    }
+    
     public function getTracking($package)
     {
-        $this->config = $package->logistics->api_config;
+        //$this->config = $package->logistics->api_config;
         
         $creatOrder = array();
         $creatOrder['buyerAddress1'] = $package->shipping_address;
@@ -114,7 +121,7 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['warehouseCode'] = $new_warehouseCode;
         $creatOrder['winitProductCode'] = $this->winitProductCode;
         
-        $this->setApi($package->warehouse_id);
+        //$this->setApi($package->warehouse_id);
         $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
         if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))
         {   

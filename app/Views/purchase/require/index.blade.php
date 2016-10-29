@@ -16,7 +16,7 @@
     SKUID</th>
     <th>sku</th>
     <th>中文名</th>
-    <th>缺货</th>
+    <th class="sort" data-field="need_total_num">缺货</th>
     <th class="sort" data-field="available_quantity">可用库存</th>
     <th class="sort" data-field="all_quantity">实库存</th>
     <th class="sort" data-field="zaitu_num">在途</th>

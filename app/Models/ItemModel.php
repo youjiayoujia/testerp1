@@ -707,7 +707,7 @@ class ItemModel extends BaseModel
 
             }
 
-            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
+            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
                 orders.id = order_items.order_id and purchases.item_id = order_items.item_id')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
 
@@ -809,8 +809,8 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url="http://120.24.100.157:60/api/skuInfoApi.php";
-        $itemModel = $this->all();
-        //$itemModel = $this->where('sku','M003')->get();
+        //$itemModel = $this->all();
+        $itemModel = $this->where('sku','M001_black')->get();
         foreach ($itemModel as $key => $model) {
             $old_data['sku'] = $model->sku;
             //print_r($old_data);exit;
@@ -823,7 +823,7 @@ class ItemModel extends BaseModel
             $buf = curl_exec($c);
             $user_array = json_decode($buf);
             //echo '<pre>';
-            //print_r($user_array);exit;
+            
             $dev_id = UserModel::where('name',$user_array->dev_name)->get(['id'])->first();
             $purchase_id = UserModel::where('name',$user_array->purchase_name)->get(['id'])->first();
             $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';

@@ -822,7 +822,7 @@ class ItemModel extends BaseModel
             curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
             $buf = curl_exec($c);
             $user_array = json_decode($buf);
-            //echo '<pre>';
+            
             $dev_id = UserModel::where('name',preg_replace("/\s/","",$user_array->dev_name))->get(['id'])->first();
             $purchase_id = UserModel::where('name',preg_replace("/\s/","",$user_array->purchase_name))->get(['id'])->first();
             $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';

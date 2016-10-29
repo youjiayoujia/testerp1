@@ -94,6 +94,7 @@ class Kernel extends ConsoleKernel
                     foreach ($channel->accounts as $account) {
                         $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
                     }
+                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
                     break;
                 case 'wish':
                     foreach ($channel->accounts as $account) {

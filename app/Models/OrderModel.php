@@ -139,7 +139,7 @@ class OrderModel extends BaseModel
             'transaction_number' => 'required',
             'amount' => 'required',
             'amount_product' => 'required',
-            'amount_shipping' => 'required',
+//            'amount_shipping' => 'required',
             'amount_coupon' => 'required',
             'shipping_firstname' => 'required',
 //            'shipping_lastname' => 'required',
@@ -194,9 +194,9 @@ class OrderModel extends BaseModel
     public function updateRule($request)
     {
         $arr = [
-            'amount_shipping' => 'required',
+//            'amount_shipping' => 'required',
             'shipping_firstname' => 'required',
-            'shipping_lastname' => 'required',
+//            'shipping_lastname' => 'required',
             'shipping_address' => 'required',
             'shipping_city' => 'required',
             'shipping_state' => 'required',

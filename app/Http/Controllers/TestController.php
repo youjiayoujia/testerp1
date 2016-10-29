@@ -77,8 +77,9 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::with('order')->with('items')->get();
-        
+        $package = PackageModel::where('id', '>', '0')->get()->sortBy(function($a,$b){
+            return $a->warehouse->created_at;
+        });
 
         var_dump($package->toarray());exit;
     }
@@ -747,7 +748,7 @@ class TestController extends Controller
         $url = 'jiangdi.zserp.com/api/SyncSellmoreData';
         $data = [
             'secretKey'               => 'VSxtAts2fQlTLc1KCLaM',
-            'type'                   => 'add',
+            'type'                   => 'update',
             //'id'                     => 30000,
             'suppliers_id'           => 40110,
             'suppliers_company'      => '',

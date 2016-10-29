@@ -698,6 +698,11 @@ return [
                     'url' => 'syncApi.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '接收接口',
+                    'url' => 'importSyncApi.index',
+                    'icon' => '',
+                ],
             ],
         ]
     ],

@@ -68,6 +68,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\NotWarehouseInSendEmail::class,
         \App\Console\Commands\SyncSellmoreApi::class,
         \App\Console\Commands\AutoGetEbayMessage::class,
+        \App\Console\Commands\SyncImportApi::class,
     ];
 
     /**

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddItemPriceHistory extends Migration
+class AddPurchaseOutofstockTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,8 @@ class AddItemPriceHistory extends Migration
      */
     public function up()
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->string('sku_history_values')->comment('采购价格变更历史')->default(NULL);
+        Schema::table('purchases', function (Blueprint $table) {
+            $table->string('need_total_num')->comment('缺货数量')->default(NULL);
         });
     }
 
@@ -24,8 +24,8 @@ class AddItemPriceHistory extends Migration
      */
     public function down()
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->dropColumn('sku_history_values');
+        Schema::table('purchases', function (Blueprint $table) {
+            $table->dropColumn('need_total_num');
         });
     }
 }

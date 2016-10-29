@@ -210,6 +210,18 @@ class ItemController extends Controller
 
     }
 
+    public function skuSupplierApi()
+    {
+        $data = request()->all();
+        $itemModel = $this->where('sku',$data['sku'])->get()->first();
+        if(count($itemModel)){
+            $itemModel->skuPrepareSupplier()->sync($data['supplier_ids']);
+            echo json_encode('success');
+        }else{
+            echo json_encode('sku不存在');
+        }
+    }
+
     /**
      * 详情
      *

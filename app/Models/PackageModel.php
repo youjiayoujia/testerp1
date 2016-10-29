@@ -376,7 +376,7 @@ class PackageModel extends BaseModel
     }
     
     public function russiaPYCode(){
-        return $this->belongsTo('App\Models\Logistics\Zone\RussiaPingCodeModel', 'shipping_country', 'country_code');
+        return $this->hasMany('App\Models\Logistics\Zone\RussiaPingCodeModel', 'country_code', 'shipping_country');
     }
 
     public function getStatusNameAttribute()

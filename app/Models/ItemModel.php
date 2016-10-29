@@ -824,8 +824,8 @@ class ItemModel extends BaseModel
             $user_array = json_decode($buf);
             //echo '<pre>';
             
-            $dev_id = UserModel::where('name',$user_array->dev_name)->get(['id'])->first();
-            $purchase_id = UserModel::where('name',$user_array->purchase_name)->get(['id'])->first();
+            $dev_id = UserModel::where('name',preg_replace("/\s/","",$user_array->dev_name))->get(['id'])->first();
+            $purchase_id = UserModel::where('name',preg_replace("/\s/","",$user_array->purchase_name))->get(['id'])->first();
             $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';
             $brr['developer'] = $dev_id?$dev_id->id:'';
             $model->update($arr);

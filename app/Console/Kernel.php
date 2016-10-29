@@ -139,6 +139,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
         //API同步sellmore database
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
+        $schedule->command('SyncImportApi:all')->everyFiveMinutes();
 
     }
 }

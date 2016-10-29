@@ -32,7 +32,7 @@
             <td>{{ $package->shipping_firstname . $package->shipping_lastname }}</td>
             <td>{{ $package->shipping_country }}</td>
             <td>
-                <button class="btn btn-primary btn-xs">
+                <button class="btn btn-{{ $package->status_color }} btn-xs">
                     {{ $package->status_name }}
                 </button>
 

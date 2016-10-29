@@ -288,7 +288,7 @@ class SpuModel extends BaseModel
                     $productModel = ProductModel::create($productData);
                     $product_id = $productModel->id;
                 }
-                $itemModel->update(['product_id'=>$product_id]);exit;
+                $itemModel->update(['product_id'=>$product_id]);
             }
         }
         

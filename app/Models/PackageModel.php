@@ -235,7 +235,7 @@ class PackageModel extends BaseModel
         $declared_cn = '';
         foreach($this->items as $packageItem){
             if($packageItem->item){
-                $declared_cn = $packageItem->item->product ? $packageItem->item->product->declared_cn : '';
+                $declared_cn = $packageItem->item->product ? $packageItem->item->product->declared_cn : '连衣裙';
             }
         }
         return $declared_cn;
@@ -249,7 +249,7 @@ class PackageModel extends BaseModel
         $declared_en = '';
         foreach($this->items as $packageItem){
             if($packageItem->item){
-                $declared_en = $packageItem->item->product ? $packageItem->item->product->declared_en : '';
+                $declared_en = $packageItem->item->product ? $packageItem->item->product->declared_en : 'dress';
             }
         }
         return $declared_en;
@@ -379,7 +379,7 @@ class PackageModel extends BaseModel
     }
     
     public function russiaPYCode(){
-        return $this->belongsTo('App\Models\Logistics\Zone\RussiaPingCodeModel', 'shipping_country', 'country_code');
+        return $this->hasMany('App\Models\Logistics\Zone\RussiaPingCodeModel', 'country_code', 'shipping_country');
     }
 
     public function getStatusNameAttribute()

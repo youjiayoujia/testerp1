@@ -16,6 +16,7 @@
     SKUID</th>
     <th>sku</th>
     <th>中文名</th>
+    <th class="sort" data-field="need_total_num">缺货</th>
     <th class="sort" data-field="available_quantity">可用库存</th>
     <th class="sort" data-field="all_quantity">实库存</th>
     <th class="sort" data-field="zaitu_num">在途</th>
@@ -29,7 +30,8 @@
     <th class="sort" data-field="refund_rate">退款率</th>
     <th>SKU状态</th>
     <th>采购状态</th>
-    <th>采购采购员</th>
+    <th>采购员</th>
+    
 @stop
 @section('tableBody')
     @foreach($data as $item)
@@ -45,7 +47,7 @@
             <td>
             {{$item->c_name}}
             </td>
-            
+            <td>{{$item->need_total_num}}</td>
             <td>{{$item->available_quantity}}</td>
             <td>{{$item->all_quantity}}</td>
             <td>{{$item->zaitu_num}}</td>
@@ -69,6 +71,7 @@
             <td>{{config('item.status')[$item->status]}}</td>
             <td>{{config('purchase.require')[$item->require_create]}}</td>
             <td>{{$item->user?$item->user->name:''}}</td>
+            
         </tr>
     @endforeach
  <script type="text/javascript">		 

@@ -214,7 +214,7 @@ class SmtController extends Controller{
        $posts = Input::get();  
        //草稿主表数据信息
        $draft_product['token_id']      = $posts['token_id'];
-       $draft_product['user_id']       = request()->user()->id;
+       //$draft_product['user_id']       = request()->user()->id;
        $draft_product['subject']       = trim($posts['subject']);
        $draft_product['groupId']       = $posts['groupId'];
        $draft_product['categoryId']    = $posts['categoryId'];
@@ -333,7 +333,6 @@ class SmtController extends Controller{
        /**自定义产品关联信息结束**/
        
        $draft_detail['detail']                 = htmlspecialchars($detail_str); //详情
-
        $draft_detail['detailLocal']            = $draft_detail['detail'];
        $draft_detail['keyword']                = $smtApi->filterForSmtProduct($posts['keyword']);      //关键字
        $draft_detail['productMoreKeywords1']   = $smtApi->filterForSmtProduct($posts['productMoreKeywords1']);
@@ -510,13 +509,11 @@ class SmtController extends Controller{
                $newData['updated'] = 0;
                $smtProductSkuModel->where('productId','=',$posts['id'])->update($newData);
                DB::commit();
-               if ($exit){       
-                   //return Redirect::to($this->mainIndex)->with('alert', $this->alert('success', '保存成功.'));
-                   return array('status' => $result_flag, 'info' => '保存'.($result_flag ? '成功' : '失败').$info, 'id' => $posts['id']);             
-               }else {                 
-                   return array('status' => true, 'info' => '保存成功', 'id' => $posts['id']);
-                   //return array('status' => $result_flag, 'info' => '保存'.($result_flag ? '成功' : '失败').$info, 'id' => $posts['id']);
-               }                               
+               if ($exit){                     
+                    $this->ajax_return('保存'.($result_flag ? '成功' : '失败').$info, $result_flag);
+                }else {
+                	return array('status' => $result_flag, 'info' => '保存'.($result_flag ? '成功' : '失败').$info, 'id' => $posts['id']);
+                }                        
                
            }catch(\Exception $e){
                DB::rollback();
@@ -526,7 +523,7 @@ class SmtController extends Controller{
            DB::beginTransaction();
            $productId = date('ymdHis').rand(1000, 9999).'-'.$posts['token_id']; //临时的产品ID           	
            $draft_product['productId'] = $productId;
-           //$draft_product['user_id'] = $token_info['customerservice_id'];         
+           //$draft_product['user_id'] = $smtApi->_customer_service_id;         
            $draft_product['productStatusType'] = ($action == 'saveToPost') ? 'waitPost' : 'newData';    //新增产品的状态
            
            $result = $this->model->create($draft_product);   
@@ -862,6 +859,10 @@ class SmtController extends Controller{
                 foreach ($imgLists as $k => $img) {
                     //$newImgLists[] = $this->replaceTempPics($img, $draft_skus[0]['skuCode'] . '-logo' . ($k + 1), $draft_info['productId']);
                     //现在上传到图片银行
+                    $flag = $this->checkURLResourceTypeIsExit($img);
+                    if($flag === false){
+                        $img = "http:".$img;
+                    }
                     $newImgLists[] = $this->uploadOnePicToBank($img, $firstSku.'-logo' . ($k + 1), $draft_info->productId);
                 }
                 unset($imgLists);
@@ -1032,7 +1033,7 @@ class SmtController extends Controller{
                     $newListData['old_token_id']      = 0;
                     $newListData['old_productId']     = '';
                     $newListData['product_url']       = 'http://www.aliexpress.com/item/-/'.$realProductId.'.html';
-                    //$newListData['ownerMemberId']     = $token_info['member_id'];
+                    //$newListData['ownerMemberId']     = $smtApi->_aliexpress_member_id;
                     
                     //更新详情表的产品ID
                     DB::beginTransaction();
@@ -1322,6 +1323,7 @@ class SmtController extends Controller{
 
         $productId = $smtProduct->productId;
         $result= $smtApi->updateProductPublishState($api,$productId);
+
         if(array_key_exists('success',$result) && $result['success']){
             if($type == 'online'){
                 $data['productStatusType'] = 'offline';
@@ -2106,6 +2108,15 @@ html;
            }
        }       
        return redirect($this->mainIndex)->with('alert', $this->alert('success', $string));
+   }
+   
+   public function checkURLResourceTypeIsExit($url){
+       $arr = parse_url($url);
+       if(array_key_exists('scheme', $arr)){
+           return true;
+       }else{
+           return false;
+       }
    }
    
 }

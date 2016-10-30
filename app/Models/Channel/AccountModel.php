@@ -143,6 +143,8 @@ class AccountModel extends BaseModel
                     'refresh_token' => $this->aliexpress_refresh_token,
                     'access_token' => $this->aliexpress_access_token,
                     'aliexpress_member_id' => $this->aliexpress_member_id,
+                    'operator_id' => $this->operator_id,
+                    'customer_service_id' => $this->customer_service_id,
                 ];
                 break;
             case 'lazada':

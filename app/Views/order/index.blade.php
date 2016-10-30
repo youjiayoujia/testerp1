@@ -48,7 +48,10 @@
                     <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                     <div>运费成本: {{ sprintf("%.3f", $order->packages->sum('cost')) }} RMB</div>
                     <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
-                    <div>毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee()) }} USD</div>
+                    <div>
+                        毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee()) }}
+                        USD
+                    </div>
                 @else
                 @endif
             </td>
@@ -131,7 +134,11 @@
                                     <img src="{{ asset('default.jpg') }}" width="50px">
                                 </div>
                             @endif
-                            <div class="col-lg-2 text-primary">{{ $orderItem->sku .' [ '. $orderItem->channel_sku .' ]' }}</div>
+                            <div class="col-lg-2 text-primary">
+                                {{ $orderItem->sku }} <br/>
+                                [{{$orderItem->channel_sku}}]<br/>
+                                {{ $orderItem->item->warehouse->name }}
+                            </div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">
                                     <strong>{{ $orderItem->item->status_name }}</strong>
@@ -147,39 +154,47 @@
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}
                                 @if($order->channel->driver == 'ebay')
                                     @if($orderItem->ebay_unpaid_status != 1)
-                                    <button class="label label-danger  ebay-unpaid-case"  data-toggle="modal" data-target="#ebay-unpaid-case-{{ $orderItem->id }}">消</button>
-                                    <div class="modal fade in" id="ebay-unpaid-case-{{$orderItem->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <form id="ebay-unpaid-form" action="{{route('message.ebayUnpaidCase')}}" methon="POST">
-                                                    {!! csrf_field() !!}
-                                                    <div class="modal-header">
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                        <h4 class="modal-title text-left" id="myModalLabel">Ebay unpaid case</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="input-group">
-                                                            <label>
-                                                                <input type="radio" name="disputeType" value="complaints" />Unpaid case(the buyer has not paid)
-                                                            </label>
-                                                            <br/>
-                                                            <label>
-                                                            <input type="radio" name="disputeType" value="cancel"/>取消交易(cancel)
-                                                            </label>
+                                        <button class="label label-danger  ebay-unpaid-case" data-toggle="modal" data-target="#ebay-unpaid-case-{{ $orderItem->id }}">
+                                            消
+                                        </button>
+                                        <div class="modal fade in" id="ebay-unpaid-case-{{$orderItem->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <form id="ebay-unpaid-form" action="{{route('message.ebayUnpaidCase')}}" methon="POST">
+                                                        {!! csrf_field() !!}
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                            <h4 class="modal-title text-left" id="myModalLabel">Ebay
+                                                                unpaid case</h4>
                                                         </div>
+                                                        <div class="modal-body">
+                                                            <div class="input-group">
+                                                                <label>
+                                                                    <input type="radio" name="disputeType" value="complaints"/>Unpaid
+                                                                    case(the buyer has not paid)
+                                                                </label>
+                                                                <br/>
+                                                                <label>
+                                                                    <input type="radio" name="disputeType" value="cancel"/>取消交易(cancel)
+                                                                </label>
+                                                            </div>
 
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                                                        <button type="button" class="btn btn-primary  ebay-unpaid-form-button">提交</button>
-                                                    </div>
-                                                    <input type="hidden" name="order_item_id" value="{{$order->id}}" />
-                                                </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                                取消
+                                                            </button>
+                                                            <button type="button" class="btn btn-primary  ebay-unpaid-form-button">
+                                                                提交
+                                                            </button>
+                                                        </div>
+                                                        <input type="hidden" name="order_item_id" value="{{$order->id}}"/>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     @else
                                         <span class="label label-success">已消</span>
                                     @endif
@@ -239,7 +254,7 @@
                             <?php break ?>
                         @endif
                     @endforeach
-                     @if($order->channel->name == 'Ebay')
+                    @if($order->channel->name == 'Ebay')
                         <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#send_ebay_message_{{ $order->id }}" title="Send ebay Message">
                             <span class="glyphicon glyphicon-envelope"></span>Send ebay Message
                         </button>
@@ -337,8 +352,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
-                       <input  type="hidden" name ="channel_id" value="{{$order->channel_id}}"/>
-                       <input  type="hidden" name ="channel_id" value="{{$order->channel_id}}"/>
+                        <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
+                        <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -386,9 +401,9 @@
                                     <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : $order->channelAccount->alias }}" readonly>
                                 </div>
                                 {{--<div class="form-group col-lg-2" id="payment">--}}
-                                    {{--<label for="payment_date" class='control-label'>支付时间</label>--}}
-                                    {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
-                                    {{--<input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">--}}
+                                {{--<label for="payment_date" class='control-label'>支付时间</label>--}}
+                                {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
+                                {{--<input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">--}}
                                 {{--</div>--}}
                                 <div class="form-group col-lg-2">
                                     <label for="refund_amount" class='control-label'>退款金额</label>
@@ -447,14 +462,14 @@
                                 </div>
                             </div>
                             <div class="row" id="paypal-input-{{ $order->id }}" style="display: none;">
-                                <div class="col-lg-6 paypal-account" >
+                                <div class="col-lg-6 paypal-account">
                                     <label for="refund_currency" class='control-label'>客户退款Paypal账号</label>
-                                    <input type="text" class="form-control"   name="user_paypal_account" value="">
+                                    <input type="text" class="form-control" name="user_paypal_account" value="">
                                 </div>
 
-                                <div class="col-lg-6 refund-voucher" >
-                                        <label for="refund_currency" class='control-label'>退款凭证：</label>
-                                        <input type="text" class="form-control"   name="refund_voucher" value="">
+                                <div class="col-lg-6 refund-voucher">
+                                    <label for="refund_currency" class='control-label'>退款凭证：</label>
+                                    <input type="text" class="form-control" name="refund_voucher" value="">
                                 </div>
                             </div>
                             @if($order->items->toArray())
@@ -580,13 +595,16 @@
                             @foreach($order->packages as $package)
                                 <div class="row">
                                     <div class="col-lg-3">
-                                        <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                                        <strong>包裹ID</strong> :
+                                        <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                                     </div>
                                     <div class="col-lg-3">
-                                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->name : '' }}
+                                        <strong>物流方式</strong>
+                                        : {{ $package->logistics ? $package->logistics->name : '' }}
                                     </div>
                                     <div class="col-lg-3">
-                                        <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                                        <strong>追踪号</strong> :
+                                        <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                                     </div>
                                     <div class="col-lg-3">
                                         <strong>包裹状态</strong> : {{ $package->status_name }}
@@ -629,7 +647,7 @@
                             <h4 class="modal-title" id="myModalLabel">Send ebay Message</h4>
                         </div>
                         <div class="modal-body">
-                           <div class="form-group row">
+                            <div class="form-group row">
                                 <label for="example-text-input" class="col-xs-2 col-form-label">买家ID：</label>
                                 <div class="col-xs-10">
                                     <input class="form-control" type="text" value="Artisanal kale" id="example-text-input" disabled>
@@ -724,7 +742,7 @@
                                             <div class="form-group row">
                                                 <label for="example-text-input" class="col-xs-2 col-form-label">内容：</label>
                                                 <div class="col-xs-10">
-                                                    <textarea class="form-control" rows="3" name="message-content" ></textarea>
+                                                    <textarea class="form-control" rows="3" name="message-content"></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -744,7 +762,9 @@
                                                 <div class="list-group">
                                                     @foreach($order->SendEbayMessageHistory as $item)
                                                         <a href="#" class="list-group-item">
-                                                            <h4 class="list-group-item-heading ">{{$item->title}}<span class="badge" style="float:right;">{{$item->created_at}}</span></h4>
+                                                            <h4 class="list-group-item-heading ">{{$item->title}}
+                                                                <span class="badge" style="float:right;">{{$item->created_at}}</span>
+                                                            </h4>
                                                             <p class="list-group-item-text">{{$item->content}}</p>
                                                         </a>
                                                     @endforeach
@@ -769,23 +789,23 @@
             </div>
         </div>
     @endforeach
-    @section('doAction')
-        <div class="row">
-            <div class="col-lg-2">
-                <strong>当前小计</strong> : {{ '$' . $subtotal }}
-            </div>
-            <div class="col-lg-2">
-                <input class="form-control" id="start_date" placeholder="开始日期" name='start_date'>
-            </div>
-            <div class="col-lg-2">
-                <input class="form-control" id="end_date" placeholder="结束日期" name='end_date'>
-            </div>
-            <div class="col-lg-1">
-                <button class="statistics">统计</button>
-            </div>
-            <div class="col-lg-4" id="statistics"></div>
+@section('doAction')
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>当前小计</strong> : {{ '$' . $subtotal }}
         </div>
-    @stop
+        <div class="col-lg-2">
+            <input class="form-control" id="start_date" placeholder="开始日期" name='start_date'>
+        </div>
+        <div class="col-lg-2">
+            <input class="form-control" id="end_date" placeholder="结束日期" name='end_date'>
+        </div>
+        <div class="col-lg-1">
+            <button class="statistics">统计</button>
+        </div>
+        <div class="col-lg-4" id="statistics"></div>
+    </div>
+@stop
 @stop
 @section('tableToolButtons')
     <div class="btn-group" role="group">
@@ -886,10 +906,10 @@
                 if (lr == '') {
                     alert('请输入利润!');
                     $('.sx').val('null');
-                }else {
+                } else {
                     var sx = $('.sx').val();
                     if (sx != null) {
-                        location.href = "{{ route('order.index') }}?sx=" + sx +"&lr=" + lr;
+                        location.href = "{{ route('order.index') }}?sx=" + sx + "&lr=" + lr;
                     }
                 }
             });
@@ -941,33 +961,33 @@
                     });
                 }
             });
-            $(".refund-type").change(function(){
-                if($(this).val() == '1' ){
-                    $('#paypal-input-'+$(this).attr('order-id')).show();
-                }else{
-                    $('#paypal-input-'+$(this).attr('order-id')).hide();
+            $(".refund-type").change(function () {
+                if ($(this).val() == '1') {
+                    $('#paypal-input-' + $(this).attr('order-id')).show();
+                } else {
+                    $('#paypal-input-' + $(this).attr('order-id')).hide();
                 }
             });
 
             $('.form-submit').click(function () {
                 var order_id = $(this).attr('order-id');
 
-                var message_form = $('#send-ebay-message-'+order_id).serializeArray();
+                var message_form = $('#send-ebay-message-' + order_id).serializeArray();
                 //console.log($('input[name="item-ids"]:checked').val());
-                if($('input[name="item-ids[]"]:checked').val() == undefined){
+                if ($('input[name="item-ids[]"]:checked').val() == undefined) {
                     alert('请先勾选商品！');
                     return;
                 }
-                var is_empty =false;
-                $.each(message_form,function(i,field){
-                    if(field.value == '' || field.value== undefined){
-                        alert('请把数据填充完整，'+field.name);
+                var is_empty = false;
+                $.each(message_form, function (i, field) {
+                    if (field.value == '' || field.value == undefined) {
+                        alert('请把数据填充完整，' + field.name);
                         is_empty = true;
                         return false;
                     }
                 });
-                if(!is_empty){
-                    $('#send-ebay-message-'+order_id).submit();
+                if (!is_empty) {
+                    $('#send-ebay-message-' + order_id).submit();
                 }
 
             });
@@ -979,7 +999,7 @@
             if (start_date && end_date) {
                 $.ajax({
                     url: "{{ route('orderStatistics') }}",
-                    data: {start_date : start_date, end_date : end_date},
+                    data: {start_date: start_date, end_date: end_date},
                     dataType: 'json',
                     type: 'get',
                     success: function (result) {
@@ -994,29 +1014,28 @@
         });
 
         //全选订单产品
-        function quanxuan(id)
-        {
-            var collid = document.getElementById("checkall"+id);
+        function quanxuan(id) {
+            var collid = document.getElementById("checkall" + id);
             var coll = document.getElementsByName("tribute_id[]");
-            if (collid.checked){
-                for(var i = 0; i < coll.length; i++)
+            if (collid.checked) {
+                for (var i = 0; i < coll.length; i++)
                     coll[i].checked = true;
                 $('.price').style.readonly = 'false';
-            }else{
-                for(var i = 0; i < coll.length; i++)
+            } else {
+                for (var i = 0; i < coll.length; i++)
                     coll[i].checked = false;
             }
         }
 
-        $('.type').click(function() {
+        $('.type').click(function () {
             var type = $(this).val();
             var id = $(this).attr('id');
             if (type == 'FULL') {
-                document.getElementById('price'+id).readOnly = true;
-                document.getElementById('refund_amount'+id).readOnly = true;
+                document.getElementById('price' + id).readOnly = true;
+                document.getElementById('refund_amount' + id).readOnly = true;
             } else {
-                document.getElementById('price'+id).readOnly = false;
-                document.getElementById('refund_amount'+id).readOnly = false;
+                document.getElementById('price' + id).readOnly = false;
+                document.getElementById('refund_amount' + id).readOnly = false;
             }
         });
 
@@ -1028,17 +1047,17 @@
                 var withdraw = $('.withdraw').val();
                 var withdraw_reason = $('#withdraw_reason').val();
                 for (var i = 0; i < checkbox.length; i++) {
-                    if(!checkbox[i].checked)
+                    if (!checkbox[i].checked)
                         continue;
-                    order_ids += checkbox[i].value+",";
+                    order_ids += checkbox[i].value + ",";
                 }
-                order_ids = order_ids.substr(0,(order_ids.length)-1);
+                order_ids = order_ids.substr(0, (order_ids.length) - 1);
                 $.ajax({
-                    url : "{{ route('withdrawAll') }}",
-                    data : {order_ids : order_ids, withdraw : withdraw, withdraw_reason : withdraw_reason},
-                    dataType : 'json',
-                    type : 'get',
-                    success:function(result){
+                    url: "{{ route('withdrawAll') }}",
+                    data: {order_ids: order_ids, withdraw: withdraw, withdraw_reason: withdraw_reason},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
                         window.location.reload();
                     }
                 });
@@ -1046,15 +1065,14 @@
         });
 
         //全选订单
-        function quanxuanOrder()
-        {
+        function quanxuanOrder() {
             var collid = document.getElementById("checkall");
             var coll = document.getElementsByName("tribute_id");
-            if (collid.checked){
-                for(var i = 0; i < coll.length; i++)
+            if (collid.checked) {
+                for (var i = 0; i < coll.length; i++)
                     coll[i].checked = true;
-            }else{
-                for(var i = 0; i < coll.length; i++)
+            } else {
+                for (var i = 0; i < coll.length; i++)
                     coll[i].checked = false;
             }
         }

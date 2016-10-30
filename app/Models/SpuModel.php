@@ -242,4 +242,72 @@ class SpuModel extends BaseModel
                 
             }
     }
+
+    //重新根据sku生成model和spu
+    public function test1()
+    {   
+        set_time_limit(0);
+        ini_set('memory_limit', '1024M');
+        $erp_products_data_arr = DB::select('select distinct products_sku,spu,model,products_warring_string from erp_products_data where spu!=""');
+        foreach($erp_products_data_arr as $erp_data){
+            $itemModel = ItemModel::where('sku',$erp_data->products_sku)->get()->first();
+            if(count($itemModel)){
+                $spuData['spu'] = $erp_data->spu;
+                //创建spu
+                if(count(SpuModel::where('spu',$erp_data->spu)->get())){
+                    $spu_id = SpuModel::where('spu',$erp_data->spu)->get()->toArray()[0]['id'];
+                }else{
+                    $spuModel = $this->create($spuData);
+                    $spu_id = $spuModel->id;
+                }
+
+
+                $productData['model'] = $erp_data->model;
+                $productData['spu_id'] = $spu_id;
+                $productData['name'] = $itemModel->name;
+                $productData['c_name'] = $itemModel->c_name;
+                $productData['catalog_id'] = $itemModel->catalog_id;
+                $productData['supplier_id'] = $itemModel->supplier_id;
+                $productData['purchase_url'] = $itemModel->purchase_url;
+                //$productData['purchase_day'] = $value['10'];
+                //$productData['product_sale_url'] = $value['11'];
+                $productData['notify'] = $erp_data->products_warring_string;
+                //采购价
+                $productData['purchase_price'] = $itemModel->purchase_price;
+                $productData['warehouse_id'] = $itemModel->warehouse_id;   
+                $productData['package_height'] = $itemModel->package_height;
+                $productData['package_width'] = $itemModel->package_width;
+                $productData['package_length'] = $itemModel->package_length;
+                $productData['height'] = $itemModel->height;
+                $productData['width'] = $itemModel->width;
+                $productData['length'] = $itemModel->length;
+
+                //创建model
+                if(count(ProductModel::where('model',$erp_data->model)->get())){
+                    $product_id = ProductModel::where('model',$erp_data->model)->get()->toArray()[0]['id'];
+                }else{
+                    $productModel = ProductModel::create($productData);
+                    $product_id = $productModel->id;
+                }
+                $itemModel->update(['product_id'=>$product_id]);
+            }
+        }     
+    }
+
+    public function test2()
+    { 
+        $erp_products_data_arr = DB::select('select distinct products_sku,spu,model,products_declared_cn,products_declared_en 
+            from erp_products_data where spu!=""');
+        foreach($erp_products_data_arr as $erp_data){
+            $data = [];
+            $data['declared_cn'] = $erp_data->products_declared_cn;
+            $data['declared_en'] = $erp_data->products_declared_en;
+            $itemModel = ItemModel::where('sku',$erp_data->products_sku)->get()->first();
+            if(count($itemModel)){
+                $itemModel->product->update($data);
+            }
+        }        
+    }
+
+
 }

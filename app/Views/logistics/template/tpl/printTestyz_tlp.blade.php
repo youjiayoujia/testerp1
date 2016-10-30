@@ -115,7 +115,7 @@
 							<td style="text-align: center;">价值<br/>Value</td>
 						</tr>
 						<tr style="height:30px;">
-							<td style="text-align: center;padding-top:2px;">{{ $model->items->first()->quantity .'*'. $model->decleared_ename }}</td>
+							<td style="text-align: center;padding-top:2px;">{{ $model->items ? $model->items->first()->quantity : '' .'*'. $model->decleared_ename }}</td>
 							<td style="text-align: center;">{{ $model->signal_weight }}</td>
 							<td style="text-align: center;">USD {{ printf("%.2f",$model->signal_price) }}</td>
 						</tr>

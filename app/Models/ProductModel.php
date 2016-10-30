@@ -774,13 +774,15 @@ class ProductModel extends BaseModel
                 $data['name'] = $image->filename;
                 $arr = (array)$image->fileId;
                 $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id=' . $arr['$id'];
-                $disk = Storage::disk('product');
-                Storage::disk('product')->put($data['path'] . $data['name'], file_get_contents($image_url));
-                $imageModel = ImageModel::create($data);
-                $tags = $image->tags;
-                $tags = $this->tagRevert($tags);
-                $imageModel->labels()->attach($tags);
-                $i++;
+                if (Storage::disk('product')->put($data['path'] . $data['name'], file_get_contents($image_url))) {
+                    $imageModel = ImageModel::create($data);
+                    if ($imageModel) {
+                        $tags = $image->tags;
+                        $tags = $this->tagRevert($tags);
+                        $imageModel->labels()->attach($tags);
+                        $i++;
+                    }
+                }
             }
             if ($i == count($contents)) {
                 return true;

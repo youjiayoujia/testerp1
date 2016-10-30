@@ -29,6 +29,8 @@ use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\ChannelNameModel;
+use App\Models\Publish\Ebay\EbayPublishProductModel;
+use App\Models\Publish\Ebay\EbayPublishProductDetailModel;
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\Publish\Joom\JoomPublishProductModel;
@@ -75,10 +77,13 @@ class TestController extends Controller
 
     public function test2()
     {
-        $a = [1,2,[3,4]];
-        var_dump(count($a));
-        var_dump(count($a,1));
+        $package = PackageModel::where('id', '>', '0')->get()->sortBy(function($a,$b){
+            return $a->warehouse->created_at;
+        });
+
+        var_dump($package->toarray());exit;
     }
+
     // public function test2()
     // {
     //     $a = ['a' => 'b', 'c' => 'e', 'f' => ['f','g','i']];
@@ -707,7 +712,77 @@ class TestController extends Controller
         exit;*/
     }
 
+
+    /**
+     * Curl Post JSON 数据
+     */
+    public function postCurlHttpsData($url, $data)
+    { // 模拟提交数据函数
+        $curl = curl_init(); // 启动一个CURL会话
+        curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
+        // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
+        curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
+        curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data); // Post提交的数据包
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30); // 设置超时限制防止死循环
+        curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
+        /*        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($data))
+                );*/
+        $tmpInfo = curl_exec($curl); // 执行操作
+        if (curl_errno($curl)) {
+            // $this->setCurlErrorLog(curl_error ( $curl ));
+            die(curl_error($curl)); //异常错误
+        }
+        curl_close($curl); // 关闭CURL会话
+        return $tmpInfo; // 返回数据
+    }
     public function testEbayCases(){
+
+
+        $url = 'jiangdi.zserp.com/api/SyncSellmoreData';
+        $data = [
+            'secretKey'               => 'VSxtAts2fQlTLc1KCLaM',
+            'type'                   => 'update',
+            //'id'                     => 30000,
+            'suppliers_id'           => 40110,
+            'suppliers_company'      => '',
+            'suppliers_website'      => '',
+            'suppliers_address'      => '',
+            'suppliers_type'         => '0',
+            'supplierArrivalMinDays' => '',
+            'suppliers_bank'        => '招商',
+            'suppliers_card_number' => '23543456345',
+            'suppliers_name'        => '160000',
+            'suppliers_mobile'      => '13016937924',
+            'suppliers_wangwang'    => '23456edg',
+            'suppliers_qq'          => '3563456',
+            'pay_method'            => '1',
+            'attachment_url'        => 'http://erp.moonarstore.com/upload/suppliers/2014/0410/13971223945484.jpg',
+        ];
+        $result = $this->postCurlHttpsData($url,$data);
+
+        echo ($result);exit;
+
+
+
+/*        'sellmore' => [
+            'pay_type' => [
+                1 => 'ONLINE',
+                2 => 'BANK_PAY',
+                3 => 'CASH_PAY',
+                4 => 'OTHER_PAY',
+            ],
+            'api_url' => 'http://120.24.100.157:60/api/api_suppliers.php',
+        ],*/
+
+
+
         foreach (AccountModel::all() as $account) {
             if($account->account == 'ebay@licn2011'){ //测试diver
 
@@ -724,10 +799,74 @@ class TestController extends Controller
      * 测试自动补货功能
      */
     public function getEbayProduct(){
-        $account = AccountModel::find(378);
-        if ($account) {
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $channel->testBuHuo();
+        //$package = PackageModel::findOrFail(3113);
+        $package =  PackageModel::where('id',2626)->first();
+        $result = $package->placeLogistics();
+        var_dump($result);exit;
+        exit;
+        $page = 2;
+        $pageSize = 2000;
+        $status = ['saleOutStopping', 'stopping', 'cleaning'];
+        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status', $status)->Offset($pageSize * $page)->limit($pageSize)->get();
+
+        foreach ($product_data as $product) {
+            if ($product->AvailableQuantity + $product->NormalTransitQuantity > 0) {
+                continue;
+            }
+            $ebay_sku_arr = EbayPublishProductDetailModel::where(['erp_sku' => trim($product->sku), 'status' => '1'])->get();
+            foreach ($ebay_sku_arr as $ebay_sku) {
+                if ($ebay_sku->ebayProduct->multi_attribute == 0) { //直接下架
+                    echo 'single  down';
+                } else {
+                    $all_ebay_sku = EbayPublishProductDetailModel::where(['item_id' => $ebay_sku->item_id,])->where('id', '!=', $ebay_sku->id)->get(); //这个广告下的全部sku 不包括这个
+                    $is_down = true; //下架改广告
+                    foreach ($all_ebay_sku as $ebay_sku_item) {
+                        if ($ebay_sku_item->status == 1) { //sku 在线
+                            echo $ebay_sku_item->erp_sku;
+                            if (in_array($ebay_sku_item->erpProduct->status, $status)) { //其他sku  不满足状态天剑
+                                if ($ebay_sku_item->erpProduct->AvailableQuantity + $ebay_sku_item->erpProduct->NormalTransitQuantity > 0) { //其他sku 虚库存+在途 > 0
+                                    $is_down = false;
+                                }
+                            } else {
+                                $is_down = false;
+                            }
+                        }
+                    }
+                    if ($is_down) { //下架这个listting
+                        echo 'mul  down';
+                    } else { //将这个sku的在线数量调成0
+                        echo 'set zero';
+
+                    }
+                }
+            }
+        }
+
+
+        //货源待定SKU 在线数量设置为0
+
+        $page = 2;
+        $pageSize = 2000;
+        $status = ['unSellTemp'];
+        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status', $status)->Offset($pageSize * $page)->limit($pageSize)->get();
+        foreach($product_data as $product){
+            if ($product->AvailableQuantity + $product->NormalTransitQuantity > 0) {
+                continue;
+            }
+            $ebay_sku_arr = EbayPublishProductDetailModel::where(['erp_sku' => trim($product->sku), 'status' => '1'])->get();
+            foreach ($ebay_sku_arr as $ebay_sku) { //设置在线数量为0
+                echo 'set zero';
+            }
+        }
+
+
+
+
+
+           /* $account = AccountModel::find(378);
+            if ($account) {
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $channel->testBuHuo();*/
 //            $is_do =true;
 //            $i=1;
 //            while($is_do) {
@@ -746,7 +885,7 @@ class TestController extends Controller
 //            }
 
 
-        }
+        //}
     }
     public function getCurlData($remote_server)
     {

@@ -68,6 +68,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomShelves::class,
         \App\Console\Commands\NotWarehouseInSendEmail::class,
         \App\Console\Commands\SyncSellmoreApi::class,
+        \App\Console\Commands\AutoGetEbayMessage::class,
+        \App\Console\Commands\SyncImportApi::class,
     ];
 
     /**
@@ -95,6 +97,7 @@ class Kernel extends ConsoleKernel
                     foreach ($channel->accounts as $account) {
                         $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
                     }
+                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
                     break;
                 case 'wish':
                     foreach ($channel->accounts as $account) {
@@ -137,6 +140,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
         //API同步sellmore database
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
+        $schedule->command('SyncImportApi:all')->everyFiveMinutes();
 
     }
 }

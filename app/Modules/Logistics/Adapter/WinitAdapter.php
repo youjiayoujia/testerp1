@@ -5,6 +5,11 @@ namespace App\Modules\Logistics\Adapter;
 use App\Models\PackageModel;
 class WinitAdapter extends BasicAdapter
 {
+    private $server_url ;
+    private $userName ;
+    private $passWord ;
+    private $token;
+    private $sign;
     protected $shipperAddrCode =array(
         999 =>'A00004',
         1000=>'SLME003',
@@ -52,10 +57,16 @@ class WinitAdapter extends BasicAdapter
         'WP-DEP103'=>'万邑邮选-德国渠道（平邮上海）-ebay IDSE',
     );
     
-    public $token = '069C80E8D3E89D0618A98CE62DDE824A';
+    public function __construct($config){
+        $this->userName = $config['userId'];
+        $this->passWord = $config['userPassword'];
+        $this->token = $config['key'];
+        $this->server_url = $config['url'];
+    }
+    
     public function getTracking($package)
     {
-        $this->config = $package->logistics->api_config;
+        //$this->config = $package->logistics->api_config;
         
         $creatOrder = array();
         $creatOrder['buyerAddress1'] = $package->shipping_address;
@@ -94,27 +105,24 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['packageList'][] = $product_last;               //包裹列表
         $creatOrder['pickUpCode'] = $package->picklist->picknum;    //捡货条码
         $creatOrder['refNo'] = $package->order->ordernum;          //卖家订单号    字段不确定，待确认
-
-        $creatOrder['shipperAddrCode'] = $this->shipperAddrCode[$package->warehouse_id];        
-        $creatOrder['warehouseCode'] = $this->warehouseCode['WP-HKP101'];
-        $creatOrder['winitProductCode'] = 'WP-HKP101';
-       
-        $postData = array();
-        $postData['action'] = 'isp.order.createOrder';  
-        $postData['app_key'] = $this->config['userId'];
-        $postData['data'] = $creatOrder;
-        $postData['format'] = 'json';
-        $postData['language'] = 'zh_CN';
-        $post_array['platform'] ="SELLERERP";        
-        $this->getSign($this->token,$postData['action'],$postData['data']);
-        $postData['sign'] =$this->sign;
-        $postData['sign_method'] ="md5";
-        $postData['timestamp'] =date('Y-m-d H:i:s');
-        $postData['version'] ="1.0";
-        $url = $this->config["url"];      
-        $headers = array("application/x-www-form-urlencoded; charset=gb2312");
-        $result = $this->curlPost($url, json_encode($postData,JSON_UNESCAPED_UNICODE),$headers);
-        dd($result);
+    
+        if($package->logistics_id == 524){
+            $new_warehouseCode='YW10000012';//此渠道发金华仓
+            $new_shipperAddrCode = 'YWSLME';
+        }else{
+            $new_warehouseCode=$this->warehouseCode[$this->winitProductCode];
+            $new_shipperAddrCode=$this->shipperAddrCode[$package->warehouse_id];
+        }
+        /*$creatOrder['shipperAddrCode'] = $this->shipperAddrCode[$package->warehouse_id];        
+        $creatOrder['warehouseCode'] = $this->warehouseCode['WP-HKP101']
+        $creatOrder['winitProductCode'] = 'WP-HKP101';*/
+        
+        $creatOrder['shipperAddrCode'] = $new_shipperAddrCode;        
+        $creatOrder['warehouseCode'] = $new_warehouseCode;
+        $creatOrder['winitProductCode'] = $this->winitProductCode;
+        
+        //$this->setApi($package->warehouse_id);
+        $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
         if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))
         {   
             $data = ['tracking_no' => $result['data']['orderNo'] ];
@@ -129,8 +137,8 @@ class WinitAdapter extends BasicAdapter
     public function getToken(){    
         $code = array();
         $code['action'] = "getToken";
-        $code['data']['userName'] = $this->config['userId'];
-        $code['data']['passWord'] = $this->config['userPassword'];
+        $code['data']['userName'] = $this->userName;
+        $code['data']['passWord'] = $this->passWord;
         $url = 'http://erp.demo.winit.com.cn/ADInterface/api';
         return $this->curlPost($url,json_encode($code));        
     }
@@ -141,6 +149,48 @@ class WinitAdapter extends BasicAdapter
         $sign =strtoupper(md5($string));
         $this->sign = $sign;
     
+    }
+    
+    public function setApi($warehouse){
+        $token=array(
+            999=>'B512F5AFBE10C0D709BF7E0AF2B0C3B6',
+            1000 =>'069C80E8D3E89D0618A98CE62DDE824A',
+        );
+        $userName =array(
+            999=>'qiongjierui@163.com',
+            1000=>'wuliu@moonarstore.com'
+        );
+        $passWord =array(
+            999=>'888',
+            1000=>'salamoer123456',
+        );
+        $server_url=array(
+            999=>'http://openapi.demo.winit.com.cn/openapi/service',
+            1000=>'http://openapi.winit.com.cn/openapi/service',
+        );
+        
+        $this->passWord = $passWord[$warehouse];
+        $this->userName = $userName[$warehouse];       
+        $this->server_url =$server_url[$warehouse];
+        $this->token = $token[$warehouse];
+    }
+    
+    public function callWinitApi($action,$data='{}'){
+        $post_array = array();
+        $post_array['action']=$action;
+        $post_array['app_key'] = $this->userName;
+        $post_array['data'] =$data;
+        $post_array['format'] ='json';
+        $post_array['language'] ="zh_CN";
+        $post_array['platform'] ="";
+        $this->getSign($this->token,$post_array['action'],$post_array['data']);
+        $post_array['sign'] =$this->sign;
+        $post_array['sign_method'] ="md5";
+        $post_array['timestamp'] =date('Y-m-d H:i:s');
+        $post_array['version'] ="1.0";    
+        $headers = array("application/x-www-form-urlencoded; charset=gb2312");
+        $result =  $this->curlPost($this->server_url,json_encode($post_array,JSON_UNESCAPED_UNICODE),$headers);
+        return $result;
     }
     
 }

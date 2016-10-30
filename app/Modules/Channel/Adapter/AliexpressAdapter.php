@@ -28,8 +28,10 @@ Class AliexpressAdapter implements AdapterInterface
     private $_returnurl;            //回传地址
     private $_version = 1;
     private $_aliexpress_member_id;
+    public  $_operator_id;  
+    public  $_customer_service_id;
 
-                    public function __construct($config)
+    public function __construct($config)
     {
         $this->_appkey = $config["appkey"];
         $this->_appsecret = $config["appsecret"];
@@ -39,7 +41,8 @@ Class AliexpressAdapter implements AdapterInterface
         $this->_aliexpress_member_id = $config['aliexpress_member_id'];
         $access_token = $this->isResetAccesstoken();   //是否过期的accesstoken
         $this->_access_token = $access_token == false ? $config["access_token"] : $access_token;
-
+        $this->_operator_id = $config['operator_id'];
+        $this->_customer_service_id = $config['customer_service_id'];
     }
 
     /** 获取订单
@@ -60,6 +63,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderStatus = $status[0];
         $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
             strtotime($startDate));
+        $startDate = $startDate>'2016-10-27 17:00:00'?$startDate:'2016-10-27 17:00:00';
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
 
@@ -480,8 +484,10 @@ Class AliexpressAdapter implements AdapterInterface
     }
     public function checkToken($data){
         $data = json_decode($data,true);
-        if($data['error_code']==401&&$data['error_message']='Request need user authorized'){
-            $this->isResetAccesstoken(true);
+        if(isset($data['error_code'])&&isset($data['error_message'])){
+            if($data['error_code']==401&&$data['error_message']='Request need user authorized'){
+                $this->isResetAccesstoken(true);
+            }
         }
     }
     /**

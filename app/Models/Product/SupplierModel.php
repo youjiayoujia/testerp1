@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\product;
+namespace App\Models\Product;
 
 use App\Base\BaseModel;
 use Tool;
-use App\Models\SyncApiModels;
+use App\Models\SyncApiModel;
 
 class SupplierModel extends BaseModel
 {
@@ -136,6 +136,7 @@ class SupplierModel extends BaseModel
                 }
             }
         }
+        $data['examine_status'] = 'newData'; //新创建
         $create = $this->create($data);
 
         $post = [];
@@ -161,7 +162,7 @@ class SupplierModel extends BaseModel
 
             !empty($data['qualifications']) ? $post['attachment_url'] = request()->server()['HTTP_HOST'].'/'.$path . $data['qualifications'] : '';
 
-            $sync = new SyncApiModels;
+            $sync = new SyncApiModel;
             $sync->relations_id = $post['suppliers_id'];
             $sync->type = 'supplier';
             $sync->url  = config('product.sellmore.api_url');
@@ -226,7 +227,7 @@ class SupplierModel extends BaseModel
 
             !empty($suplier->qualifications) ? $post['attachment_url'] = request()->server()['HTTP_HOST'].'/'.$path . $suplier->qualifications : '';
 
-            $sync = new SyncApiModels;
+            $sync = new SyncApiModel;
             $sync->relations_id = $post['suppliers_id'];
             $sync->type = 'supplier';
             $sync->url  = config('product.sellmore.api_url');

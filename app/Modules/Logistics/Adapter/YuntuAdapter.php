@@ -101,9 +101,9 @@ Class YuntuAdapter extends BasicAdapter
 								$request_json .= implode(",",$sku_json);
 								$request_json.='    
 								  ], 
-								  "OrderNumber": "SLM'.$ordersinfo->num.'",	  
+								  "OrderNumber": "SLM'.$ordersinfo->id.'",
 								  "TrackingNumber": "'.$ordersinfo->tracking_no.'",
-								  "ShippingMethodCode": "TWYZA",	    
+								  "ShippingMethodCode": "'.$ordersinfo->logistics->type.'",
 								  "ApplicationType": 4,
 								  "Weight": 1,
 								  "PackageNumber": 1,
@@ -154,13 +154,16 @@ Class YuntuAdapter extends BasicAdapter
 		}else{
 			curl_close($ch);		
 			$data = json_decode($data,true);
-			if($data['Item'][0]['OrderId']){
-				$reStr = DB::table("packages")->where('id',$ordersinfo->id)->update(
-					['tracking_no' => serialize($orderShippingCode['Item'][0]['OrderId']),
-					]);
-				return $reStr;
+			if(isset($data['Item'][0]['OrderId']) && !empty($data['Item'][0]['OrderId'])){
+				return $result = [
+						'code' => 'success',
+						'result' => $data['Item'][0]['WayBillNumber']
+				];
 			}else{
-				return false;;
+				return $result = [
+						'code' => 'error',
+						'result' => $data['Item'][0]['Feedback']
+				];
 			}
 		}		
     }	

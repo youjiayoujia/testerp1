@@ -4,9 +4,12 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\ProductModel;
+use App\Jobs\ImportImages;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class ProductImage extends Command
 {
+    use DispatchesJobs;
     /**
      * The name and signature of the console command.
      *
@@ -36,9 +39,13 @@ class ProductImage extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(ProductModel $product)
     {
-        $product = new ProductModel();
-        $product->oneSku();
+        ini_set('memory_limit', '2048M');
+        foreach ($product->all() as $model) {
+            $job = new ImportImages($model);
+            $job = $job->onQueue('importImages');
+            $this->dispatch($job);
+        }
     }
 }

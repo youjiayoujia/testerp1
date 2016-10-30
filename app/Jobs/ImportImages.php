@@ -2,29 +2,28 @@
 
 namespace App\Jobs;
 
-use Cache;
 use App\Jobs\Job;
-use Exception;
+use App\Models\ItemModel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
+class ImportImages extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
-    protected $package;
+    protected $model;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($package)
+    public function __construct($model)
     {
-        $this->package = $package;
-        $this->relation_id = $this->package->id;
-        $this->description = 'Package:' . $this->package->id . ' place logistics order.';
+        $this->model = $model;
+        $this->relation_id = $model->id;
+        $this->description = 'Import ' . $model->id . ' images';
     }
 
     /**
@@ -35,16 +34,14 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        $result = $this->package->placeLogistics();
-        if (isset($result['status'])&&$result['status']) {
+        if ($this->model->oneSku()) {
             $this->result['status'] = 'success';
-            $this->result['remark'] = 'packages  tracking_no:'.$result['tracking_no'];
+            $this->result['remark'] = 'Success.';
         } else {
-            $this->release();
             $this->result['status'] = 'fail';
-            $this->result['remark'] = $result['tracking_no'];
+            $this->result['remark'] = 'Fail.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('PlaceLogistics');
+        $this->log('ImportImages');
     }
 }

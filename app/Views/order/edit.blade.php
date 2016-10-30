@@ -180,7 +180,7 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_lastname" class='control-label'>发货姓氏</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
                 <input class="form-control" id="shipping_lastname" placeholder="发货姓氏" name='shipping_lastname' value="{{ old('shipping_lastname') ? old('shipping_lastname') : $model->shipping_lastname }}">
             </div>
             <div class="form-group col-lg-2">
@@ -232,7 +232,7 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="amount_shipping" class='control-label'>运费</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
                 <input class="form-control" id="amount_shipping" placeholder="运费" name='amount_shipping' value="{{ old('amount_shipping') ? old('amount_shipping') : $model->amount_shipping }}">
             </div>
         </div>

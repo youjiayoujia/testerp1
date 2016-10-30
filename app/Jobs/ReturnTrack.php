@@ -56,7 +56,7 @@ class ReturnTrack extends Job implements SelfHandling, ShouldQueue
         $IsUploadTrackingNumber = true;
         $logistics_channel_name = ChannelNameModel::where('channel_id', $package->channel_id)->whereHas('logistics', function ($query) use ($package) {
             $query = $query->where('logistics_id', $package->logistics_id);
-        })->first()->key;
+        })->first()->logistics_key;
 
         $tracking_no = $package->tracking_no;
         if ($this->orderMarkLogic->is_upload == 2) { //标记发货但不上传跟踪号

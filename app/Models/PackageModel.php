@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Excel;
 use DB;
+use App\Jobs\AssignStocks;
 use App\Base\BaseModel;
 use App\Models\RequireModel;
 use App\Models\Logistics\RuleModel;
@@ -14,17 +15,19 @@ use App\Models\Channel\AccountModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Product\ProductLogisticsLimitModel;
+use Queue;
 
 class PackageModel extends BaseModel
 {
     public $table = 'packages';
 
-    public $searchFields = ['id' => 'ID'];
-
     public $rules = [
         'create' => ['ordernum' => 'required'],
         'update' => [],
     ];
+
+    // 用于查询
+    public $searchFields = ['id' => 'ID'];
 
     public $fillable = [
         'channel_id',
@@ -434,6 +437,60 @@ class PackageModel extends BaseModel
     }
 
     /*******************************************************************************/
+    public function reCreatePackage()
+    {
+        $arr = [];
+        foreach($this->items as $key => $packageItem) {
+            $arr[$packageItem->item->warehouse_id][$key]['item_id'] = $packageItem->item_id;
+            $arr[$packageItem->item->warehouse_id][$key]['quantity'] = $packageItem->quantity;
+            $arr[$packageItem->item->warehouse_id][$key]['order_item_id'] = $packageItem->order_item_id;
+        }
+        if(count($arr) > 1) {
+            foreach($this->items as $bufItem) {
+                $bufItem->delete();
+            }
+            $j = 0;
+            foreach($arr as $k => $v) {
+                if($j == 0) {
+                    foreach($v as $k1 => $v1) {
+                        $this->items()->create($v1);
+                    }
+                    $flag = 1;
+                    if(count($v) > 1) {
+                        $flag = 3;
+                    } elseif (count($v) == 1) {
+                        if($v['0']['quantity'] > 1) {
+                            $flag = 2;
+                        } else {
+                            $flag = 1;
+                        }
+                    }
+                    $this->update(['warehouse_id' => $k, 'type' => ($flag == 1 ? 'SINGLE' : ($flag == 2 ? 'SINGLEMULTI' : 'MULTI'))]);
+                } else {
+                    $package = $this->create($this->toArray());
+                    foreach($v as $k2 => $v2) {
+                        $package->items()->create($v2);
+                    }
+                    $flag = 1;
+                    if(count($v) > 1) {
+                        $flag = 3;
+                    } elseif (count($v) == 1) {
+                        if(array_values($v)['0']['quantity'] > 1) {
+                            $flag = 2;
+                        } else {
+                            $flag = 1;
+                        }
+                    }
+                    $package->update(['warehouse_id' => $k, 'type' => ($flag == 1 ? 'SINGLE' : ($flag == 2 ? 'SINGLEMULTI' : 'MULTI'))]);
+                }
+                $j++;
+            }
+            return $this->order_id;
+        }
+
+        return false;
+    }
+
     public function createPackageItems()
     {
         $items = $this->setPackageItems();
@@ -441,18 +498,30 @@ class PackageModel extends BaseModel
             return $this->createPackageDetail($items);
         } else {
             if ($this->status == 'NEW') {
-                foreach ($this->items as $item) {
-                    $require = [];
-                    $require['item_id'] = $item->item_id;
-                    $require['warehouse_id'] = $item->item->warehouse_id;
-                    $require['order_item_id'] = $item->order_item_id;
-                    $require['sku'] = $item->item->sku;
-                    $require['quantity'] = $item->quantity;
-                    $this->requires()->create($require);
+                if($this->type == 'MULTI') {
+                    $orderId = $this->reCreatePackage();
+                    if($orderId) {
+                        $order = OrderModel::find($orderId);
+                        foreach($order->packages as $package) {
+                            $job = new AssignStocks($package);
+                            Queue::pushOn('assignStocks', $job);
+                        }
+                        return true;
+                    }
+                } else {
+                    foreach ($this->items as $item) {
+                        $require = [];
+                        $require['item_id'] = $item->item_id;
+                        $require['warehouse_id'] = $item->item->warehouse_id;
+                        $require['order_item_id'] = $item->order_item_id;
+                        $require['sku'] = $item->item->sku;
+                        $require['quantity'] = $item->quantity;
+                        $this->requires()->create($require);
+                    }
+                    $this->update(['status' => 'NEED']);
+                    $this->order->update(['status' => 'NEED']);
+                    return true;
                 }
-                $this->update(['status' => 'NEED']);
-                $this->order->update(['status' => 'NEED']);
-                return true;
             } else {
                 if (strtotime($this->created_at) < strtotime('-3 days')) {
                     $arr = $this->explodePackage();
@@ -636,57 +705,41 @@ class PackageModel extends BaseModel
     //设置多产品订单包裹产品
     public function setMultiPackageItem()
     {
-        $packageItem = [];
-        $stocks = [];
-        //根据仓库满足库存数量进行排序
-        $warehouses = [];
-        foreach ($this->items as $originPackageItem) {
-            $quantity = $originPackageItem->quantity;
-            if (!$quantity) {
-                continue;
-            }
-            $itemStocks = $originPackageItem->item->matchStock($quantity);
-            if ($itemStocks) {
-                foreach ($itemStocks as $itemStock) {
-                    foreach ($itemStock as $warehouseId => $stock) {
-                        if (isset($warehouses[$warehouseId])) {
-                            $warehouses[$warehouseId] += 1;
-                        } else {
-                            $warehouses[$warehouseId] = 1;
-                        }
+        $warehouses = WarehouseModel::all();
+        foreach($warehouses as $key => $warehouse) {
+            $buf = [];
+            $i = 0;
+            foreach($this->items as $packageItem) {
+                $pquantity = $packageItem->quantity;
+                $stocks = StockModel::where(['warehouse_id' => $warehouse->id, 'item_id' => $packageItem->item_id])->get()->sortByDesc('available_quantity');
+                if($stocks->sum('available_quantity') < $packageItem->quantity) {
+                    unset($buf);
+                    continue 2;
+                }
+                foreach($stocks as $key => $stock) {
+                    if($stock->available_quantity < $pquantity) {
+                        $buf[$warehouse->id][$i]['item_id'] = $packageItem->item_id;
+                        $buf[$warehouse->id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                        $buf[$warehouse->id][$i]['order_item_id'] = $packageItem->order_item_id;
+                        $buf[$warehouse->id][$i]['quantity'] = $stock->available_quantity;
+                        $pquantity -= $stock->available_quantity;
+                        $i++;
+                    } else {
+                        $buf[$warehouse->id][$i]['item_id'] = $packageItem->item_id;
+                        $buf[$warehouse->id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                        $buf[$warehouse->id][$i]['order_item_id'] = $packageItem->order_item_id;
+                        $buf[$warehouse->id][$i]['quantity'] = $pquantity;
+                        $i++;
+                        continue 2;
                     }
                 }
-                $stocks[$originPackageItem->order_item_id] = $itemStocks;
-            } else {
-                return false;
             }
-        }
-        krsort($warehouses);
-        //set package item
-        foreach ($stocks as $orderItemId => $itemStocks) {
-            foreach ($itemStocks as $type => $itemStock) {
-                if ($type == 'SINGLE') {
-                    $stock = collect($itemStock)->sortByDesc(function ($value, $key) use ($warehouses) {
-                        return $warehouses[$key];
-                    })->first();
-                    foreach ($stock as $key => $value) {
-                        $packageItem[$value['warehouse_id']][$key] = $value;
-                        $packageItem[$value['warehouse_id']][$key]['order_item_id'] = $orderItemId;
-                        $packageItem[$value['warehouse_id']][$key]['remark'] = 'REMARK';
-                    }
-                } else {
-                    foreach ($itemStock as $warehouseId => $warehouseStock) {
-                        foreach ($warehouseStock as $key => $value) {
-                            $packageItem[$warehouseId][$key] = $value;
-                            $packageItem[$warehouseId][$key]['order_item_id'] = $orderItemId;
-                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
-                        }
-                    }
-                }
+            if(!empty($buf)) {
+                return $buf;
             }
         }
 
-        return $packageItem;
+        return false;
     }
 
     public function createPackageDetail($items)

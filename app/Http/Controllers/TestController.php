@@ -77,10 +77,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::with('order')->with('items')->get();
-        
-
-        var_dump($package->toarray());exit;
+        $package = PackageModel::find(112);
+        var_dump($package->searchFields);exit;
     }
 
     // public function test2()

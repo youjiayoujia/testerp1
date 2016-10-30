@@ -22,6 +22,7 @@ class ImportImages extends Job implements SelfHandling, ShouldQueue
     public function __construct($model)
     {
         $this->model = $model;
+        $this->relation_id = $model->id;
         $this->description = 'Import ' . $model->id . ' images';
     }
 

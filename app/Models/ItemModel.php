@@ -22,7 +22,7 @@ class ItemModel extends BaseModel
 
     protected $stock;
 
-    public $searchFields = ['sku' => 'sku'];
+    public $searchFields = ['sku' =>'sku'];
 
     public $rules = [
         'update' => []
@@ -103,7 +103,7 @@ class ItemModel extends BaseModel
 
     public function warehousePosition()
     {
-        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel','warehouse_position');
     }
 
     public function purchase()
@@ -113,7 +113,7 @@ class ItemModel extends BaseModel
 
     public function purchases()
     {
-        return $this->hasOne('App\Models\Purchase\PurchasesModel', 'item_id');
+        return $this->hasOne('App\Models\Purchase\PurchasesModel','item_id');
     }
 
     public function orderItem()
@@ -123,8 +123,7 @@ class ItemModel extends BaseModel
 
     public function skuPrepareSupplier()
     {
-        return $this->belongsToMany('App\Models\Product\SupplierModel', 'item_prepare_suppliers', 'item_id',
-            'supplier_id')->withTimestamps();
+        return $this->belongsToMany('App\Models\Product\SupplierModel', 'item_prepare_suppliers', 'item_id','supplier_id')->withTimestamps();
     }
 
     public function updateItem($data)
@@ -166,7 +165,7 @@ class ItemModel extends BaseModel
         $zaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
             if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
-                if (!$purchaseItem->purchaseOrder->write_off && $purchaseItem->purchaseOrder->type == 0) {
+                if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
                     $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                 }
             }
@@ -181,7 +180,7 @@ class ItemModel extends BaseModel
         $szaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
             if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
-                if (!$purchaseItem->purchaseOrder->write_off && $purchaseItem->purchaseOrder->type == 1) {
+                if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
                     $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                 }
             }
@@ -195,13 +194,13 @@ class ItemModel extends BaseModel
     {
         $data = [];
         $stockCollection = $this->stocks->groupBy('warehouse_id');
-        foreach ($stockCollection as $colleciton) {
+        foreach($stockCollection as $colleciton){
             $data[$colleciton[0]->warehouse_id]['all_quantity'] = $colleciton->sum('all_quantity');
-            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity');
+            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity');    
         }
         $warehouses = WarehouseModel::all();
-        foreach ($warehouses as $warehouse) {
-            if (!array_key_exists($warehouse->id, $data)) {
+        foreach($warehouses as $warehouse){
+            if(!array_key_exists($warehouse->id,$data)){
                 $data[$warehouse->id]['all_quantity'] = 0;
                 $data[$warehouse->id]['available_quantity'] = 0;
             }
@@ -218,24 +217,24 @@ class ItemModel extends BaseModel
             $warehouse_id = $purchaseItemCollection[0]->warehouse_id;
             $data[$warehouse_id]['normal'] = 0;
             $data[$warehouse_id]['special'] = 0;
-            foreach ($purchaseItemCollection as $purchaseItem) {
-                if ($purchaseItem->purchaseOrder->status > 0 && $purchaseItem->purchaseOrder->status < 4) {
-                    if ($purchaseItem->purchaseOrder->type == 0) {
+            foreach ($purchaseItemCollection as $purchaseItem) {          
+                if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->type==0){
                         $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
-                    } else {
+                    }else{
                         $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
-                    }
+                    }  
                 }
             }
         }
         $warehouses = WarehouseModel::all();
-        foreach ($warehouses as $warehouse) {
-            if (!array_key_exists($warehouse->id, $data)) {
+        foreach($warehouses as $warehouse){
+            if(!array_key_exists($warehouse->id,$data)){
                 $data[$warehouse->id]['normal'] = 0;
                 $data[$warehouse->id]['special'] = 0;
             }
         }
-
+        
         return $data;
     }
 
@@ -243,7 +242,7 @@ class ItemModel extends BaseModel
     public function getOutOfStockAttribute()
     {
         $item_id = $this->id;
-        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "' . $item_id . '" and 
+        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
                 packages.id = package_items.package_id')[0]->num;
 
         return $num;
@@ -260,17 +259,17 @@ class ItemModel extends BaseModel
     {
         $id = $this->id;
         $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
-            ->whereIn('packages.status', ['NEED'])
-            ->where('package_items.item_id', $id)
-            ->first(['packages.created_at']);
+                ->whereIn('packages.status', ['NEED'])
+                ->where('package_items.item_id', $id)
+                ->first(['packages.created_at']);
 
-        if ($firstNeedItem) {
+        if($firstNeedItem){
             $firstNeedItem = $firstNeedItem->toArray();
-            $time = ceil((time() - strtotime($firstNeedItem['created_at'])) / (3600 * 24));
-        } else {
+            $time = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
+        }else{
             $time = 0;
-        }
-
+        } 
+        
         return $time;
     }
 
@@ -283,7 +282,7 @@ class ItemModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'], 'warehouse' => ['name']],
+            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'],'warehouse' => ['name'] ],
             'filterFields' => [],
             'filterSelects' => ['status' => config('item.status'),],
             'selectRelatedSearchs' => [],
@@ -315,9 +314,9 @@ class ItemModel extends BaseModel
             $coefficient = 1;
         } else {
             if (($seven_sales / 7) / ($fourteen_sales / 14 * 1.1) >= 1) {
-                $coefficient = 1.3;
+                $coefficient = 1.3; 
             } elseif (($fourteen_sales / 14 * 0.9) / ($seven_sales / 7) >= 1) {
-                $coefficient = 0.6;
+                $coefficient = 0.6; 
             } else {
                 $coefficient = 1;
             }
@@ -402,10 +401,9 @@ class ItemModel extends BaseModel
             /*if ($flag && $this->cost && ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3)) {
                 throw new Exception('入库单价不在原单价0.6-1.3范围内');
             }*/
-            if ($this->all_quantity + $quantity) {
+            if($this->all_quantity + $quantity) {
                 $this->update([
-                    'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)),
-                        3)
+                    'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
                 ]);
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
@@ -488,9 +486,7 @@ class ItemModel extends BaseModel
     //分配库存
     public function assignStock($quantity)
     {
-        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function ($query) {
-            return $query->warehouse->is_available == 1;
-        });
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1;});
         if ($stocks->sum('available_quantity') >= $quantity) {
             $warehouseStocks = $stocks->groupBy('warehouse_id');
             //默认仓库
@@ -610,11 +606,11 @@ class ItemModel extends BaseModel
             $zaitu_num = 0;
             foreach ($item->purchase as $purchaseItem) {
                 if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
-                    if ($purchaseItem->purchaseOrder) {
+                    if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
                             $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                         }
-                    }
+                    }  
                 }
             }
             $data['zaitu_num'] = $zaitu_num;
@@ -635,9 +631,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
-            if ($sevenDaySellNum == null) {
-                $sevenDaySellNum = 0;
-            }
+            if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -646,9 +640,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
-            if ($fourteenDaySellNum == null) {
-                $fourteenDaySellNum = 0;
-            }
+            if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -657,9 +649,7 @@ class ItemModel extends BaseModel
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
-            if ($thirtyDaySellNum == null) {
-                $thirtyDaySellNum = 0;
-            }
+            if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
 
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
@@ -718,7 +708,7 @@ class ItemModel extends BaseModel
             }
 
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="' . $item->id . '" ')[0]->num;
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
 
             $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
@@ -727,23 +717,23 @@ class ItemModel extends BaseModel
             //平均利润率
             $data['profit'] = $total_profit_num ? $total_profit_rate / $total_profit_num : '0';
 
-            $data['status'] = $item->status ? $item->status : 'saleOutStopping';
-            $data['require_create'] = $needPurchaseNum > 0 ? 1 : 0;
+            $data['status'] = $item->status?$item->status:'saleOutStopping';
+            $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
-            $data['user_id'] = $item->purchase_adminer ? $item->purchase_adminer : 0;
+            $data['user_id'] = $item->purchase_adminer?$item->purchase_adminer:0;
 
             $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
                 ->whereIn('packages.status', ['NEED'])
                 ->where('package_items.item_id', $item['id'])
                 ->first(['packages.created_at']);
 
-            if ($firstNeedItem) {
+            if($firstNeedItem){
                 $firstNeedItem = $firstNeedItem->toArray();
-                $data['owe_day'] = ceil((time() - strtotime($firstNeedItem['created_at'])) / (3600 * 24));
-            } else {
+                $data['owe_day'] = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
+            }else{
                 $data['owe_day'] = 0;
             }
-
+            
             if ($thisModel) {
                 $thisModel->update($data);
             } else {
@@ -754,68 +744,60 @@ class ItemModel extends BaseModel
 
     public function createPurchaseStaticstics()
     {
-        $users = UserRoleModel::all()->where('role_id', '2');
+        $users = UserRoleModel::all()->where('role_id','2');
         foreach ($users as $user) {
             $data = [];
             //采购负责人
             $data['purchase_adminer'] = $user->user_id;
             //管理的SKU数
-            $data['sku_num'] = $this->where('purchase_adminer', $user->user_id)->count();
+            $data['sku_num'] = $this->where('purchase_adminer',$user->user_id)->count();
             //获取时间
-            $data['get_time'] = date('Y-m-d', time());
+            $data['get_time'] = date('Y-m-d',time());
             //必须当天内下单SKU数
-            $data['need_purchase_num'] = DB::select('select count(*) as num from purchases where user_id = "' . $user->user_id . '" and need_purchase_num > 0 and available_quantity+zaitu_num-seven_sales < 0 ')[0]->num;
+            $data['need_purchase_num'] = DB::select('select count(*) as num from purchases where user_id = "'.$user->user_id.'" and need_purchase_num > 0 and available_quantity+zaitu_num-seven_sales < 0 ')[0]->num;
             //15天缺货订单
-            $data['fifteenday_need_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-d',
-                    time() - 24 * 3600 * 15) . '" ')[0]->num;
+            $data['fifteenday_need_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "'.date('Y-m-d',time()-24*3600*15).'" ')[0]->num;
             //15天所有订单
-            $data['fifteenday_total_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status!= "CANCEL" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-d',
-                    time() - 24 * 3600 * 15) . '" ')[0]->num;
+            $data['fifteenday_total_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status!= "CANCEL" and purchases.user_id = "'.$user->user_id.'" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "'.date('Y-m-d',time()-24*3600*15).'" ')[0]->num;
             //订单缺货率
-            $data['need_percent'] = $data['fifteenday_total_order_num'] ? round($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'],
-                4) : 0;
+            $data['need_percent'] = $data['fifteenday_total_order_num'] ? round ($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'] ,4):0;
             //缺货总数
-            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
+            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
                 orders.id = order_items.order_id and purchases.item_id = order_items.item_id')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //平均缺货天数
-            $data['avg_need_day'] = round(DB::select('select avg(' . time() . '-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day, 1);
+            $data['avg_need_day'] = round(DB::select('select avg('.time().'-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day,1);
             //最长缺货天数
-            $data['long_need_day'] = round(DB::select('select max(' . time() . '-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day, 1);
+            $data['long_need_day'] = round(DB::select('select max('.time().'-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day,1);
             //采购单超期
-            $data['purchase_order_exceed_time'] = DB::select('select count(*) as num from purchase_orders where user_id = "' . $user->user_id . '" and created_at < "' . date('Y-m-d H:i:s',
-                    time() - 86400 * 15) . '" ')[0]->num;
+            $data['purchase_order_exceed_time'] = DB::select('select count(*) as num from purchase_orders where user_id = "'.$user->user_id.'" and created_at < "'.date('Y-m-d H:i:s',time()-86400*15).'" ')[0]->num;
             //当月累计下单数量
-            $data['month_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status!= "CANCEL" and orders.status!= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-01 00:00:00',
-                    time()) . '" and order_items.price > 0')[0]->num;
+            $data['month_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status!= "CANCEL" and orders.status!= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "'.date('Y-m-01 00:00:00',time()).'" and order_items.price > 0')[0]->num;
             //当月累计下单总金额
-            $data['month_order_money'] = DB::select('select sum(orders.amount*orders.rate) as total_price from orders,order_items,purchases where orders.status!= "CANCEL" and orders.status!= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-01 00:00:00',
-                    time()) . '" and order_items.price > 0')[0]->total_price;
+            $data['month_order_money'] = DB::select('select sum(orders.amount*orders.rate) as total_price from orders,order_items,purchases where orders.status!= "CANCEL" and orders.status!= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "'.date('Y-m-01 00:00:00',time()).'" and order_items.price > 0')[0]->total_price;
             $data['month_order_money'] = $data['month_order_money'] ? $data['month_order_money'] : 0;
             //累计运费
-            $data['total_carriage'] = DB::select('select sum(total_postage) as total_postage from purchase_orders where user_id = "' . $user->user_id . '" and created_at > "' . date('Y-m-01 00:00:00',
-                    time()) . '"')[0]->total_postage;
+            $data['total_carriage'] = DB::select('select sum(total_postage) as total_postage from purchase_orders where user_id = "'.$user->user_id.'" and created_at > "'.date('Y-m-01 00:00:00',time()).'"')[0]->total_postage;
             $data['total_carriage'] = $data['total_carriage'] ? $data['total_carriage'] : 0;
             //节约成本
-            $item_id_arr = DB::select('select order_items.item_id,sum(order_items.quantity) as qty from orders,order_items,purchases where orders.status!= "CANCEL" and orders.status!= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
+            $item_id_arr = DB::select('select order_items.item_id,sum(order_items.quantity) as qty from orders,order_items,purchases where orders.status!= "CANCEL" and orders.status!= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
                 orders.id = order_items.order_id and purchases.item_id = order_items.item_id group by order_items.item_id');
             $total_cost = 0;
             foreach ($item_id_arr as $item_id) {
                 $stock_model = $this->find($item_id->item_id)->stocks;
-                if (count($stock_model) > 0) {
+                if(count($stock_model)>0){
                     $stock_id = $stock_model[0]->id;
-                    $cof_model = CarryOverFormsModel::where('stock_id', $stock_id)->where('parent_id',
-                        date('m', strtotime('2011-08-25')))->get()->first();
-                    if ($cof_model) {
-                        $total_cost += $purchase_price * $item_id->qty;
+                    $cof_model = CarryOverFormsModel::where('stock_id',$stock_id)->where('parent_id',date('m', strtotime('2011-08-25')))->get()->first();
+                    if($cof_model){
+                        $total_cost += $purchase_price*$item_id->qty;
                     }
-                }
+                }       
             }
             $data['save_money'] = $total_cost - ($data['month_order_money'] - $data['total_carriage']);
             PurchaseStaticsticsModel::create($data);
@@ -826,58 +808,57 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        $url = "http://120.24.100.157:60/api/skuInfoApi.php";
+        $url="http://120.24.100.157:60/api/skuInfoApi.php";
         $itemModel = $this->all();
         //$itemModel = $this->where('sku','M001_black')->get();
         foreach ($itemModel as $key => $model) {
             $old_data['sku'] = $model->sku;
             //print_r($old_data);exit;
-            $c = curl_init();
-            curl_setopt($c, CURLOPT_URL, $url);
+            $c = curl_init(); 
+            curl_setopt($c, CURLOPT_URL, $url); 
             curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
             curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60);
+            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
             $buf = curl_exec($c);
             $user_array = json_decode($buf);
-
-            $dev_id = UserModel::where('name', preg_replace("/\s/", "", $user_array->dev_name))->get(['id'])->first();
-            $purchase_id = UserModel::where('name',
-                preg_replace("/\s/", "", $user_array->purchase_name))->get(['id'])->first();
-            $arr['purchase_adminer'] = $purchase_id ? $purchase_id->id : '';
-            $brr['developer'] = $dev_id ? $dev_id->id : '';
+            
+            $dev_id = UserModel::where('name',preg_replace("/\s/","",$user_array->dev_name))->get(['id'])->first();
+            $purchase_id = UserModel::where('name',preg_replace("/\s/","",$user_array->purchase_name))->get(['id'])->first();
+            $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';
+            $brr['developer'] = $dev_id?$dev_id->id:'';
             $model->update($arr);
             $model->product->spu->update($brr);
         }
-
+        
     }
 
     public function updateOldData()
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        //$model = $this->all();
-        $model = $this->where('id', '>', '65279')->get();
+        $model = $this->all();
+        //$model = $this->where('id','>','65279')->get();
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select pack_method,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder 
-                    from erp_products_data where products_sku =  "' . $itemModel->sku . '" ');
-
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            
             $arr = [];
-            if ($erp_products_data[0]->pack_method) {
+            if($erp_products_data[0]->pack_method){
                 $arr[] = $erp_products_data[0]->pack_method;
                 $itemModel->product->wrapLimit()->sync($arr);
             }
             $brr = [];
-            if ($erp_products_data[0]->products_with_battery) {
+            if($erp_products_data[0]->products_with_battery){
                 $brr[] = 1;
             }
-            if ($erp_products_data[0]->products_with_adapter) {
+            if($erp_products_data[0]->products_with_adapter){
                 $brr[] = 4;
             }
-            if ($erp_products_data[0]->products_with_fluid) {
+            if($erp_products_data[0]->products_with_fluid){
                 $brr[] = 5;
             }
-            if ($erp_products_data[0]->products_with_powder) {
+            if($erp_products_data[0]->products_with_powder){
                 $brr[] = 2;
             }
             $itemModel->product->logisticsLimit()->sync($brr);
@@ -888,14 +869,14 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        //$model = $this->all();
-        $model = $this->where('id', '>', '65279')->get();
+        $model = $this->all();
+        //$model = $this->where('id','>','65279')->get();
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                     products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                     product_warehouse_id,products_location,products_more_img,productsPhotoStandard,products_remark_2
-                    from erp_products_data where products_sku =  "' . $itemModel->sku . '" ');
-
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            
             $old_data['name'] = $erp_products_data[0]->products_name_en;
             $old_data['c_name'] = $erp_products_data[0]->products_name_cn;
             //$old_data['products_sku'] = $model->sku;
@@ -907,12 +888,12 @@ class ItemModel extends BaseModel
             $old_data['package_weight'] = $erp_products_data[0]->weightWithPacket;
             $old_data['supplier_id'] = $erp_products_data[0]->products_suppliers_id;
             $old_data['quality_standard'] = $erp_products_data[0]->products_check_standard;
-            $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id == 1000 ? 1 : 2;
+            $old_data['warehouse_id'] = $erp_products_data[0]->product_warehouse_id==1000?1:2;
             $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
             $old_data['purchase_url'] = $erp_products_data[0]->products_more_img;
             $old_data['competition_url'] = $erp_products_data[0]->productsPhotoStandard;
             $old_data['notify'] = $erp_products_data[0]->products_remark_2;
-            $arr = [];
+            $arr =[];
             $arr = explode(',', $erp_products_data[0]->products_suppliers_ids);
 
             $itemModel->update($old_data);
@@ -930,12 +911,12 @@ class ItemModel extends BaseModel
         foreach ($model as $key => $itemModel) {
             $old_data = [];
             $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
-                    from erp_products_data where products_sku =  "' . $itemModel->sku . '" ');
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
             //print_r(count($erp_products_data));exit;
-            if (count($erp_products_data)) {
-                if ($erp_products_data[0]->product_warehouse_id == 1025) {
+            if(count($erp_products_data)){
+                if($erp_products_data[0]->product_warehouse_id==1025){
                     $warehouse_id = 2;
-                } else {
+                }else{
                     $warehouse_id = 1;
                 }
                 $old_data['warehouse_id'] = $warehouse_id;
@@ -943,7 +924,7 @@ class ItemModel extends BaseModel
                 //print_r($old_data);exit;
                 $itemModel->update($old_data);
             }
-
+            
         }
     }
 
@@ -953,14 +934,14 @@ class ItemModel extends BaseModel
         set_time_limit(0);
         $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
                     from erp_products_data where product_warehouse_id = 1025');
-
-        foreach ($erp_products_data as $data) {
+       
+        foreach($erp_products_data as $data){
             $arr = [];
             $arr['warehouse_id'] = 2;
             $arr['name'] = $data->products_location;
             PositionModel::create($arr);
         }
-
+        
     }
-
+    
 }

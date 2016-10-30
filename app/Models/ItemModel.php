@@ -196,7 +196,7 @@ class ItemModel extends BaseModel
         $stockCollection = $this->stocks->groupBy('warehouse_id');
         foreach($stockCollection as $colleciton){
             $data[$colleciton[0]->warehouse_id]['all_quantity'] = $colleciton->sum('all_quantity');
-            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity');    
+            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity');
         }
         $warehouses = WarehouseModel::all();
         foreach($warehouses as $warehouse){
@@ -217,13 +217,13 @@ class ItemModel extends BaseModel
             $warehouse_id = $purchaseItemCollection[0]->warehouse_id;
             $data[$warehouse_id]['normal'] = 0;
             $data[$warehouse_id]['special'] = 0;
-            foreach ($purchaseItemCollection as $purchaseItem) {          
+            foreach ($purchaseItemCollection as $purchaseItem) {
                 if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
                     if($purchaseItem->purchaseOrder->type==0){
                         $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
                     }else{
                         $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
-                    }  
+                    }
                 }
             }
         }
@@ -234,7 +234,7 @@ class ItemModel extends BaseModel
                 $data[$warehouse->id]['special'] = 0;
             }
         }
-        
+
         return $data;
     }
 
@@ -268,8 +268,8 @@ class ItemModel extends BaseModel
             $time = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
         }else{
             $time = 0;
-        } 
-        
+        }
+
         return $time;
     }
 
@@ -314,9 +314,9 @@ class ItemModel extends BaseModel
             $coefficient = 1;
         } else {
             if (($seven_sales / 7) / ($fourteen_sales / 14 * 1.1) >= 1) {
-                $coefficient = 1.3; 
+                $coefficient = 1.3;
             } elseif (($fourteen_sales / 14 * 0.9) / ($seven_sales / 7) >= 1) {
-                $coefficient = 0.6; 
+                $coefficient = 0.6;
             } else {
                 $coefficient = 1;
             }
@@ -610,7 +610,7 @@ class ItemModel extends BaseModel
                         if (!$purchaseItem->purchaseOrder->write_off) {
                             $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                         }
-                    }  
+                    }
                 }
             }
             $data['zaitu_num'] = $zaitu_num;
@@ -733,7 +733,7 @@ class ItemModel extends BaseModel
             }else{
                 $data['owe_day'] = 0;
             }
-            
+
             if ($thisModel) {
                 $thisModel->update($data);
             } else {
@@ -797,7 +797,7 @@ class ItemModel extends BaseModel
                     if($cof_model){
                         $total_cost += $purchase_price*$item_id->qty;
                     }
-                }       
+                }
             }
             $data['save_money'] = $total_cost - ($data['month_order_money'] - $data['total_carriage']);
             PurchaseStaticsticsModel::create($data);
@@ -814,15 +814,15 @@ class ItemModel extends BaseModel
         foreach ($itemModel as $key => $model) {
             $old_data['sku'] = $model->sku;
             //print_r($old_data);exit;
-            $c = curl_init(); 
-            curl_setopt($c, CURLOPT_URL, $url); 
+            $c = curl_init();
+            curl_setopt($c, CURLOPT_URL, $url);
             curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
             curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
+            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60);
             $buf = curl_exec($c);
             $user_array = json_decode($buf);
-            
+
             $dev_id = UserModel::where('name',preg_replace("/\s/","",$user_array->dev_name))->get(['id'])->first();
             $purchase_id = UserModel::where('name',preg_replace("/\s/","",$user_array->purchase_name))->get(['id'])->first();
             $arr['purchase_adminer'] = $purchase_id?$purchase_id->id:'';
@@ -830,7 +830,7 @@ class ItemModel extends BaseModel
             $model->update($arr);
             $model->product->spu->update($brr);
         }
-        
+
     }
 
     public function updateOldData()
@@ -842,7 +842,7 @@ class ItemModel extends BaseModel
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select pack_method,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder 
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
-            
+
             $arr = [];
             if($erp_products_data[0]->pack_method){
                 $arr[] = $erp_products_data[0]->pack_method;
@@ -876,7 +876,7 @@ class ItemModel extends BaseModel
                     products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                     product_warehouse_id,products_location,products_more_img,productsPhotoStandard,products_remark_2
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
-            
+
             $old_data['name'] = $erp_products_data[0]->products_name_en;
             $old_data['c_name'] = $erp_products_data[0]->products_name_cn;
             //$old_data['products_sku'] = $model->sku;
@@ -924,7 +924,7 @@ class ItemModel extends BaseModel
                 //print_r($old_data);exit;
                 $itemModel->update($old_data);
             }
-            
+
         }
     }
 
@@ -934,14 +934,14 @@ class ItemModel extends BaseModel
         set_time_limit(0);
         $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
                     from erp_products_data where product_warehouse_id = 1025');
-       
+
         foreach($erp_products_data as $data){
             $arr = [];
             $arr['warehouse_id'] = 2;
             $arr['name'] = $data->products_location;
             PositionModel::create($arr);
         }
-        
+
     }
-    
+
 }

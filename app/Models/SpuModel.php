@@ -243,6 +243,7 @@ class SpuModel extends BaseModel
             }
     }
 
+    //重新根据sku生成model和spu
     public function test1()
     {   
         set_time_limit(0);
@@ -290,7 +291,23 @@ class SpuModel extends BaseModel
                 }
                 $itemModel->update(['product_id'=>$product_id]);
             }
-        }
-        
+        }     
     }
+
+    public function test2()
+    { 
+        $erp_products_data_arr = DB::select('select distinct products_sku,spu,model,products_declared_cn,products_declared_en 
+            from erp_products_data where spu!=""');
+        foreach($erp_products_data_arr as $erp_data){
+            $data = [];
+            $data['declared_cn'] = $erp_data->products_declared_cn;
+            $data['declared_en'] = $erp_data->products_declared_en;
+            $itemModel = ItemModel::where('sku',$erp_data->products_sku)->get()->first();
+            if(count($itemModel)){
+                $itemModel->product->update($data);
+            }
+        }        
+    }
+
+
 }

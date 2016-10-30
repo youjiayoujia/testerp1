@@ -54,7 +54,7 @@
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                                 <td class='col-lg-3'>
                                     @foreach($packageitem->item->product->wrapLimit as $limit)  
-                                        {{ $limit->name }} . ' '
+                                        {{ $limit->name }}
                                     @endforeach
                                 </td>
                                 <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>

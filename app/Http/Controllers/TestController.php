@@ -77,11 +77,9 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::where('id', '>', '0')->get()->sortBy(function($a,$b){
-            return $a->warehouse->created_at;
-        });
+        $package = PackageModel::find(112);
+        var_dump($package->searchFields);exit;
 
-        var_dump($package->toarray());exit;
     }
 
     // public function test2()

@@ -507,6 +507,19 @@ class PackageModel extends BaseModel
                             Queue::pushOn('assignStocks', $job);
                         }
                         return true;
+                    } else {
+                        foreach ($this->items as $item) {
+                            $require = [];
+                            $require['item_id'] = $item->item_id;
+                            $require['warehouse_id'] = $item->item->warehouse_id;
+                            $require['order_item_id'] = $item->order_item_id;
+                            $require['sku'] = $item->item->sku;
+                            $require['quantity'] = $item->quantity;
+                            $this->requires()->create($require);
+                        }
+                        $this->update(['status' => 'NEED', 'warehouse_id' => $this->items->first()->item->warehouse_id]);
+                        $this->order->update(['status' => 'NEED']);
+                        return true;
                     }
                 } else {
                     foreach ($this->items as $item) {
@@ -518,7 +531,7 @@ class PackageModel extends BaseModel
                         $require['quantity'] = $item->quantity;
                         $this->requires()->create($require);
                     }
-                    $this->update(['status' => 'NEED']);
+                    $this->update(['status' => 'NEED', 'warehouse_id' => $this->items->first()->item->warehouse_id]);
                     $this->order->update(['status' => 'NEED']);
                     return true;
                 }
@@ -670,7 +683,11 @@ class PackageModel extends BaseModel
     public function setPackageItems()
     {
         if ($this->items->count() > 1) { //多产品
-            $packageItem = $this->setMultiPackageItem();
+            if(empty($this->warehouse_id)) {
+                $packageItem = $this->setMultiPackageItem();
+            } else {
+                $packageItem = $this->setMultiPackageItemFb();
+            }
         } else { //单产品
             $packageItem = $this->setSinglePackageItem();
         }
@@ -704,6 +721,62 @@ class PackageModel extends BaseModel
 
     //设置多产品订单包裹产品
     public function setMultiPackageItem()
+    {
+        $packageItem = [];
+        $stocks = [];
+        //根据仓库满足库存数量进行排序
+        $warehouses = [];
+        foreach ($this->items as $originPackageItem) {
+            $quantity = $originPackageItem->quantity;
+            if (!$quantity) {
+                continue;
+            }
+            $itemStocks = $originPackageItem->item->matchStock($quantity);
+            if ($itemStocks) {
+                foreach ($itemStocks as $itemStock) {
+                    foreach ($itemStock as $warehouseId => $stock) {
+                        if (isset($warehouses[$warehouseId])) {
+                            $warehouses[$warehouseId] += 1;
+                        } else {
+                            $warehouses[$warehouseId] = 1;
+                        }
+                    }
+                }
+                $stocks[$originPackageItem->order_item_id] = $itemStocks;
+            } else {
+                return false;
+            }
+        }
+        krsort($warehouses);
+        //set package item
+        foreach ($stocks as $orderItemId => $itemStocks) {
+            foreach ($itemStocks as $type => $itemStock) {
+                if ($type == 'SINGLE') {
+                    $stock = collect($itemStock)->sortByDesc(function ($value, $key) use ($warehouses) {
+                        return $warehouses[$key];
+                    })->first();
+                    foreach ($stock as $key => $value) {
+                        $packageItem[$value['warehouse_id']][$key] = $value;
+                        $packageItem[$value['warehouse_id']][$key]['order_item_id'] = $orderItemId;
+                        $packageItem[$value['warehouse_id']][$key]['remark'] = 'REMARK';
+                    }
+                } else {
+                    foreach ($itemStock as $warehouseId => $warehouseStock) {
+                        foreach ($warehouseStock as $key => $value) {
+                            $packageItem[$warehouseId][$key] = $value;
+                            $packageItem[$warehouseId][$key]['order_item_id'] = $orderItemId;
+                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                        }
+                    }
+                }
+            }
+        }
+
+        return $packageItem;
+    }
+
+    //设置多产品订单包裹产品
+    public function setMultiPackageItemFb()
     {
         $warehouses = WarehouseModel::all();
         foreach($warehouses as $key => $warehouse) {

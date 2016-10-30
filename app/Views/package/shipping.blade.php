@@ -114,6 +114,8 @@
             if (event.keyCode == '13') {
                 if ($('.weight').is(':focus')) {
                     $('.trackno').val('');
+                    $('.holder').text('');
+                    $('.holder_weight').text('');
                     $('.trackno').focus();
                     return true;
                 }

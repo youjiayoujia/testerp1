@@ -837,8 +837,8 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        //$model = $this->all();
-        $model = $this->where('id','>','65279')->get();
+        $model = $this->all();
+        //$model = $this->where('id','>','65279')->get();
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select pack_method,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder 
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
@@ -869,8 +869,8 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        //$model = $this->all();
-        $model = $this->where('id','>','65279')->get();
+        $model = $this->all();
+        //$model = $this->where('id','>','65279')->get();
         foreach ($model as $key => $itemModel) {
             $erp_products_data = DB::select('select products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                     products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,

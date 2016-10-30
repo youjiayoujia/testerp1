@@ -43,7 +43,7 @@ class ProductModel extends BaseModel
         ]
     ];
 
-    public $searchFields = ['name'=>'英文名', 'id'=>'id', 'c_name'=>'中文名', 'model'=>'model'];
+    public $searchFields = ['name' => '英文名', 'id' => 'id', 'c_name' => '中文名', 'model' => 'model'];
 
     /**
      * The attributes that are mass assignable.
@@ -169,12 +169,14 @@ class ProductModel extends BaseModel
 
     public function logisticsLimit()
     {
-        return $this->belongsToMany('App\Models\Logistics\LimitsModel','product_logistics_limits','product_id','logistics_limits_id')->withTimestamps();
+        return $this->belongsToMany('App\Models\Logistics\LimitsModel', 'product_logistics_limits', 'product_id',
+            'logistics_limits_id')->withTimestamps();
     }
 
     public function wrapLimit()
     {
-        return $this->belongsToMany('App\Models\WrapLimitsModel','product_wrap_limits','product_id','wrap_limits_id')->withTimestamps();
+        return $this->belongsToMany('App\Models\WrapLimitsModel', 'product_wrap_limits', 'product_id',
+            'wrap_limits_id')->withTimestamps();
     }
 
     public function variationValues()
@@ -236,34 +238,34 @@ class ProductModel extends BaseModel
 
     public function getDimageAttribute()
     {
-        $arr = LabelModel::whereIn('name',['正面图','外观图'])->get(['id'])->toArray();
-        $arr = array_column($arr, 'id'); 
+        $arr = LabelModel::whereIn('name', ['正面图', '外观图'])->get(['id'])->toArray();
+        $arr = array_column($arr, 'id');
         if (count($this->imageAll)) {
             foreach ($this->imageAll as $key => $image) {
                 $temp = [];
-                foreach ($image->labels as  $label) {
+                foreach ($image->labels as $label) {
                     $temp[] = $label->pivot->label_id;
                 }
-                if(count(array_intersect($arr,$temp))==2){
+                if (count(array_intersect($arr, $temp)) == 2) {
                     return $image->path . $image->name;
                 }
-            }   
+            }
         }
         return '/default.jpg';
     }
 
     public function getShapeAttribute()
     {
-        $arr = LabelModel::where('name',['外观图'])->first();
+        $arr = LabelModel::where('name', ['外观图'])->first();
         $img = [];
         if (count($this->imageAll)) {
             foreach ($this->imageAll as $key => $image) {
-                foreach ($image->labels as  $label) {
-                    if($label->pivot->label_id==$arr->id){
+                foreach ($image->labels as $label) {
+                    if ($label->pivot->label_id == $arr->id) {
                         $img[] = $image->path . $image->name;
-                    }    
+                    }
                 }
-            }   
+            }
         }
 
         return $img;
@@ -281,14 +283,14 @@ class ProductModel extends BaseModel
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
             //$code_num = SpuModel::where("spu", "like", $catalog->code . "%")->get()->count();
-            
+
             //创建spu，,并插入数据
             //$spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num)]);
-            $spuobj = SpuModel::where('product_require_id',$data['require_id'])->get()->first();
-            
+            $spuobj = SpuModel::where('product_require_id', $data['require_id'])->get()->first();
+
             $data['purchase_adminer'] = $spuobj->purchase;
             $data['spu_id'] = $spuobj->id;
-            
+
             $az = array(
                 'A',
                 'B',
@@ -323,30 +325,38 @@ class ProductModel extends BaseModel
                 $data['model'] = $spuobj->spu . $az[$aznum];
                 $data['examine_status'] = 'pending';
                 $product = $this->create($data);
-                
+
                 $data['products_with_battery'] = 0;
                 $data['products_with_adapter'] = 0;
                 $data['products_with_fluid'] = 0;
                 $data['products_with_powder'] = 0;
-                if(array_key_exists('carriage_limit_arr', $data)){
-                    foreach($data['carriage_limit_arr'] as $logistics_limit_id){
+                if (array_key_exists('carriage_limit_arr', $data)) {
+                    foreach ($data['carriage_limit_arr'] as $logistics_limit_id) {
                         $arr['logistics_limits_id'] = $logistics_limit_id;
                         $product->logisticsLimit()->attach($arr);
                     }
                     //回传旧系统
-                    if(in_array('1', $data['carriage_limit_arr']))$data['products_with_battery'] = 1;
-                    if(in_array('4', $data['carriage_limit_arr']))$data['products_with_adapter'] = 1;
-                    if(in_array('5', $data['carriage_limit_arr']))$data['products_with_fluid'] = 1;
-                    if(in_array('2', $data['carriage_limit_arr']))$data['products_with_powder'] = 1;
+                    if (in_array('1', $data['carriage_limit_arr'])) {
+                        $data['products_with_battery'] = 1;
+                    }
+                    if (in_array('4', $data['carriage_limit_arr'])) {
+                        $data['products_with_adapter'] = 1;
+                    }
+                    if (in_array('5', $data['carriage_limit_arr'])) {
+                        $data['products_with_fluid'] = 1;
+                    }
+                    if (in_array('2', $data['carriage_limit_arr'])) {
+                        $data['products_with_powder'] = 1;
+                    }
                 }
 
-                if(array_key_exists('package_limit_arr', $data)){
-                    foreach($data['package_limit_arr'] as $wrap_limits_id){
+                if (array_key_exists('package_limit_arr', $data)) {
+                    foreach ($data['package_limit_arr'] as $wrap_limits_id) {
                         $brr['wrap_limits_id'] = $wrap_limits_id;
                         $product->wrapLimit()->attach($brr);
                     }
                 }
-                
+
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
                 //echo '<pre>';
@@ -416,7 +426,7 @@ class ProductModel extends BaseModel
                 $product->createItem($data);
                 $aznum++;
             }
-            $require_status['status']=3;
+            $require_status['status'] = 3;
             RequireModel::find($data['require_id'])->update($require_status);
         } catch (Exception $e) {
             DB::rollBack();
@@ -433,16 +443,16 @@ class ProductModel extends BaseModel
     {
         $spu_id = $this->spu_id;
         DB::beginTransaction();
-        
-        if(array_key_exists('package_limit_arr', $data)){
-            foreach($data['package_limit_arr'] as $wrap_limits_id){
-                $arr[] = $wrap_limits_id;         
+
+        if (array_key_exists('package_limit_arr', $data)) {
+            foreach ($data['package_limit_arr'] as $wrap_limits_id) {
+                $arr[] = $wrap_limits_id;
             }
             $this->wrapLimit()->sync($arr);
         }
-        if(array_key_exists('carriage_limit_arr', $data)){
-            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
-                $brr[] = $logistics_limits_id;         
+        if (array_key_exists('carriage_limit_arr', $data)) {
+            foreach ($data['carriage_limit_arr'] as $logistics_limits_id) {
+                $brr[] = $logistics_limits_id;
             }
             $this->logisticsLimit()->sync($brr);
         }
@@ -573,7 +583,7 @@ class ProductModel extends BaseModel
             $old_data['products_name_en'] = $itemModel->name;
             $old_data['products_name_cn'] = $itemModel->c_name;
             $old_data['products_sku'] = $itemModel->sku;
-            $old_data['products_sort'] = CatalogModel::find($itemModel->catalog_id)?CatalogModel::find($itemModel->catalog_id)->name:'异常';
+            $old_data['products_sort'] = CatalogModel::find($itemModel->catalog_id) ? CatalogModel::find($itemModel->catalog_id)->name : '异常';
             $old_data['products_declared_en'] = $itemModel->product->declared_en;
             $old_data['products_declared_cn'] = $itemModel->product->declared_cn;
             $old_data['products_value'] = $itemModel->purchase_price;
@@ -594,13 +604,13 @@ class ProductModel extends BaseModel
             $old_data['type'] = 'add';
             $old_data['products_title'] = '';
             //回传老系统
-            $url="http://120.24.100.157:60/api/products.php";
-            $c = curl_init(); 
-            curl_setopt($c, CURLOPT_URL, $url); 
+            $url = "http://120.24.100.157:60/api/products.php";
+            $c = curl_init();
+            curl_setopt($c, CURLOPT_URL, $url);
             curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
             curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
+            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60);
             $buf = curl_exec($c);
         }
 
@@ -689,31 +699,32 @@ class ProductModel extends BaseModel
      * @param array data 修改的信息
      */
     public function updateMulti($data)
-    {   
+    {
         foreach ($data['info'] as $channel_id => $language) {
             $arr = [];
             $pre = $language['language'];
             foreach ($language as $prefix => $value) {
-                $arr[$pre."_".$prefix] = $value;
+                $arr[$pre . "_" . $prefix] = $value;
             }
             //print_r($arr);
             //exit;
             $model = $this->productMultiOption->where("channel_id", (int)$channel_id)->first();
-            if($model){
+            if ($model) {
                 $model->update($arr);
             }
-           
+
         }
         //
     }
 
-    public function tagRevert($data){
-        foreach($data as $key=>$_data){
+    public function tagRevert($data)
+    {
+        foreach ($data as $key => $_data) {
             switch ($_data) {
                 case 'photo':
                     $data[$key] = 1;
                     break;
-                
+
                 case 'link':
                     $data[$key] = 2;
                     break;
@@ -744,35 +755,33 @@ class ProductModel extends BaseModel
             }
         }
         return $data;
-    }  
+    }
 
-    public function oneSku(){
+    public function oneSku()
+    {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        //$imageModel = new ImageModel();
-        //$model = $this->all();
-        $model = $this->where('id','>','20035')->get();
-        foreach($model as $_item){
-            $sku = $_item->item[0]->sku;
-            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
-            //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
-            $contents = json_decode(file_get_contents($url));
-            if(count($contents)){
-                foreach ($contents as $image) {
-                    $data['spu_id'] = $_item->item[0]->product->spu_id;
-                    $data['product_id'] = $_item->item[0]->product_id;
-                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' ;
-                    $data['name'] = $image->filename;
-                    $arr = (array)$image->fileId;
-                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id='.$arr['$id'];
-                    $disk = Storage::disk('product');
-                    Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($image_url));
-                    $imageModel = ImageModel::create($data);
-                    $tags = $image->tags;
-                    $tags = $this->tagRevert($tags);
-                    $imageModel->labels()->attach($tags);
-                }
+        $sku = $this->item[0]->sku;
+        $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=' . $sku;
+        //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
+        $contents = json_decode(file_get_contents($url));
+        if (count($contents)) {
+            foreach ($contents as $image) {
+                $data['spu_id'] = $this->item[0]->product->spu_id;
+                $data['product_id'] = $this->item[0]->product_id;
+                $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/';
+                $data['name'] = $image->filename;
+                $arr = (array)$image->fileId;
+                $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id=' . $arr['$id'];
+                $disk = Storage::disk('product');
+                Storage::disk('product')->put($data['path'] . $data['name'], file_get_contents($image_url));
+                $imageModel = ImageModel::create($data);
+                $tags = $image->tags;
+                $tags = $this->tagRevert($tags);
+                $imageModel->labels()->attach($tags);
             }
+            return true;
         }
+        return false;
     }
 }

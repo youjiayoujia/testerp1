@@ -98,7 +98,8 @@ return [
         'PlaceLogistics' => '物流下单',
         'SendMessages' => '发送邮件',
         'MatchPaypal'=>'匹配Paypal',
-        'ReturnTrack'=>'物流回传'
+        'ReturnTrack'=>'物流回传',
+        'ImportImages'=>'图片导入',
     ]
 
 ];

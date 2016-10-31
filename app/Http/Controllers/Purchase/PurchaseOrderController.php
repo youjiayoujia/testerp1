@@ -27,6 +27,7 @@ use App\Models\PackageModel;
 use App\Jobs\AssignStocks;
 use Excel;
 use Tool;
+use DB;
 use App\Jobs\Job;
 use Mail;
 use App\Models\StockModel;
@@ -829,8 +830,13 @@ class PurchaseOrderController extends Controller
                     $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty - $purchaseItemModel->unqualified_qty;
                 }
             }
+
+            //缺货
+            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //虚库存
-            $xu_kucun = $itemModel->available_quantity;
+            $xu_kucun = $itemModel->available_quantity-$data['need_total_num'];
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])

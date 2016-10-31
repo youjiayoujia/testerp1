@@ -29,6 +29,7 @@ use Excel;
 use Tool;
 use App\Jobs\Job;
 use Mail;
+use App\Models\StockModel;
 
 class PurchaseOrderController extends Controller
 {
@@ -645,14 +646,14 @@ class PurchaseOrderController extends Controller
         if (!$purchase_order) {
             return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
         }
-        foreach($purchase_order->purchaseItem as $purchase_item){
+        /*foreach($purchase_order->purchaseItem as $purchase_item){
             if(!$purchase_item->productItem->warehousePosition){
                 return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请先添加库位.'));
             }
             if(!$purchase_item->productItem->warehousePosition->name){
                 return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请先添加库位.'));
             }
-        }
+        }*/
         $response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
@@ -670,14 +671,17 @@ class PurchaseOrderController extends Controller
         $p_id = request()->input("p_id");
         $data = substr($data, 0,strlen($data)-1);
         $arr = explode(',', $data);
+        $global = 1;
         if($data){
             foreach ($arr as $value) {
                 $update_data = explode(':', $value);
                 $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
                 $purchase_item = $arrivel_log->purchaseItem;
+                $warehousePosition = StockModel::where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->where('item_id',$purchase_item->item_id)->get()->first();
                 
-                if($purchase_item->item->warehouse_position==''){
-                    return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请添加库位后重新入库.'));
+                if(!$warehousePosition){ 
+                    $purchase_item->update(['status'=>'6']);
+                    $global = 0;
                 }else{
                     $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
                     $filed['bad_num'] =  $filed['good_num'];
@@ -693,7 +697,7 @@ class PurchaseOrderController extends Controller
                     }
                     
                     $purchase_item->update($datas);
-                    $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
+                    $purchase_item->item->in($warehousePosition->warehouse_position_id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
                     
                 } 
                 //need包裹分配库存
@@ -709,14 +713,17 @@ class PurchaseOrderController extends Controller
                 }       
             }
         } 
-        $p_status = 4;
-        $purchasrOrder = $this->model->find($p_id);
-        foreach($purchasrOrder->purchaseItem as $p_item){
-            if($p_item->status!=4){
-                $p_status = 3;
+        if($global){
+            $p_status = 4;
+            $purchasrOrder = $this->model->find($p_id);
+            foreach($purchasrOrder->purchaseItem as $p_item){
+                if($p_item->status!=4){
+                    $p_status = 3;
+                }
             }
+            $purchasrOrder->update(['status'=>$p_status]);
         }
-        $purchasrOrder->update(['status'=>$p_status]);
+        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];

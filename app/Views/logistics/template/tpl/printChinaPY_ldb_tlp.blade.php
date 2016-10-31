@@ -32,7 +32,7 @@
    <div class="main" style="margin-left:5px;">
 		<table cellspacing="0" cellpadding="0" style="width:98mm;height:95mm;">
 			<tr style="height:35px;text-align:center;">
-				<td style="width:35mm;text-align:center;"><img src="{{ asset('picture/post_logo.jp') }}" style="height:35px;"/></td>
+				<td style="width:35mm;text-align:center;"><img src="{{ asset('picture/post_logo.jpg') }}" style="height:35px;"/></td>
 				<td style="width:20mm;">Small Packet<br/>BY AIR</td>
 				<td style="width:13mm;font-weight:bold;font-size:16px;">
 				    {{ $model->country ? $model->country->code : '' }}

@@ -27,7 +27,7 @@ use App\Modules\Logistics\Adapter\YuntuAdapter;
 use App\Modules\Logistics\Adapter\kuaiyouAdapter;
 use App\Modules\Logistics\Adapter\MalaixiyaAdapter;
 use App\Modules\Logistics\Adapter\DiouAdapter;
-
+use App\Modules\Logistics\Adapter\SzPostXBAdapter;
 
 
 
@@ -170,5 +170,8 @@ class LogisticsModule
     {
         return new DiouAdapter($config);
     }
-
+    
+    public function createSzPostXBDriver($config){
+        return new SzPostXBAdapter($config);
+    }
 }

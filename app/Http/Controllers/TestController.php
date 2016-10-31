@@ -79,9 +79,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $item = ItemModel::find('72');
-        var_dump($item->logistics_limit);exit;
-
+        $package = PackageModel::where('status', 'ERROR')->count();
+        var_dump($package->toarray());
     }
 
     // public function test2()

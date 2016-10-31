@@ -54,7 +54,7 @@
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                                 <td class='col-lg-3'>
                                     @foreach($packageitem->item->product->wrapLimit as $limit)  
-                                        {{ $limit->name }} . ' '
+                                        {{ $limit->name }}
                                     @endforeach
                                 </td>
                                 <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
@@ -100,7 +100,11 @@
                                 <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
                                 @endif
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
-                                <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>
+                                <td class='col-lg-3'>
+                                    @foreach($packageitem->item->product->wrapLimit as $limit)  
+                                        {{ $limit->name }}
+                                    @endforeach
+                                </td>
                                 <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
                                 <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
                                 @if($key == '0')

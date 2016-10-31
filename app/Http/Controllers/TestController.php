@@ -64,6 +64,8 @@ use Illuminate\Support\Facades\Storage;
 
 use BarcodeGen;
 
+use App\Models\ProductModel;
+
 class TestController extends Controller
 {
     private $itemModel;
@@ -77,10 +79,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::with('order')->with('items')->get();
-        
-
-        var_dump($package->toarray());exit;
+        $package = PackageModel::where('status', 'ERROR')->count();
+        var_dump($package->toarray());
     }
 
     // public function test2()
@@ -747,7 +747,7 @@ class TestController extends Controller
         $url = 'jiangdi.zserp.com/api/SyncSellmoreData';
         $data = [
             'secretKey'               => 'VSxtAts2fQlTLc1KCLaM',
-            'type'                   => 'add',
+            'type'                   => 'update',
             //'id'                     => 30000,
             'suppliers_id'           => 40110,
             'suppliers_company'      => '',

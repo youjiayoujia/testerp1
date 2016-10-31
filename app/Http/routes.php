@@ -1049,6 +1049,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('spu', 'SpuController');
     //接口路由
     Route::resource('syncApi','SyncApiController');
+    Route::resource('importSyncApi','SyncSellmoreDataController');
 });
 
 

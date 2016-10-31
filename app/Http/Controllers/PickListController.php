@@ -461,7 +461,7 @@ class PickListController extends Controller
         $sum = 0;
         foreach($picklist->package as $package)
         {
-            if($package->status != 'PACKED') {
+            if(!in_array($package->status, ['PACKED', 'SHIPPED'])) {
                 $package->status = 'ERROR';
                 $package->save();
                 foreach($package->items as $packageItem) {

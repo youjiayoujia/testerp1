@@ -84,9 +84,11 @@
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
-                {{--<a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>--}}
-                    {{--<span class="glyphicon glyphicon-random"></span>--}}
-                {{--</a>--}}
+                @if($package->status == 'ASSIGNED' || $package->status == 'TRACKINGFAILED')
+                <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
+                    <span class="glyphicon glyphicon-random"></span>
+                </a>
+                @endif
                 <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>
@@ -216,6 +218,7 @@
         $('.change_logistics').select2();
 
         $(document).on('click', '.sku_search', function () {
+            $('.buf').html('');
             sku = $.trim($(this).text());
             if (sku) {
                 $.get(

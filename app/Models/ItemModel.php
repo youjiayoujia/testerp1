@@ -613,17 +613,22 @@ class ItemModel extends BaseModel
                     }
                 }
             }
+            //缺货
+            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
+            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+
             $data['zaitu_num'] = $zaitu_num;
             //实库存
             $data['all_quantity'] = $item->all_quantity;
             //可用库存
             $data['available_quantity'] = $item->available_quantity;
             //虚库存
-            $quantity = $requireModel->where('is_require', 1)->where('item_id',
+            /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
                 $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',
-                $item->id)->sum('quantity') : 0;
+                $item->id)->sum('quantity') : 0;*/
             //$xu_kucun = $data['all_quantity'] - $quantity;
-            $xu_kucun = $item->available_quantity;
+            $xu_kucun = $item->available_quantity-$data['need_total_num'];
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
@@ -707,9 +712,7 @@ class ItemModel extends BaseModel
 
             }
 
-            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
-            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+            
 
             $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
             //退款率

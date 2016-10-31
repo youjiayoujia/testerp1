@@ -108,6 +108,7 @@ class SmtAdapter extends BasicAdapter
                 }
             }
         }
+
         if(false === $flag){
             return array('code' => 'error','result' => 'The order does not support this channel');
         }
@@ -126,8 +127,8 @@ class SmtAdapter extends BasicAdapter
             'productNum'           => $productNum,
             'productWeight'        => $package->total_weight,
             'isContainsBattery'    => $package->is_battery ? 1 : 0,
-            'isAneroidMarkup'      => 0,
-            'isOnlyBattery'        => 0,
+            /*'isAneroidMarkup'      => 0,
+            'isOnlyBattery'        => 0,*/
         );
         
         $addressArray = array(
@@ -160,15 +161,12 @@ class SmtAdapter extends BasicAdapter
         $addressArray = array_merge($addressArray, $this->_senderAddress['5']);      
         $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
         $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
-
-        $data['declareProductDTOs']         = json_encode($productData);
-        $data['addressDTOs']                = json_encode($addressArray);
-
+      
+        $data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
+        $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);
         $api = 'api.createWarehouseOrder';  
         $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
         $result = json_decode($rs,true);
-        dd($data);
-
         if(array_key_exists('success', $result)){
             if ($result['result']['success']){
                 if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取

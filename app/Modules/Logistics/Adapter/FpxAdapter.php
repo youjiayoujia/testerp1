@@ -17,7 +17,7 @@ class FpxAdapter extends BasicAdapter{
                 "unitPrice" => $unitPrice,                      //单价  
             ));   
         }
-        list($name,$productCode) =  explode(',',$package->logistics->logistics_code);
+        list($name,$productCode) =  explode(',',$package->logistics->type);
         $arrs = array(    
             "city" => $package->shipping_city,//城市 【***】
             "consigneeEmail" => $package->order->email,//收件人Email

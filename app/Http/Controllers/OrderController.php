@@ -146,6 +146,7 @@ class OrderController extends Controller
      */
     public function index()
     {
+        // var_dump(request('mixedSearchFields'));exit;
         request()->flash();
         $sx = request()->input('sx');
         $lr = request()->input('lr');

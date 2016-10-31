@@ -267,10 +267,10 @@ class OrderModel extends BaseModel
                 'time' => ['created_at']
             ],
             'relatedSearchFields' => [
+                'country' => ['code'],
                 'items' => ['item' => ['status' => config('item.status')]],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
-                'country' => ['code'],
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [

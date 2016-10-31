@@ -24,7 +24,7 @@
                         <form action="" method="get">
                             <div class="col-lg-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="{{ isset($data) ? (count($data) ? $data->first()->showSearch() : '') : '' }}"/>
+                                    <input type="text" class="form-control" name="keywords" value="{{ request()->has('keywords') ? request('keywords') : '' }}" placeholder="{{ isset($data) ? (count($data) ? $data->first()->showSearch() : '') : '' }}"/>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="submit">
                                             <i class="glyphicon glyphicon-search"></i>

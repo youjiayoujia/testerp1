@@ -14,6 +14,6 @@ class AmaLogisticsModel extends SellMoreModel
 
     public function logistics()
     {
-        return $this->hasOne('App\Models\Sellmore\ShipmentModel', '')
+        return $this->hasOne('App\Models\Sellmore\ShipmentModel', '');
     }
 }

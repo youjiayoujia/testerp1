@@ -65,7 +65,7 @@
                                                     @foreach($value1 as $relation_ship2 => $value2)
                                                         @foreach($value2 as $key => $name)
                                                             <div class="col-lg-2 form-group searchItem">
-                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
+                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" value="{{ old('mixedSearchFields[$type][$relation_ship1][$relation_ship2][$name]')}}" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
                                                     @endforeach

@@ -517,7 +517,9 @@ class PackageModel extends BaseModel
                             $require['quantity'] = $item->quantity;
                             $this->requires()->create($require);
                         }
-                        $this->update(['status' => 'NEED', 'warehouse_id' => $this->items->first()->item->warehouse_id]);
+                        //todo v3测试，正式上线删除
+                        $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
+                        $this->update(['status' => 'NEED', 'warehouse_id' => $warehouse_id]);
                         $this->order->update(['status' => 'NEED']);
                         return true;
                     }
@@ -531,7 +533,9 @@ class PackageModel extends BaseModel
                         $require['quantity'] = $item->quantity;
                         $this->requires()->create($require);
                     }
-                    $this->update(['status' => 'NEED', 'warehouse_id' => $this->items->first()->item->warehouse_id]);
+                    //todo v3测试，正式上线删除
+                    $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
+                    $this->update(['status' => 'NEED', 'warehouse_id' => $warehouse_id]);
                     $this->order->update(['status' => 'NEED']);
                     return true;
                 }
@@ -1203,7 +1207,9 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //物流查询链接
-                $trackingUrl = $rule->logistics->url;
+                $logistics = $rule->logistics;
+                $object = $logistics->logisticsChannels->where('channel_id', $this->channel_id)->first();
+                $trackingUrl = $object ? $object->url : '';
                 $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
                 return $this->update([
                     'status' => 'ASSIGNED',

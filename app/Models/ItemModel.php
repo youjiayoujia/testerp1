@@ -126,6 +126,20 @@ class ItemModel extends BaseModel
         return $this->belongsToMany('App\Models\Product\SupplierModel', 'item_prepare_suppliers', 'item_id','supplier_id')->withTimestamps();
     }
 
+    public function getLogisticsLimitAttribute()
+    {
+        $product = $this->product;
+        $limits = $product->logisticsLimit;
+        $str = '';
+        if(!empty($limits)) {
+            foreach($limits as $limit) {
+                $str .= $limit->name . ' ';
+            }
+        }
+
+        return $str;
+    }
+
     public function updateItem($data)
     {
         $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',', $data['carriage_limit_arr']);

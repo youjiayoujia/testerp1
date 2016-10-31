@@ -249,7 +249,7 @@ class SpuModel extends BaseModel
         set_time_limit(0);
         ini_set('memory_limit', '1024M');
         //$model = $this->all();
-        $model = ItemModel::all();
+        $model = ItemModel::where('id','>','49976')->get();
         //$erp_products_data_arr = DB::select('select distinct products_sku,spu,model,products_warring_string from erp_products_data where spu!=""');
         foreach($model as $itemModel){
             //print_r($itemModel->sku);exit;
@@ -276,8 +276,8 @@ class SpuModel extends BaseModel
                 //$productData['purchase_day'] = $value['10'];
                 //$productData['product_sale_url'] = $value['11'];
                 $productData['notify'] = $erp_data->products_warring_string;
-                $productData['declared_en'] = $erp_data->products_declared_en;
-                $productData['declared_cn'] = $erp_data->products_declared_cn;
+                $productData['declared_en'] = $erp_data->products_declared_en?$erp_data->products_declared_en:'';
+                $productData['declared_cn'] = $erp_data->products_declared_cn?$erp_data->products_declared_cn:'';
                 //采购价
                 $productData['purchase_price'] = $itemModel->purchase_price;
                 $productData['warehouse_id'] = $itemModel->warehouse_id;   
@@ -296,8 +296,10 @@ class SpuModel extends BaseModel
                     $product_id = $productModel->id;
                 }
                 $itemModel->update(['product_id'=>$product_id]);
+            }else{
+                $itemModel->update(['product_id'=>0]);
             }
-            $itemModel->update(['product_id'=>0]);
+            
         }     
     }
 

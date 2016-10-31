@@ -95,10 +95,11 @@ class SmtAdapter extends BasicAdapter
         $warehouseId = $package->warehouse_id; //仓库
         $shipId = $package->logistics_id; //物流
         $channel_account_id = $package->channel_account_id;
-        list($name, $channel) = explode(',',$package->logistics->type);        
+        list($name, $channel) = explode(',',$package->logistics->type);       
         //获取渠道帐号资料
         $account = AccountModel::findOrFail($channel_account_id);
-        $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+        $smtApi = Channel::driver($account->channel->driver, $account->api_config);        
+        
         $qd_result = $smtApi->getOnlineLogisticsServiceListByOrderId($orderId);
         if(array_key_exists('success',$qd_result) && $qd_result['success']){
             foreach($qd_result['result'] as $address){
@@ -166,7 +167,7 @@ class SmtAdapter extends BasicAdapter
         $api = 'api.createWarehouseOrder';  
         $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
         $result = json_decode($rs,true);
-
+        dd($data);
 
         if(array_key_exists('success', $result)){
             if ($result['result']['success']){

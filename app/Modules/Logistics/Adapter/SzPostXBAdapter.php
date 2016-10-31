@@ -1,7 +1,7 @@
 <?php
 namespace App\Modules\Logistics\Adapter;
 
-class szPostXBAdapter extends BasicAdapter
+class SzPostXBAdapter extends BasicAdapter
 {
     public function __construct($config){
         $this->ShipServerUrl = $config['url'];
@@ -38,6 +38,17 @@ class szPostXBAdapter extends BasicAdapter
         
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);
+        if($result['return_success'] == 'true'){
+            $barCodeList = $result['barCodeList'];
+            foreach($barCodeList as $v){
+                $shipcode = $v['bar_code'];
+                return array('code' => 'success', 'result' => $shipcode);
+            }
+        }else{
+            return array('code' => 'error','result' => 'error description.');
+        }
+            
+        
     }
     
     public function postCurlHttpsData($url, $data) { // 模拟提交数据函数
@@ -47,8 +58,8 @@ class szPostXBAdapter extends BasicAdapter
     
         $curl = curl_init (); // 启动一个CURL会话
         curl_setopt ( $curl, CURLOPT_URL, $url ); // 要访问的地址
-        curl_setopt ( $curl, CURLOPT_SSL_VERIFYPEER, 0 ); // 对认证证书来源的检查
-        curl_setopt ( $curl, CURLOPT_SSL_VERIFYHOST, 1 ); // 从证书中检查SSL加密算法是否存在
+        //curl_setopt ( $curl, CURLOPT_SSL_VERIFYPEER, 0 ); // 对认证证书来源的检查
+        //curl_setopt ( $curl, CURLOPT_SSL_VERIFYHOST, 1 ); // 从证书中检查SSL加密算法是否存在
         //curl_setopt ( $curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT'] ); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt ( $curl, CURLOPT_FOLLOWLOCATION, 1 ); // 使用自动跳转

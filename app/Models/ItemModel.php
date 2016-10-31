@@ -928,6 +928,26 @@ class ItemModel extends BaseModel
         }
     }
 
+    public function updateWeight()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $model = $this->all();
+        
+        foreach ($model as $key => $itemModel) {
+            $old_data = [];
+            $erp_products_data = DB::select('select products_weight
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            //print_r(count($erp_products_data));exit;
+            if(count($erp_products_data)){
+                $old_data['weight'] = $erp_products_data[0]->products_weight;
+                //print_r($old_data);exit;
+                $itemModel->update($old_data);
+            }
+            
+        }
+    }
+
     public function insertWarehousePosition()
     {
         ini_set('memory_limit', '2048M');

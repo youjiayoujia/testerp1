@@ -932,7 +932,7 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        $model = $this->all();
+        $model = $this->where('weight',null)->get();
         
         foreach ($model as $key => $itemModel) {
             $old_data = [];

@@ -204,7 +204,7 @@ text-align: left;
                 <label for="keyword" class="right"><span class="red">*</span>关键字:</label>
             </div>
             <div class="col-sm-10">		
-                <input type="text" class="form-control" name="keyword" placeholder="关键字,3个关键字加起来不能超过255个字符"  nullmsg="关键字不能为空" value="<?php echo $draft_detail ? $draft_detail['keyword'] : '';?>">		    
+                <input type="text" class="form-control" name="keyword" placeholder="关键字,3个关键字加起来不能超过255个字符"  value="<?php echo $draft_detail ? $draft_detail['keyword'] : '';?>">		    
 			</div>
         </div>
         <div class="row">

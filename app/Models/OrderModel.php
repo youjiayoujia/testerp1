@@ -635,6 +635,7 @@ class OrderModel extends BaseModel
                     $newPackageItem = $package->items()->create($packageItem);
                 }
             }
+            $package->update(['weight' => $package->total_weight]);
         }
 
         return $package;

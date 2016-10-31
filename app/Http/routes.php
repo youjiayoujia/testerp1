@@ -20,6 +20,7 @@ Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
 Route::post('api/curlApiChangeWarehousePositon', ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
 Route::any('api/skuHandleApi', ['uses' => 'ItemController@skuHandleApi', 'as' => 'item.skuHandleApi']);
+Route::any('api/SyncSellmoreData', ['uses' => 'SyncSellmoreDataController@SyncSuppliersFromSell', 'as' => 'SyncSellmoreData']);
 Route::any('api/skuSupplierApi', ['uses' => 'ItemController@skuSupplierApi', 'as' => 'item.skuSupplierApi']);
 
 // Authentication routes...
@@ -1048,6 +1049,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('spu', 'SpuController');
     //接口路由
     Route::resource('syncApi','SyncApiController');
+    Route::resource('importSyncApi','SyncSellmoreDataController');
 });
 
 

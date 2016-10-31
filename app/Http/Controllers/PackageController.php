@@ -48,7 +48,7 @@ class PackageController extends Controller
     {
         $len = 1000;
         $start = 0;
-        $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
+        $packages = $this->model->whereIn('status', ['NEED', 'NEW'])->skip($start)->take($len)->get();
         $name = UserModel::find(request()->user()->id)->name;
         while ($packages->count()) {
             foreach ($packages as $package) {
@@ -99,7 +99,7 @@ class PackageController extends Controller
         $logisticses = LogisticsModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList(!empty($buf) ? $buf : $this->model->with('order')->with('warehouse')->with('logistics')->with('items')->with('channel')->with('picklist')),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
         ];
@@ -111,9 +111,9 @@ class PackageController extends Controller
     {
         $arr = request('arr');
         $buf = [];
-        foreach($arr as $id) {
+        foreach ($arr as $id) {
             $package = $this->model->find($id);
-            if(!$package) {
+            if (!$package) {
                 $buf[] = '虚拟匹配未匹配到';
                 continue;
             }
@@ -1028,7 +1028,7 @@ class PackageController extends Controller
     public function shipping()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, '出库复检'),
             'logistics' => LogisticsModel::all(),
         ];
 

@@ -6,19 +6,19 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>订单平台</th>
-                <th>待发货数量(不欠货/不能拣货)</th>
-                <th>发货中数量(不欠货/可以拣货)</th>
-                <th>已发货数量</th>
-                <th><font color='red'>拣货中(3天以上不欠货)</font></th>
-                <th><font color='red'>拣货中(最近3天)</font></th>
-                <th>当日已发货</th>
-                <th>欠货</th>
-                <th>昨日销售额</th>
-                <th>当月销售额</th>
-                <th>目标完成率</th>
-                <th>时间进度</th>
-                <th>日均销售额</th>
+                <td>订单平台</td>
+                <td>待发货数量(不欠货/不能拣货)</td>
+                <td>发货中数量(不欠货/可以拣货)</td>
+                <td>已发货数量</td>
+                <td><font color='red'>拣货中(3天以上不欠货)</font></td>
+                <td><font color='red'>拣货中(最近3天)</font></td>
+                <td>当日已发货</td>
+                <td>欠货</td>
+                <td>昨日销售额</td>
+                <td>当月销售额</td>
+                <td>目标完成率</td>
+                <td>时间进度</td>
+                <td>日均销售额</td>
             </tr>
             </thead>
             <tbody>

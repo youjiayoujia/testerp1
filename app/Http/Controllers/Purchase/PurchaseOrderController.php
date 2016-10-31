@@ -606,7 +606,7 @@ class PurchaseOrderController extends Controller
                     $filed['arrival_num'] = $update_data[1];
                     PurchaseItemArrivalLogModel::create($filed);
                 }
-                
+                $purchase_item->purchaseOrder->update(['status'=>2]);   
             } 
         }else{
             $purchaseOrderModel = $this->model->find($p_id);
@@ -772,13 +772,22 @@ class PurchaseOrderController extends Controller
         switch ($type) {
             case 'examineStatus':
                 foreach($arr as $id){
-                    $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+                    $purchaseOrder = $this->model->find($id);
+                    $purchaseOrder->update(['examineStatus'=>1,'status'=>1]);
+                    foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
+                        $purchaseitemModel->update(['status'=>1]);
+                    }
                 }
                 break;
             
             case 'write_off':
                 foreach($arr as $id){
-                    $this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+                    //$this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+                    $purchaseOrder = $this->model->find($id);
+                    $purchaseOrder->update(['write_off'=>1,'status'=>4]);
+                    foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
+                        $purchaseitemModel->update(['status'=>4]);
+                    }
                 }
                 break;
             case 'close_status':

@@ -185,7 +185,7 @@
                             return false;
                         }
                         if (result == "success") {
-                            $('.holder').html('<img src="{{ asset('image/right.jpg') }}"/>');
+                            $('.holder').html('<img src="{{ asset('image/right.jpg') }}"/> width="50%"');
                             $('.holder_weight').text('重量保存成功');
                             $('.trackno').val('');
                             $('.weight').val('');

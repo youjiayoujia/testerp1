@@ -20,6 +20,7 @@ use App\Models\Pick\ErrorListModel;
 use App\Models\ItemModel;
 use DB;
 use App\Models\UserModel;
+use Exception;
 
 class PickListController extends Controller
 {
@@ -554,10 +555,13 @@ class PickListController extends Controller
                 DB::beginTransaction();
                 try {
                     foreach($package->items as $packageItem) {
-                        $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                        $flag = $packageItem->item->holdout($packageItem->warehouse_position_id,
                                                     $packageItem->quantity,
                                                     'PACKAGE',
                                                     $packageItem->id);
+                        if(!$flag) {
+                            throw new Exception('包裹出库库存有问题');
+                        }
                         $packageItem->orderItem->update(['status' => 'SHIPPED']);
                     }
                 } catch (Exception $e) {

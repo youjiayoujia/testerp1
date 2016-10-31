@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\ProductModel;
+use App\Models\Log\QueueModel;
 use App\Jobs\ImportImages;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
@@ -15,7 +16,7 @@ class ProductImage extends Command
      *
      * @var string
      */
-    protected $signature = 'image:create';
+    protected $signature = 'image:create {type}';
 
     /**
      * The console command description.
@@ -39,13 +40,29 @@ class ProductImage extends Command
      *
      * @return mixed
      */
-    public function handle(ProductModel $product)
+    public function handle(ProductModel $product, QueueModel $queueModel)
     {
         ini_set('memory_limit', '2048M');
-        foreach ($product->all() as $model) {
-            $job = new ImportImages($model);
-            $job = $job->onQueue('importImages');
-            $this->dispatch($job);
+        if ($this->argument('type') == 'fail') {
+            $queues = $queueModel
+                ->where('queue', '=', 'ImportImages')
+                ->where('result', '=', 'fail')
+                ->get();
+            foreach ($queues as $queue) {
+                $model = $product->find($queue->relation_id);
+                if ($model) {
+                    $job = new ImportImages($model);
+                    $job = $job->onQueue('importImages');
+                    $this->dispatch($job);
+                }
+                $queue->forceDelete();
+            }
+        } else {
+            foreach ($product->all() as $model) {
+                $job = new ImportImages($model);
+                $job = $job->onQueue('importImages');
+                $this->dispatch($job);
+            }
         }
     }
 }

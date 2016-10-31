@@ -297,7 +297,7 @@ class SpuModel extends BaseModel
                 }
                 $itemModel->update(['product_id'=>$product_id]);
             }
-            $itemModel->update(['product_id'=>0]);exit;
+            $itemModel->update(['product_id'=>0]);
         }     
     }
 

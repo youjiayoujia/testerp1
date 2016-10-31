@@ -765,7 +765,8 @@ class ProductModel extends BaseModel
         $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=' . $sku;
         //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
         $contents = json_decode(file_get_contents($url));
-        if (count($contents)) {
+        if (is_array($contents)) {
+            $i = 0;
             foreach ($contents as $image) {
                 $data['spu_id'] = $this->item[0]->product->spu_id;
                 $data['product_id'] = $this->item[0]->product_id;
@@ -773,14 +774,19 @@ class ProductModel extends BaseModel
                 $data['name'] = $image->filename;
                 $arr = (array)$image->fileId;
                 $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id=' . $arr['$id'];
-                $disk = Storage::disk('product');
-                Storage::disk('product')->put($data['path'] . $data['name'], file_get_contents($image_url));
-                $imageModel = ImageModel::create($data);
-                $tags = $image->tags;
-                $tags = $this->tagRevert($tags);
-                $imageModel->labels()->attach($tags);
+                if (Storage::disk('product')->put($data['path'] . $data['name'], file_get_contents($image_url))) {
+                    $imageModel = ImageModel::create($data);
+                    if ($imageModel) {
+                        $tags = $image->tags;
+                        $tags = $this->tagRevert($tags);
+                        $imageModel->labels()->attach($tags);
+                        $i++;
+                    }
+                }
             }
-            return true;
+            if ($i == count($contents)) {
+                return true;
+            }
         }
         return false;
     }

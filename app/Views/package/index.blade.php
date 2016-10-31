@@ -216,6 +216,7 @@
         $('.change_logistics').select2();
 
         $(document).on('click', '.sku_search', function () {
+            $('.buf').html('');
             sku = $.trim($(this).text());
             if (sku) {
                 $.get(

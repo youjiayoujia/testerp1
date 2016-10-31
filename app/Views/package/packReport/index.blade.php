@@ -12,17 +12,17 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>姓名</th>
-                <th>仓库</th>
-                <th>昨天发货数</th>
-                <th>今天发货数</th>
-                <th>当月发货数(各类型订单数量)</th>
-                <th>总工时</th>
-                <th>当月平均发货数</th>
-                <th>当月发错货数</th>
-                <th>时间</th>
-                <th>操作</th>
+                <td>ID</td>
+                <td>姓名</td>
+                <td>仓库</td>
+                <td>昨天发货数</td>
+                <td>今天发货数</td>
+                <td>当月发货数(各类型订单数量)</td>
+                <td>总工时</td>
+                <td>当月平均发货数</td>
+                <td>当月发错货数</td>
+                <td>时间</td>
+                <td>操作</td>
             </tr>
             </thead>
             <tbody>

@@ -37,12 +37,12 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>拣货人员</th>
-                <th>拣货组</th>
-                <th>本月总拣货完成数(各类型sku数)</th>
-                <th>漏检sku数</th>
-                <th>今日sku拣货数</th>
-                <th>今日分配拣货单</th>
+                <td>拣货人员</td>
+                <td>拣货组</td>
+                <td>本月总拣货完成数(各类型sku数)</td>
+                <td>漏检sku数</td>
+                <td>今日sku拣货数</td>
+                <td>今日分配拣货单</td>
             </tr>
             </thead>
             <tbody>

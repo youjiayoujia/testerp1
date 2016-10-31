@@ -964,8 +964,11 @@ class PackageController extends Controller
             return json_encode(false);
         }
         $logistics = LogisticsModel::find($logistics_id);
+        $object = $logistics->logisticsChannels->where('channel_id', $model->channel_id)->first();
+        $trackingUrl = $object ? $object->url : '';
+
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
-        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
+        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto, 'tracking_link' => $trackingUrl]);
         $orderRate = $model->order->calculateProfitProcess();
         if ($orderRate > 0) {
             if ($is_auto) {

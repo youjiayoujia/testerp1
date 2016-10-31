@@ -248,10 +248,14 @@ class SpuModel extends BaseModel
     {   
         set_time_limit(0);
         ini_set('memory_limit', '1024M');
-        $erp_products_data_arr = DB::select('select distinct products_sku,spu,model,products_warring_string from erp_products_data where spu!=""');
-        foreach($erp_products_data_arr as $erp_data){
-            $itemModel = ItemModel::where('sku',$erp_data->products_sku)->get()->first();
-            if(count($itemModel)){
+        //$model = $this->all();
+        $model = ItemModel::all();
+        //$erp_products_data_arr = DB::select('select distinct products_sku,spu,model,products_warring_string from erp_products_data where spu!=""');
+        foreach($model as $itemModel){
+            //print_r($itemModel->sku);exit;
+            $erp_data_arr = DB::select('select products_sku,products_declared_en,products_declared_cn,spu,model,products_warring_string from erp_products_data where products_sku="'.$itemModel->sku.'" and spu!=""');
+            if(count($erp_data_arr)){
+                $erp_data = $erp_data_arr[0];
                 $spuData['spu'] = $erp_data->spu;
                 //创建spu
                 if(count(SpuModel::where('spu',$erp_data->spu)->get())){
@@ -272,6 +276,8 @@ class SpuModel extends BaseModel
                 //$productData['purchase_day'] = $value['10'];
                 //$productData['product_sale_url'] = $value['11'];
                 $productData['notify'] = $erp_data->products_warring_string;
+                $productData['declared_en'] = $erp_data->products_declared_en;
+                $productData['declared_cn'] = $erp_data->products_declared_cn;
                 //采购价
                 $productData['purchase_price'] = $itemModel->purchase_price;
                 $productData['warehouse_id'] = $itemModel->warehouse_id;   
@@ -291,6 +297,7 @@ class SpuModel extends BaseModel
                 }
                 $itemModel->update(['product_id'=>$product_id]);
             }
+            $itemModel->update(['product_id'=>0]);exit;
         }     
     }
 

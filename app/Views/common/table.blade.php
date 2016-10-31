@@ -4,7 +4,6 @@
         <div class="panel-heading">
             <strong>@section('tableTitle') {{ $metas['title'] }} @show{{-- 列表标题 --}}</strong>
         </div>
-
         <div class="modal fade" id="dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -139,7 +138,7 @@
                                         @endforeach
                                         <div class="col-lg-2">
                                             <button class="btn btn-success" type="submit">查询</button>
-                                            <button class="btn btn-default" type="reset">取消</button>
+                                            <a class="btn btn-default" href="{{ request()->url() }}">取消</a>
                                         </div>
                                     </div>
                                 </form>

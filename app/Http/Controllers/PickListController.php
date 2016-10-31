@@ -353,6 +353,9 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        if(!in_array($model->status, ['PICKING', 'INBOXED', 'PACKAGEING'])) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹状态不对不能包装'));
+        }
         if($model->status == 'PICKING') {
             $model->update(['status' => 'PACKAGEING']);
         }

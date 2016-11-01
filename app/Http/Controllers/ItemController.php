@@ -195,7 +195,7 @@ class ItemController extends Controller
         }else{
             $arr = [];
             $brr = [];
-            $data['purchaseAdminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
+            $data['purchase_adminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
             $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['id'];
             $spuModel = SpuModel::create($data);
             $data['spu_id'] = $spuModel->id;

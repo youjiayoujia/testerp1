@@ -179,7 +179,7 @@ class SmtAdapter extends BasicAdapter
                     $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
                     return array('code' => 'success', 'result' => $result['result']['intlTracking'] );
                 }else{
-                    return array('code' => 'success', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
+                    return array('code' => 'again', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
                 }
             } else {
                 return array('code' => 'error', 'result' => 'error description.');

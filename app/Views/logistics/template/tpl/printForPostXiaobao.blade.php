@@ -33,21 +33,19 @@
                                         </td>
                                     </tr>
                                     <tr align="center">
-                                        <td>
-                                            {{ $model->country ? $model->country->code : '' }} *
-                                            <?php
-                                            $country_fenjian  = array(
-                                                    'RU' => 21,'US' => 22,'GB' => 23,'BR' => 24,
-                                                    'AU' => 25,'FR' => 26,'ES' => 27,'CA' => 28,
-                                                    'IL' => 29,'IT' => 30,'DE' => 31,'CL' => 32,
-                                                    'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
-                                                    'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,
-                                            );
-                                                if($model->country){
-                                                    $code = !empty($country_fenjian[$model->country->code]) ? $country_fenjian[$model->country->code] : '';
-                                                    echo $code;
-                                                }
-                                            ?>
+                                        <td style="width:13mm;font-weight:bold;font-size:16px;">
+                                            {{ $model->country ? $model->country->code : '' }}
+                                            @if($model->country)
+                                                @foreach(['RU' => 21,'US' => 22,'GB' => 23,'BR' => 24,
+                                                          'AU' => 25,'FR' => 26,'ES' => 27,'CA' => 28,
+                                                          'IL' => 29,'IT' => 30,'DE' => 31,'CL' => 32,
+                                                          'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
+                                                          'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
+                                                    @if($value[$key] == $model->country->code)
+                                                        {{ $key }}
+                                                    @endif
+                                                @endforeach
+                                            @endif
                                         </td>
                                     </tr>
                                 </table>
@@ -64,15 +62,16 @@
             </tr>
             <tr valign="top" height="22">
                 <td style="border-bottom: 1px solid black;">
-                    <div style="float:left;">协议客户：{{$model->postconfig ? $model->postconfig->consumer_name : ''}}</div>
+                    <div style="float:left;">协议客户：
+                        {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '') : '' }}</div>
                 </td>
             </tr>
             <tr height="56">
                 <td style="border-bottom: 1px solid black;">
                     <table border="0" cellpadding="0" cellspacing="0">
-                        <tr><td width="50" align="right" valign="top"><strong>FROM:&nbsp;</strong></td><td colspan="3" style="white-space: normal; word-break: break-all;">{{$model->getpostconfig ? $model->getpostconfig->consumer_from : ''}}</td></tr>
-                        <tr><td align="right"><strong>ZIP:&nbsp;</strong></td><td width="100">{{$model->getpostconfig ? $model->getpostconfig->consumer_zip : ''}}</td>
-                            <td width="40" align="right"><strong>TEL:&nbsp;</strong></td><td>{{$model->getpostconfig ? $model->getpostconfig->consumer_phone : ''}}</td></tr>
+                        <tr><td width="50" align="right" valign="top"><strong>FROM:&nbsp;</strong></td><td colspan="3" style="white-space: normal; word-break: break-all;">{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}</td></tr>
+                        <tr><td align="right"><strong>ZIP:&nbsp;</strong></td><td width="100">{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->zipcode) : '') : '' }}</td>
+                            <td width="40" align="right"><strong>TEL:&nbsp;</strong></td><td>{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}</td></tr>
                     </table>
                 </td>
             </tr>
@@ -106,10 +105,14 @@
             <span style="margin-left:240px;">{{ round($model->total_price,2) }}</span>
         </div>
         <div style="width: 370px;  bottom:60px; text-align: center; clear:both; border-top:1px solid black; padding-bottom: 2px;">
-            {{$model->getpostconfig ? $model->getpostconfig->consumer_back : ''}}
+
+        </div>
+        <div style="width: 370px;  bottom:60px; text-align: center; clear:both; border-top:1px solid black; padding-bottom: 2px;">
+            退件单位：{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->unit) : '') : '' }}
         </div>
         <div style="width: 370px; height:58px; bottom:0px; text-align: center; clear:both; border-top:1px solid black; padding-top: 2px;">
             <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
+            <span class="fontSize10"><br>{{ $model->tracking_no ? $model->tracking_no : '' }}</span>
         </div>
     </div>
 

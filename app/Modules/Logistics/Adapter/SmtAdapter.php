@@ -171,30 +171,14 @@ class SmtAdapter extends BasicAdapter
         $api = 'api.createWarehouseOrder';  
         $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
         $result = json_decode($rs,true);
-        dd($result);
-        if(array_key_exists('success', $result)){
-            if ($result['result']['success']){
-                if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
-                    $data['channel_listnum'] = $result['result']['intlTracking'];
-                    $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
-                    return array('code' => 'success', 'result' => $result['result']['intlTracking'] );
-                }else{
-                    return array('code' => 'success', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
-=======
-        $data['declareProductDTOs'] = json_encode($productData);
-        $data['addressDTOs'] = json_encode($addressArray);
-        $api = 'api.createWarehouseOrder';
-        $rs = $smtApi->getJsonDataUsePostMethod($api, $data);
-        $result = json_decode($rs, true);
-        if (array_key_exists('success', $result)) {
-            if ($result['result']['success']) {
-                if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
-                    $data['channel_listnum'] = $result['result']['intlTracking'];
-                    $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
-                    return array('code' => 'success', 'result' => $result['result']['intlTracking']);
->>>>>>> df881004e5b3cd3b4242f5de15aaafad77bc8fc8
-                }
-            }
+        if(array_key_exists('success', $result) && $result['result']['success']){           
+            if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
+                $data['channel_listnum'] = $result['result']['intlTracking'];
+                $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
+                return array('code' => 'success', 'result' => $result['result']['intlTracking'] );
+            }else{
+                return array('code' => 'success', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
+            }   
         } else {
             return array('code' => 'error', 'result' => 'error description.');
         }

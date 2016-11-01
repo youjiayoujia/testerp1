@@ -60,13 +60,7 @@
             <td>{{ $item->weight }}kg</td>
             <td>{{ $item->warehouse?$item->warehouse->name:'' }}<br>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
             <td>{{ $item->product?$item->product->declared_en:'' }}<br>{{ $item->product?$item->product->declared_cn:'' }}<br>
-                    $<?php
-                        if($item->product){
-                                if($item->product->declared_value>0){
-                                    echo $item->product->declared_value;
-                                }elseif(($item->purchase_price/6)<1){echo 1;}elseif(($item->purchase_price/6)>25){echo 25;}else{echo round($item->purchase_price/6);}
-                        }
-                    ?>
+                    ${{$item->declared_value}}
             </td>
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>

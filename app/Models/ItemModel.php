@@ -153,6 +153,20 @@ class ItemModel extends BaseModel
         return $this->hasMany('App\Models\StockModel', 'item_id');
     }
 
+    public function getDeclaredValueAttribute()
+    {
+        $purchase_price = $this->purchase_price;
+        if(($purchase_price/6)<1){
+            $value = 1;
+        }elseif(($purchase_price/6)>25){
+            $value = 25;
+        }else{
+            $value = round($purchase_price/6);
+        }
+        
+        return $value;
+    }
+
     public function getImageAttribute()
     {
         if ($this->product->image) {

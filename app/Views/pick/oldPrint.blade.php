@@ -35,8 +35,8 @@ $(document).ready(function(){
         trackno = $('.re_trackno').val();
         if(trackno) {
             $.ajax({
-                url:"{{ route('package.ajaxReturnPackageId')}}",
-                data:{package_id:package_id, trackno:trackno},
+                url:"{{ route('package.ajaxReturnPackageId') }}",
+                data:{trackno:trackno},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
@@ -44,7 +44,7 @@ $(document).ready(function(){
                         alert('对应的物流追踪号无法对应包裹');
                         return false;
                     } else {
-                        $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                        $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+result));
                         $('#barcode').load(function(){
                             $('#barcode')[0].contentWindow.focus();
                             $('#barcode')[0].contentWindow.print();

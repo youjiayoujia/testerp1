@@ -54,7 +54,7 @@ Class YuntuAdapter extends BasicAdapter
 			  "HSCode": "'.trim($item->item->product->model).'",
 			  "Qty": '.$item->quantity.',
 			  "UnitPrice":'.$deValue.',
-			  "UnitWeight": '.$item->item->product->weight.',
+			  "UnitWeight": '.$ordersinfo->weight.',
 			  "PickingName": "'.$declare_name_cn.'",
 			  "Remark":"'.trim($item->item->product->model).'",
 			  "ProductUrl":"www.baidu.com"				  
@@ -157,7 +157,8 @@ Class YuntuAdapter extends BasicAdapter
 			if(isset($data['Item'][0]['OrderId']) && !empty($data['Item'][0]['OrderId'])){
 				return $result = [
 						'code' => 'success',
-						'result' => $data['Item'][0]['WayBillNumber']
+						'result' => $data['Item'][0]['WayBillNumber'],
+						'result_other' => $data['Item'][0]['OrderId']
 				];
 			}else{
 				return $result = [

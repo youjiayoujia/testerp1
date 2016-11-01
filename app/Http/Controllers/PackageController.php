@@ -742,7 +742,7 @@ class PackageController extends Controller
         $buf = request()->input('buf');
         foreach ($buf as $v) {
             $package = $this->model->find($v);
-            $package->update(['status' => 'SHIPPED']);
+            $package->update(['status' => 'SHIPPED', 'shipper_id' => request()->user()->id]);
             DB::beginTransaction();
             try {
                 foreach ($package->items as $packageItem) {

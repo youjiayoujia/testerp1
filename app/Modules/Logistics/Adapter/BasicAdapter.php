@@ -17,6 +17,12 @@ class BasicAdapter
     }
 
     /**
+     *
+     *   code =>['success','error','again']
+     *   result=>'tracking_no'
+     *   result_other =>'logistics_order_number'
+     *
+     *
      * 物流下单
      * @param $package package model
      * @return

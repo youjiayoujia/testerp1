@@ -3,6 +3,7 @@
     <th class="sort" data-field="id">ID</th>
     <th>渠道</th>
     <th>名字</th>
+    <th>回传编码</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -13,6 +14,7 @@
             <td>{{ $channelName->id }}</td>
             <td>{{ $channelName->channel ? $channelName->channel->name : ''}}</td>
             <td>{{ $channelName->name }}</td>
+            <td>{{ $channelName->logistics_key }}</td>
             <td>{{ $channelName->created_at }}</td>
             <td>{{ $channelName->updated_at }}</td>
             <td>

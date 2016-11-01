@@ -127,7 +127,6 @@ class Kernel extends ConsoleKernel
             }
         }
         $schedule->command('pick:report')->hourly();
-        $schedule->command('pick:report')->dailyAt('1:5');
         $schedule->command('all:report')->daily();
         //CRM
         $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');

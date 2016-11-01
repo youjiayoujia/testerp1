@@ -42,7 +42,7 @@
                                                           'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                                                           'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
                                                     @if($value[$key] == $model->country->code)
-                                                        {{ $key }}
+                                                        {{ $key }} {{ $value }}
                                                     @endif
                                                 @endforeach
                                             @endif
@@ -100,9 +100,9 @@
             </tr>
         </table>
         <div style="width:370px;height:30px; font-size:25px;">
-            <span style="font-size:25px;">{{ $model->logistics_id }}</span>
+            <span style="font-size:25px;">{{ $model->shipping ? $model->shipping->logistics_code : '' }}</span>
 
-            <span style="margin-left:240px;">{{ round($model->total_price,2) }}</span>
+            <span style="margin-left:240px;">{{ $model->quantity ? $model->quantity : 0 }}</span>
         </div>
         <div style="width: 370px;  bottom:60px; text-align: center; clear:both; border-top:1px solid black; padding-bottom: 2px;">
 

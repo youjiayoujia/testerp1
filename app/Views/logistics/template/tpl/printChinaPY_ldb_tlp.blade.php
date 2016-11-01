@@ -54,16 +54,17 @@
 			<tr style="height:23mm;" valign="top">
 				<td style="width:35mm;text-align:left;padding:1px;">
 				    <?php 
+				    /*
 				        $backAddress = DB::table('erp_postpacket_config')->whereRaw("FIND_IN_SET($model->logistics_id, shipment_id_string)")->first();			       
 				        $send_street = $backAddress ? $backAddress->consumer_from : '';
 				        $send_mobilePhone = $backAddress ? $backAddress->consumer_phone : '';
-				        $back_address = $backAddress ? $backAddress->consumer_back : '';
+				        $back_address = $backAddress ? $backAddress->consumer_back : '';*/
 				     
 				    ?>
-					From:<br/>
-					
-					 {{ $send_street }}<br/>
-			 		 <b style="font-weight:bold;">Phone:{{ $send_mobilePhone }}
+					From:<br/>					
+					 {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}<br/>
+			 		 <b style="font-weight:bold;">Phone:
+			 		 {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
 				</td>
 				<td colspan="3" style="text-align:left;padding:2px;">
 					{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>
@@ -100,7 +101,7 @@
 				</td>
 			</tr>
 			<tr style="height:5mm;">
-				<td colspan="4" style="text-align:left;">退件单位:{{ $back_address }}</td>
+				<td colspan="4" style="text-align:left;">退件单位: {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->unit) : '') : '' }}</td>
 			</tr>
 			<tr style="height:5mm;line-height:11px;font-size:12px;" >
 				<td colspan="2" >Dcscription of Contents</td>

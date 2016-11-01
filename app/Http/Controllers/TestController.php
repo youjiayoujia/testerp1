@@ -224,6 +224,9 @@ class TestController extends Controller
 
     public function index()
     {
+        $package = PackageModel::find(62);
+        var_dump($package->placeLogistics());
+        exit;
         set_time_limit(0);
         $account = AccountModel::find(28);
         if ($account) {

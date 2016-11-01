@@ -92,9 +92,20 @@ class HoldModel extends BaseModel
         if($this->type == 'MAKE_ACCOUNT')
             return '库存导入';
         if($this->type == 'PACKAGE')
-            return '包裹Item Id:'.$this->relation_id;
+            return '包裹Id:'.($this->packageItem ? ($this->packageItem->package ? $this->packageItem->package->id : '') : '' ).'...'.$this->relation_id;
         if($this->type == 'FBA')
             return '申请表id:'.$this->relation_id;
+    }
+
+    /**
+     * get the relation between the two Model
+     * 
+     *  @return relation
+     *
+     */
+    public function packageItem()
+    {
+        return $this->belongsTo('App\Models\Package\ItemModel', 'relation_id', 'id');
     }
 
     /**

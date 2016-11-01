@@ -80,7 +80,8 @@
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道:  {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单:  {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='7'>
+            <td colspan='2'>运输方式: {{ $package->order->shipping }}</td>
+            <td colspan='5'>
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>

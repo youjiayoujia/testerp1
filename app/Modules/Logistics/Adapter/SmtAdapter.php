@@ -86,7 +86,6 @@ class SmtAdapter extends BasicAdapter
                 }
             }
         }
-
         if(false === $flag){
             return array('code' => 'error','result' => 'The order does not support this channel');
         }
@@ -100,7 +99,7 @@ class SmtAdapter extends BasicAdapter
         $productData = array(
             'categoryCnDesc'       => $package->decleared_cname,
             'categoryEnDesc'       => $package->decleared_ename,
-            'productDeclareAmount' => $package->decleared_value,
+            'productDeclareAmount' => $package->items->declared_value,
             'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,
             'productNum'           => $productNum,
             'productWeight'        => $package->total_weight,
@@ -142,7 +141,7 @@ class SmtAdapter extends BasicAdapter
        
         /*$data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
         $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);*/
-        $data['declareProductDTOs']         = json_encode([$productData]);
+        $data['declareProductDTOs']         = json_encode([$productData]);  //二维数组
         $data['addressDTOs']                = json_encode($addressArray);
        
         $api = 'api.createWarehouseOrder';  
@@ -155,6 +154,8 @@ class SmtAdapter extends BasicAdapter
                     $data['channel_listnum'] = $result['result']['intlTracking'];
                     $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
                     return array('code' => 'success', 'result' => $result['result']['intlTracking'] );
+                }else{
+                    return array('code' => 'success', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
                 }
             }
         }else{

@@ -60,28 +60,6 @@ class SmtAdapter extends BasicAdapter
         )
     );
     public function __construct($config){
-        //寄件人信息
-        $this->_sender = 'HUANGCHAOYUN';
-        $this->_senderZip = '518129';
-        $this->_senderMobile = '18565631099';
-        $this->_senderProvinceCode = '440000';
-        $this->_senderCityCode = '440300';
-        $this->_senderAreaCode = '440307';
-        $this->_senderCompany = ' Salamoer Tech';
-        $this->_senderStreet = 'B3-4 Hekan Industrial Zone, No.41, Wuhe Road South';
-        $this->_senderEmail = 'wuliu@moonarstore.com';
-
-        //揽收人信息
-        $this->_contacter = '黄超云';
-        $this->_zipCode = '518129';
-        $this->_phone = '18565631099';
-        $this->_mobilePhone = '18565631099';
-        $this->_provinceCode = '440000';
-        $this->_cityCode = '440300';
-        $this->_areaCode = '440307';
-        $this->_company = '深圳市萨拉摩尔科技有限公司';
-        $this->_street = '坂田五和大道南41号 和堪工业区B3栋4楼';
-        $this->_email = 'wuliu@moonarstore.com';
     }
     
     
@@ -136,9 +114,9 @@ class SmtAdapter extends BasicAdapter
                 'country'       => $package->shipping_country, //国家简称, 速卖通下单下来应该就是吧
                 'province'      => $package->shipping_state, //省/州,（必填，长度限制1-48字节）
                 'city'          => $package->shipping_city, //城市
-                'streetAddress' => $package->shipping_address . ' ' . $package->shipping_address1, //街道 ,（必填，长度限制1-90字节）
+                'streetAddress' => trim($package->shipping_address . ' ' . $package->shipping_address1), //街道 ,（必填，长度限制1-90字节）
                 'phone'         => $package->shipping_phone, //phone（长度限制1- 54字节）,phone,mobile两者二选一
-                'name'          => $package->shipping_firstname . " " . $package->shipping_lastname, //姓名,（必填，长度限制1-90字节）
+                'name'          => trim($package->shipping_firstname . ' ' . $package->shipping_lastname), //姓名,（必填，长度限制1-90字节）
                 'postcode'      => $package->shipping_zipcode  //邮编
             ),
         );
@@ -158,12 +136,14 @@ class SmtAdapter extends BasicAdapter
         );
         $address_result = $smtApi->getJsonDataUsePostMethod($address_api, $address_smt);
         $address_result = json_decode($address_result, true);
-        $addressArray = array_merge($addressArray, $this->_senderAddress['5']);      
+        $addressArray = array_merge($addressArray, $this->_senderAddress[5]); 
         $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
         $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
-      
-        $data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
-        $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);
+       
+        /*$data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
+        $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);*/
+        $data['declareProductDTOs']         = json_encode($productData);
+        $data['addressDTOs']                = json_encode($addressArray);
         $api = 'api.createWarehouseOrder';  
         $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
         $result = json_decode($rs,true);

@@ -169,8 +169,9 @@ class LogisticsModel extends BaseModel
      */
     public function placeOrder($packageId)
     {
-        $return['status'] = false;
+        $return['status'] = 'error';
         $return['tracking_no'] = '';
+        $return['logistics_order_number'] = '';
         switch ($this->docking) {
             case 'CODE':
                 $code = $this->codes->where('status', '0')->first();
@@ -180,25 +181,24 @@ class LogisticsModel extends BaseModel
                         'package_id' => $packageId,
                         'used_at' => date('y-m-d', time())
                     ]);
-                    $return['status'] = true;
+                    $return['status'] ='success';
                     $return['tracking_no'] = $code->code;
+                }else{
+                    $return['tracking_no'] = '号码池无可用号码';
                 }
                 break;
             case 'API':
                 $package =  PackageModel::where('id',$packageId)->first();
                 $apiResult = Logistics::driver($package->logistics->driver, $package->logistics->api_config)->getTracking($package);
-                if(isset($apiResult['code'])&&$apiResult['code']=='success'){
-                    $return['status'] = true;
-                    $return['tracking_no'] = $apiResult['result'];
-                }else{
-                    $return['tracking_no'] = isset($apiResult['result'])?$apiResult['result']:'api unknown error';
-                }
+                $return['status'] = $apiResult['code'];
+                $return['tracking_no'] = $apiResult['result'];
+                $return['logistics_order_number'] = isset($apiResult['result_other'])?$apiResult['result_other']:'';
                 break;
             case 'MANUAL':
                 $return['tracking_no'] = 'manual';
                 break;
             case 'SELFAPI':
-                $return['status'] = true;
+                $return['status'] = 'success';
                 $return['tracking_no'] = 'S'.$packageId;  //slme 为S+内单号， 现在改为S+包裹id  防止 1个订单对应多个包裹 出现重复追踪号情况
                 break;
         }

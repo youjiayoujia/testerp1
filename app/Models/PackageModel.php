@@ -1113,16 +1113,24 @@ class PackageModel extends BaseModel
     {
         if ($this->canPlaceLogistics()) {
             $result  = $this->logistics->placeOrder($this->id);
-            if (isset($result['status'])&&$result['status']) {
-                 $this->update([
+            if ($result['status'] == 'success') {
+                $this->update([
                     'status' => 'PROCESSING',
                     'tracking_no' => $result['tracking_no'],
-                    'logistics_order_at' => date('Y-m-d H:i:s')
+                    'logistics_order_number' => $result['logistics_order_number'],
+                    'logistics_order_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            if ($result['status'] == 'again') {
+                $this->update([
+                    'tracking_no' => $result['tracking_no'],
+                    'logistics_order_number' => $result['logistics_order_number'],
+                    'logistics_order_at' => date('Y-m-d H:i:s'),
                 ]);
             }
             return $result;
         }
-        return ['status'=>false,'tracking_no'=>'Fail to place logistics order'];
+        return ['status'=>false,'tracking_no'=>'Fail to place logistics order','logistics_order_number'=>''];
     }
 
     /**

@@ -730,7 +730,16 @@ class TestController extends Controller
      */
     public function getEbayProduct(){
         //$package = PackageModel::findOrFail(3113);
-        $package =  PackageModel::where('id',7)->first();
+
+        $package =  PackageModel::where('id',3113)->first();
+
+        $logistics_channel_name = ChannelNameModel::where('channel_id', $package->channel_id)->whereHas('logistics', function ($query) use ($package) {
+            $query = $query->where('logistics_id1', $package->logistics_id);
+        })->first()->logistics_key;
+
+        echo $logistics_channel_name;
+        exit;
+        $package =  PackageModel::where('id',3113)->first();
         $result = $package->placeLogistics();
         var_dump($result);exit;
         exit;

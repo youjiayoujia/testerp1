@@ -163,6 +163,7 @@ class ItemModel extends BaseModel
         }else{
             $value = round($purchase_price/6);
         }
+        
         return $value;
     }
 

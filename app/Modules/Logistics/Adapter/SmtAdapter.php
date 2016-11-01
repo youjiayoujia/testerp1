@@ -195,7 +195,9 @@ class SmtAdapter extends BasicAdapter
                             return array('code' => 'success', 'result' => $row['internationallogisticsId']);//国际运单号;
                         }
                     }
-                }
+                }else{
+                            return array('code' => 'again', 'result' => '', 'result_other' => $onlineLogisticsId);//国际运单号;
+                        }
             }
             
         }

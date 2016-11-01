@@ -34,6 +34,7 @@
                                     </tr>
                                     <tr align="center">
                                         <td style="width:13mm;font-weight:bold;font-size:16px;">
+                                            {{ $model->country ? $model->country->cn_name : '' }}
                                             {{ $model->country ? $model->country->code : '' }}
                                             @if($model->country)
                                                 @foreach(['RU' => 21,'US' => 22,'GB' => 23,'BR' => 24,

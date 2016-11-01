@@ -176,8 +176,8 @@ class ItemController extends Controller
         if($data['type']=='edit'){
             $arr = [];
             $brr = [];
-            $data['purchaseAdminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['name'];
-            $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['name'];
+            $data['purchaseAdminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
+            $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['id'];
             $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
             if(count($skuModel)==0){
                 echo json_encode('no sku');exit;
@@ -194,8 +194,8 @@ class ItemController extends Controller
         }else{
             $arr = [];
             $brr = [];
-            $data['purchaseAdminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['name'];
-            $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['name'];
+            $data['purchaseAdminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
+            $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['id'];
             $spuModel = SpuModel::create($data);
             $data['spu_id'] = $spuModel->id;
             $productModel = ProductModel::create($data);

@@ -142,11 +142,13 @@ class SmtAdapter extends BasicAdapter
        
         /*$data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
         $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);*/
-        $data['declareProductDTOs']         = json_encode($productData);
+        $data['declareProductDTOs']         = json_encode([$productData]);
         $data['addressDTOs']                = json_encode($addressArray);
+       
         $api = 'api.createWarehouseOrder';  
         $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
         $result = json_decode($rs,true);
+        dd($result);
         if(array_key_exists('success', $result)){
             if ($result['result']['success']){
                 if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取

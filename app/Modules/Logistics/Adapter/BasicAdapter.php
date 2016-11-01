@@ -30,6 +30,7 @@ class BasicAdapter
      * [
      *  'code' => 'success',
      *  'result' => $trackingNumber
+     *  'result_other' => $logistics_order_number
      * ]
      * ERROR
      * [

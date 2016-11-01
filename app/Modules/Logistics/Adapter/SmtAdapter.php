@@ -105,8 +105,8 @@ class SmtAdapter extends BasicAdapter
             }
         }
 
-        if (false === $flag) {
-            return array('code' => 'error', 'result' => 'The order does not support this channel');
+        if(false === $flag){
+            return array('code' => 'error','result' => 'The order does not support this channel');
         }
         $warehouseCarrierService = $channel;  //物流方式
         $totalWeight = 0;
@@ -116,13 +116,13 @@ class SmtAdapter extends BasicAdapter
             $productNum += $packageItem->quantity;
         }
         $productData = array(
-            'categoryCnDesc' => $package->decleared_cname,
-            'categoryEnDesc' => $package->decleared_ename,
-            'productDeclareAmount' => $package->decleared_value,
-            'productId' => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,
-            'productNum' => $productNum,
-            'productWeight' => $package->total_weight,
-            'isContainsBattery' => $package->is_battery ? 1 : 0,
+            'categoryCnDesc'       => $package->items ? $package->items->first()->item->product->declared_cn : '连衣裙',
+            'categoryEnDesc'       => $package->items ? $package->items->first()->item->product->declared_en : 'dress',
+            'productDeclareAmount' => $package->items->first()->item->declared_value,
+            'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,
+            'productNum'           => $productNum,
+            'productWeight'        => $package->total_weight,
+            'isContainsBattery'    => $package->is_battery ? 1 : 0,
             /*'isAneroidMarkup'      => 0,
             'isOnlyBattery'        => 0,*/
         );
@@ -165,21 +165,20 @@ class SmtAdapter extends BasicAdapter
         $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
         $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
 
-        /*$data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
-        $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);*/
-        $data['declareProductDTOs'] = json_encode($productData);
-        $data['addressDTOs'] = json_encode($addressArray);
-        $api = 'api.createWarehouseOrder';
-        $rs = $smtApi->getJsonDataUsePostMethod($api, $data);
-        $result = json_decode($rs, true);
-        if (array_key_exists('success', $result)) {
-            if ($result['result']['success']) {
-                if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
-                    $data['channel_listnum'] = $result['result']['intlTracking'];
-                    $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
-                    return array('code' => 'success', 'result' => $result['result']['intlTracking']);
-                }
-            }
+        $data['declareProductDTOs']         = json_encode([$productData]);  //二维数组
+        $data['addressDTOs']                = json_encode($addressArray);
+       
+        $api = 'api.createWarehouseOrder';  
+        $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
+        $result = json_decode($rs,true);
+        if(array_key_exists('success', $result) && $result['result']['success']){           
+            if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
+                $data['channel_listnum'] = $result['result']['intlTracking'];
+                $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
+                return array('code' => 'success', 'result' => $result['result']['intlTracking'] );
+            }else{
+                return array('code' => 'success', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
+            }   
         } else {
             return array('code' => 'error', 'result' => 'error description.');
         }

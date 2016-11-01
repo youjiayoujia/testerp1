@@ -97,9 +97,9 @@ class SmtAdapter extends BasicAdapter
             $productNum += $packageItem->quantity;
         }
         $productData = array(
-            'categoryCnDesc'       => $package->decleared_cname,
-            'categoryEnDesc'       => $package->decleared_ename,
-            'productDeclareAmount' => $package->items->declared_value,
+            'categoryCnDesc'       => $package->items ? $package->items->first()->item->product->declared_cn : '连衣裙',
+            'categoryEnDesc'       => $package->items ? $package->items->first()->item->product->declared_en : 'dress',
+            'productDeclareAmount' => $package->items->first()->item->declared_value,
             'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,
             'productNum'           => $productNum,
             'productWeight'        => $package->total_weight,

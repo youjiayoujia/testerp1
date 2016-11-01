@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -43,7 +44,7 @@
                                   'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                                   'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
                             @if($value[$key] == $model->country->code)
-                                {{ $key }}
+                                {{ $value }}
                             @endif
                         @endforeach
                     @endif
@@ -52,9 +53,17 @@
 			</tr>
 			<tr style="height:23mm;" valign="top">
 				<td style="width:35mm;text-align:left;padding:1px;">
+				    <?php 
+				        $backAddress = DB::table('erp_postpacket_config')->whereRaw("FIND_IN_SET($model->logistics_id, shipment_id_string)")->first();			       
+				        $send_street = $backAddress ? $backAddress->consumer_from : '';
+				        $send_mobilePhone = $backAddress ? $backAddress->consumer_phone : '';
+				        $back_address = $backAddress ? $backAddress->consumer_back : '';
+				     
+				    ?>
 					From:<br/>
-					{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}<br/>
-			 		 <b style="font-weight:bold;">Phone:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
+					
+					 {{ $send_street }}<br/>
+			 		 <b style="font-weight:bold;">Phone:{{ $send_mobilePhone }}
 				</td>
 				<td colspan="3" style="text-align:left;padding:2px;">
 					{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>
@@ -73,7 +82,7 @@
 				    <?php  $countryZone = config('countryZone'); ?>  
 				    @if($model->country)				   
 				        @foreach($countryZone as $key => $val)  
-				            @if(in_array($model->country->cn_name, explode(',',$value[$key])))
+				            @if(in_array($model->country->cn_name, explode(',',$val)))
 				               {{$key}}
 				            @endif
 				        @endforeach				     				            
@@ -91,7 +100,7 @@
 				</td>
 			</tr>
 			<tr style="height:5mm;">
-				<td colspan="4" style="text-align:left;">退件单位:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->unit) : '') : '' }}</td>
+				<td colspan="4" style="text-align:left;">退件单位:{{ $back_address }}</td>
 			</tr>
 			<tr style="height:5mm;line-height:11px;font-size:12px;" >
 				<td colspan="2" >Dcscription of Contents</td>

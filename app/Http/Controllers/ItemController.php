@@ -176,7 +176,7 @@ class ItemController extends Controller
         if($data['type']=='edit'){
             $arr = [];
             $brr = [];
-            $data['purchaseAdminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
+            $data['purchase_adminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
             $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['id'];
             $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
             if(count($skuModel)==0){
@@ -191,6 +191,7 @@ class ItemController extends Controller
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->sync($arr);
+            $skuModel->product->spu->update($data);
         }else{
             $arr = [];
             $brr = [];
@@ -209,6 +210,7 @@ class ItemController extends Controller
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->attach($arr);
+            $skuModel->product->spu->update($data);
         }
         echo json_encode('success');exit;
 

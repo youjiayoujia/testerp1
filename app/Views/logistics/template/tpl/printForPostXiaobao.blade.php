@@ -41,8 +41,8 @@
                                                           'IL' => 29,'IT' => 30,'DE' => 31,'CL' => 32,
                                                           'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                                                           'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
-                                                    @if($value[$key] == $model->country->code)
-                                                        {{ $key }} {{ $value }}
+                                                    @if($key == $model->country->code)
+                                                         {{ $value }}
                                                     @endif
                                                 @endforeach
                                             @endif
@@ -102,7 +102,7 @@
         <div style="width:370px;height:30px; font-size:25px;">
             <span style="font-size:25px;">{{ $model->shipping ? $model->shipping->logistics_code : '' }}</span>
 
-            <span style="margin-left:240px;">{{ $model->quantity ? $model->quantity : 0 }}</span>
+            <span style="margin-left:240px;">{{ $model->items ? $model->items->sum('quantity') : 0 }}</span>
         </div>
         <div style="width: 370px;  bottom:60px; text-align: center; clear:both; border-top:1px solid black; padding-bottom: 2px;">
 

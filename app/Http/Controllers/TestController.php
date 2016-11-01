@@ -224,6 +224,7 @@ class TestController extends Controller
 
     public function index()
     {
+        echo "<pre>";
         $package = PackageModel::find(62);
         var_dump($package->placeLogistics());
         exit;

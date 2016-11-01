@@ -164,7 +164,8 @@ class SmtAdapter extends BasicAdapter
       
         $data['declareProductDTOs']         = json_encode($productData,JSON_UNESCAPED_UNICODE);
         $data['addressDTOs']                = json_encode($addressArray,JSON_UNESCAPED_UNICODE);
-        $api = 'api.createWarehouseOrder';  
+        var_dump($data);
+        $api = 'api.createWarehouseOrder';
         $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
         $result = json_decode($rs,true);
         if(array_key_exists('success', $result)){

@@ -123,6 +123,11 @@ return [
                     'url' => 'recieve',
                     'icon' => '',
                 ],
+                [
+                    'name' => '新品待入库',
+                    'url' => 'purchaseItemIndex',
+                    'icon' => '',
+                ],
             ],
             '发货' => [
                 [

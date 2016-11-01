@@ -64,6 +64,8 @@ use Illuminate\Support\Facades\Storage;
 
 use BarcodeGen;
 
+use App\Models\ProductModel;
+
 class TestController extends Controller
 {
     private $itemModel;
@@ -77,9 +79,12 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(112);
-        var_dump($package->searchFields);exit;
-
+        $package = PackageModel::where('id',1)->first();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $package,
+        ];
+        return view('logistics.template.tpl.printChinaPY_ldb_tlp' , $response);
     }
 
     // public function test2()

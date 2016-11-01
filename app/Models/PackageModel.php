@@ -1207,7 +1207,9 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //物流查询链接
-                $trackingUrl = $rule->logistics->url;
+                $logistics = $rule->logistics;
+                $object = $logistics->logisticsChannels->where('channel_id', $this->channel_id)->first();
+                $trackingUrl = $object ? $object->url : '';
                 $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
                 return $this->update([
                     'status' => 'ASSIGNED',

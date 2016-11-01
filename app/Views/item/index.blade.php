@@ -49,10 +49,12 @@
             <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
                                     开发时间：{{ $item->created_at }}<br>
                                     【包装方式：<br>
+                                    <?php if($item->product){ ?>
                                     @foreach($item->product->wrapLimit as $wrap)
                                         {{$wrap->name}}<br>
                                     @endforeach
                                     】
+                                    <?php } ?>
                                 </td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->weight }}kg</td>
@@ -81,7 +83,11 @@
             </td>
             <td>{{ config('item.status')[$item->status]}}</td>
             <td>{{ $item->purchaseAdminer?$item->purchaseAdminer->name:''}}</td>
-            <td>{{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}</td>
+            <td>
+                @if($item->product)
+                    {{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}
+                @endif
+            </td>
             <td>{{--<button class ="btn btn-success" >计算</button>--}}
                 <a href="javascript:" class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModal_{{$item->id}}">
                     计算
@@ -241,9 +247,11 @@
                      
                      <div class="modal-body">
                         <!-- 50条sql -->
-                        @foreach($item->product->shape as $image)
-                            <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
-                        @endforeach
+                        @if($item->product)
+                            @foreach($item->product->shape as $image)
+                                <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
+                            @endforeach
+                        @endif
                      </div>
                      
                   </div>

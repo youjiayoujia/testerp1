@@ -700,10 +700,13 @@ class PackageController extends Controller
         DB::beginTransaction();
         try {
             foreach ($package->items as $packageItem) {
-                $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                $flag = $packageItem->item->holdout($packageItem->warehouse_position_id,
                     $packageItem->quantity,
                     'PACKAGE',
                     $packageItem->id);
+                if(!$flag) {
+                    throw new Exception('包裹出库库存有问题');
+                }
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
             }
         } catch (Exception $e) {
@@ -743,10 +746,13 @@ class PackageController extends Controller
             DB::beginTransaction();
             try {
                 foreach ($package->items as $packageItem) {
-                    $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                    $flag = $packageItem->item->holdout($packageItem->warehouse_position_id,
                         $packageItem->quantity,
                         'PACKAGE',
                         $packageItem->id);
+                    if(!$flag) {
+                        throw new Exception('包裹出库库存有问题');
+                    }
                     $packageItem->orderItem->update(['status' => 'SHIPPED']);
                 }
             } catch (Exception $e) {
@@ -964,8 +970,11 @@ class PackageController extends Controller
             return json_encode(false);
         }
         $logistics = LogisticsModel::find($logistics_id);
+        $object = $logistics->logisticsChannels->where('channel_id', $model->channel_id)->first();
+        $trackingUrl = $object ? $object->url : '';
+
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
-        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
+        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto, 'tracking_link' => $trackingUrl]);
         $orderRate = $model->order->calculateProfitProcess();
         if ($orderRate > 0) {
             if ($is_auto) {

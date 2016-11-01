@@ -249,7 +249,7 @@ class SpuModel extends BaseModel
         set_time_limit(0);
         ini_set('memory_limit', '1024M');
         //$model = $this->all();
-        $model = ItemModel::where('id','>','16188')->get();
+        $model = ItemModel::where('id','>','49976')->get();
         //$erp_products_data_arr = DB::select('select distinct products_sku,spu,model,products_warring_string from erp_products_data where spu!=""');
         foreach($model as $itemModel){
             //print_r($itemModel->sku);exit;
@@ -296,8 +296,10 @@ class SpuModel extends BaseModel
                     $product_id = $productModel->id;
                 }
                 $itemModel->update(['product_id'=>$product_id]);
+            }else{
+                $itemModel->update(['product_id'=>0]);
             }
-            $itemModel->update(['product_id'=>0]);
+            
         }     
     }
 

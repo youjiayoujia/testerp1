@@ -88,6 +88,23 @@ class PurchaseItemController extends Controller
         $model->destroy($id);
         return 1;
 	}
+
+	/**
+     * 采购条目
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function purchaseItemIndex()
+	{
+		request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model,$this->model->where('status','6')),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view('purchase.purchaseItemList.purchaseItemIndex', $response);
+	}
 	
 
 }

@@ -239,6 +239,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         Route::get('purchaseOrder/purchaseStaticstics', ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
     });*/
     //采购条目
+    //新品待入库
+    Route::any('purchaseItem/purchaseItemIndex', ['uses' => 'Purchase\PurchaseItemController@purchaseItemIndex', 'as' => 'purchaseItemIndex']);
     Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
     Route::any('purchaseItem/deletePurchaseItem', ['uses' => 'Purchase\PurchaseItemController@deletePurchaseItem', 'as' => 'deletePurchaseItem']);
     Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}',
@@ -267,6 +269,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('purchaseOrder/payOrder/{id}',
         ['uses' => 'Purchase\PurchaseOrderController@payOrder', 'as' => 'payOrder']);
     Route::any('purchaseOrder/purchaseExmaine', ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
+
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
     Route::any('purchaseOrder/printInWarehouseOrder/{id}', ['uses' => 'Purchase\PurchaseOrderController@printInWarehouseOrder', 'as' => 'purchaseOrder.printInWarehouseOrder']);

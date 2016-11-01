@@ -827,7 +827,7 @@ class PurchaseOrderController extends Controller
             $zaitu_num = 0;//在途
             if ($purchaseItemModel->status > 0 || $purchaseItemModel->status < 4) {
                 if (!$purchaseItemModel->purchaseOrder->write_off) {
-                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty - $purchaseItemModel->unqualified_qty;
+                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty;
                 }
             }
 

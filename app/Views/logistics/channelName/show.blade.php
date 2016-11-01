@@ -12,6 +12,9 @@
             <div class="col-lg-4">
                 <strong>名字</strong>: {{ $model->name }}
             </div>
+            <div class="col-lg-4">
+                <strong>回传编码</strong>: {{ $model->logistics_key }}
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

@@ -192,7 +192,7 @@ class SmtAdapter extends BasicAdapter
                     foreach ($res['result'] as $row){
                         //分仓，估计要结合 物流分类+状态 来进行判断获取国际运单号
                         if ($row['internationalLogisticsType'] == $warehouseCarrierService && $row['onlineLogisticsId'] == $onlineLogisticsId) { //渠道和物流内单号对应上了
-                            return array('code' => 'success', 'result' => $row['result']['intlTracking']);//国际运单号;
+                            return array('code' => 'success', 'result' => $row['internationallogisticsId']);//国际运单号;
                         }
                     }
                 }

@@ -172,7 +172,7 @@ class SmtAdapter extends BasicAdapter
              
             $api = 'api.createWarehouseOrder';
             $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
-            $row['internationallogisticsId'] = json_decode($rs,true);
+            $result = json_decode($rs,true);
             if(array_key_exists('success', $result) && $result['result']['success']){
                 if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
                     $data['channel_listnum'] = $result['result']['intlTracking'];

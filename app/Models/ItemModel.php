@@ -611,13 +611,7 @@ class ItemModel extends BaseModel
     public function createPurchaseNeedData()
     {
         ini_set('memory_limit', '2048M');
-        //$items = $this->all();
-        $arr = array("20208","21219","21372","29644","30974","31011","31012",
-  "37454","39547","42437","45448","45571","45971","52449","52455",
-  "54756","54980","55750","55751","55752","55753","55754","57370","57616","57617","57618","59186","59187");
-        
-        $items = $this->find($arr);
-        
+        $items = $this->all();
         $requireModel = new RequireModel();
         foreach ($items as $item) {
             $data['item_id'] = $item->id;

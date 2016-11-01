@@ -42,7 +42,7 @@
                                                           'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                                                           'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
                                                     @if($key == $model->country->code)
-                                                        {{ $key }} {{ $value }}
+                                                         {{ $value }}
                                                     @endif
                                                 @endforeach
                                             @endif

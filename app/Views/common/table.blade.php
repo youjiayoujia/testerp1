@@ -4,7 +4,6 @@
         <div class="panel-heading">
             <strong>@section('tableTitle') {{ $metas['title'] }} @show{{-- 列表标题 --}}</strong>
         </div>
-
         <div class="modal fade" id="dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -25,7 +24,7 @@
                         <form action="" method="get">
                             <div class="col-lg-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="{{ isset($data) ? (count($data) ? $data->first()->showSearch() : '') : '' }}"/>
+                                    <input type="text" class="form-control" name="keywords" value="{{ request()->has('keywords') ? request('keywords') : '' }}" placeholder="{{ isset($data) ? (count($data) ? $data->first()->showSearch() : '') : '' }}"/>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="submit">
                                             <i class="glyphicon glyphicon-search"></i>
@@ -64,7 +63,7 @@
                                                     @foreach($value1 as $relation_ship2 => $value2)
                                                         @foreach($value2 as $key => $name)
                                                             <div class="col-lg-2 form-group searchItem">
-                                                                <input type="text" class="form-control" value="{{request()->has('mixedSearchFields'.'.'.$type.'.'.$relation_ship1.'.'.$relation_ship2.'.'.$name)?request('mixedSearchFields'.'.'.$type.$relation_ship1.'.'.$relation_ship2.'.'.$name) : ''}}" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
+                                                                <input type="text" class="form-control" value="{{request()->has('mixedSearchFields'.'.'.$type.'.'.$relation_ship1.'.'.$relation_ship2.'.'.$name)?request('mixedSearchFields'.'.'.$type.'.'.$relation_ship1.'.'.$relation_ship2.'.'.$name) : ''}}" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
                                                     @endforeach
@@ -139,7 +138,7 @@
                                         @endforeach
                                         <div class="col-lg-2">
                                             <button class="btn btn-success" type="submit">查询</button>
-                                            <button class="btn btn-default" type="reset">取消</button>
+                                            <a class="btn btn-default" href="{{ request()->url() }}">取消</a>
                                         </div>
                                     </div>
                                 </form>

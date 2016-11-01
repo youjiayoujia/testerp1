@@ -12,6 +12,7 @@ return [
         'SELFAPI' => '内单号api',
         'API' => '物流api',
         'CODE' => '号码池',
+        'CODEAPI' => '号码池+物流api',
     ],
 
     //面单模版

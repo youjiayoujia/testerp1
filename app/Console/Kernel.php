@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetOrders::class,
         \App\Console\Commands\CreatePurchase::class,
         \App\Console\Commands\PurchaseStaticstics::class,
+        \App\Console\Commands\Test::class,
         \App\Console\Commands\TransferProduct::class,
         \App\Console\Commands\TransferChannelAccount::class,
         \App\Console\Commands\TransferSupplier::class,
@@ -67,6 +68,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomShelves::class,
         \App\Console\Commands\NotWarehouseInSendEmail::class,
         \App\Console\Commands\SyncSellmoreApi::class,
+        \App\Console\Commands\AutoGetEbayMessage::class,
+        \App\Console\Commands\SyncImportApi::class,
     ];
 
     /**
@@ -78,7 +81,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
-        $schedule->command('purchase:create')->cron('20 0,12 * * *');
+        $schedule->command('purchase:create')->cron('20 4,12 * * *');
         //黑名单定时任务
         $schedule->command('blacklists:get')->dailyAt('2:00');
         $schedule->command('blacklists:update')->dailyAt('3:00');
@@ -124,7 +127,6 @@ class Kernel extends ConsoleKernel
             }
         }
         $schedule->command('pick:report')->hourly();
-        $schedule->command('pick:report')->dailyAt('1:5');
         $schedule->command('all:report')->daily();
         //CRM
         $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');
@@ -137,6 +139,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
         //API同步sellmore database
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
+        $schedule->command('SyncImportApi:all')->everyFiveMinutes();
 
     }
 }

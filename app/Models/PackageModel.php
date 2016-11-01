@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Excel;
 use DB;
+use App\Jobs\AssignStocks;
 use App\Base\BaseModel;
 use App\Models\RequireModel;
 use App\Models\Logistics\RuleModel;
@@ -14,17 +15,19 @@ use App\Models\Channel\AccountModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Product\ProductLogisticsLimitModel;
+use Queue;
 
 class PackageModel extends BaseModel
 {
     public $table = 'packages';
 
-    public $searchFields = ['id' => 'ID'];
-
     public $rules = [
         'create' => ['ordernum' => 'required'],
         'update' => [],
     ];
+
+    // 用于查询
+    public $searchFields = ['id' => 'ID'];
 
     public $fillable = [
         'channel_id',
@@ -232,7 +235,7 @@ class PackageModel extends BaseModel
         $declared_cn = '';
         foreach($this->items as $packageItem){
             if($packageItem->item){
-                $declared_cn = $packageItem->item->product ? $packageItem->item->product->declared_cn : '';
+                $declared_cn = $packageItem->item->product ? $packageItem->item->product->declared_cn : '连衣裙';
             }
         }
         return $declared_cn;
@@ -246,7 +249,7 @@ class PackageModel extends BaseModel
         $declared_en = '';
         foreach($this->items as $packageItem){
             if($packageItem->item){
-                $declared_en = $packageItem->item->product ? $packageItem->item->product->declared_en : '';
+                $declared_en = $packageItem->item->product ? $packageItem->item->product->declared_en : 'dress';
             }
         }
         return $declared_en;
@@ -376,7 +379,7 @@ class PackageModel extends BaseModel
     }
     
     public function russiaPYCode(){
-        return $this->belongsTo('App\Models\Logistics\Zone\RussiaPingCodeModel', 'shipping_country', 'country_code');
+        return $this->hasMany('App\Models\Logistics\Zone\RussiaPingCodeModel', 'country_code', 'shipping_country');
     }
 
     public function getStatusNameAttribute()
@@ -434,6 +437,60 @@ class PackageModel extends BaseModel
     }
 
     /*******************************************************************************/
+    public function reCreatePackage()
+    {
+        $arr = [];
+        foreach($this->items as $key => $packageItem) {
+            $arr[$packageItem->item->warehouse_id][$key]['item_id'] = $packageItem->item_id;
+            $arr[$packageItem->item->warehouse_id][$key]['quantity'] = $packageItem->quantity;
+            $arr[$packageItem->item->warehouse_id][$key]['order_item_id'] = $packageItem->order_item_id;
+        }
+        if(count($arr) > 1) {
+            foreach($this->items as $bufItem) {
+                $bufItem->delete();
+            }
+            $j = 0;
+            foreach($arr as $k => $v) {
+                if($j == 0) {
+                    foreach($v as $k1 => $v1) {
+                        $this->items()->create($v1);
+                    }
+                    $flag = 1;
+                    if(count($v) > 1) {
+                        $flag = 3;
+                    } elseif (count($v) == 1) {
+                        if($v['0']['quantity'] > 1) {
+                            $flag = 2;
+                        } else {
+                            $flag = 1;
+                        }
+                    }
+                    $this->update(['warehouse_id' => $k, 'type' => ($flag == 1 ? 'SINGLE' : ($flag == 2 ? 'SINGLEMULTI' : 'MULTI'))]);
+                } else {
+                    $package = $this->create($this->toArray());
+                    foreach($v as $k2 => $v2) {
+                        $package->items()->create($v2);
+                    }
+                    $flag = 1;
+                    if(count($v) > 1) {
+                        $flag = 3;
+                    } elseif (count($v) == 1) {
+                        if(array_values($v)['0']['quantity'] > 1) {
+                            $flag = 2;
+                        } else {
+                            $flag = 1;
+                        }
+                    }
+                    $package->update(['warehouse_id' => $k, 'type' => ($flag == 1 ? 'SINGLE' : ($flag == 2 ? 'SINGLEMULTI' : 'MULTI'))]);
+                }
+                $j++;
+            }
+            return $this->order_id;
+        }
+
+        return false;
+    }
+
     public function createPackageItems()
     {
         $items = $this->setPackageItems();
@@ -441,18 +498,47 @@ class PackageModel extends BaseModel
             return $this->createPackageDetail($items);
         } else {
             if ($this->status == 'NEW') {
-                foreach ($this->items as $item) {
-                    $require = [];
-                    $require['item_id'] = $item->item_id;
-                    $require['warehouse_id'] = $item->item->warehouse_id;
-                    $require['order_item_id'] = $item->order_item_id;
-                    $require['sku'] = $item->item->sku;
-                    $require['quantity'] = $item->quantity;
-                    $this->requires()->create($require);
+                if($this->type == 'MULTI') {
+                    $orderId = $this->reCreatePackage();
+                    if($orderId) {
+                        $order = OrderModel::find($orderId);
+                        foreach($order->packages as $package) {
+                            $job = new AssignStocks($package);
+                            Queue::pushOn('assignStocks', $job);
+                        }
+                        return true;
+                    } else {
+                        foreach ($this->items as $item) {
+                            $require = [];
+                            $require['item_id'] = $item->item_id;
+                            $require['warehouse_id'] = $item->item->warehouse_id;
+                            $require['order_item_id'] = $item->order_item_id;
+                            $require['sku'] = $item->item->sku;
+                            $require['quantity'] = $item->quantity;
+                            $this->requires()->create($require);
+                        }
+                        //todo v3测试，正式上线删除
+                        $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
+                        $this->update(['status' => 'NEED', 'warehouse_id' => $warehouse_id]);
+                        $this->order->update(['status' => 'NEED']);
+                        return true;
+                    }
+                } else {
+                    foreach ($this->items as $item) {
+                        $require = [];
+                        $require['item_id'] = $item->item_id;
+                        $require['warehouse_id'] = $item->item->warehouse_id;
+                        $require['order_item_id'] = $item->order_item_id;
+                        $require['sku'] = $item->item->sku;
+                        $require['quantity'] = $item->quantity;
+                        $this->requires()->create($require);
+                    }
+                    //todo v3测试，正式上线删除
+                    $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
+                    $this->update(['status' => 'NEED', 'warehouse_id' => $warehouse_id]);
+                    $this->order->update(['status' => 'NEED']);
+                    return true;
                 }
-                $this->update(['status' => 'NEED']);
-                $this->order->update(['status' => 'NEED']);
-                return true;
             } else {
                 if (strtotime($this->created_at) < strtotime('-3 days')) {
                     $arr = $this->explodePackage();
@@ -601,7 +687,11 @@ class PackageModel extends BaseModel
     public function setPackageItems()
     {
         if ($this->items->count() > 1) { //多产品
-            $packageItem = $this->setMultiPackageItem();
+            if(empty($this->warehouse_id)) {
+                $packageItem = $this->setMultiPackageItem();
+            } else {
+                $packageItem = $this->setMultiPackageItemFb();
+            }
         } else { //单产品
             $packageItem = $this->setSinglePackageItem();
         }
@@ -687,6 +777,46 @@ class PackageModel extends BaseModel
         }
 
         return $packageItem;
+    }
+
+    //设置多产品订单包裹产品
+    public function setMultiPackageItemFb()
+    {
+        $warehouses = WarehouseModel::all();
+        foreach($warehouses as $key => $warehouse) {
+            $buf = [];
+            $i = 0;
+            foreach($this->items as $packageItem) {
+                $pquantity = $packageItem->quantity;
+                $stocks = StockModel::where(['warehouse_id' => $warehouse->id, 'item_id' => $packageItem->item_id])->get()->sortByDesc('available_quantity');
+                if($stocks->sum('available_quantity') < $packageItem->quantity) {
+                    unset($buf);
+                    continue 2;
+                }
+                foreach($stocks as $key => $stock) {
+                    if($stock->available_quantity < $pquantity) {
+                        $buf[$warehouse->id][$i]['item_id'] = $packageItem->item_id;
+                        $buf[$warehouse->id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                        $buf[$warehouse->id][$i]['order_item_id'] = $packageItem->order_item_id;
+                        $buf[$warehouse->id][$i]['quantity'] = $stock->available_quantity;
+                        $pquantity -= $stock->available_quantity;
+                        $i++;
+                    } else {
+                        $buf[$warehouse->id][$i]['item_id'] = $packageItem->item_id;
+                        $buf[$warehouse->id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                        $buf[$warehouse->id][$i]['order_item_id'] = $packageItem->order_item_id;
+                        $buf[$warehouse->id][$i]['quantity'] = $pquantity;
+                        $i++;
+                        continue 2;
+                    }
+                }
+            }
+            if(!empty($buf)) {
+                return $buf;
+            }
+        }
+
+        return false;
     }
 
     public function createPackageDetail($items)
@@ -848,6 +978,8 @@ class PackageModel extends BaseModel
             $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
         })->where(['is_clearance' => $isClearance])
+            ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
+            ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
             ->get()
             ->sortBy(function($single,$key){
                 return $single->logistics ? $single->logistics->priority : 1;
@@ -948,7 +1080,7 @@ class PackageModel extends BaseModel
             
             return $rule->logistics->code;
         }
-        return '&nbsp;&nbsp;&nbsp;&nbsp;虚拟匹配未匹配到';
+        return '虚拟匹配未匹配到';
     }
 
     public function assignLogistics()
@@ -974,8 +1106,10 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
-              ->get()
-              ->sortBy(function($single,$key){
+                ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
+                ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
+                ->get()
+                ->sortBy(function($single,$key){
                 return $single->logistics ? $single->logistics->priority : 1;
               });
             foreach ($rules as $rule) {
@@ -1073,7 +1207,9 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //物流查询链接
-                $trackingUrl = $rule->logistics->url;
+                $logistics = $rule->logistics;
+                $object = $logistics->logisticsChannels->where('channel_id', $this->channel_id)->first();
+                $trackingUrl = $object ? $object->url : '';
                 $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
                 return $this->update([
                     'status' => 'ASSIGNED',

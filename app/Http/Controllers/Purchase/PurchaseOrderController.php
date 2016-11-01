@@ -27,8 +27,10 @@ use App\Models\PackageModel;
 use App\Jobs\AssignStocks;
 use Excel;
 use Tool;
+use DB;
 use App\Jobs\Job;
 use Mail;
+use App\Models\StockModel;
 
 class PurchaseOrderController extends Controller
 {
@@ -606,7 +608,7 @@ class PurchaseOrderController extends Controller
                     $filed['arrival_num'] = $update_data[1];
                     PurchaseItemArrivalLogModel::create($filed);
                 }
-                
+                $purchase_item->purchaseOrder->update(['status'=>2]);   
             } 
         }else{
             $purchaseOrderModel = $this->model->find($p_id);
@@ -645,14 +647,14 @@ class PurchaseOrderController extends Controller
         if (!$purchase_order) {
             return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
         }
-        foreach($purchase_order->purchaseItem as $purchase_item){
+        /*foreach($purchase_order->purchaseItem as $purchase_item){
             if(!$purchase_item->productItem->warehousePosition){
                 return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请先添加库位.'));
             }
             if(!$purchase_item->productItem->warehousePosition->name){
                 return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请先添加库位.'));
             }
-        }
+        }*/
         $response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
@@ -670,14 +672,17 @@ class PurchaseOrderController extends Controller
         $p_id = request()->input("p_id");
         $data = substr($data, 0,strlen($data)-1);
         $arr = explode(',', $data);
+        $global = 1;
         if($data){
             foreach ($arr as $value) {
                 $update_data = explode(':', $value);
                 $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
                 $purchase_item = $arrivel_log->purchaseItem;
+                $warehousePosition = StockModel::where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->where('item_id',$purchase_item->item_id)->get()->first();
                 
-                if($purchase_item->item->warehouse_position==''){
-                    return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请添加库位后重新入库.'));
+                if(!$warehousePosition){ 
+                    $purchase_item->update(['status'=>'6']);
+                    $global = 0;
                 }else{
                     $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
                     $filed['bad_num'] =  $filed['good_num'];
@@ -693,7 +698,7 @@ class PurchaseOrderController extends Controller
                     }
                     
                     $purchase_item->update($datas);
-                    $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
+                    $purchase_item->item->in($warehousePosition->warehouse_position_id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
                     
                 } 
                 //need包裹分配库存
@@ -709,14 +714,17 @@ class PurchaseOrderController extends Controller
                 }       
             }
         } 
-        $p_status = 4;
-        $purchasrOrder = $this->model->find($p_id);
-        foreach($purchasrOrder->purchaseItem as $p_item){
-            if($p_item->status!=4){
-                $p_status = 3;
+        if($global){
+            $p_status = 4;
+            $purchasrOrder = $this->model->find($p_id);
+            foreach($purchasrOrder->purchaseItem as $p_item){
+                if($p_item->status!=4){
+                    $p_status = 3;
+                }
             }
+            $purchasrOrder->update(['status'=>$p_status]);
         }
-        $purchasrOrder->update(['status'=>$p_status]);
+        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
@@ -772,13 +780,22 @@ class PurchaseOrderController extends Controller
         switch ($type) {
             case 'examineStatus':
                 foreach($arr as $id){
-                    $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+                    $purchaseOrder = $this->model->find($id);
+                    $purchaseOrder->update(['examineStatus'=>1,'status'=>1]);
+                    foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
+                        $purchaseitemModel->update(['status'=>1]);
+                    }
                 }
                 break;
             
             case 'write_off':
                 foreach($arr as $id){
-                    $this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+                    //$this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+                    $purchaseOrder = $this->model->find($id);
+                    $purchaseOrder->update(['write_off'=>1,'status'=>4]);
+                    foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
+                        $purchaseitemModel->update(['status'=>4]);
+                    }
                 }
                 break;
             case 'close_status':
@@ -810,11 +827,16 @@ class PurchaseOrderController extends Controller
             $zaitu_num = 0;//在途
             if ($purchaseItemModel->status > 0 || $purchaseItemModel->status < 4) {
                 if (!$purchaseItemModel->purchaseOrder->write_off) {
-                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty - $purchaseItemModel->unqualified_qty;
+                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty;
                 }
             }
+
+            //缺货
+            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //虚库存
-            $xu_kucun = $itemModel->available_quantity;
+            $xu_kucun = $itemModel->available_quantity-$data['need_total_num'];
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])

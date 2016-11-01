@@ -123,6 +123,11 @@ return [
                     'url' => 'recieve',
                     'icon' => '',
                 ],
+                [
+                    'name' => '新品待入库',
+                    'url' => 'purchaseItemIndex',
+                    'icon' => '',
+                ],
             ],
             '发货' => [
                 [
@@ -696,6 +701,11 @@ return [
                 [
                     'name' => '同步接口',
                     'url' => 'syncApi.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '接收接口',
+                    'url' => 'importSyncApi.index',
                     'icon' => '',
                 ],
             ],

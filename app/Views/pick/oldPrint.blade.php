@@ -1,4 +1,5 @@
 @extends('common.detail')
+@section('detailTitle')@parent(<font color='red'>填入包裹ID或者追踪号</font>)@stop
 @section('detailBody')
 <div class='row'>
     <div class='form-group col-lg-1'>

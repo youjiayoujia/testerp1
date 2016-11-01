@@ -139,10 +139,10 @@ class OrderModel extends BaseModel
             'transaction_number' => 'required',
             'amount' => 'required',
             'amount_product' => 'required',
-            'amount_shipping' => 'required',
+//            'amount_shipping' => 'required',
             'amount_coupon' => 'required',
             'shipping_firstname' => 'required',
-            'shipping_lastname' => 'required',
+//            'shipping_lastname' => 'required',
             'shipping_address' => 'required',
             'shipping_city' => 'required',
             'shipping_state' => 'required',
@@ -194,9 +194,9 @@ class OrderModel extends BaseModel
     public function updateRule($request)
     {
         $arr = [
-            'amount_shipping' => 'required',
+//            'amount_shipping' => 'required',
             'shipping_firstname' => 'required',
-            'shipping_lastname' => 'required',
+//            'shipping_lastname' => 'required',
             'shipping_address' => 'required',
             'shipping_city' => 'required',
             'shipping_state' => 'required',
@@ -267,10 +267,10 @@ class OrderModel extends BaseModel
                 'time' => ['created_at']
             ],
             'relatedSearchFields' => [
+                'country' => ['code'],
                 'items' => ['item' => ['status' => config('item.status')]],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
-                'country' => ['code'],
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [
@@ -635,6 +635,7 @@ class OrderModel extends BaseModel
                     $newPackageItem = $package->items()->create($packageItem);
                 }
             }
+            $package->update(['weight' => $package->total_weight]);
         }
 
         return $package;

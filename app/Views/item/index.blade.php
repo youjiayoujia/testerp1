@@ -42,29 +42,25 @@
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>
                 <!-- 100条sql -->
-                <img src="{{ asset($item->product->dimage) }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;">
+                <img src="{{ asset($item->product?$item->product->dimage:'') }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;">
                 <br><br>
-                <div style='text-align:center' ><a href='' data-toggle="modal" data-target="#imgModal_{{$item->id}}">[{{count($item->product->shape)}}]<a></div>
+                <div style='text-align:center' ><a href='' data-toggle="modal" data-target="#imgModal_{{$item->id}}">[{{$item->product?count($item->product->shape):0}}]<a></div>
             </td>
             <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
                                     开发时间：{{ $item->created_at }}<br>
                                     【包装方式：<br>
+                                    <?php if($item->product){ ?>
                                     @foreach($item->product->wrapLimit as $wrap)
                                         {{$wrap->name}}<br>
                                     @endforeach
                                     】
+                                    <?php } ?>
                                 </td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->weight }}kg</td>
             <td>{{ $item->warehouse?$item->warehouse->name:'' }}<br>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
             <td>{{ $item->product?$item->product->declared_en:'' }}<br>{{ $item->product?$item->product->declared_cn:'' }}<br>
-                    $<?php
-                        if($item->product){
-                                if($item->product->declared_value>0){
-                                    echo $item->product->declared_value;
-                                }elseif(($item->purchase_price/6)<1){echo 1;}elseif(($item->purchase_price/6)>25){echo 25;}else{echo round($item->purchase_price/6);}
-                        }
-                    ?>
+                    ${{$item->declared_value}}
             </td>
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>
@@ -81,7 +77,11 @@
             </td>
             <td>{{ config('item.status')[$item->status]}}</td>
             <td>{{ $item->purchaseAdminer?$item->purchaseAdminer->name:''}}</td>
-            <td>{{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}</td>
+            <td>
+                @if($item->product)
+                    {{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}
+                @endif
+            </td>
             <td>{{--<button class ="btn btn-success" >计算</button>--}}
                 <a href="javascript:" class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModal_{{$item->id}}">
                     计算
@@ -241,9 +241,11 @@
                      
                      <div class="modal-body">
                         <!-- 50条sql -->
-                        @foreach($item->product->shape as $image)
-                            <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
-                        @endforeach
+                        @if($item->product)
+                            @foreach($item->product->shape as $image)
+                                <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
+                            @endforeach
+                        @endif
                      </div>
                      
                   </div>

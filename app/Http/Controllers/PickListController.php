@@ -21,6 +21,7 @@ use App\Models\ItemModel;
 use DB;
 use App\Models\UserModel;
 use Exception;
+use App\Models\WarehouseModel;
 
 class PickListController extends Controller
 {
@@ -56,7 +57,8 @@ class PickListController extends Controller
             'data' => $this->autoList(!empty($model) ? $model : $this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'today_print' => $today_print,
-            'allocate' => $allocate
+            'allocate' => $allocate,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -149,7 +151,9 @@ class PickListController extends Controller
                 'metas' => $this->metas(__FUNCTION__),
                 'model' => $model,
                 'size' => $model->logistics ? ($model->logistics->template ? $model->logistics->template->size : '暂无面单尺寸信息') : '暂无面单尺寸信息',
-                'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
+                'picklistitemsArray' => $model->pickListItem()->get()->sortBy(function($single,$key){
+                return $single->position ? $single->position->name : 1;
+              })->chunk('25'),
             ];
             $this->eventLog($name, '打印拣货单,id='.$model->id, $from, $from);
             $html .= view($this->viewPath.'print', $response);

@@ -54,7 +54,7 @@ Class YuntuAdapter extends BasicAdapter
 			  "HSCode": "'.trim($item->item->product->model).'",
 			  "Qty": '.$item->quantity.',
 			  "UnitPrice":'.$deValue.',
-			  "UnitWeight": '.$item->item->product->weight.',
+			  "UnitWeight": '.$ordersinfo->weight.',
 			  "PickingName": "'.$declare_name_cn.'",
 			  "Remark":"'.trim($item->item->product->model).'",
 			  "ProductUrl":"www.baidu.com"				  

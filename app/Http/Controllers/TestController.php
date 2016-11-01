@@ -803,7 +803,7 @@ class TestController extends Controller
      */
     public function getEbayProduct(){
         //$package = PackageModel::findOrFail(3113);
-        $package =  PackageModel::where('id',2626)->first();
+        $package =  PackageModel::where('id',3)->first();
         $result = $package->placeLogistics();
         var_dump($result);exit;
         exit;

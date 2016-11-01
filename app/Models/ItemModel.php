@@ -622,7 +622,7 @@ class ItemModel extends BaseModel
                 if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
                     if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
-                            $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                            $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
                         }
                     }
                 }

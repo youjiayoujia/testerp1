@@ -157,7 +157,8 @@ Class YuntuAdapter extends BasicAdapter
 			if(isset($data['Item'][0]['OrderId']) && !empty($data['Item'][0]['OrderId'])){
 				return $result = [
 						'code' => 'success',
-						'result' => $data['Item'][0]['WayBillNumber']
+						'result' => $data['Item'][0]['WayBillNumber'],
+						'result_other' => $data['Item'][0]['OrderId']
 				];
 			}else{
 				return $result = [

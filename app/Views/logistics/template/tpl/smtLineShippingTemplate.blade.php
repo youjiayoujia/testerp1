@@ -46,7 +46,7 @@
             <span style="font-weight:bold;font-size:11px;display:inline-block;">Untracked 平小包</span>
         </p>
         <p style="float:left;width:140px;">
-            <span style="width:140px;display:inline-block;height:97px;border-left:1px solid #000;border-bottom:1px solid #000;font-size:11px;padding-left:4px;">
+            <span style="width:140px;display:inline-block;height:97px;border-left:1px solid #000;border-bottom:1px solid #000;font-size:8px;padding-left:4px;">
                 From:<br/>
                     {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}
                 <br/>

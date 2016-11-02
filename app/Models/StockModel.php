@@ -236,12 +236,12 @@ class StockModel extends BaseModel
     {
         $price = $this->unit_cost;
         if($this->unit_cost <= 0) {
-            throw new Exception('');
+            return false;
         }
         $this->hold_quantity -= $quantity;
         $this->all_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
-            throw new Exception('');
+            return false;
         }
         $this->save();
         $this->stockUnhold()->create([
@@ -258,6 +258,7 @@ class StockModel extends BaseModel
             'relation_id' => $relation_id,
             'remark' => $remark
         ]);
+        return true;
     }
 
     /**

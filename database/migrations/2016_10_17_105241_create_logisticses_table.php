@@ -23,7 +23,7 @@ class CreateLogisticsesTable extends Migration
 			$table->string('type');
 			$table->string('url');
 			$table->string('driver')->nullable();
-			$table->string('docking');
+			$table->enum('docking', array('MANUAL','SELFAPI','API','CODE','CODEAPI'))->default('MANUAL');
 			$table->integer('logistics_catalog_id')->nullable()->default(0);
 			$table->integer('logistics_email_template_id')->nullable()->default(0);
 			$table->integer('logistics_template_id')->nullable()->default(0);

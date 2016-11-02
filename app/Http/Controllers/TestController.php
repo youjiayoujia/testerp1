@@ -64,6 +64,8 @@ use Illuminate\Support\Facades\Storage;
 
 use BarcodeGen;
 
+use App\Models\ProductModel;
+
 class TestController extends Controller
 {
     private $itemModel;
@@ -77,9 +79,12 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(112);
-        var_dump($package->searchFields);exit;
-
+        $package = PackageModel::where('id',1)->first();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $package,
+        ];
+        return view('logistics.template.tpl.printChinaPY_ldb_tlp' , $response);
     }
 
     // public function test2()
@@ -219,6 +224,10 @@ class TestController extends Controller
 
     public function index()
     {
+        echo "<pre>";
+        $package = PackageModel::find(62);
+        var_dump($package->placeLogistics());
+        exit;
         set_time_limit(0);
         $account = AccountModel::find(28);
         if ($account) {
@@ -798,7 +807,8 @@ class TestController extends Controller
      */
     public function getEbayProduct(){
         //$package = PackageModel::findOrFail(3113);
-        $package =  PackageModel::where('id',2626)->first();
+        $package =  PackageModel::where('id',81)->first();
+
         $result = $package->placeLogistics();
         var_dump($result);exit;
         exit;

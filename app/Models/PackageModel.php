@@ -48,6 +48,7 @@ class PackageModel extends BaseModel
         'width',
         'height',
         'tracking_no',
+        'logistics_order_number',
         'tracking_link',
         'email',
         'shipping_firstname',
@@ -1207,7 +1208,9 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //物流查询链接
-                $trackingUrl = $rule->logistics->url;
+                $logistics = $rule->logistics;
+                $object = $logistics->logisticsChannels->where('channel_id', $this->channel_id)->first();
+                $trackingUrl = $object ? $object->url : '';
                 $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
                 return $this->update([
                     'status' => 'ASSIGNED',
@@ -1247,16 +1250,24 @@ class PackageModel extends BaseModel
     {
         if ($this->canPlaceLogistics()) {
             $result  = $this->logistics->placeOrder($this->id);
-            if (isset($result['status'])&&$result['status']) {
-                 $this->update([
+            if ($result['status'] == 'success') {
+                $this->update([
                     'status' => 'PROCESSING',
                     'tracking_no' => $result['tracking_no'],
-                    'logistics_order_at' => date('Y-m-d H:i:s')
+                    'logistics_order_number' => $result['logistics_order_number'],
+                    'logistics_order_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            if ($result['status'] == 'again') {
+                $this->update([
+                    'tracking_no' => $result['tracking_no'],
+                    'logistics_order_number' => $result['logistics_order_number'],
+                    'logistics_order_at' => date('Y-m-d H:i:s'),
                 ]);
             }
             return $result;
         }
-        return ['status'=>false,'tracking_no'=>'Fail to place logistics order'];
+        return ['status'=>false,'tracking_no'=>'Fail to place logistics order','logistics_order_number'=>''];
     }
 
     /**
@@ -1312,7 +1323,6 @@ class PackageModel extends BaseModel
                 'tracking_no' => $content['tracking_no'],
                 'status' => 'SHIPPED',
                 'shipped_at' => date('Y-m-d G:i:s', time()),
-                'shipper_id' => '2'
             ]);
             foreach ($this->find($content['package_id'])->items as $packageitem) {
                 $packageitem->orderItem->update(['status' => 'SHIPPED']);

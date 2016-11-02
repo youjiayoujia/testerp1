@@ -35,7 +35,7 @@
             <img src="{{ asset('picture/post_logo.jpg') }}" style="width:140px;height:50px;"/>
             <span style="font-size:10px;">Small Packet By Air</span><br/>
             <span style="display:inline-block;width:55px;height:22px;border:2px solid #000;margin-left:40px;text-align:center;font-size:18px;font-weight:bold;">
-                {{ $model->country ? $model->country->code : '' }}{{ '编码' }}
+                {{ $model->country ? $model->country->code : '' }}{{ $model->logistics ? $model->logistics->logistics_code : '' }}
             </span>
         </p>
         <p style="float:left;width:238px;height:90px;text-align:center;border-right:1px solid #000;">
@@ -56,15 +56,7 @@
             </span>
             <span style="width:140px;font-size:16px;line-height:29px;background:#fff;display:inline-block;border-left:1px solid #000;">
                 @if($model->warehouse)
-                    @if($model->warehouse->name == '金华仓')
-                        {{ '中邮金华仓' }}
-                    @elseif($model->warehouse->name == '南京仓')
-                        {{ '中邮南京仓' }}
-                    @elseif($model->warehouse->name == '广州仓')
-                        {{ '中邮广州仓' }}
-                    @else
-                        {{ '中邮深圳仓' }}
-                    @endif
+                    {{ $model->warehouse->name }}
                 @endif
             </span>
         </p>

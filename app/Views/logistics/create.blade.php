@@ -64,7 +64,7 @@
                 <option value="0">==选择回邮模版==</option>
                 @foreach($emailTemplates as $emailTemplate)
                     <option value="{{$emailTemplate->id}}" {{ Tool::isSelected('logistics_email_template_id', $emailTemplate->id) }}>
-                        {{$emailTemplate->name}}
+                        {{$emailTemplate->name}}{{$emailTemplate->eub_head}}
                     </option>
                 @endforeach
             </select>

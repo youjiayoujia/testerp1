@@ -126,6 +126,20 @@ class ItemModel extends BaseModel
         return $this->belongsToMany('App\Models\Product\SupplierModel', 'item_prepare_suppliers', 'item_id','supplier_id')->withTimestamps();
     }
 
+    public function getLogisticsLimitAttribute()
+    {
+        $product = $this->product;
+        $limits = $product->logisticsLimit;
+        $str = '';
+        if(!empty($limits)) {
+            foreach($limits as $limit) {
+                $str .= $limit->name . ' ';
+            }
+        }
+
+        return $str;
+    }
+
     public function updateItem($data)
     {
         $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',', $data['carriage_limit_arr']);
@@ -137,6 +151,20 @@ class ItemModel extends BaseModel
     public function stocks()
     {
         return $this->hasMany('App\Models\StockModel', 'item_id');
+    }
+
+    public function getDeclaredValueAttribute()
+    {
+        $purchase_price = $this->purchase_price;
+        if(($purchase_price/6)<1){
+            $value = 1;
+        }elseif(($purchase_price/6)>25){
+            $value = 25;
+        }else{
+            $value = round($purchase_price/6);
+        }
+
+        return $value;
     }
 
     public function getImageAttribute()
@@ -597,7 +625,11 @@ class ItemModel extends BaseModel
     public function createPurchaseNeedData()
     {
         ini_set('memory_limit', '2048M');
-        $items = $this->all();
+        //$items = $this->all();
+        $crr = array('21372','21373','29644','30974','32076','42437','47534','54980','57370','57616','59186');
+        $items = $this->find($crr);
+        echo '<pre>';
+        print_r($items);exit;
         $requireModel = new RequireModel();
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
@@ -608,22 +640,27 @@ class ItemModel extends BaseModel
                 if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
                     if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
-                            $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                            $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
                         }
                     }
                 }
             }
+            //缺货
+            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
+            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+
             $data['zaitu_num'] = $zaitu_num;
             //实库存
             $data['all_quantity'] = $item->all_quantity;
             //可用库存
             $data['available_quantity'] = $item->available_quantity;
             //虚库存
-            $quantity = $requireModel->where('is_require', 1)->where('item_id',
+            /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
                 $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',
-                $item->id)->sum('quantity') : 0;
+                $item->id)->sum('quantity') : 0;*/
             //$xu_kucun = $data['all_quantity'] - $quantity;
-            $xu_kucun = $item->available_quantity;
+            $xu_kucun = $item->available_quantity-$data['need_total_num'];
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
@@ -707,9 +744,7 @@ class ItemModel extends BaseModel
 
             }
 
-            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
-            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+            
 
             $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
             //退款率
@@ -925,6 +960,26 @@ class ItemModel extends BaseModel
                 $itemModel->update($old_data);
             }
 
+        }
+    }
+
+    public function updateWeight()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $model = $this->where('weight',null)->get();
+        
+        foreach ($model as $key => $itemModel) {
+            $old_data = [];
+            $erp_products_data = DB::select('select products_weight
+                    from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
+            //print_r(count($erp_products_data));exit;
+            if(count($erp_products_data)){
+                $old_data['weight'] = $erp_products_data[0]->products_weight;
+                //print_r($old_data);exit;
+                $itemModel->update($old_data);
+            }
+            
         }
     }
 

@@ -126,13 +126,12 @@ class ZoneModel extends BaseModel
     public function updateData($arr)
     {
         $this->update($arr);
-        $countries = $this->zone_countries;
-        foreach($countries as $country) {
-            $country->forceDelete();
-        }
+        $countries = $this->logistics_zone_countries;
+        $buf = [];
         if(array_key_exists('countrys', $arr)) {
-            $this->logistics_zone_countries()->attach($arr['countrys']);
+            $buf = array_unique($arr['countrys']);
         }
+        $this->logistics_zone_countries()->sync($buf);
         if($arr['type'] == 'second') {
             $sectionPrices = $this->zone_section_prices;
             foreach($sectionPrices as $sectionPrice) {

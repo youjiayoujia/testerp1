@@ -22,7 +22,11 @@
         <tr>
             <td>{{ $emailTemplate->id }}</td>
             <td>{{ $emailTemplate->type == 'default' ? '默认' : 'EUB'}}</td>
-            <td>{{ $emailTemplate->name }}</td>
+            @if($emailTemplate->type == 'default')
+                <td>{{ $emailTemplate->name }}</td>
+            @else
+                <td>{{ $emailTemplate->eub_head }}</td>
+            @endif
             <td>{{ $emailTemplate->customer }}</td>
             <td>{{ $emailTemplate->zipcode }}</td>
             <td>{{ $emailTemplate->phone }}</td>

@@ -153,7 +153,7 @@ Class YuntuAdapter extends BasicAdapter
 			return $reArr;
 		}else{
 			curl_close($ch);		
-			$data = json_decode($data,true);
+			$data = json_decode($data,true);print_r($data);
 			if(isset($data['Item'][0]['OrderId']) && !empty($data['Item'][0]['OrderId'])){
 				return $result = [
 						'code' => 'success',

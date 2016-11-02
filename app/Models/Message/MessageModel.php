@@ -260,6 +260,7 @@ class MessageModel extends BaseModel{
     public function reply($data)
     {
         $data['to_email'] = trim($data['to_email']);
+        $data['status'] = 'NEW';
         if ($this->replies()->create($data)) {
             //记录回复邮件类型
             $this->type_id = $data['type_id']?$data['type_id']:"";

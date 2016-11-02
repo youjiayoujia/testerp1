@@ -43,7 +43,7 @@
                                   'IL' => 29,'IT' => 30,'DE' => 31,'CL' => 32,
                                   'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                                   'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
-                            @if($value[$key] == $model->country->code)
+                            @if($key == $model->country->code)
                                 {{ $value }}
                             @endif
                         @endforeach

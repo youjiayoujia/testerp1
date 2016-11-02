@@ -195,7 +195,13 @@
 
         $(document).on('click', '.opposite_select', function(){
             block = $(this).parent().parent();
-            block.find("input[type='checkbox']").prop('checked', false);
+            $.each(block.find("input[type='checkbox']"), function(){
+                if($(this).prop('checked') == true) {
+                    $(this).prop('checked', false);
+                } else {
+                    $(this).prop('checked', true);
+                }
+            });
         });
 
 

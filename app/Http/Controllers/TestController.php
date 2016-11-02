@@ -79,7 +79,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::where('id',2)->first();
+        $package = PackageModel::where('id',1)->first();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $package,

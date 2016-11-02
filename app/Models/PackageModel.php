@@ -144,6 +144,22 @@ class PackageModel extends BaseModel
         return $value;
     }
 
+    public function getLogisticsZoneAttribute()
+    {
+        $zone = 0;
+        if($this->logistics) {
+            foreach($this->logistics->zones as $zone) {
+                foreach($zone->zone_countries as $country) {
+                    if($this->shipping_country == $country->country->code) {
+                        $zone = $country->logistics_zone_id;
+                    }
+                }
+            }
+        }
+
+        return $zone;
+    }
+
     //包裹sku信息
     public function getSkuInfoAttribute()
     {

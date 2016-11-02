@@ -35,7 +35,7 @@
             <img src="{{ asset('picture/post_logo.jpg') }}" style="width:140px;height:50px;"/>
             <span style="font-size:10px;">Small Packet By Air</span><br/>
             <span style="display:inline-block;width:55px;height:22px;border:2px solid #000;margin-left:40px;text-align:center;font-size:18px;font-weight:bold;">
-                {{ $model->country ? $model->country->code : '' }}{{ $model->logistics ? $model->logistics->logistics_code : '' }}
+                {{ $model->country ? $model->country->code : '' }}{{ $model->logistics_zone }}
             </span>
         </p>
         <p style="float:left;width:238px;height:90px;text-align:center;border-right:1px solid #000;">

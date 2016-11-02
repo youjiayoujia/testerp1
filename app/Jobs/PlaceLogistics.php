@@ -45,7 +45,7 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'packages  logistics_order_number:'.$result['logistics_order_number'] .' need  get tracking_no ';
 
             $job = new PlaceLogistics($this->package);
-            $job = $job->onQueue('placeLogistics');
+            $job = $job->onQueue('placeLogistics')->delay(600); //暂设10分钟
             $this->dispatch($job);
 
         } else {

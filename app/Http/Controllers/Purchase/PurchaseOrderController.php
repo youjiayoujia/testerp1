@@ -233,7 +233,7 @@ class PurchaseOrderController extends Controller
         $model->update($data);
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
-        return redirect( route('purchaseOrder.edit', $id));     
+        return redirect($this->mainIndex);
     }
     
     /**

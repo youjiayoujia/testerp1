@@ -69,7 +69,7 @@
             {{ $model->country ? $model->country->name : '' . ' ' . $model->shipping_zipcode }}<br/>
             phone:{{ $model->shipping_phone }}&nbsp;&nbsp;&nbsp;
             <span style="font-size:16px;">{{ $model->country ? $model->country->cn_name : '' }}</span>
-            &nbsp;&nbsp;&nbsp;{{ '分区' }}
+            &nbsp;&nbsp;&nbsp;{{ $model->logistics_zone }}
         </p>
     </div>
     <table border="0" style="width:382px;height:110px;" cellspacing="0" cellpadding="0">

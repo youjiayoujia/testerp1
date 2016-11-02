@@ -29,4 +29,9 @@ class CountriesModel extends BaseModel
         'update' => [
         ],
     ];
+
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
 }

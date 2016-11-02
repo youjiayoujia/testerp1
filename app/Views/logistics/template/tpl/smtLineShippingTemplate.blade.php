@@ -39,7 +39,7 @@
             </span>
         </p>
         <p style="float:left;width:238px;height:90px;text-align:center;border-right:1px solid #000;">
-            <span style="display:inline-block;margin-top:12px;margin-left:40px;">
+            <span style="display:inline-block;margin-top:5px;margin-left:40px;">
                 <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 {{ $model->tracking_no }}
             </span>
@@ -59,7 +59,7 @@
             </span>
         </p>
         <p style="float:left;width:238px;border:1px solid #000;border-bottom:none;font-size:12px;">
-            <span style="font-weight:bold;font-size:12px;">Ship To:</span><br/>
+            <span style="font-weight:bold;font-size:10px;">Ship To:</span><br/>
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
             {{ $model->shipping_city }}<br/>
@@ -109,7 +109,9 @@
     </table>
     <div style="width:382px;height:40px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
         <span style="font-size:12px;font-weight:bold;">
-            【{{ $model->logistics_id }}】
+            【
+            {{ $model->logistics ? $model->logistics->logistics_code : '' }}
+            】
         </span>
         {{ $model->sku_info }}
     </div>

@@ -54,7 +54,7 @@
                     Phone:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
                 </b>
             </span>
-            <span style="width:140px;font-size:16px;line-height:29px;background:#fff;display:inline-block;border-left:1px solid #000;">中邮广州仓
+            <span style="width:140px;font-size:16px;line-height:29px;background:#fff;display:inline-block;border-left:1px solid #000;">
                 {{ '中邮广州仓' }}
             </span>
         </p>

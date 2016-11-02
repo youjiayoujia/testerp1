@@ -304,9 +304,10 @@ class TestController extends Controller
     }
 
     public function testYw(){
-        $package = PackageModel::findOrFail(3);
+        $id = request()->get('id');
+        $package = PackageModel::findOrFail($id);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-        ->getTracking($package);
+            ->getTracking($package);
         exit;
     }
 

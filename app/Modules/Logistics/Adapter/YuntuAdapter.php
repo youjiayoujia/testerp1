@@ -35,7 +35,16 @@ Class YuntuAdapter extends BasicAdapter
     {
 		$credentials = "C10262&8EE7CxtoZ2c=";  //帐号：密码		
 		$declare_value = ($ordersinfo->order->amount>20) ? 20 : $ordersinfo->order->amount;//申报价值即是订单总金额除以sku的数量（向上取整,保留两位一位），最高不超过20没有
-		
+		if(isset($ordersinfo->logistics_order_number) && $ordersinfo->logistics_order_number !== '' && $ordersinfo->tracking_no == ''){
+			$res = $this->yunTuGetTrackNumApi($ordersinfo->id);
+			if(isset($res['ResultCode']) && $res['ResultCode']=='0000'){
+				return $result = [
+						'code' => 'success',
+						'result' => isset($res['Item'][0]['TrackingNumber']) ? $res['Item'][0]['TrackingNumber'] : ''
+				];
+			}
+
+		}
 		foreach($ordersinfo->items as $key => $item){
 			$declare_name_cn = $item->item->product->declared_cn;//申报中文名称是第一个产品的中文申报名称
 			$declare_name_en = $item->item->product->declared_en;//申报英文名称是第一个产品的英文申报名称
@@ -101,8 +110,8 @@ Class YuntuAdapter extends BasicAdapter
 								$request_json .= implode(",",$sku_json);
 								$request_json.='    
 								  ], 
-								  "OrderNumber": "SLME'.$ordersinfo->id.'",
-								  "TrackingNumber": "'.$ordersinfo->tracking_no.'",
+								  "OrderNumber": "SL'.$ordersinfo->id.'",
+								  "TrackingNumber": "'.$ordersinfo->logistics_order_number.'",
 								  "ShippingMethodCode": "'.$ordersinfo->logistics->type.'",
 								  "ApplicationType": 4,
 								  "Weight": 1,
@@ -153,20 +162,53 @@ Class YuntuAdapter extends BasicAdapter
 			return $reArr;
 		}else{
 			curl_close($ch);		
-			$data = json_decode($data,true);print_r($data);
-			if(isset($data['Item'][0]['OrderId']) && !empty($data['Item'][0]['OrderId'])){
+			$data = json_decode($data,true);
+			if(isset($data['Item'][0]['OrderId']) && isset($data['Item'][0]['WayBillNumber']) && $data['Item'][0]['OrderId'] !== '' && $data['Item'][0]['WayBillNumber'] !== ''){
 				return $result = [
 						'code' => 'success',
-						'result' => $data['Item'][0]['WayBillNumber'],
-						'result_other' => $data['Item'][0]['OrderId']
+						'result' => isset($data['Item'][0]['OrderId']) ? $data['Item'][0]['OrderId'] : '',
+						'result_other' => isset($data['Item'][0]['WayBillNumber']) ? $data['Item'][0]['WayBillNumber'] : ''
+				];
+			}else if(isset($data['Item'][0]['OrderId']) || isset($data['Item'][0]['WayBillNumber'])){
+				return $result = [
+						'code' => 'again',
+						'result' => isset($data['Item'][0]['OrderId']) ? $data['Item'][0]['OrderId'] : '',
+						'result_other' => isset($data['Item'][0]['WayBillNumber']) ? $data['Item'][0]['WayBillNumber'] : ''
 				];
 			}else{
 				return $result = [
 						'code' => 'error',
-						'result' => $data['Item'][0]['Feedback']
+						'result' => isset($data['Item'][0]['Feedback']) ? $data['Item'][0]['Feedback'] : ''
 				];
 			}
 		}		
-    }	
+    }
+	/**
+	 * 根据订单号获取跟踪号
+	 * @param unknown $ordersInfoArr
+	 */
+	public function yunTuGetTrackNumApi($ordersInfoArr){
+		$credentials = "C10262&8EE7CxtoZ2c=";  //帐号：密码
+		$url = "http://gapi.yunexpress.com/api/WayBill/GetTrackNumber?orderId=SLM".$ordersInfoArr;
+		$headers = array(
+				"Authorization:Basic ".base64_encode($credentials),
+				"Content-type: application/json;charset=UTF-8"
+		);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL,$url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		$data = curl_exec($ch);
+		$reArr = array();
+		if (curl_errno($ch)) {
+			$reArr['Error'] = curl_error($ch);
+			return $reArr;
+		}else{
+			curl_close($ch);
+			$data = json_decode($data,true);
+			return $data;
+		}
+	}
     
 }

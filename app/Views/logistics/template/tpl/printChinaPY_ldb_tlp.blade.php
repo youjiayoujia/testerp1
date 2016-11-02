@@ -93,9 +93,7 @@
 			</tr>
 			<tr style="height:16mm;" valign="center">
 				<td style="font-size:16px;text-align:center; valign="top">
-				@if($model->logistics_order_number)
-				<p style="text-align:left;height:4mm;border-bottom:1px solid black;line-height:4mm;">'.$model->logistics_order_number.'</p>
-				@endif
+				<p style="text-align:left;height:4mm;border-bottom:1px solid black;line-height:4mm;"> {{ $model->shipping ? $model->shipping->logistics_code : '' }} </p>
 				<p style="font-size:16px;font-weight:bold;text-align:center;">UNTRACKED</p>
 				</td>
 				<td colspan="3" >

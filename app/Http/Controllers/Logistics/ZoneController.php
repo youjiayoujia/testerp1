@@ -39,7 +39,7 @@ class ZoneController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses'=>LogisticsModel::all(),
-            'partitions' => PartitionModel::all(),
+            'partitions' => PartitionModel::with('partitionSorts.country')->get(),
             'model' => $this->model->where('logistics_id', LogisticsModel::first()->id)->first(),
             'logistics_id' => $logistics_id,
             'logistics_name' => $logistics_name,
@@ -131,19 +131,22 @@ class ZoneController extends Controller
      */
     public function edit($id)
     {
-        $model = $this->model->find($id);
+        $model = $this->model->with('zone_section_prices')->with('logistics_zone_countries')->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $arr = explode('/', $_SERVER['HTTP_REFERER']);
+        $logistics_id = $arr[count($arr) - 1];
+        $logistics_name = LogisticsModel::where('id', $logistics_id)->first()->name;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'countries' => $model->logistics_zone_countries,
-            'logisticses'=>LogisticsModel::all(),
-            'partitions' => PartitionModel::all(),
+            'partitions' => PartitionModel::with('partitionSorts.country')->get(),
             'sectionPrices' => $model->zone_section_prices,
             'len' =>  $model->zone_section_prices->count(),
+            'logistics_name' => $logistics_name,
         ];
+
         return view($this->viewPath . 'edit', $response);
     }
 

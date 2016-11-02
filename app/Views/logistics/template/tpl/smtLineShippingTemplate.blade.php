@@ -48,7 +48,7 @@
         <p style="float:left;width:140px;">
             <span style="width:140px;display:inline-block;height:97px;border-left:1px solid #000;border-bottom:1px solid #000;font-size:10px;padding-left:4px;">
                 From:<br/>
-                    {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}
+                {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}
                 <br/>
                 <b style="font-weight:bold;">
                     Phone:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
@@ -58,7 +58,7 @@
                 {{ '中邮广州仓' }}
             </span>
         </p>
-        <p style="float:left;width:238px;border:1px solid #000;border-bottom:none;font-size:12px;">
+        <p style="float:left;width:233px;border:1px solid #000;border-bottom:none;font-size:12px;padding-left: 5px;">
             <span style="font-weight:bold;font-size:10px;">Ship To:</span><br/>
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>

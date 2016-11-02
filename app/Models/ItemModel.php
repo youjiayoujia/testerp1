@@ -628,8 +628,7 @@ class ItemModel extends BaseModel
         //$items = $this->all();
         $crr = array('21372','21373','29644','30974','32076','42437','47534','54980','57370','57616','59186');
         $items = $this->find($crr);
-        echo '<pre>';
-        print_r($items);exit;
+        
         $requireModel = new RequireModel();
         foreach ($items as $item) {
             $data['item_id'] = $item->id;

@@ -161,8 +161,9 @@ class ItemModel extends BaseModel
         }elseif(($purchase_price/6)>25){
             $value = 25;
         }else{
-            $value = round($item->purchase_price/6);
+            $value = round($purchase_price/6);
         }
+        
         return $value;
     }
 

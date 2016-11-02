@@ -48,6 +48,7 @@ class PackageModel extends BaseModel
         'width',
         'height',
         'tracking_no',
+        'logistics_order_number',
         'tracking_link',
         'email',
         'shipping_firstname',

@@ -43,7 +43,7 @@
                                   'IL' => 29,'IT' => 30,'DE' => 31,'CL' => 32,
                                   'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                                   'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
-                            @if($value[$key] == $model->country->code)
+                            @if($key == $model->country->code)
                                 {{ $value }}
                             @endif
                         @endforeach
@@ -78,7 +78,7 @@
 			</tr>			
 	
 			<tr style="height:5mm;">
-				<td style="text-align:left;"> 自编号:{{ $model->order ? $model->order->ordernum : '' }}</td>
+				<td style="text-align:left;"> 自编号:{{ $model->id }}</td>
 				<td>
 				    <?php  $countryZone = config('countryZone'); ?>  
 				    @if($model->country)				   
@@ -127,7 +127,7 @@
 				</td>
 			</tr>
 			<tr style="height:5mm;line-height:11px;font-size:11px;">
-				<td colspan="2" style="text-align:left;"> Sender\'s Singniture:SLME</td>
+				<td colspan="2" style="text-align:left;"> Sender's Singniture:SLME</td>
 				<td>CN22</td>
 				<td>{{ date('Y-m-d') }}</td>
 			</tr>

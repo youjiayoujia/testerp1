@@ -150,7 +150,7 @@ class PackageModel extends BaseModel
         if($this->logistics) {
             foreach($this->logistics->zones as $zone) {
                 foreach($zone->zone_countries as $country) {
-                    if($this->shipping_country == $country->country->code) {
+                    if($this->shipping_country == $country->country ? $country->country->code : '') {
                         $zone = $country->logistics_zone_id;
                     }
                 }

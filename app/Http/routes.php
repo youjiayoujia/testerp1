@@ -472,9 +472,6 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //拣货单异常
     Route::get('errorList/exportException/{arr}',
         ['uses' => 'Picklist\ErrorListController@exportException', 'as' => 'errorList.exportException']);
-
-    Route::get('errorList/ajaxProcess',
-        ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
     Route::get('pickList/printInfo',

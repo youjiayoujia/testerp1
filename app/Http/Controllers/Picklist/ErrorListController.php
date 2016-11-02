@@ -65,22 +65,6 @@ class ErrorListController extends Controller
         return view($this->viewPath.'show', $response);
     }
 
-    public function ajaxProcess()
-    {
-        $id = request('id');
-        $model = $this->model->find($id);
-        if(!$model) {
-            return json_encode('false');
-        }
-        $package = PackageModel::find($model->package_id);
-        if(!$package) {
-            return json_encode('false');
-        }
-        $package->update(['status' => 'SHIPPED']);
-        $model->update(['status' => '1', 'process_by' => request()->user()->id, 'process_time' => date('Y-m-d h:m:s', time())]);
-        return json_encode('true');
-    }
-
     public function exportException($arr)
     {
         $rows = [];

@@ -1323,7 +1323,6 @@ class PackageModel extends BaseModel
                 'tracking_no' => $content['tracking_no'],
                 'status' => 'SHIPPED',
                 'shipped_at' => date('Y-m-d G:i:s', time()),
-                'shipper_id' => '2'
             ]);
             foreach ($this->find($content['package_id'])->items as $packageitem) {
                 $packageitem->orderItem->update(['status' => 'SHIPPED']);

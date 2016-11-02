@@ -51,7 +51,7 @@ class PurchaseOrderController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->where('status','0')),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
 

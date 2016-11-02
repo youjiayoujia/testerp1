@@ -58,7 +58,7 @@
                 {{ '中邮广州仓' }}
             </span>
         </p>
-        <p style="float:left;width:238px;border:1px solid #000;border-bottom:none;font-size:12px;">
+        <p style="float:left;width:238px;border:1px solid #000;border-bottom:none;font-size:12px;padding:10px">
             <span style="font-weight:bold;font-size:10px;">Ship To:</span><br/>
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>

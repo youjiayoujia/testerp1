@@ -24,7 +24,7 @@ class FpxAdapter extends BasicAdapter{
             "destinationCountryCode" => $package->shipping_country,//目的国家二字代码，参照国家代码表
             'customerWeight' => round($package->total_weight,2),
             "initialCountryCode" => 'CN',               //起运国家二字代码，参照国家代码表【***】
-            "orderNo" => 'LME' . $package->order_id,    //客户订单号码，由客户自己定义【***】
+            "orderNo" => 'LME' . $package->id,    //客户订单号码，由客户自己定义【***】
             "productCode" => $product_arr[1],                      //产品代码，指DHL、新加坡小包挂号、联邮通挂号等，参照产品代码表 【***】    不确定字段在哪个表中,如何获取，暂时固定
             "returnSign" => 'Y',                        //小包退件标识 Y: 发件人要求退回 N: 无须退回(默认)
             "stateOrProvince" => $package->shipping_state,//州  /  省 【***】
@@ -43,7 +43,6 @@ class FpxAdapter extends BasicAdapter{
         if(is_object($response)){
             $response = get_object_vars($response->return);
         }
-        dd($response);
         if($response['ack'] == 'Success'){
             $data = ['tracking_no' => $response['trackingNumber']];
            // PackageModel::where('id',$package->id)->update($data);

@@ -110,7 +110,7 @@ Class YuntuAdapter extends BasicAdapter
 								$request_json .= implode(",",$sku_json);
 								$request_json.='    
 								  ], 
-								  "OrderNumber": "SL'.$ordersinfo->id.'",
+								  "OrderNumber": "SLME'.$ordersinfo->id.'",
 								  "TrackingNumber": "'.$ordersinfo->logistics_order_number.'",
 								  "ShippingMethodCode": "'.$ordersinfo->logistics->type.'",
 								  "ApplicationType": 4,
@@ -189,7 +189,7 @@ Class YuntuAdapter extends BasicAdapter
 	 */
 	public function yunTuGetTrackNumApi($ordersInfoArr){
 		$credentials = "C10262&8EE7CxtoZ2c=";  //帐号：密码
-		$url = "http://gapi.yunexpress.com/api/WayBill/GetTrackNumber?orderId=SLM".$ordersInfoArr;
+		$url = "http://gapi.yunexpress.com/api/WayBill/GetTrackNumber?orderId=SLME".$ordersInfoArr;
 		$headers = array(
 				"Authorization:Basic ".base64_encode($credentials),
 				"Content-type: application/json;charset=UTF-8"

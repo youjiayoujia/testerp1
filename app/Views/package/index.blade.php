@@ -90,7 +90,7 @@
                         <span class="glyphicon glyphicon-random"></span>
                     </a>
                 @endif
-                @if(in_array($package->status,['PROCESSING','PICKING']))
+                @if(in_array($package->status,['PROCESSING','PICKING','PACKED']))
                     <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
                         <span class="glyphicon glyphicon-refresh"></span>
                     </a>

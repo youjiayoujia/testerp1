@@ -1271,7 +1271,7 @@ class PackageModel extends BaseModel
     {
         if ($type == 'UPDATE') {
             //判断订单状态
-            if (!in_array($this->status, ['PROCESSING', 'PICKING'])) {
+            if (!in_array($this->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
                 return false;
             }
         } else {

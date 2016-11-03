@@ -280,12 +280,16 @@
 
             $(document).on('click', '.recycle', function () {
                 id = $(this).data('id');
-                location.href = "{{ route('package.recycle') }}?id=" + id;
+                if (confirm('确认重新匹配物流？')) {
+                    location.href = "{{ route('package.recycle') }}?id=" + id;
+                }
             })
 
             $(document).on('click', '.retrack', function () {
                 id = $(this).data('id');
-                location.href = "{{ route('package.retrack') }}?id=" + id;
+                if (confirm('确认重下物流单？')) {
+                    location.href = "{{ route('package.retrack') }}?id=" + id;
+                }
             })
 
             $(document).on('click', '.submit_logistics', function () {

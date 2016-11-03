@@ -66,7 +66,7 @@
 			 		 <b style="font-weight:bold;">Phone:
 			 		 {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
 				</td>
-				<td colspan="3" style="text-align:left;padding:2px;">
+				<td colspan="3" style="text-align:left;padding:2px;font-size:9px">
 					{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 					{{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
 					{{ $model->shipping_city }}<br/>

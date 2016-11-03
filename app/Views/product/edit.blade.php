@@ -20,15 +20,17 @@
                             {{$product->model}}
                         </label>
                     </div>
-                    @foreach($product->catalog->variations as $key=>$getattr)        
-                        <div class="checkbox col-md-2 innercheckboxs">{{$getattr->name}}:
-                            @foreach($getattr->values as $innervalue)
-                                <label>
-                                    <input type='checkbox' class='{{$getattr->id}}-{{$innervalue->name}}' name='variations[{{$getattr->id}}][{{$innervalue->id}}]' value='{{$innervalue->name}}' {{ in_array($innervalue->id, $variation_value_id_arr)? 'checked' : '' }}>{{$innervalue->name}}
-                                </label>
-                            @endforeach
-                        </div>
-                    @endforeach
+                    @if($product->catalog)
+                        @foreach($product->catalog->variations as $key=>$getattr)        
+                            <div class="checkbox col-md-2 innercheckboxs">{{$getattr->name}}:
+                                @foreach($getattr->values as $innervalue)
+                                    <label>
+                                        <input type='checkbox' class='{{$getattr->id}}-{{$innervalue->name}}' name='variations[{{$getattr->id}}][{{$innervalue->id}}]' value='{{$innervalue->name}}' {{ in_array($innervalue->id, $variation_value_id_arr)? 'checked' : '' }}>{{$innervalue->name}}
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
         </div>
         <div class="form-group third">

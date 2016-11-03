@@ -72,32 +72,6 @@ class PackageModel extends BaseModel
         'lazada_package_id'
     ];
 
-    public function getPackageInfoAttribute()
-    {
-        $count = 0;
-        $skuString = '';
-        foreach ($this->items as $packageItem) {
-            if ($count > 5) {
-                $skuString .= ',***';
-            } else {
-                $skuString .= ',' . ($packageItem->item ? $packageItem->item->sku : '') . '*' . ($packageItem->item ? $packageItem->item->cost : '') . '' . ($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '');
-            }
-            $count++;
-        }
-        $skuString = substr($skuString, 1);
-        return $skuString;
-    }
-
-    public function getDeclareNameAttribute()
-    {
-        $skuString = '';
-        foreach ($this->items as $packageItem) {
-            $skuString .= ($packageItem->item ? $packageItem->item->name : '') . '*';
-        }
-        $skuString = substr($skuString, 1);
-        return $skuString;
-    }
-
     public function getMixedSearchAttribute()
     {
         $arr = [];
@@ -127,6 +101,32 @@ class PackageModel extends BaseModel
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
         ];
+    }
+
+    public function getPackageInfoAttribute()
+    {
+        $count = 0;
+        $skuString = '';
+        foreach ($this->items as $packageItem) {
+            if ($count > 5) {
+                $skuString .= ',***';
+            } else {
+                $skuString .= ',' . ($packageItem->item ? $packageItem->item->sku : '') . '*' . ($packageItem->item ? $packageItem->item->cost : '') . '' . ($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '');
+            }
+            $count++;
+        }
+        $skuString = substr($skuString, 1);
+        return $skuString;
+    }
+
+    public function getDeclareNameAttribute()
+    {
+        $skuString = '';
+        foreach ($this->items as $packageItem) {
+            $skuString .= ($packageItem->item ? $packageItem->item->name : '') . '*';
+        }
+        $skuString = substr($skuString, 1);
+        return $skuString;
     }
 
     public function shipperName()

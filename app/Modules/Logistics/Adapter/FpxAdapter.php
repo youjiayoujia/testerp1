@@ -41,7 +41,9 @@ class FpxAdapter extends BasicAdapter{
         $params['arg1'] = $arrs;
         
         $response = $this->soap->createAndPreAlertOrderService($params);
-        dd($response);
+        if(is_object($response)){
+            $response = get_object_vars($response->return);
+        }
         if($response['ack'] == 'success'){
             $data = ['tracking_no' => $response['trackingNumber']];
            // PackageModel::where('id',$package->id)->update($data);

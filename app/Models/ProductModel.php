@@ -576,6 +576,7 @@ class ProductModel extends BaseModel
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
             $product_data['status'] = 'sellWaiting';
+            $product_data['competition_url'] = $this->spu->productRequire->competition_url;
             unset($product_data['id']);
             $itemModel = $this->item()->create($product_data);
             //初始化

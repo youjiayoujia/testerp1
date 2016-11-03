@@ -55,7 +55,11 @@
                 </b>
             </span>
             <span style="width:140px;font-size:16px;line-height:29px;background:#fff;display:inline-block;border-left:1px solid #000;">
-                {{ '中邮广州仓' }}
+                @if($model->warehouse_id == 3)
+                    {{ '中邮广州仓' }}
+                @elseif($model->warehouse_id == 4)
+                    {{ '中邮南京仓' }}
+                @endif
             </span>
         </p>
         <p style="float:left;width:233px;border:1px solid #000;border-bottom:none;font-size:12px;padding-left: 5px;">

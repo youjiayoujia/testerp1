@@ -101,7 +101,13 @@ class ZoneController extends Controller
     public function one($id)
     {
         request()->flash();
-        return redirect(route('logisticsZone.index')."/?logisticsId=".$id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model, $this->model->where('logistics_id', $id)),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'id' => $id,
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 
     /**

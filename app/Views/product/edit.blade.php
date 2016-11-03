@@ -37,31 +37,33 @@
             <label for='set'>feature属性:</label>
             <div class="panel panel-info">
                 <div class="checkbox panel-body "><?php $i=0; ?>
-                    @foreach($product->catalog->features as $key=>$getfeature)
-                        
-                        @if($getfeature->type==1)
-                            <div class="featurestyle" style="padding-bottom:10px">                           
-                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="<?php if(count($features_input)>0)echo $features_input[$i]['feature_value'];$i++; ?>" name='featureinput[{{$getfeature->id}}]' />
-                            </div>
+                    @if($product->catalog)
+                        @foreach($product->catalog->features as $key=>$getfeature)
                             
-                        @elseif($getfeature->type==2)
-                            <div class="radio">{{$getfeature->name}}
-                            @foreach($getfeature->values as $value)
-                            <label>
-                                <input class='{{$getfeature->id}}-{{$value->name}}' {{ in_array($value->id, $features_value_id_arr)? 'checked' : '' }} type='radio' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
-                            </label>
-                            @endforeach
-                            </div>
-                        @else($getfeature->type==3)
-                            <div class="checkbox">{{$getfeature->name}}
-                            @foreach($getfeature->values as $value)
-                            <label>
-                                <input class='{{$getfeature->id}}-{{$value->name}}' {{ in_array($value->id, $features_value_id_arr)? 'checked' : '' }} type='checkbox' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
-                            </label>
-                            @endforeach
-                            </div>
-                        @endif
-                    @endforeach
+                            @if($getfeature->type==1)
+                                <div class="featurestyle" style="padding-bottom:10px">                           
+                                        {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="<?php if(count($features_input)>0)echo $features_input[$i]['feature_value'];$i++; ?>" name='featureinput[{{$getfeature->id}}]' />
+                                </div>
+                                
+                            @elseif($getfeature->type==2)
+                                <div class="radio">{{$getfeature->name}}
+                                @foreach($getfeature->values as $value)
+                                <label>
+                                    <input class='{{$getfeature->id}}-{{$value->name}}' {{ in_array($value->id, $features_value_id_arr)? 'checked' : '' }} type='radio' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
+                                </label>
+                                @endforeach
+                                </div>
+                            @else($getfeature->type==3)
+                                <div class="checkbox">{{$getfeature->name}}
+                                @foreach($getfeature->values as $value)
+                                <label>
+                                    <input class='{{$getfeature->id}}-{{$value->name}}' {{ in_array($value->id, $features_value_id_arr)? 'checked' : '' }} type='checkbox' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
+                                </label>
+                                @endforeach
+                                </div>
+                            @endif
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div> 

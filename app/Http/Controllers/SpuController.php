@@ -34,7 +34,34 @@ class SpuController extends Controller
      */
     public function index()
     {
-        /*$old_data = [];
+        /*$model = new SpuModel();
+        $model->test1();exit;
+        $arr = array();
+        $arr['c_name'] = '绒面一字扣防水台高跟鞋【白】【38码】';
+        $arr['sku'] = 'SS4733A1';
+        $arr['purchase_price'] = '261';
+        $arr['supplier_id'] = '10001';
+        $arr['purchase_url'] = 'http://www.ebay.com/itm/ws/eBayISAPI.dll?ViewItem&item=400386085083';
+        $arr['dev_name'] = '曾杨顺';
+        $arr['notify'] = '';
+        $arr['spu'] = '12';
+        $arr['model'] = '122';
+        $arr['purchase_name'] = '张金平';
+        $arr['status'] = 'cleaning';
+        $arr['carriage_limit_arr'] = 'a:2:{i:0;i:1;i:1;i:4;}';
+        $arr['package_limit_arr'] = 'a:0:{}';
+        $arr['warehouse_id'] = '';
+        $arr['type'] = 'edit';
+        $url="http://www.yjerp.com/api/skuHandleApi";
+        $c = curl_init(); 
+        curl_setopt($c, CURLOPT_URL, $url); 
+        curl_setopt($c, CURLOPT_POST, 1);
+        curl_setopt($c, CURLOPT_POSTFIELDS, $arr);
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
+        $buf = curl_exec($c);
+        print_r($buf);exit;
+        $old_data = [];
         $old_data['sku'] = 'HJ1019W4';
         $old_data['name'] = '';
         $old_data['c_name'] = 'eee';
@@ -54,7 +81,7 @@ class SpuController extends Controller
         $old_data['notify'] = '';
         $old_data['unit'] = '千克/件';
         $old_data['status'] = 'stopping';
-        $old_data['type'] = 'edit';
+        $old_data['type'] = 'add';
         $arr = [];
         $arr[] = '2';
         $arr[] = '3';
@@ -67,7 +94,7 @@ class SpuController extends Controller
         //$old_data = json_encode($old_data);
        //echo '<pre>';
 //print_r($old_data);exit; 
-        $url="http://smerp.nocannobibi.me/api/skuHandleApi";
+        $url="http://v3.erp.moonarstore.com/api/skuHandleApi";
         $c = curl_init(); 
         curl_setopt($c, CURLOPT_URL, $url); 
         curl_setopt($c, CURLOPT_POST, 1);

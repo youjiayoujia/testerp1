@@ -10,13 +10,13 @@ class FpxAdapter extends BasicAdapter{
         
         $declave_values = $package->order->amount / $package->order->rate;
         $unitPrice = ($declave_values > 30) ? 30 : ceil($declave_values); 
-        foreach($package->items as $item){
-            $products_info = array(array(
-                "eName" => $item->item->product->declared_en,   //海关申报英文品名
-                "name" => $item->item->product->declared_cn,    //海关申报中文品名
-                "unitPrice" => $unitPrice,                      //单价  
-            ));   
-        }
+   
+        $products_info = array(array(
+            "eName" => $package->items ? $package->items->first()->item->product->declared_en : '',   //海关申报英文品名
+            "name" => $package->items ? $package->items->first()->item->product->declared_cn : '',    //海关申报中文品名
+            "unitPrice" => $unitPrice,                      //单价  
+        ));   
+    
         list($name,$productCode) =  explode(',',$package->logistics->type);
         $arrs = array(    
             "city" => $package->shipping_city,//城市 【***】
@@ -41,7 +41,7 @@ class FpxAdapter extends BasicAdapter{
         $response = $this->soapClient->createAndPreAlertOrderService($params);
         if($response['ack'] == 'success'){
             $data = ['tracking_no' => $response['trackingNumber']];
-            PackageModel::where('id',$package->id)->update($data);
+           // PackageModel::where('id',$package->id)->update($data);
             $result = [
                 'code' => 'success',
                 'result' => $response['trackingNumber']

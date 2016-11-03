@@ -73,18 +73,35 @@ class ZoneController extends Controller
         return redirect($this->mainIndex . '/one/' . $logistics_id);
     }
 
+
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        $buf = '';
+        if(request()->has('logisticsId')) {
+            $buf = $this->model->where('logistics_id', request('logisticsId'));
+        }
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+
     /**
      * 某个物流方式分区报价首页
      */
     public function one($id)
     {
         request()->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('logistics_id', $id)),
-            'id' => $id,
-        ];
-        return view($this->viewPath . 'index', $response);
+        return redirect(route('logisticsZone.index')."/?logisticsId=".$id);
     }
 
     /**

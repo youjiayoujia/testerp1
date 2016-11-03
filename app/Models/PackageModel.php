@@ -458,7 +458,6 @@ class PackageModel extends BaseModel
         return $arr;
     }
 
-    /*******************************************************************************/
     public function reCreatePackage()
     {
         $arr = [];
@@ -907,9 +906,6 @@ class PackageModel extends BaseModel
 
         return true;
     }
-
-    /**********************************************************************************/
-
 
     public function getShippingLimitsAttribute()
     {

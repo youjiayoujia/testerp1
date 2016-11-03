@@ -45,6 +45,12 @@ Class YuntuAdapter extends BasicAdapter
 			}
 
 		}
+		if(isset($ordersinfo->logistics_order_number) && $ordersinfo->logistics_order_number !== '' && isset($ordersinfo->tracking_no) && $ordersinfo->tracking_no !== ''){
+			return $result = [
+					'code' => 'error',
+					'result' => 'Purple tracking number already exists'
+			];
+		}
 		foreach($ordersinfo->items as $key => $item){
 			$declare_name_cn = $item->item->product->declared_cn;//申报中文名称是第一个产品的中文申报名称
 			$declare_name_en = $item->item->product->declared_en;//申报英文名称是第一个产品的英文申报名称
@@ -110,7 +116,7 @@ Class YuntuAdapter extends BasicAdapter
 								$request_json .= implode(",",$sku_json);
 								$request_json.='    
 								  ], 
-								  "OrderNumber": "SLMR'.$ordersinfo->id.'",
+								  "OrderNumber": "SLMRS'.$ordersinfo->id.'",
 								  "TrackingNumber": "'.$ordersinfo->logistics_order_number.'",
 								  "ShippingMethodCode": "'.$ordersinfo->logistics->type.'",
 								  "ApplicationType": 4,
@@ -189,7 +195,7 @@ Class YuntuAdapter extends BasicAdapter
 	 */
 	public function yunTuGetTrackNumApi($ordersInfoArr){
 		$credentials = "C10262&8EE7CxtoZ2c=";  //帐号：密码
-		$url = "http://gapi.yunexpress.com/api/WayBill/GetTrackNumber?orderId=SLMR".$ordersInfoArr;
+		$url = "http://gapi.yunexpress.com/api/WayBill/GetTrackNumber?orderId=SLMRS".$ordersInfoArr;
 		$headers = array(
 				"Authorization:Basic ".base64_encode($credentials),
 				"Content-type: application/json;charset=UTF-8"

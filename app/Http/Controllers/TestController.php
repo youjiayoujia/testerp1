@@ -79,12 +79,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::where('id',1)->first();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $package,
-        ];
-        return view('logistics.template.tpl.printChinaPY_ldb_tlp' , $response);
+        $package = PackageModel::find(530);
+        var_dump($package->logistics_zone->toarray());exit;
     }
 
     // public function test2()

@@ -16,9 +16,9 @@ use App\Models\Logistics\Zone\CountriesModel as ZoneCountriesModel;
 
 class ZoneModel extends BaseModel
 {
-    protected $table = 'logistics_zones';
+    public $table = 'logistics_zones';
 
-    protected $fillable = [
+    public $fillable = [
         'zone',
         'logistics_id',
         'type',

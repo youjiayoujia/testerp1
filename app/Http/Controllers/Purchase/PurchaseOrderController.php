@@ -51,7 +51,7 @@ class PurchaseOrderController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->where('examineStatus','0')),
+            'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
 
@@ -94,7 +94,7 @@ class PurchaseOrderController extends Controller
     public function store()
     {
         request()->flash();
-        $this->validate(request(), $this->model->rules('create'));
+        //$this->validate(request(), $this->model->rules('create'));
         $this->model->createPurchaseOrder(request()->all());
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
@@ -109,6 +109,7 @@ class PurchaseOrderController extends Controller
     
     public function edit($id)
     {   
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -121,6 +122,7 @@ class PurchaseOrderController extends Controller
             'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
             'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
             'warehouses' =>WarehouseModel::all(),
+            'hideUrl' => $hideUrl
         ];
         return view($this->viewPath . 'edit', $response);   
     }
@@ -233,7 +235,8 @@ class PurchaseOrderController extends Controller
         $model->update($data);
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url);
     }
     
     /**
@@ -244,10 +247,32 @@ class PurchaseOrderController extends Controller
      */
     public function purchaseOrdersOut()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-        return view($this->viewPath.'excelOut',$response);  
+        $p_id = request()->input('purchaseOrder_id');
+        $purchaseOrder = PurchaseOrderModel::where('id',$p_id)->get();
+        $rows = [];
+        
+        foreach($purchaseOrder as $model) {
+            $rows[] = [
+                '采购单号' => $model->id,
+                '外部单号' => $warehouse->post_coding,
+                '付款方式' => config('purchase.purchaseOrder.pay_type')[$model->pay_type],
+                '物流方式' => config('purchase.purchaseOrder.carriage_type')[$model->purchaseUser->name],
+                '采购负责人' => $model->purchaseUser->name,
+                '入库仓库' => $model->warehouse->name,
+                '商品总金额' => $model->total_purchase_cost,
+                '总数量' => 1,
+                '运费' => $model->total_postage,
+                '订单总金额' => $model->out_of_stock_time,
+                '供应商编号' => $model->supplier_id,
+                '下单时间' => $model->created_at,
+            ];          
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');    
     }
 
      /**

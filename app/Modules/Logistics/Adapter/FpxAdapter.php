@@ -8,7 +8,6 @@ class FpxAdapter extends BasicAdapter{
 
         $declave_values = $package->order->amount / $package->order->rate;
         $unitPrice = ($declave_values > 30) ? 30 : ceil($declave_values); 
-   
         $products_info = array(array(
             "eName" => $package->items ? $package->items->first()->item->product->declared_en : '',   //海关申报英文品名
             "name" => $package->items ? $package->items->first()->item->product->declared_cn : '',    //海关申报中文品名
@@ -44,6 +43,7 @@ class FpxAdapter extends BasicAdapter{
         if(is_object($response)){
             $response = get_object_vars($response->return);
         }
+        dd($response);
         if($response['ack'] == 'Success'){
             $data = ['tracking_no' => $response['trackingNumber']];
            // PackageModel::where('id',$package->id)->update($data);

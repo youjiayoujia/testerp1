@@ -35,7 +35,7 @@ class SpuController extends Controller
     public function index()
     {
         /*$model = new SpuModel();
-        $model->test1();exit;*/
+        $model->test1();exit;
         $arr = array();
         $arr['c_name'] = '绒面一字扣防水台高跟鞋【白】【38码】';
         $arr['sku'] = 'SS4733A1';
@@ -61,7 +61,7 @@ class SpuController extends Controller
         curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
         $buf = curl_exec($c);
         print_r($buf);exit;
-       /* $old_data = [];
+        $old_data = [];
         $old_data['sku'] = 'HJ1019W4';
         $old_data['name'] = '';
         $old_data['c_name'] = 'eee';

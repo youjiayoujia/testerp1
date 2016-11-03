@@ -35,7 +35,6 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
      */
     public function handle(OrderModel $orderModel)
     {
-        $channel = ChannelModel::where('name', 'Ebay')->first();
         $start = microtime(true);
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
         if (!$oldOrder) {

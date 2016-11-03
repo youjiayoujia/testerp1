@@ -9,7 +9,61 @@
     <div class="ajaxinsert">
         <div class="panel panel-info adjustmargin">
             <div class="panel-heading">勾选model及对应variation属性:</div>
-            @foreach($data['models'] as $model)
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>颜色:</label>
+
+                        <div class="form-group">
+                            <select class="form-control select-model" id="set" style="width:180px;">
+                                <option value="" >--请选择颜色--</option>
+                                @foreach($data['models'] as $model)
+                                    <option value="{{$model}}" >{{$model}} </option>
+                                @endforeach
+                            </select>
+                            <div class="input-group">
+                                <input name="set-new" class="form-control" type="text" placeholder="新增颜色" style="width: 150px;">
+                                <button type="button" class="btn btn-success add-set-option">+</button>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-3">
+                        <label>{{$data['variations'][0]['name']}}:</label>
+                        <input type="hidden" id="variation-name" value="{{$data['variations'][0]['name']}}">
+                        <div class="form-group">
+                            <select class="form-control select-model" style="width: 180px;" id="variation">
+                                <option value="" >--请选择{{$data['variations'][0]['name']}}--</option>
+                                @foreach($data['variations'][0]['value'] as $variation)
+                                    <option value="{{$variation}}" >{{$variation}} </option>
+                                @endforeach
+                            </select>
+                            <div class="input-group">
+                                <input name="variation-new" class="form-control" type="text" placeholder="新增{{$data['variations'][0]['name']}}" style="width: 150px;">
+                                <button type="button" class="btn btn-success add-variation-option">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="create" id="add-attribute"><i class="glyphicon glyphicon-plus"></i></div>
+                </div>
+                <!--属性列表-->
+                <attributes id="attributes">
+                </attributes>
+
+                <!--隐藏表单-->
+                <hidden-inputs id="hidden-inputs">
+
+                </hidden-inputs>
+
+            </div>
+
+
+
+{{--            @foreach($data['models'] as $model)
                 <div class="checkbox panel-body {{$model}}">
                     <div class="checkbox col-md-2">
                         <label>
@@ -28,7 +82,7 @@
                     @endforeach
                 </div>  
             <hr width="98%" style="border:0.5px solid #d9edf7">
-            @endforeach
+            @endforeach--}}
         </div>
         <div class="form-group third">
             <label for='set'>feature属性:</label>
@@ -248,8 +302,18 @@
     <input type='hidden' value='{{$catalogs->id}}' name="catalog_id" />
 @stop
 
+<set-value style="display: none">
+    <select class="form-control select-model" style="width: 80px;">
+        <option value="" >--请选择--</option>
+        @foreach($data['models'] as $model)
+            <option value="modelSet[{{$model}}][model]" >{{$model}} </option>
+        @endforeach
+    </select>
+</set-value>
+
 @section('pageJs')
 <script type="text/javascript">
+    var row = 1;
     $('.supplier').select2({
         ajax: {
             url: "{{ route('ajaxSupplier') }}",
@@ -310,6 +374,78 @@
 $(function () {
     $('#myTab a:first').tab('show');
   })
+
+    $(document).ready(function () {
+        $('.select-model').select2();
+
+        $('.add-set-option').click(function(){
+            var value = $('input[name="set-new"]').val();
+            if(value){
+                if(confirm('确定新增此属性？')){
+                    $('#set').append('<option value="'+value+'">'+value+'<option>');
+                    $('input[name="set-new"]').val('');
+                }
+
+            }
+        });
+        $('.add-variation-option').click(function(){
+            var value = $('input[name="variation-new"]').val();
+            if(value){
+                if(confirm('确定新增此属性？')){
+                    $('#variation').append('<option value="'+value+'">'+value+'<option>');
+                    $('input[name="variation-new"]').val('');
+                }
+            }
+        });
+    });
+
+    $('#add-attribute').click(function(){
+        var row_attr = '<div class="alert alert-warning" role="alert" id="alert-'+row+'"><div class="row"><div class="col-lg-3"><set class="set-row-'+row+'"></set></div><div class="col-lg-7"><variation class="variation-row-'+row+'"></variation></div><div class="col-lg-2"><button type="button" class="btn btn-success" onclick="subimtAttribute('+row+')">确定</button><button type="button" class="btn btn-danger" onclick="deleteAttribute('+row+')">删除</button></div></div></div>';
+        $('#attributes').append(row_attr);
+        row += 1;
+        console.log(row);
+    });
+
+    $('#set').change(function() {
+        var current = row - 1;
+        if($(this).val() != '' && current > 0){
+            //var set = '<span class="label label-success">'+$(this).val()+'<span aria-hidden="true">×</span></span>';
+            var set = '<code>'+$(this).val()+'</code>';
+            $(".set-row-"+current).html(set);
+           // $('.set-hidden'+current).remove();
+            if($('.set-hidden-'+current).val()){
+                $('.set-hidden-'+current).val($(this).val());
+/*                var hidden = '<input type="hidden" class="set-hidden-'+current+'" name="modelSet['+$(this).val()+'][model]" value="'+$(this).val()+'">';
+                $('#hidden-inputs').append(hidden);*/
+            }else{
+                var hidden = '<input type="hidden" class="set-hidden-'+current+'" name="modelSet['+$(this).val()+'][model]" value="'+$(this).val()+'">';
+                $('#hidden-inputs').append(hidden);
+            }
+
+            $(this).val('');
+        }
+
+    });
+    $('#variation').change(function() {
+        var current = row - 1;
+
+        if($(this).val() != ''){
+            var variation = '<code>'+$(this).val()+'</code>';
+            $(".variation-row-"+current).append(variation);
+
+            //把属性增加到隐藏表单
+            var set = $('.set-row-'+current).first().text();
+            if(set){
+                //modelSet[{{$model}}][model]
+                var variation_name = $("#variation-name").val();
+                var hidden = '<input type="hidden" class="variation-hide-"'+current+' name="modelSet['+set+'][variations]['+variation_name+'][]" value="'+$(this).val()+'">';
+                $('#hidden-inputs').append(hidden);
+            }
+            $(this).val('');
+
+        }
+
+    });
     $(document).on('change','#catalog_id',function(){
         var catalog_id = $("#catalog_id").val();  
         $.ajax({
@@ -327,5 +463,8 @@ $(function () {
             }
         });       
     });
+    function deleteAttribute(id) {
+        $('#alert-'+id).remove();
+    }
 </script>
 @stop

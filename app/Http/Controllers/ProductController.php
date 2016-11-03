@@ -24,6 +24,10 @@ use App\Models\Catalog\CatalogChannelsModel;
 use App\Models\CurrencyModel;
 use Gate;
 use App\Models\PaypalRatesModel;
+use App\Models\Catalog\SetModel;
+use App\Models\Catalog\SetValueModel;
+use App\Models\Catalog\VariationModel;
+use App\Models\Catalog\VariationValueModel;
 class ProductController extends Controller
 {
     public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel,WarehouseModel $warehouse)
@@ -53,6 +57,7 @@ class ProductController extends Controller
         $require_id = request()->input('id');
         $requireModel = RequireModel::find($require_id);
         $data = $this->catalog->getCatalogProperty($requireModel->catalog_id);
+        //dd($data);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->find($requireModel->catalog_id),
@@ -74,6 +79,9 @@ class ProductController extends Controller
      */
     public function store()
     {
+        $attributesAry = request()->input('modelSet');
+
+        //dd(request()->input('modelSet'));
         /*if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
         }*/
@@ -82,6 +90,60 @@ class ProductController extends Controller
         if(!array_key_exists('modelSet',request()->all())){
             return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
         }
+
+        if(!empty($attributesAry)){
+            $setId = SetModel::where('catalog_id',request()->input('catalog_id'))->where('name','颜色')->first()->id;
+            $variationObj  = VariationModel::where('catalog_id',request()->input('catalog_id'))->first();
+            $setVlaues     = SetValueModel::where('set_id',$setId)->get();
+            $VarValues     = VariationValueModel::where('variation_id',$variationObj->id)->get();
+            $needToCreates = [];
+            $needToCreateVariation = [];
+            foreach ($attributesAry as $key => $attribute){
+                $needToCreates[] = $key;
+
+            }
+            foreach ($needToCreates as $key => $needToCreate) {
+                //SET
+                foreach ($setVlaues as $setVlaue){
+                    if($setVlaue->name == $needToCreate){
+                        unset($needToCreates[$key]);
+                    }
+
+                }
+                //variation
+                foreach ($attribute['variations'][$variationObj->name] as $itemVar){
+
+                    $needToCreateVariation[$itemVar] = $itemVar;
+                }
+                foreach ($needToCreateVariation as $key => $itemVariation){
+                    foreach ($VarValues as $varValue){
+                        if($varValue->name == $itemVariation){
+                            unset($needToCreateVariation[$key]);
+                        }
+                    }
+                }
+            }
+            if(!empty($needToCreates)){
+                foreach ($needToCreates as $setName){
+                    $setValueObj = new SetValueModel;
+                    $setValueObj->set_id = $setId;
+                    $setValueObj->name = $setName;
+                    $setValueObj->save();
+                }
+            }
+
+            if(!empty($needToCreateVariation)){
+                foreach ($needToCreateVariation as $itemCreateVar){
+                    $varValueObj =  new VariationValueModel;
+                    $varValueObj->variation_id       = $variationObj->id;
+                    $varValueObj->variation_value_id = 0;
+                    $varValueObj->name               = $itemCreateVar;
+                    $varValueObj->save();
+                }
+            }
+        }
+
+
 
         $this->model->createProduct(request()->all(),request()->files);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));

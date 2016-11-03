@@ -337,6 +337,20 @@ class PackageController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹已重新匹配物流'));
     }
 
+    public function retrack()
+    {
+        $id = request('id');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
+        }
+        $job = new PlaceLogistics($model, 'UPDATE');
+        $job = $job->onQueue('placeLogistics');
+        $this->dispatch($job);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹已重新下物流单'));
+    }
+
     public function allocateLogistics($id)
     {
         $response = [
@@ -704,7 +718,7 @@ class PackageController extends Controller
                     $packageItem->quantity,
                     'PACKAGE',
                     $packageItem->id);
-                if(!$flag) {
+                if (!$flag) {
                     throw new Exception('包裹出库库存有问题');
                 }
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
@@ -750,7 +764,7 @@ class PackageController extends Controller
                         $packageItem->quantity,
                         'PACKAGE',
                         $packageItem->id);
-                    if(!$flag) {
+                    if (!$flag) {
                         throw new Exception('包裹出库库存有问题');
                     }
                     $packageItem->orderItem->update(['status' => 'SHIPPED']);
@@ -974,7 +988,12 @@ class PackageController extends Controller
         $trackingUrl = $object ? $object->url : '';
 
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
-        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto, 'tracking_link' => $trackingUrl]);
+        $model->update([
+            'logistics_id' => $logistics_id,
+            'status' => 'ASSIGNED',
+            'is_auto' => $is_auto,
+            'tracking_link' => $trackingUrl
+        ]);
         $orderRate = $model->order->calculateProfitProcess();
         if ($orderRate > 0) {
             if ($is_auto) {

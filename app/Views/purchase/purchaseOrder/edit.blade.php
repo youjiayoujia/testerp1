@@ -240,6 +240,84 @@
     <input type="hidden" value="{{ $model->id }}" name="purchase_order_id">
         </div>
     </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">编辑基本信息</div>
+        <div class="panel-body" id="itemDiv">
+              <!-- <div class='row'>
+                <div class="form-group col-md-3">
+                    <label for="size">订单类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <select  class="form-control" name="type">
+                        @foreach(config('purchase.purchaseOrder.type') as $key=>$v)
+                            <option value="{{$key}}">{{$v}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="size">付款方式</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <select  class="form-control" name="purchase_type">
+                        @foreach(config('purchase.purchaseOrder.pay_type') as $key=>$paytype)
+                            <option value="{{ $key }}">{{$paytype}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="size">供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <select class='form-control supplier' id="supplier_id" name="supplier_id"></select>
+                </div>
+               
+                <div class="form-group col-md-3">
+                        <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <select  class="form-control" name="warehouse_id">
+                            @foreach($warehouses as $warehouse)
+                                <option value="{{ $warehouse->id }}">{{$warehouse->name}}</option>
+                            @endforeach
+                        </select>
+                </div>
+            
+            </div>
+
+            <div class='row'>
+                <div class="form-group col-md-3">
+                    <label for="size">物流方式</label><small class="text-danger glyphicon glyphicon-asterisk"></small>           
+                    <select  class="form-control" name="carriage_type">
+                        @foreach(config('purchase.purchaseOrder.carriage_type') as $key=>$v)
+                            <option value="{{$key}}">{{$v}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="size">运费</label>
+                    <input class="form-control" id="second_supplier_sku" placeholder="运费" name='total_postage' value="">
+                </div>
+               <div class="form-group col-md-3">
+                    <label for="size">外部单号</label>
+                    <input class="form-control" id="second_supplier_sku" placeholder="外部单号" name='post_coding' value="">
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="size">付款凭证</label>
+                     <select  class="form-control" name="is_certificate">
+                        <option value="1">需要</option>
+                        <option value="0">不需要</option>
+                    </select>
+                </div>
+                
+                <div class="form-group col-md-3">
+                    <label for="size">备注</label>
+                    <input class="form-control" id="remark" placeholder="备注" name='remark' value="">
+                </div>
+            </div> -->
+
+            <div class='row'>
+                <div class="form-group col-md-3">
+                    <label for="size">运费</label>
+                    <input class="form-control" id="total_postage" placeholder="运费" name='total_postage' value="{{ old('total_postage') ?  old('total_postage') : $model->total_postage }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="panel panel-default">
         <div class="panel-heading">添加物流单号</div>
         <div class="panel-body" id="itemDiv">

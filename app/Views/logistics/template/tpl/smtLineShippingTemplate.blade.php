@@ -35,41 +35,35 @@
             <img src="{{ asset('picture/post_logo.jpg') }}" style="width:140px;height:50px;"/>
             <span style="font-size:10px;">Small Packet By Air</span><br/>
             <span style="display:inline-block;width:55px;height:22px;border:2px solid #000;margin-left:40px;text-align:center;font-size:18px;font-weight:bold;">
-                {{ $model->country ? $model->country->code : '' }}{{ '编码' }}
+                {{ $model->country ? $model->country->code : '' }}{{ $model->logistics_zone }}
             </span>
         </p>
         <p style="float:left;width:238px;height:90px;text-align:center;border-right:1px solid #000;">
-            <span style="display:inline-block;margin-top:12px;margin-left:40px;">
+            <span style="display:inline-block;margin-top:5px;margin-left:40px;">
                 <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 {{ $model->tracking_no }}
             </span>
             <span style="font-weight:bold;font-size:11px;display:inline-block;">Untracked 平小包</span>
         </p>
         <p style="float:left;width:140px;">
-            <span style="width:140px;display:inline-block;height:97px;border-left:1px solid #000;border-bottom:1px solid #000;font-size:11px;padding-left:4px;">
+            <span style="width:140px;display:inline-block;height:97px;border-left:1px solid #000;border-bottom:1px solid #000;font-size:10px;padding-left:4px;">
                 From:<br/>
-                    {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}
+                {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}
                 <br/>
                 <b style="font-weight:bold;">
                     Phone:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
                 </b>
             </span>
             <span style="width:140px;font-size:16px;line-height:29px;background:#fff;display:inline-block;border-left:1px solid #000;">
-                @if($model->warehouse)
-                    @if($model->warehouse->name == '金华仓')
-                        {{ '中邮金华仓' }}
-                    @elseif($model->warehouse->name == '南京仓')
-                        {{ '中邮南京仓' }}
-                    @elseif($model->warehouse->name == '广州仓')
-                        {{ '中邮广州仓' }}
-                    @else
-                        {{ '中邮深圳仓' }}
-                    @endif
+                @if($model->warehouse_id == 3)
+                    {{ '中邮广州仓' }}
+                @elseif($model->warehouse_id == 4)
+                    {{ '中邮南京仓' }}
                 @endif
             </span>
         </p>
-        <p style="float:left;width:238px;border:1px solid #000;border-bottom:none;font-size:12px;">
-            <span style="font-weight:bold;font-size:12px;">Ship To:</span><br/>
+        <p style="float:left;width:233px;border:1px solid #000;border-bottom:none;font-size:12px;padding-left: 5px;">
+            <span style="font-weight:bold;font-size:10px;">Ship To:</span><br/>
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
             {{ $model->shipping_city }}<br/>
@@ -77,7 +71,7 @@
             {{ $model->country ? $model->country->name : '' . ' ' . $model->shipping_zipcode }}<br/>
             phone:{{ $model->shipping_phone }}&nbsp;&nbsp;&nbsp;
             <span style="font-size:16px;">{{ $model->country ? $model->country->cn_name : '' }}</span>
-            &nbsp;&nbsp;&nbsp;{{ '分区' }}
+            &nbsp;&nbsp;&nbsp;{{ $model->logistics_zone }}
         </p>
     </div>
     <table border="0" style="width:382px;height:110px;" cellspacing="0" cellpadding="0">
@@ -119,7 +113,9 @@
     </table>
     <div style="width:382px;height:40px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
         <span style="font-size:12px;font-weight:bold;">
-            【{{ $model->logistics_id }}】
+            【
+            {{ $model->logistics ? $model->logistics->logistics_code : '' }}
+            】
         </span>
         {{ $model->sku_info }}
     </div>

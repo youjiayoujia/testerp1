@@ -191,6 +191,8 @@ class ItemController extends Controller
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->sync($arr);
+            $skuModel->product->update($data);
+            $data['status'] = 0;
             $skuModel->product->spu->update($data);
         }else{
             $arr = [];
@@ -210,6 +212,7 @@ class ItemController extends Controller
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->attach($arr);
+            $data['status'] = 0;
             $skuModel->product->spu->update($data);
         }
         echo json_encode('success');exit;

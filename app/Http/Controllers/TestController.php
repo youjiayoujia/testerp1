@@ -300,9 +300,10 @@ class TestController extends Controller
     }
 
     public function testYw(){
-        $package = PackageModel::findOrFail(3);
+        $id = request()->get('id');
+        $package = PackageModel::findOrFail($id);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-        ->getTracking($package);
+            ->getTracking($package);
         exit;
     }
 
@@ -803,7 +804,8 @@ class TestController extends Controller
      */
     public function getEbayProduct(){
         //$package = PackageModel::findOrFail(3113);
-        $package =  PackageModel::where('id',81)->first();
+        $id = request()->get('id');
+        $package =  PackageModel::where('id',$id)->first();
 
         $result = $package->placeLogistics();
         var_dump($result);exit;

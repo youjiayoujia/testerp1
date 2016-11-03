@@ -27,8 +27,9 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
     {
         //
         $this->reply = $reply;
-        $this->description = 'Send message to'.$this->reply['to_email'].'(message_id:'.$this->reply['message_id'].') in SYS.';
+        $this->description = 'Send message to' . $this->reply['to_email'] . '(message_id:' . $this->reply['message_id'] . ') in SYS.';
     }
+
     /**
      * Execute the job.
      *
@@ -36,28 +37,28 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        if($this->reply){
+        if ($this->reply) {
             $account = $this->reply->message->account;
 
-           // if($account->channel->driver == 'aliexpress') //亚马逊渠道邮件
+            // if($account->channel->driver == 'aliexpress') //亚马逊渠道邮件
 
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-                if($channel->sendMessages($this->reply)){//发送渠道message
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'the message send to ['.$this->reply['to_email'].'] message successful!';
-                }else{
-                    $this->result['status'] = 'fail';
-                    $this->result['remark'] = 'the message send to ['.$this->reply['to_email'].'] message failed!';
-                }
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            if ($channel->sendMessages($this->reply)) {//发送渠道message
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'the message send to [' . $this->reply['to_email'] . '] message successful!';
+            } else {
+                $this->result['status'] = 'fail';
+                $this->result['remark'] = 'the message send to [' . $this->reply['to_email'] . '] message failed!';
+            }
 
 
-        }else{
+        } else {
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'not find message';
         }
         $start = microtime(true);
 
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('SendMessages', addslashes($this->reply));
+        $this->log('SendMessages', base64_encode(serialize($this->reply)));
     }
 }

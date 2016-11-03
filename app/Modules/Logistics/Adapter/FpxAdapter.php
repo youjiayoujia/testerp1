@@ -44,6 +44,7 @@ class FpxAdapter extends BasicAdapter{
         if(is_object($response)){
             $response = get_object_vars($response->return);
         }
+        dd($response['ack']);
         if($response['ack'] == 'success'){
             $data = ['tracking_no' => $response['trackingNumber']];
            // PackageModel::where('id',$package->id)->update($data);

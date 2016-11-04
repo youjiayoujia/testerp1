@@ -57,7 +57,6 @@ class ProductController extends Controller
         $require_id = request()->input('id');
         $requireModel = RequireModel::find($require_id);
         $data = $this->catalog->getCatalogProperty($requireModel->catalog_id);
-        //dd($data);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->find($requireModel->catalog_id),
@@ -80,8 +79,6 @@ class ProductController extends Controller
     public function store()
     {
         $attributesAry = request()->input('modelSet');
-
-        //dd(request()->input('modelSet'));
         /*if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
         }*/

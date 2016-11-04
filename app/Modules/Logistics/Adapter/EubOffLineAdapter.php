@@ -16,13 +16,18 @@ class EubofflineAdapter extends BasicAdapter
 
     public function __construct($config)
     {
-        $this->_authenticate = $config['key'];
-        $this->_customer_code = $config['userId'];
-        $this->_vip_code = $config['userPassword'];
+        //$this->_authenticate = $config['key'];
+        //$this->_customer_code = $config['userId'];
+        //$this->_vip_code = $config['userPassword'];
         $this->_version = 'international_eub_us_1.1';
-        $this->_url = $config['url'];
+       // $this->_url = $config['url'];
 
-        //寄件人信息
+        $this->_url ='http://shipping2.ems.com.cn/partner/api/public/p/order/';//发送地址
+
+
+
+
+       /* //寄件人信息
         $this->_sender = 'HUANGCHAOYUN';
         $this->_senderZip = '518129';
         $this->_senderMobile = '18565631099';
@@ -43,14 +48,46 @@ class EubofflineAdapter extends BasicAdapter
         $this->_areaCode = '440307';
         $this->_company = '深圳市萨拉摩尔科技有限公司';
         $this->_street = '坂田五和大道南41号 和堪工业区B3栋4楼';
-        $this->_email = 'wuliu@moonarstore.com';
+        $this->_email = 'wuliu@moonarstore.com';*/
 
     }
 
 
     public function getTracking($package)
     {
+        $emailTemplateInfo = $package->emailTemplate;
+
+        $apiInfoArr=explode(',',$emailTemplateInfo->eub_api);
+        $this->_authenticate = $apiInfoArr[0];//授权码
+        $this->_customer_code = $apiInfoArr[1];//客户编码
+        $this->_vip_code = $apiInfoArr[2];//大客户编码;
+        //寄件人信息
+        $this->_sender = $emailTemplateInfo->eub_sender;
+        $this->_senderZip = $emailTemplateInfo->eub_sender_zipcode;
+        $this->_senderMobile = $emailTemplateInfo->eub_phone;
+        $this->_senderProvinceCode = $emailTemplateInfo->eub_sender_province_code;
+        $this->_senderCityCode = $emailTemplateInfo->eub_sender_city_code;
+        $this->_senderAreaCode = $emailTemplateInfo->eub_sender_zone_code;
+        $this->_senderCompany =$emailTemplateInfo->eub_sender_company;
+        $this->_senderStreet = $emailTemplateInfo->eub_sender_street.$emailTemplateInfo->eub_sender_zone.$emailTemplateInfo->eub_sender_city.$emailTemplateInfo->eub_sender_province;
+        $this->_senderEmail =$emailTemplateInfo->eub_sender_email;
+
+        //揽收人信息
+        $this->_contacter = $emailTemplateInfo->eub_contact_name;
+        $this->_zipCode = $emailTemplateInfo->eub_zipcode;
+        $this->_phone = $emailTemplateInfo->eub_phone;
+        $this->_mobilePhone = $emailTemplateInfo->eub_mobile_phone;
+        $this->_provinceCode = $emailTemplateInfo->eub_province_code;
+        $this->_cityCode = $emailTemplateInfo->eub_city_code;
+        $this->_areaCode = $emailTemplateInfo->eub_zone_code;
+        $this->_company = $emailTemplateInfo->eub_contact_company_name;
+        $this->_street = $emailTemplateInfo->eub_street;
+        $this->_email = $emailTemplateInfo->eub_email;
+
+
         $response = $this->doUpload($package);
+
+
 
         if ($response['status'] != 0) {
             $result = [

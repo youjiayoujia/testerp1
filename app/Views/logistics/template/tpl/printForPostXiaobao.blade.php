@@ -63,7 +63,7 @@
             </tr>
             <tr valign="top" height="22">
                 <td style="border-bottom: 1px solid black;">
-                    <div style="float:left;">协议客户：
+                    <div style="float:left;font-size:22px">协议客户：
                         {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '') : '' }}</div>
                 </td>
             </tr>

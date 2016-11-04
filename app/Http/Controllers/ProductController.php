@@ -90,7 +90,7 @@ class ProductController extends Controller
         if(!array_key_exists('modelSet',request()->all())){
             return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
         }
-
+        //创建新添加的SET 和 Variation属性
         if(!empty($attributesAry)){
             $setId = SetModel::where('catalog_id',request()->input('catalog_id'))->where('name','颜色')->first()->id;
             $variationObj  = VariationModel::where('catalog_id',request()->input('catalog_id'))->first();
@@ -131,7 +131,6 @@ class ProductController extends Controller
                     $setValueObj->save();
                 }
             }
-
             if(!empty($needToCreateVariation)){
                 foreach ($needToCreateVariation as $itemCreateVar){
                     $varValueObj =  new VariationValueModel;
@@ -142,8 +141,6 @@ class ProductController extends Controller
                 }
             }
         }
-
-
 
         $this->model->createProduct(request()->all(),request()->files);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));

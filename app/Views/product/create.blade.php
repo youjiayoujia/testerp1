@@ -8,7 +8,7 @@
     </div>
     <div class="ajaxinsert">
         <div class="panel panel-info adjustmargin">
-            <div class="panel-heading">勾选model及对应variation属性:</div>
+            <div class="panel-heading">添加SET 和 Variation 属性:</div>
             <div class="panel-body">
 
                 <div class="row">
@@ -56,33 +56,8 @@
 
                 <!--隐藏表单-->
                 <hidden-inputs id="hidden-inputs">
-
                 </hidden-inputs>
-
             </div>
-
-
-
-{{--            @foreach($data['models'] as $model)
-                <div class="checkbox panel-body {{$model}}">
-                    <div class="checkbox col-md-2">
-                        <label>
-                            <input type='checkbox' id="{{$model}}" onclick="quanxuan('{{$model}}')" name='modelSet[{{$model}}][model]' value='{{$model}}'>{{$model}}
-                        </label>
-                    </div>
-
-                    @foreach($data['variations'] as $key=>$getattr)        
-                        <div class="checkbox col-md-2 innercheckboxs">{{$getattr['name']}}:
-                            @foreach($getattr['value'] as $varaiton_key=>$innervalue)
-                                <label>
-                                    <input type='checkbox' class="{{$model}}quanxuan" name='modelSet[{{$model}}][variations][{{$getattr['name']}}][{{$varaiton_key}}]' value='{{$innervalue}}'>{{$innervalue}}
-                                </label>
-                            @endforeach
-                        </div>
-                    @endforeach
-                </div>  
-            <hr width="98%" style="border:0.5px solid #d9edf7">
-            @endforeach--}}
         </div>
         <div class="form-group third">
             <label for='set'>feature属性:</label>
@@ -400,8 +375,10 @@ $(function () {
     });
 
     $('#add-attribute').click(function(){
-        var row_attr = '<div class="alert alert-warning" role="alert" id="alert-'+row+'"><div class="row"><div class="col-lg-3"><set class="set-row-'+row+'"></set></div><div class="col-lg-7"><variation class="variation-row-'+row+'"></variation></div><div class="col-lg-2"><button type="button" class="btn btn-success" onclick="subimtAttribute('+row+')">确定</button><button type="button" class="btn btn-danger" onclick="deleteAttribute('+row+')">删除</button></div></div></div>';
+        var row_attr  = '<div class="alert alert-warning" role="alert" id="alert-'+row+'"><div class="row"><div class="col-lg-3"><set class="set-row-'+row+'"></set></div><div class="col-lg-7"><variation class="variation-row-'+row+'"></variation></div><div class="col-lg-2"><button type="button" class="btn btn-danger" onclick="deleteAttribute('+row+')">删除</button></div></div></div>';
         $('#attributes').append(row_attr);
+        var row_hidden = '<div id="hidden-row-'+row+'"></div>';
+        $('#hidden-inputs').append(row_hidden);
         row += 1;
         console.log(row);
     });
@@ -409,42 +386,35 @@ $(function () {
     $('#set').change(function() {
         var current = row - 1;
         if($(this).val() != '' && current > 0){
-            //var set = '<span class="label label-success">'+$(this).val()+'<span aria-hidden="true">×</span></span>';
             var set = '<code>'+$(this).val()+'</code>';
             $(".set-row-"+current).html(set);
-           // $('.set-hidden'+current).remove();
             if($('.set-hidden-'+current).val()){
                 $('.set-hidden-'+current).val($(this).val());
-/*                var hidden = '<input type="hidden" class="set-hidden-'+current+'" name="modelSet['+$(this).val()+'][model]" value="'+$(this).val()+'">';
-                $('#hidden-inputs').append(hidden);*/
+                $('.set-hidden-'+current).attr('name','modelSet['+$(this).val()+'][model]');
+                $('.variation-hide-'+current).attr('name','modelSet['+$(this).val()+'][variations]['+$("#variation-name").val()+'][]');
             }else{
                 var hidden = '<input type="hidden" class="set-hidden-'+current+'" name="modelSet['+$(this).val()+'][model]" value="'+$(this).val()+'">';
-                $('#hidden-inputs').append(hidden);
+                console.log(hidden);
+                $('#hidden-row-'+current).append(hidden);
             }
-
             $(this).val('');
         }
 
     });
     $('#variation').change(function() {
         var current = row - 1;
-
         if($(this).val() != ''){
             var variation = '<code>'+$(this).val()+'</code>';
             $(".variation-row-"+current).append(variation);
-
             //把属性增加到隐藏表单
             var set = $('.set-row-'+current).first().text();
             if(set){
-                //modelSet[{{$model}}][model]
                 var variation_name = $("#variation-name").val();
-                var hidden = '<input type="hidden" class="variation-hide-"'+current+' name="modelSet['+set+'][variations]['+variation_name+'][]" value="'+$(this).val()+'">';
-                $('#hidden-inputs').append(hidden);
+                var hidden = '<input type="hidden" class="variation-hide-'+current+'" name="modelSet['+set+'][variations]['+variation_name+'][]" value="'+$(this).val()+'">';
+                $('#hidden-row-'+current).append(hidden);
             }
             $(this).val('');
-
         }
-
     });
     $(document).on('change','#catalog_id',function(){
         var catalog_id = $("#catalog_id").val();  
@@ -465,6 +435,7 @@ $(function () {
     });
     function deleteAttribute(id) {
         $('#alert-'+id).remove();
+        $('#hidden-row-'+id).remove(); //隐藏表单
     }
 </script>
 @stop

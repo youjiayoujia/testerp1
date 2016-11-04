@@ -621,14 +621,30 @@ Class AliexpressAdapter implements AdapterInterface
                             $message_list[$j]['label'] = '订单留言';
                             $temp_message = json_decode($detailArrJson);
                             foreach ($temp_message->result as $get_one_detail){
+
                                 $temp_oreder_url = $get_one_detail->summary->orderUrl;
-                                $message_list[$j]['labels'] = isset($get_one_detail->messageType) ? $get_one_detail->messageType : '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
+                                //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
+                                $message_list[$j]['labels'] = isset($get_one_detail->messageType) ? $get_one_detail->messageType : '' ;
                                 break;
                             }
+                            //dd($temp_message->result);
+                            foreach ($temp_message->result  as $temp_detail){
+                                $productDetail = '';
+
+                                $detail_type = isset($temp_detail->messageType) ? $temp_detail->messageType : '' ;
+
+                                if($detail_type == 'product'){
+                                    $productDetail['product_img_url']      = isset($temp_detail->summary->productImageUrl) ? $temp_detail->summary->productImageUrl : '';
+                                    $productDetail['product_product_url']  = isset($temp_detail->summary->productDetailUrl) ? $temp_detail->summary->productDetailUrl : '';
+                                    $productDetail['product_product_name'] = isset($temp_detail->summary->productName) ? $temp_detail->summary->productName : '';
+                                }
+                            }
+
                             $message_fields_ary = [
                                 'message_type' => $Sources, //消息类型
-                                'order_id' => $item['channelId'], //消息类型
-                                'order_url' => $temp_oreder_url,
+                                'order_id'     => $item['channelId'], //消息类型
+                                'order_url'    => $temp_oreder_url,
+                                'product_info' => $productDetail,
                             ];
                         }else{
                             $message_list[$j]['label'] = '站内信';

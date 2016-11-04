@@ -135,7 +135,7 @@ class ShunfengAdapter extends BasicAdapter
         $product_str .= '<Cargo name="' . htmlspecialchars($products_declared_en) . '" count="1" unit="u" weight="' . $package->weight . '" amount="' . $amount . '" currency="USD" source_area="CN"></Cargo>';
 
         if($package->id==98){
-            $package->id='S'.$package->id;
+            $package->id='SLME'.$package->id;
         }
         $order_str = '<?xml version="1.0" encoding="UTF-8"?>
                         <Request service="OrderService" lang="zh-CN">

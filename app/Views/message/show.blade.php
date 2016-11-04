@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
 
@@ -152,7 +152,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             @if($model->related)
                 @if($model->relatedOrders()->count() > 1)
                     <ul class="nav nav-tabs" role="tablist">

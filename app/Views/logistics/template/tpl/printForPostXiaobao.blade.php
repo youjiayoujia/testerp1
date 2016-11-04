@@ -123,7 +123,7 @@
                 <td style="border-bottom: 1px solid black;" colspan="7">
                     <table cellpadding="0" cellspacing="0" border="0" width="100%">
                         <tr align="center">
-                            <td width="90" rowspan="2"></td>
+                            <td width="90" rowspan="2">{{ $model->id ? $model->id : '' }}</td>
                             <td width="175"><strong>报关签条</strong></td>
                             <td><strong>邮2113</strong></td>
                         </tr>
@@ -162,8 +162,8 @@
                 <td style="border-bottom: 1px solid black; border-right:1px solid black;" colspan="5" align="center">
 
 
-                    {{ $model->catelog ? $model->catelog->c_name : ''}}<br>*
-                    {{ $model->catelog ? $model->catelog->name : ''}}
+                    {{ $model->declared_cn ? $model->declared_cn : ''}}<br>*
+                    {{ $model->declared_en ? $model->declared_en : ''}}*{{ $model->items ? $model->items->sum('quantity') : 0 }}
                 </td>
                 <td style="border-bottom: 1px solid black;border-right:1px solid black;" align="center">
                     {{ $model->total_weight }}

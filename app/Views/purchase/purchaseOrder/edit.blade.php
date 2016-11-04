@@ -4,6 +4,7 @@
  <input type="hidden" name="_method" value="PUT"/>
  <input type="hidden" name="update_userid" value="2"/>
  <input type="hidden" name="total_purchase_cost" value="0"/>
+ <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
         <div class="row">
          <div class="form-group col-lg-4">
                 <strong>标题: 萨拉摩尔公司向 {{$model->supplier?$model->supplier->name:''}} 采购单</strong>

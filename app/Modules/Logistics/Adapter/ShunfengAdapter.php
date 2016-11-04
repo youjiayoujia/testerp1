@@ -53,6 +53,16 @@ class ShunfengAdapter extends BasicAdapter
                     $result['result_other'] = $agent_mailno;
                 }
 
+                if( $this->_express_type == 10){ //挂号 传到平台上的值放在result
+                    $result = [
+                        'code' => 'success',
+                        'result' =>$agent_mailno,
+                        'result_other' => $shipping_code
+                    ];
+
+                }
+
+
             }else{
                 $msg = '';
                 switch ($remark){

@@ -93,7 +93,7 @@
                                                         <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                             <option value=''>{{config('setting.transfer_search')[$name]}}</option>
                                                             @foreach($content as $k => $v)
-                                                                <option value="{{ $k }}" {{$k==(request()->has('mixedSearchFields'.'.'.$type.'.'.$name)?request('mixedSearchFields'.'.'.$type.'.'.$name):'')?'selected':''}} >{{$v}}</option>
+                                                                <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.'.$name) ? ($k==request('mixedSearchFields'.'.'.$type.'.'.$name)?'selected':'') : ''}} >{{$v}}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>

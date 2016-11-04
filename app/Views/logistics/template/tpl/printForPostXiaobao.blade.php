@@ -63,7 +63,7 @@
             </tr>
             <tr valign="top" height="22">
                 <td style="border-bottom: 1px solid black;">
-                    <div style="float:left;">协议客户：
+                    <div style="float:left;font-size:22px">协议客户：
                         {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '') : '' }}</div>
                 </td>
             </tr>
@@ -160,16 +160,13 @@
             </tr>
             <tr>
                 <td style="border-bottom: 1px solid black; border-right:1px solid black;" colspan="5" align="center">
-
-
-                    {{ $model->declared_cn ? $model->declared_cn : ''}}<br>*
-                    {{ $model->declared_en ? $model->declared_en : ''}}*{{ $model->items ? $model->items->sum('quantity') : 0 }}
+                    {{ $model->declared_en }}{{ ' * ' }}{{ $model->items ? $model->items->sum('quantity') : 0 }}
                 </td>
                 <td style="border-bottom: 1px solid black;border-right:1px solid black;" align="center">
-                    {{ $model->total_weight }}
+                    {{ $model->signal_weight }}
                 </td>
                 <td style="border-bottom: 1px solid black;" align="center">
-                    {{ $model->declared_value }}USD
+                    {{ $model->signal_weight }}USD
                 </td>
             </tr>
 

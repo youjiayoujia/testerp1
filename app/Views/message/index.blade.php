@@ -86,7 +86,7 @@
     <th class="sort">消息处理客服</th>
     <th class="sort" data-field="created_at">创建日期</th>
     <th class="sort" data-field="updated_at">更新日期</th>
-    <th>延时</th>
+    <th>延时（秒）</th>
     <th>操作</th>
     <th>无需回复</th>
 @stop
@@ -110,7 +110,7 @@
                 <?php
                 if($message->status == 'COMPLETE'){
                 ?>
-                {{ ceil((strtotime($message->updated_at)-strtotime($message->created_at))/60) }}
+                {{ ceil((strtotime($message->updated_at)-strtotime($message->created_at))) }}
                 <?php
                 }else{
                 ?>
@@ -118,7 +118,9 @@
                 <?php
                 }
                 ?>
-                分</td>
+
+
+            </td>
             <td>
                 @if($message->status == 'UNREAD')
                     <a href="{{ route('message.process', ['id'=>$message->id]) }}" class="btn btn-primary btn-xs">

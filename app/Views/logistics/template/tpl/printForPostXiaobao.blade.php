@@ -63,12 +63,12 @@
             </tr>
             <tr valign="top" height="22">
                 <td style="border-bottom: 1px solid black;">
-                    <div style="float:left;">协议客户：
+                    <div style="float:left;font-size: 12px">协议客户：
                         {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '') : '' }}</div>
                 </td>
             </tr>
             <tr height="56">
-                <td style="border-bottom: 1px solid black;">
+                <td style="border-bottom: 1px solid black;font-size: 12px">
                     <table border="0" cellpadding="0" cellspacing="0">
                         <tr><td width="50" align="right" valign="top"><strong>FROM:&nbsp;</strong></td><td colspan="3" style="white-space: normal; word-break: break-all;">{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}</td></tr>
                         <tr><td align="right"><strong>ZIP:&nbsp;</strong></td><td width="100">{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->zipcode) : '') : '' }}</td>

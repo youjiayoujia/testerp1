@@ -163,7 +163,7 @@
 
 
                     {{ $model->declared_cn ? $model->declared_cn : ''}}<br>*
-                    {{ $model->declared_en ? $model->declared_en : ''}}*{{ $model->items()->sum('quantity') }}
+                    {{ $model->declared_en ? $model->declared_en : ''}}*{{ $model->items ? $model->items->sum('quantity') : 0 }}
                 </td>
                 <td style="border-bottom: 1px solid black;border-right:1px solid black;" align="center">
                     {{ $model->total_weight }}

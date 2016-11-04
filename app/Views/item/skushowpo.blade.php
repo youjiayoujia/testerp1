@@ -36,11 +36,11 @@ case 'small':
         <tr>
             <td align="center" valign="middle">
                 <b>
-                        <span style="font-size:4px;">
+                        <span style="font-size:14px;">
                             {{$model->sku}}
                         </span>
                 </b>
-                <div style="font-weight:bold; font-size:2px; line-height:2px; text-align:center; width:100%; white-space: normal; word-break: break-all; word-wrap: break-word;">
+                <div style="font-weight:bold; font-size:8px; line-height:10px; text-align:center; width:100%; white-space: normal; word-break: break-all; word-wrap: break-word;">
                     {{$model->c_name}}
                 </div>
                 <div>

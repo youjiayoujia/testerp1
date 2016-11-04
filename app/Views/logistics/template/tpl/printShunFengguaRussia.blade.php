@@ -67,7 +67,7 @@
             <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             <br/>{{$model->tracking_no}}
         </p>
-        <p style="width:130px;height:100%;line-height:68px;float:right;text-align:center;font-weight:bold;font-size:22px;">
+        <p style="width:130px;height:100%;line-height:68px;float:right;text-align:center;font-weight:bold;font-size:14px;">
             {{$model->tracking_no}}
         </p>
     </div>

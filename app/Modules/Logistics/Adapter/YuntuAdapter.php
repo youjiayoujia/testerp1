@@ -172,14 +172,14 @@ Class YuntuAdapter extends BasicAdapter
 			if(isset($data['Item'][0]['OrderId']) && isset($data['Item'][0]['WayBillNumber']) && $data['Item'][0]['OrderId'] !== '' && $data['Item'][0]['WayBillNumber'] !== ''){
 				return $result = [
 						'code' => 'success',
-						'result' => isset($data['Item'][0]['OrderId']) ? $data['Item'][0]['OrderId'] : '',
-						'result_other' => isset($data['Item'][0]['WayBillNumber']) ? $data['Item'][0]['WayBillNumber'] : ''
+						'result' => isset($data['Item'][0]['WayBillNumber']) ? $data['Item'][0]['WayBillNumber'] : '',
+						'result_other' => isset($data['Item'][0]['OrderId']) ? $data['Item'][0]['OrderId'] : ''
 				];
 			}else if(isset($data['Item'][0]['WayBillNumber']) && $data['Item'][0]['WayBillNumber'] !== ''){
 				return $result = [
 						'code' => 'again',
-						'result' => isset($data['Item'][0]['OrderId']) ? $data['Item'][0]['OrderId'] : '',
-						'result_other' => isset($data['Item'][0]['WayBillNumber']) ? $data['Item'][0]['WayBillNumber'] : ''
+						'result' => isset($data['Item'][0]['WayBillNumber']) ? $data['Item'][0]['WayBillNumber'] : '',
+						'result_other' => isset($data['Item'][0]['OrderId']) ? $data['Item'][0]['OrderId'] : ''
 				];
 			}else{
 				return $result = [

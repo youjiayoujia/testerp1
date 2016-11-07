@@ -36,20 +36,21 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if (($this->package->status == 'NEED' || $this->package->status == 'NEW') && $this->package->createPackageItems()) {
-            if ($this->package->status == 'WAITASSIGN') {
+        if (in_array($this->package->status, ['NEW', 'NEED', 'PROCESSING']) && $this->package->createPackageItems()) {
+            if (in_array($this->package->status, ['WAITASSIGN', 'NEED'])) {
                 $job = new AssignLogistics($this->package);
                 $job = $job->onQueue('assignLogistics');
                 $this->dispatch($job);
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success to assign stock.';
-            } elseif ($this->package->status == 'NEED') {
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Out of stock.';
+                if($this->package->status == 'NEED') {
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Out of stock.'; 
+                }
             }
         } else {
             $this->result['status'] = 'fail';
-            $this->result['remark'] = 'Fail to assign stock Or status is not NEED or NEW.';
+            $this->result['remark'] = 'status error or cannt assign stocks';
         }
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('assignStocks');

@@ -851,6 +851,11 @@ class PackageModel extends BaseModel
 
     public function createPackageDetail($items)
     {
+        $oldStatus = $this->status;
+        $oldWarehouseId = $this->warehouse_id;
+        $oldLogisticsId = $this->logistics_id;
+        $oldTrackingNo = $this->tracking_no;
+
         foreach ($this->items as $packageItem) {
             $packageItem->delete();
         }
@@ -874,7 +879,19 @@ class PackageModel extends BaseModel
                     }
                     DB::commit();
                 }
-                $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                if(empty($oldWarehouseId)) {
+                    $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                } else {
+                    if($oldWarehouseId != $warehouseId) {
+                        $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                    } else {
+                        if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                            $this->update(['weight' => $weight]);
+                        } else {
+                            $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                        }
+                    }
+                }
                 $i = false;
             } else {
                 $newPackage = $this->create($this->toArray());
@@ -900,6 +917,19 @@ class PackageModel extends BaseModel
                         'status' => 'WAITASSIGN',
                         'weight' => $weight
                     ]);
+                    if(empty($oldWarehouseId)) {
+                        $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                    } else {
+                        if($oldWarehouseId != $warehouseId) {
+                            $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                        } else {
+                            if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                $newPackage->update(['weight' => $weight]);
+                            } else {
+                                $newPackage->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -938,8 +968,8 @@ class PackageModel extends BaseModel
      */
     public function canAssignLogistics()
     {
-        //判断订单状态
-        if (!in_array($this->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
+        //判断包裹状态
+        if (!in_array($this->status, ['WAITASSIGN', 'ASSIGNFAILED', 'NEED'])) {
             return false;
         }
 

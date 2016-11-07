@@ -286,14 +286,19 @@ class PackageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
-            'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
+            'packageNum' => $this->model->where('status', 'NEW')->count(),
             'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function ($single) {
                 return $single->packages()->count() == 0;
             })->count(),
-            'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
+            'weatherNum' => $this->model->where('status', 'PROCESSING')->get()->filter(function($single){
+                return empty($single->items->first()->warehouse_position_id);
+            })->count(),
+            'assignNum' => $this->model->whereIn('status', ['WAITASSIGN', 'NEED'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
-            'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
+            'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->get()->filter(function($single){
+                return !empty($single->items->first()->warehouse_position_id);
+            })->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
             'singlePack' => PickListModel::where('type', 'SINGLE')->whereIn('status',
                 ['PACKAGEING', 'PICKING'])->count(),
@@ -315,6 +320,20 @@ class PackageController extends Controller
         foreach ($packages as $package) {
             $job = new AssignLogistics($package);
             $job = $job->onQueue('assignLogistics');
+            $this->dispatch($job);
+        }
+
+        return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count() . '个包裹放入队列'));
+    }
+
+    public function processingAssignStocks()
+    {
+        $packages = $this->model->where('status', 'PROCESSING')->get()->filter(function($single){
+            return empty($single->items->first()->warehouse_position_id);
+        });
+        foreach($packages as $package) {
+            $job = new AssignStocks($package);
+            $job = $job->onQueue('assignStocks');
             $this->dispatch($job);
         }
 
@@ -788,7 +807,7 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->where('status', 'WAITASSIGN')
+            ->whereIn('status', ['WAITASSIGN', 'NEED'])
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {

@@ -76,6 +76,13 @@ class StockController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
+        $stock = $this->model->where(['item_id' => request('item_id'), 'warehouse_position_id' => request('warehouse_position_id')])->first();
+        if(!$stock) {
+            $stocks = $this->model->where(['item_id' => request('item_id'), 'warehouse_id' => request('warehouse_id')])->get();
+            if($stocks->count() > 1) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '该仓库对应sku库位数量超过2'));
+            }
+        }
         $item = ItemModel::find(request('item_id'));
         $item->in(request('warehouse_position_id'), request()->input('all_quantity'), request()->input('all_quantity') * ($item->cost ? $item->cost : $item->purchase_price), 'MAKE_ACCOUNT');
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
@@ -332,15 +339,12 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $sku = trim(request()->input('sku'));
-            $warehouseId = trim(request('warehouse_id'));
-            $stocks = $this->model->where('warehouse_id', $warehouseId)->whereHas('item', function($query) use ($sku){
-                $query = $query->where('sku', 'like', '%'.$sku.'%');
-            })->get();
-            $total = $stocks->count();
+            $items = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            $total = $items->count();
             $arr = [];
-            foreach($stocks as $key => $stock) {
-                $arr[$key]['id'] = $stock->item_id;
-                $arr[$key]['text'] = $stock->item->sku;
+            foreach($items as $key => $item) {
+                $arr[$key]['id'] = $item->id;
+                $arr[$key]['text'] = $item->sku;
             }
             if($total)
                 return json_encode(['results' => $arr, 'total' => $total]);

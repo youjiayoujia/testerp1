@@ -97,7 +97,7 @@
 				<p style="font-size:16px;font-weight:bold;text-align:center;">UNTRACKED</p>
 				</td>
 				<td colspan="3" >
-					<p style="margin-top:2px;"><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="max-height:200px;"></p>
+					<p style="margin-top:2px;"><img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}" style="max-height:200px;"></p>
 					<p style="margin-top:3px;">{{ $model->logistics_order_number }}</p>
 				</td>
 			</tr>

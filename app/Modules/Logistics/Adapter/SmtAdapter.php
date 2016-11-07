@@ -179,7 +179,7 @@ class SmtAdapter extends BasicAdapter
                     $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
                     return array('code' => 'success', 'result' => $result['result']['intlTracking'] );
                 }else{
-                    return array('code' => 'success', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
+                    return array('code' => 'again', 'result' => '', 'result_other' => $result['result']['warehouseOrderId']);
                 }
             } else {
                 return array('code' => 'error', 'result' => 'error description.');
@@ -192,9 +192,11 @@ class SmtAdapter extends BasicAdapter
                     foreach ($res['result'] as $row){
                         //分仓，估计要结合 物流分类+状态 来进行判断获取国际运单号
                         if ($row['internationalLogisticsType'] == $warehouseCarrierService && $row['onlineLogisticsId'] == $onlineLogisticsId) { //渠道和物流内单号对应上了
-                            return array('code' => 'success', 'result' => $row['result']['intlTracking']);//国际运单号;
+                            return array('code' => 'success', 'result' => $row['internationallogisticsId'],'result_other' => $onlineLogisticsId);//国际运单号;
                         }
                     }
+                }else{
+                    return array('code' => 'again', 'result' => '', 'result_other' => $onlineLogisticsId);//国际运单号;
                 }
             }
             

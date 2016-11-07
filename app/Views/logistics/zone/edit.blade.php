@@ -10,12 +10,10 @@
         </div>
         <div class="form-group col-lg-3">
             <label for="logistics_id">物流方式</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="logistics_id" class="form-control logistics" id="logistics_id">
-                @foreach($logisticses as $logistics)
-                    <option value="{{ $logistics->id }}" {{ old('logistics_id') ? (old('logistics_id') == $logistics->id ? 'selected' : '') : ($model->logistics_id == $logistics->id ? 'selected' : '' )}}>
-                        {{ $logistics->name }}
-                    </option>
-                @endforeach
+            <select class="form-control logistics" id="logistics_id">
+                <option value=""}}>
+                    {{ $logistics_name }}
+                </option>
             </select>
         </div>
         <div class="modal fade" id="countrys" tabindex="-1" role="dialog" 
@@ -33,17 +31,29 @@
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-body">
+                            <div class='form-group'>
+                                <div class='col-lg-12 row'>
+                                    <font size='3px' color='blue'>{{$model->zone}}</font>
+                                    <button type='button' class='btn btn-info all_select'>全选</button>
+                                    <button type='button' class='btn btn-info opposite_select'>反选</button>
+                                </div>
+                                @foreach($model->logistics_zone_countries as $country)
+                                    <div class='col-lg-4'>
+                                        <input type='checkbox' class='country' name='countrys[]' value="{{ $country->id }}" checked><font size='3px'>{{ $country->cn_name }}</font>
+                                    </div>
+                                @endforeach
+                            </div>
                             @foreach($partitions as $partition)
                             <div class='form-group'>
-                                <div class='col-lg-12'>
+                                <div class='col-lg-12 row'>
                                     <font size='3px' color='blue'>{{$partition->name}}</font>
                                     <button type='button' class='btn btn-info all_select'>全选</button>
                                     <button type='button' class='btn btn-info opposite_select'>反选</button>
                                 </div>
                                 @foreach($partition->partitionSorts as $partitionSort)
-                                <div class='col-lg-4'>
-                                    <input type='checkbox' class='country' name='countrys[]' value="{{ $partitionSort->country_id }}" {{ $model->inZone($partitionSort->country_id) ? 'checked' : ($model->weatherAvailable($partitionSort->country_id) ? '' : '') }}><font size='3px'>{{ $partitionSort->country->cn_name }}</font>
-                                </div>
+                                    <div class='col-lg-4'>
+                                        <input type='checkbox' class='country' name='countrys[]' value="{{ $partitionSort->country_id }}"}}><font size='3px'>{{ $partitionSort->country->cn_name }}</font>
+                                    </div>
                                 @endforeach
                             </div>
                             @endforeach
@@ -207,7 +217,13 @@
 
         $(document).on('click', '.opposite_select', function(){
             block = $(this).parent().parent();
-            block.find("input[type='checkbox']").prop('checked', false);
+            $.each(block.find("input[type='checkbox']"), function(){
+                if($(this).prop('checked') == true) {
+                    $(this).prop('checked', false);
+                } else {
+                    $(this).prop('checked', true);
+                }
+            });
         });
 
 

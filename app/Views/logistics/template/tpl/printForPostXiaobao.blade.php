@@ -34,6 +34,7 @@
                                     </tr>
                                     <tr align="center">
                                         <td style="width:13mm;font-weight:bold;font-size:16px;">
+                                            {{ $model->country ? $model->country->cn_name : '' }}
                                             {{ $model->country ? $model->country->code : '' }}
                                             @if($model->country)
                                                 @foreach(['RU' => 21,'US' => 22,'GB' => 23,'BR' => 24,
@@ -41,8 +42,8 @@
                                                           'IL' => 29,'IT' => 30,'DE' => 31,'CL' => 32,
                                                           'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                                                           'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
-                                                    @if($value[$key] == $model->country->code)
-                                                        {{ $key }}
+                                                    @if($key == $model->country->code)
+                                                         {{ $value }}
                                                     @endif
                                                 @endforeach
                                             @endif
@@ -62,12 +63,12 @@
             </tr>
             <tr valign="top" height="22">
                 <td style="border-bottom: 1px solid black;">
-                    <div style="float:left;">协议客户：
+                    <div style="float:left;font-size: 12px">协议客户：
                         {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '') : '' }}</div>
                 </td>
             </tr>
             <tr height="56">
-                <td style="border-bottom: 1px solid black;">
+                <td style="border-bottom: 1px solid black;font-size: 12px">
                     <table border="0" cellpadding="0" cellspacing="0">
                         <tr><td width="50" align="right" valign="top"><strong>FROM:&nbsp;</strong></td><td colspan="3" style="white-space: normal; word-break: break-all;">{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}</td></tr>
                         <tr><td align="right"><strong>ZIP:&nbsp;</strong></td><td width="100">{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->zipcode) : '') : '' }}</td>
@@ -100,9 +101,9 @@
             </tr>
         </table>
         <div style="width:370px;height:30px; font-size:25px;">
-            <span style="font-size:25px;">{{ $model->logistics_id }}</span>
+            <span style="font-size:25px;">{{ $model->shipping ? $model->shipping->logistics_code : '' }}</span>
 
-            <span style="margin-left:240px;">{{ round($model->total_price,2) }}</span>
+            <span style="margin-left:240px;">{{ $model->items ? $model->items->sum('quantity') : 0 }}</span>
         </div>
         <div style="width: 370px;  bottom:60px; text-align: center; clear:both; border-top:1px solid black; padding-bottom: 2px;">
 
@@ -122,7 +123,7 @@
                 <td style="border-bottom: 1px solid black;" colspan="7">
                     <table cellpadding="0" cellspacing="0" border="0" width="100%">
                         <tr align="center">
-                            <td width="90" rowspan="2"></td>
+                            <td width="90" rowspan="2">{{ $model->id ? $model->id : '' }}</td>
                             <td width="175"><strong>报关签条</strong></td>
                             <td><strong>邮2113</strong></td>
                         </tr>
@@ -159,16 +160,13 @@
             </tr>
             <tr>
                 <td style="border-bottom: 1px solid black; border-right:1px solid black;" colspan="5" align="center">
-
-
-                    {{ $model->catelog ? $model->catelog->c_name : ''}}<br>*
-                    {{ $model->catelog ? $model->catelog->name : ''}}
+                    {{ $model->declared_en }}*{{ $model->items ? $model->items->sum('quantity') : 0 }}
                 </td>
                 <td style="border-bottom: 1px solid black;border-right:1px solid black;" align="center">
-                    {{ $model->total_weight }}
+                    {{ $model->signal_weight }}
                 </td>
                 <td style="border-bottom: 1px solid black;" align="center">
-                    {{ $model->declared_value }}USD
+                    {{ $model->signal_price }}USD
                 </td>
             </tr>
 

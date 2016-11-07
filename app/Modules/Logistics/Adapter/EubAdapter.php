@@ -31,49 +31,14 @@ class EubAdapter extends BasicAdapter
             'APISellerUserToken'=>'',
             'APISellerUserID'=>'',
         );
-        $this->eMSPickUpType = 0;//上门揽收
-        $this->pickUpAddress = array( //揽收地址信息
-            'Contact' => '黄超云',
-            'Company' => '深圳市萨拉摩尔科技有限公司',
-            'Street' => '坂田五和大道南41号 和堪工业区B3栋4楼',
-            'District' => 440307,
-            'City' => 440300,
-            'Province' => 440000,
-            'Postcode' => 518129,
-            'CountryCode'=> 'CN',
-            'Email' => 'wuliu@moonarstore.com',
-            'Mobile' => 18565631099,
-            'Phone' => 18565631099
-        );
-        $this->shipFromAddress = array( //寄件人地址信息
-            'Contact' => 'HUANGCHAOYUN',
-            'Company' => 'Salamoer Tech',
-            'Street' => 'B3-4 Hekan Industrial Zone, No.41, Wuhe Road South',
-            'District' => 'LONGGANG',
-            'City' => 'SHENZHEN',
-            'Province' => 'GUANGDONG',
-            'Postcode' => '518129',
-            'CountryCode'=> 'CN',
-            'Email' => 'wuliu@moonarstore.com',
-            'Mobile' => '18565631099'
-        );
-        $this->returnAddress = array( //退货地址信息
-            'Contact' => '黄超云',
-            'Company' => '深圳市萨拉摩尔科技有限公司',
-            'Street' => '坂田五和大道南41号 和堪工业区A3栋2楼',
-            'District' => '龙岗',
-            'City' => '深圳',
-            'Province' => '广东',
-            'Postcode' => 518129,
-            'CountryCode'=> 'CN'
-        );
+
     }
 
 
     public function getTracking($package)
     {
         $response = $this->doUpload($package);
-        if ($response['status'] != 0) {
+        if ($response['status'] != 0) {0
             $result = [
                 'code' => 'success',
                 'result' =>$response['msg'] //跟踪号
@@ -98,6 +63,49 @@ class EubAdapter extends BasicAdapter
         $this->callBase['AppCert'] = $account_info->ebay_developer_certid;//eBay token
         $this->callBase['APISellerUserToken'] = $account_info->ebay_token;//eBay token
         $this->callBase['APISellerUserID'] = $account_info->ebay_eub_developer;//卖家eBay帐户
+
+        $emailTemplateInfo = $package->emailTemplate;
+
+        $this->eMSPickUpType = $emailTemplateInfo->eub_transport_type;
+
+
+        $this->pickUpAddress = array( //揽收地址信息
+            'Contact' => $emailTemplateInfo->eub_contact_name,
+            'Company' => $emailTemplateInfo->eub_contact_company_name,
+            'Street' => $emailTemplateInfo->eub_street,
+            'District' => $emailTemplateInfo->eub_zone_code,
+            'City' => $emailTemplateInfo->eub_city_code,
+            'Province' => $emailTemplateInfo->eub_province_code,
+            'Postcode' => $emailTemplateInfo->eub_zipcode,
+            'CountryCode'=> 'CN',
+            'Email' => $emailTemplateInfo->eub_email,
+            'Mobile' => $emailTemplateInfo->eub_mobile_phone,
+            'Phone' => $emailTemplateInfo->eub_phone
+        );
+        $this->shipFromAddress = array( //寄件人地址信息
+            'Contact' => $emailTemplateInfo->eub_sender,
+            'Company' => $emailTemplateInfo->eub_sender_company,
+            'Street' => $emailTemplateInfo->eub_sender_street,
+            'District' => $emailTemplateInfo->eub_sender_zone,
+            'City' => $emailTemplateInfo->eub_sender_city,
+            'Province' => $emailTemplateInfo->eub_sender_province,
+            'Postcode' => $emailTemplateInfo->eub_sender_province_code,
+            'CountryCode'=> 'CN',
+            'Email' => $emailTemplateInfo->eub_sender_email,
+            'Mobile' => $emailTemplateInfo->eub_sender_mobile_phone
+        );
+        $this->returnAddress = array( //退货地址信息
+            'Contact' => $emailTemplateInfo->eub_return_contact,
+            'Company' => $emailTemplateInfo->eub_return_company,
+            'Street' => $emailTemplateInfo->eub_return_address,
+            'District' => $emailTemplateInfo->eub_return_zone,
+            'City' => $emailTemplateInfo->eub_return_city,
+            'Province' => $emailTemplateInfo->eub_return_province,
+            'Postcode' => $emailTemplateInfo->eub_return_zipcode,
+            'CountryCode'=> 'CN'
+        );
+
+
 
         $shipToAddress = array( //收件人地址信息
             'Contact' 	  => $package->shipping_firstname.' '.$package->shipping_lastname,

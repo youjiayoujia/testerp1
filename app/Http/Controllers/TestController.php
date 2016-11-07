@@ -69,22 +69,19 @@ use App\Models\ProductModel;
 class TestController extends Controller
 {
     private $itemModel;
-	private $orderModel;
+    private $orderModel;
 
     public function __construct(OrderModel $orderModel, ItemModel $itemModel)
     {
         $this->itemModel = $itemModel;
-		$this->orderModel = $orderModel;
+        $this->orderModel = $orderModel;
     }
 
     public function test2()
     {
-        $package = PackageModel::where('id',1)->first();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $package,
-        ];
-        return view('logistics.template.tpl.printChinaPY_ldb_tlp' , $response);
+        $package = PackageModel::find(530);
+        var_dump($package->logistics_zone->toarray());
+        exit;
     }
 
     // public function test2()
@@ -96,35 +93,35 @@ class TestController extends Controller
     //     var_dump($b);
     // }
 
-    public function calcTwoArr(&$a,&$b)
+    public function calcTwoArr(&$a, &$b)
     {
-        foreach($a as $key => $value) {
-            if(array_key_exists($key, $b)) {
-                if($this->valueequal($value,$b[$key])) {
+        foreach ($a as $key => $value) {
+            if (array_key_exists($key, $b)) {
+                if ($this->valueequal($value, $b[$key])) {
                     unset($a[$key]);
                     unset($b[$key]);
                 } else {
-                    if(getType($value) == getType($b[$key]) && is_array($value)) {
-                        $this->calcTwoArr($a[$key],$b[$key]);
+                    if (getType($value) == getType($b[$key]) && is_array($value)) {
+                        $this->calcTwoArr($a[$key], $b[$key]);
                     }
                 }
             }
         }
     }
 
-    public function valueEqual($c,$d)
+    public function valueEqual($c, $d)
     {
-        if(getType($c) == getType($d)) {
-            if(!is_array($c)) {
-                if($c == $d) {
+        if (getType($c) == getType($d)) {
+            if (!is_array($c)) {
+                if ($c == $d) {
                     return true;
                 } else {
                     return false;
                 }
             } else {
-                foreach($c as $key => $value) {
-                    if(array_key_exists($key, $d)) {
-                        if(!$this->valueEqual($value, $d[$key])) {
+                foreach ($c as $key => $value) {
+                    if (array_key_exists($key, $d)) {
+                        if (!$this->valueEqual($value, $d[$key])) {
                             return false;
                         }
                     } else {
@@ -219,7 +216,8 @@ class TestController extends Controller
 
     public function test1()
     {
-        var_dump('123');exit;
+        var_dump('123');
+        exit;
     }
 
     public function index()
@@ -303,10 +301,12 @@ class TestController extends Controller
         exit;
     }
 
-    public function testYw(){
-        $package = PackageModel::findOrFail(3);
+    public function testYw()
+    {
+        $id = request()->get('id');
+        $package = PackageModel::findOrFail($id);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-        ->getTracking($package);
+            ->getTracking($package);
         exit;
     }
 
@@ -659,9 +659,9 @@ class TestController extends Controller
             }
         }
     }
-    public function jdtestCrm(){
 
-
+    public function jdtestCrm()
+    {
 
 
         /*        $message_obj = MessageModel::find(36336);
@@ -694,29 +694,30 @@ class TestController extends Controller
          *
          */
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'hkdajin@126.com'){ //测试diver
+            if ($account->account == 'hkdajin@126.com') { //测试diver
 
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
-                print_r($messageList);exit;
+                print_r($messageList);
+                exit;
 
             }
         }
 
 
-/*        $userId =  request()->user()->id;
-        $accounts = AccountModel::where('customer_service_id','=',$userId)->get();
-        if(count($accounts) <> 0){
+        /*        $userId =  request()->user()->id;
+                $accounts = AccountModel::where('customer_service_id','=',$userId)->get();
+                if(count($accounts) <> 0){
 
-            foreach ($accounts as $key => $account){
-                $ids_ary[] = $account->id;
-            }
+                    foreach ($accounts as $key => $account){
+                        $ids_ary[] = $account->id;
+                    }
 
-            return $ids_ary;
+                    return $ids_ary;
 
-        }
-        exit;*/
+                }
+                exit;*/
     }
 
 
@@ -749,53 +750,55 @@ class TestController extends Controller
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-    public function testEbayCases(){
+
+    public function testEbayCases()
+    {
 
 
         $url = 'jiangdi.zserp.com/api/SyncSellmoreData';
         $data = [
-            'secretKey'               => 'VSxtAts2fQlTLc1KCLaM',
-            'type'                   => 'update',
+            'secretKey' => 'VSxtAts2fQlTLc1KCLaM',
+            'type' => 'update',
             //'id'                     => 30000,
-            'suppliers_id'           => 40110,
-            'suppliers_company'      => '',
-            'suppliers_website'      => '',
-            'suppliers_address'      => '',
-            'suppliers_type'         => '0',
+            'suppliers_id' => 40110,
+            'suppliers_company' => '',
+            'suppliers_website' => '',
+            'suppliers_address' => '',
+            'suppliers_type' => '0',
             'supplierArrivalMinDays' => '',
-            'suppliers_bank'        => '招商',
+            'suppliers_bank' => '招商',
             'suppliers_card_number' => '23543456345',
-            'suppliers_name'        => '160000',
-            'suppliers_mobile'      => '13016937924',
-            'suppliers_wangwang'    => '23456edg',
-            'suppliers_qq'          => '3563456',
-            'pay_method'            => '1',
-            'attachment_url'        => 'http://erp.moonarstore.com/upload/suppliers/2014/0410/13971223945484.jpg',
+            'suppliers_name' => '160000',
+            'suppliers_mobile' => '13016937924',
+            'suppliers_wangwang' => '23456edg',
+            'suppliers_qq' => '3563456',
+            'pay_method' => '1',
+            'attachment_url' => 'http://erp.moonarstore.com/upload/suppliers/2014/0410/13971223945484.jpg',
         ];
-        $result = $this->postCurlHttpsData($url,$data);
+        $result = $this->postCurlHttpsData($url, $data);
 
-        echo ($result);exit;
+        echo($result);
+        exit;
 
 
-
-/*        'sellmore' => [
-            'pay_type' => [
-                1 => 'ONLINE',
-                2 => 'BANK_PAY',
-                3 => 'CASH_PAY',
-                4 => 'OTHER_PAY',
-            ],
-            'api_url' => 'http://120.24.100.157:60/api/api_suppliers.php',
-        ],*/
-
+        /*        'sellmore' => [
+                    'pay_type' => [
+                        1 => 'ONLINE',
+                        2 => 'BANK_PAY',
+                        3 => 'CASH_PAY',
+                        4 => 'OTHER_PAY',
+                    ],
+                    'api_url' => 'http://120.24.100.157:60/api/api_suppliers.php',
+                ],*/
 
 
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'ebay@licn2011'){ //测试diver
+            if ($account->account == 'ebay@licn2011') { //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getCases();
-                print_r($messageList);exit;
+                print_r($messageList);
+                exit;
 
             }
         }
@@ -805,28 +808,38 @@ class TestController extends Controller
      * 同步ebay信息
      * 测试自动补货功能
      */
-    public function getEbayProduct(){
+    public function getEbayProduct()
+    {
         //$package = PackageModel::findOrFail(3113);
-        $package =  PackageModel::where('id',81)->first();
-
-        $result = $package->placeLogistics();
-        var_dump($result);exit;
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        var_dump($result);
         exit;
         $page = 2;
         $pageSize = 2000;
         $status = ['saleOutStopping', 'stopping', 'cleaning'];
-        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status', $status)->Offset($pageSize * $page)->limit($pageSize)->get();
+        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status',
+            $status)->Offset($pageSize * $page)->limit($pageSize)->get();
 
         foreach ($product_data as $product) {
             if ($product->AvailableQuantity + $product->NormalTransitQuantity > 0) {
                 continue;
             }
-            $ebay_sku_arr = EbayPublishProductDetailModel::where(['erp_sku' => trim($product->sku), 'status' => '1'])->get();
+            $ebay_sku_arr = EbayPublishProductDetailModel::where([
+                'erp_sku' => trim($product->sku),
+                'status' => '1'
+            ])->get();
             foreach ($ebay_sku_arr as $ebay_sku) {
                 if ($ebay_sku->ebayProduct->multi_attribute == 0) { //直接下架
                     echo 'single  down';
                 } else {
-                    $all_ebay_sku = EbayPublishProductDetailModel::where(['item_id' => $ebay_sku->item_id,])->where('id', '!=', $ebay_sku->id)->get(); //这个广告下的全部sku 不包括这个
+                    $all_ebay_sku = EbayPublishProductDetailModel::where(['item_id' => $ebay_sku->item_id,])->where('id',
+                        '!=', $ebay_sku->id)->get(); //这个广告下的全部sku 不包括这个
                     $is_down = true; //下架改广告
                     foreach ($all_ebay_sku as $ebay_sku_item) {
                         if ($ebay_sku_item->status == 1) { //sku 在线
@@ -856,25 +869,26 @@ class TestController extends Controller
         $page = 2;
         $pageSize = 2000;
         $status = ['unSellTemp'];
-        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status', $status)->Offset($pageSize * $page)->limit($pageSize)->get();
-        foreach($product_data as $product){
+        $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status',
+            $status)->Offset($pageSize * $page)->limit($pageSize)->get();
+        foreach ($product_data as $product) {
             if ($product->AvailableQuantity + $product->NormalTransitQuantity > 0) {
                 continue;
             }
-            $ebay_sku_arr = EbayPublishProductDetailModel::where(['erp_sku' => trim($product->sku), 'status' => '1'])->get();
+            $ebay_sku_arr = EbayPublishProductDetailModel::where([
+                'erp_sku' => trim($product->sku),
+                'status' => '1'
+            ])->get();
             foreach ($ebay_sku_arr as $ebay_sku) { //设置在线数量为0
                 echo 'set zero';
             }
         }
 
 
-
-
-
-           /* $account = AccountModel::find(378);
-            if ($account) {
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $channel->testBuHuo();*/
+        /* $account = AccountModel::find(378);
+         if ($account) {
+             $channel = Channel::driver($account->channel->driver, $account->api_config);
+             $channel->testBuHuo();*/
 //            $is_do =true;
 //            $i=1;
 //            while($is_do) {
@@ -895,6 +909,7 @@ class TestController extends Controller
 
         //}
     }
+
     public function getCurlData($remote_server)
     {
         $ch = curl_init();
@@ -911,53 +926,55 @@ class TestController extends Controller
         curl_close($ch);
         return $output;
     }
-    public function getSmtIssue(){
+
+    public function getSmtIssue()
+    {
 
 
-      //  $refund = RefundModel::find(2);
+        //  $refund = RefundModel::find(2);
 
-/*        dd($refund->PakcageWeight);
+        /*        dd($refund->PakcageWeight);
 
-        dd($refund);*/
+                dd($refund);*/
 
-        for($i = 1; $i>0; $i++){
-            $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page='.$i;
+        for ($i = 1; $i > 0; $i++) {
+            $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page=' . $i;
             $data = json_decode($this->getCurlData($url));
-            if(empty($data)){
+            if (empty($data)) {
                 break;
-            }else{
-                foreach ($data as $key => $value){
+            } else {
+                foreach ($data as $key => $value) {
 
-                    $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
-                    $content      = file_get_contents($img_src);
-                    $suffix       = strstr(substr($value->attachment_url,1),'.');
-                    $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
+                    $img_src = 'http://erp.moonarstore.com' . substr($value->attachment_url, 1);
+                    $content = file_get_contents($img_src);
+                    $suffix = strstr(substr($value->attachment_url, 1), '.');
+                    $uploads_file = '/product/supplier/' . Tool::randString(16, false) . $suffix;
 
-                //dd($uploads_file);
-                    $bytes = Storage::put($uploads_file,$content);
-                    
+                    //dd($uploads_file);
+                    $bytes = Storage::put($uploads_file, $content);
+
                     $pay_type = $value->pay_method;
 
                     $insert = [
-                        'company'         => $value->suppliers_company,
-                        'address'         => $value->suppliers_address,
-                        'contact_name'    => $value->suppliers_name,
+                        'company' => $value->suppliers_company,
+                        'address' => $value->suppliers_address,
+                        'contact_name' => $value->suppliers_name,
                         //'contact_name' => $value->suppliers_phone,
-                        'telephone'       => $value->suppliers_mobile,
-                        'official_url'    => $value->suppliers_website,
-                        'qq'              => $value->suppliers_qq,
-                        'wangwang'        => $value->suppliers_wangwang,
-                        'bank_account'    => $value->suppliers_bank,
-                        'bank_code'       => $value->suppliers_card_number,
-                        'examine_status'  => $value->suppliers_status,
-                        'purchase_time'   => $value->supplierArrivalMinDays,
-                        'created_by'      => $value->user_id,
-                        'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
-                        'qualifications'  => Tool::randString(16,false).$suffix,
+                        'telephone' => $value->suppliers_mobile,
+                        'official_url' => $value->suppliers_website,
+                        'qq' => $value->suppliers_qq,
+                        'wangwang' => $value->suppliers_wangwang,
+                        'bank_account' => $value->suppliers_bank,
+                        'bank_code' => $value->suppliers_card_number,
+                        'examine_status' => $value->suppliers_status,
+                        'purchase_time' => $value->supplierArrivalMinDays,
+                        'created_by' => $value->user_id,
+                        'pay_type' => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
+                        'qualifications' => Tool::randString(16, false) . $suffix,
 
                     ];
 
-                    if(!empty($insert)){
+                    if (!empty($insert)) {
                         SupplierModel::create($insert);
                     }
                 }
@@ -965,32 +982,29 @@ class TestController extends Controller
         }
 
 
-
-
-
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'smtjiahongming@126.com'){ //测试diver
+            if ($account->account == 'smtjiahongming@126.com') { //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
 
                 $getIssueLists = $channel->getIssues();
-                if(!empty($getIssueLists)){
-                    foreach($getIssueLists as $issue){
+                if (!empty($getIssueLists)) {
+                    foreach ($getIssueLists as $issue) {
                         $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
-                        if(empty($issue_list->id)){
-                            $issue_list->issue_id      = $issue['issue_id'];
-                            $issue_list->gmtModified   = $issue['gmtModified'];
-                            $issue_list->issueStatus   = $issue['issueStatus'];
-                            $issue_list->gmtCreate     = $issue['gmtCreate'];
+                        if (empty($issue_list->id)) {
+                            $issue_list->issue_id = $issue['issue_id'];
+                            $issue_list->gmtModified = $issue['gmtModified'];
+                            $issue_list->issueStatus = $issue['issueStatus'];
+                            $issue_list->gmtCreate = $issue['gmtCreate'];
                             $issue_list->reasonChinese = $issue['reasonChinese'];
-                            $issue_list->orderId       = $issue['orderId'];
+                            $issue_list->orderId = $issue['orderId'];
                             $issue_list->reasonEnglish = $issue['reasonEnglish'];
-                            $issue_list->issueType     = $issue['issueType'];
+                            $issue_list->issueType = $issue['issueType'];
                             $issue_list->save();
 
-                            if(!empty($issue['issue_detail'])){
+                            if (!empty($issue['issue_detail'])) {
                                 $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
-                                if(empty($issue_detail->id)){
+                                if (empty($issue_detail->id)) {
                                     $issue_detail->issue_list_id = $issue_list->id;
                                     $issue_detail->resultMemo = $issue['issue_detail']->resultMemo;
                                     $issue_detail->orderId = $issue['issue_detail']->resultObject->orderId;
@@ -1013,7 +1027,6 @@ class TestController extends Controller
 
                                 }
 
-                                
 
                             }
                         }
@@ -1023,28 +1036,30 @@ class TestController extends Controller
         }
     }
 
-    public function oneSku(){
+    public function oneSku()
+    {
         ini_set('memory_limit', '2048M');
         $model = ProductModel::all();
-        foreach($model as $_item){
+        foreach ($model as $_item) {
             $sku = $_item->item[0]->sku;
-            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=' . $sku;
             $contents = json_decode(file_get_contents($url));
-            if(count($contents)){
+            if (count($contents)) {
                 foreach ($contents as $image) {
                     $data['spu_id'] = $_item->item[0]->product->spu_id;
                     $data['product_id'] = $_item->item[0]->product_id;
-                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' ;
+                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/';
                     $data['name'] = $image->filename;
                     $arr = (array)$image->fileId;
-                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id='.$arr['$id'];
+                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id=' . $arr['$id'];
                     $disk = Storage::disk('product');
-                    Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($image_url));
+                    Storage::disk('product')->put($data['path'] . $data['name'], file_get_contents($image_url));
                 }
             }
         }
     }
-	/*Synchronize joom platform data
+
+    /*Synchronize joom platform data
      *@model:joom
      *@param $account_ids
      */
@@ -1052,68 +1067,70 @@ class TestController extends Controller
     {
         //$account_ids = 412;
         $account_ids = request()->get('accountIDs');
-        $account_arr = explode(',',$account_ids);
-        foreach($account_arr as $account_id){
-        $account = AccountModel::find($account_id);
-        $begin = microtime(true);
-        $channel = Channel::driver($account->channel->driver, $account->api_config);
-        $hasProduct = true;
-        $start = 0;
-        while ($hasProduct) {
-            $productList = $channel->getOnlineProduct($start, 50);
-            if ($productList) {
-                foreach ($productList as $product) {
-                    $is_add = true;
-                    $productInfo = $product['productInfo'];
-                    $variants = $product['variants'];
-                    foreach ($variants as $key => $variant) {
-                        $productInfo['sellerID'] = $variant['sellerID'];
-                        $variants[$key]['account_id'] = $account_id;     //request account id
-                    }
-                    $productInfo['account_id'] = $account_id;  //request account id
-                    $thisProduct = JoomPublishProductModel::where('productID', $productInfo['productID'])->first();
-
-                    if ($thisProduct) {
-                        $is_add = false;
-                        $mark_id = $thisProduct->id;
-                    }
-                    if ($is_add) {    //not data create
-                        $joom = JoomPublishProductModel::create($productInfo);
-                        foreach ($variants as $detail) {
-                            $detail['product_id'] = $joom->id;
-                            $joomDetail = JoomPublishProductDetailModel::create($detail);
+        $account_arr = explode(',', $account_ids);
+        foreach ($account_arr as $account_id) {
+            $account = AccountModel::find($account_id);
+            $begin = microtime(true);
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $hasProduct = true;
+            $start = 0;
+            while ($hasProduct) {
+                $productList = $channel->getOnlineProduct($start, 50);
+                if ($productList) {
+                    foreach ($productList as $product) {
+                        $is_add = true;
+                        $productInfo = $product['productInfo'];
+                        $variants = $product['variants'];
+                        foreach ($variants as $key => $variant) {
+                            $productInfo['sellerID'] = $variant['sellerID'];
+                            $variants[$key]['account_id'] = $account_id;     //request account id
                         }
-                    } else {         //exist update data
-                        JoomPublishProductModel::where('productID', $productInfo['productID'])->update($productInfo);
-                        foreach ($variants as $key1 => $item) {
-                            $productDetail = JoomPublishProductModel::find($mark_id)->details;
-                            if (count($variants) == count($productDetail)) {
-                                foreach ($productDetail as $key2 => $productItem) {
-                                    if ($key1 == $key2) {
-                                        $productItem->update($item);
+                        $productInfo['account_id'] = $account_id;  //request account id
+                        $thisProduct = JoomPublishProductModel::where('productID', $productInfo['productID'])->first();
+
+                        if ($thisProduct) {
+                            $is_add = false;
+                            $mark_id = $thisProduct->id;
+                        }
+                        if ($is_add) {    //not data create
+                            $joom = JoomPublishProductModel::create($productInfo);
+                            foreach ($variants as $detail) {
+                                $detail['product_id'] = $joom->id;
+                                $joomDetail = JoomPublishProductDetailModel::create($detail);
+                            }
+                        } else {         //exist update data
+                            JoomPublishProductModel::where('productID',
+                                $productInfo['productID'])->update($productInfo);
+                            foreach ($variants as $key1 => $item) {
+                                $productDetail = JoomPublishProductModel::find($mark_id)->details;
+                                if (count($variants) == count($productDetail)) {
+                                    foreach ($productDetail as $key2 => $productItem) {
+                                        if ($key1 == $key2) {
+                                            $productItem->update($item);
+                                        }
                                     }
-                                }
-                            } else {
-                                foreach ($productDetail as $key2 => $orderItem) {
-                                    $orderItem->delete($item);
-                                }
-                                foreach ($variants as $value) {
-                                    $value['product_id'] = $mark_id;
-                                    JoomPublishProductDetailModel::create($value);
+                                } else {
+                                    foreach ($productDetail as $key2 => $orderItem) {
+                                        $orderItem->delete($item);
+                                    }
+                                    foreach ($variants as $value) {
+                                        $value['product_id'] = $mark_id;
+                                        JoomPublishProductDetailModel::create($value);
+                                    }
                                 }
                             }
                         }
                     }
+                    $start++;
+                } else {
+                    $hasProduct = false;
                 }
-                $start++;
-            } else {
-                $hasProduct = false;
             }
-         }
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
     /*Time:2016-10-7
      *get joom order
      *@param $account_ids
@@ -1123,14 +1140,14 @@ class TestController extends Controller
         $begin = microtime(true);
         $account_ids = request()->get('accountIDs');
         $account = AccountModel::find($account_ids);
-        $startDate = date("Y-m-d",strtotime('-3 day'));
+        $startDate = date("Y-m-d", strtotime('-3 day'));
         $endDate = date("Y-m-d H:i:s");
         $status = $account->api_status;
         $channel = Channel::driver($account->channel->driver, $account->api_config);
-        for($i=0;$i>=0;$i++){
+        for ($i = 0; $i >= 0; $i++) {
             $pagesize = 50;
             $orderList = $channel->listOrders($startDate, $endDate, $status, $i, $pagesize);
-            if(isset($orderList['orders'])){
+            if (isset($orderList['orders'])) {
                 foreach ($orderList['orders'] as $order) {
                     $thisOrder = OrderModel::where('channel_ordernum', $order['channel_ordernum'])->first();
                     $order['channel_id'] = $account->channel->id;
@@ -1141,82 +1158,94 @@ class TestController extends Controller
                         $this->orderModel->createOrder($order);
                     }
                 }
-            }else{   //over
+            } else {   //over
                 break;
             }
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-/*Time:2016-10-14
-     *joom_OrdersToShipping 标记发货
-     *@param $order_id $id
-     */
+
+    /*Time:2016-10-14
+         *joom_OrdersToShipping 标记发货
+         *@param $order_id $id
+         */
     public function joomToShipping()
     {
         $begin = microtime(true);
         $id = request()->get('id');
-        $orders = OrderModel::where('id',$id)->first();
-        if(!$orders){
-            echo "Parameter error！";exit;
+        $orders = OrderModel::where('id', $id)->first();
+        if (!$orders) {
+            echo "Parameter error！";
+            exit;
         }
-        if($orders->channel_id !== 9){
-            echo "Parameter error！";exit;
+        if ($orders->channel_id !== 9) {
+            echo "Parameter error！";
+            exit;
         }
-        $account = AccountModel::where('channel_id',$orders->channel_id)->first();
+        $account = AccountModel::where('channel_id', $orders->channel_id)->first();
         $channel = Channel::driver($account->channel->driver, $account->api_config);
-        $channel_arr = explode("+",$orders->channel_ordernum);
+        $channel_arr = explode("+", $orders->channel_ordernum);
         $provider = '';   //joom承运商承认物流
-        if(!$provider){
+        if (!$provider) {
             $provider = 'SFExpress';
         }
-        foreach($channel_arr as $item){
-            foreach($orders->packages as $track){
-                $order_shipping = JoomShippingModel::where(['joomID'=>$item,'shipping_code'=>$track->tracking_no])->get();
-                $orderList = $channel->joomApiOrdersToShipping($item,$provider,$track->tracking_no,$orders->status);
-                if($orderList['code'] == 0 || isset($orderList['data']['success'])){
-                    if($orders->status == 'SHIPPED'){
+        foreach ($channel_arr as $item) {
+            foreach ($orders->packages as $track) {
+                $order_shipping = JoomShippingModel::where([
+                    'joomID' => $item,
+                    'shipping_code' => $track->tracking_no
+                ])->get();
+                $orderList = $channel->joomApiOrdersToShipping($item, $provider, $track->tracking_no, $orders->status);
+                if ($orderList['code'] == 0 || isset($orderList['data']['success'])) {
+                    if ($orders->status == 'SHIPPED') {
 
                     }
-                }else if(strpos($orderList['message'],"has been shipped already")){
+                } else {
+                    if (strpos($orderList['message'], "has been shipped already")) {
 
-                    echo "".$orderList->id."在joom平台上已经标记发货成功！不需重新发货！api返回信息为".$orderList['message']."<br>";
-                }else{
+                        echo "" . $orderList->id . "在joom平台上已经标记发货成功！不需重新发货！api返回信息为" . $orderList['message'] . "<br>";
+                    } else {
 
-                    echo "发生错误，错误信息为".$orderList["message"]."<br>";
+                        echo "发生错误，错误信息为" . $orderList["message"] . "<br>";
+                    }
                 }
             }
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
     /*
      * Time:2016-10-17
      * joomordersshelves  refure token
      * @param $order_id $id
      */
-    public function joomrefreshtoken(){
+    public function joomrefreshtoken()
+    {
         $begin = microtime(true);
         $account = request()->get('account');
-        if(!$account){
-            echo "Parameter error！";exit;  //参数不能为空
+        if (!$account) {
+            echo "Parameter error！";
+            exit;  //参数不能为空
         }
-        $account = AccountModel::where('account',$account)->first();
+        $account = AccountModel::where('account', $account)->first();
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $url = "https://api-merchant.joom.it/api/v2/oauth/refresh_token";
-        $post_data = "client_id=".$account->client_id."&client_secret=".$account->client_secret."&refresh_token=".$account->refresh_token."&grant_type=refresh_token";
+        $post_data = "client_id=" . $account->client_id . "&client_secret=" . $account->client_secret . "&refresh_token=" . $account->refresh_token . "&grant_type=refresh_token";
         //$json_data = $channel->postCurlHttpsData($url,$post_data);   //刷新token返回的信息
-        if(isset($json_data)){
+        if (isset($json_data)) {
             $ret = DB::table('channel_accounts')->where('id', $account->id)->update([
                 'joom_access_token' => $json_data->data->access_token,
                 'joom_refresh_token' => $json_data->data->refresh_token,
-                'joom_expiry_time' => $json_data->data->expiry_time]);
-            if($ret){
-                echo "系统刷新token成功!请检查！刷新后token信息为".$json_data->data->access_token."<br>";
-            }else{
+                'joom_expiry_time' => $json_data->data->expiry_time
+            ]);
+            if ($ret) {
+                echo "系统刷新token成功!请检查！刷新后token信息为" . $json_data->data->access_token . "<br>";
+            } else {
                 echo "系统刷新token失败!请检查！<br>";
             }
-        }else{
+        } else {
             echo "系统刷新token失败!请检查！<br>";
         }
         $end = microtime(true);

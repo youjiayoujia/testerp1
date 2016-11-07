@@ -42,8 +42,10 @@ class PickListController extends Controller
     public function index()
     {
         $model = '';
+        $user = UserModel::find(request()->user()->id);
+        $warehouseId = $user->warehouse_id;
         if(request()->has('checkid')) {
-            $model = $this->model->where('pick_by', request('checkid'))->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))]);
+            $model = $this->model->where('pick_by', request('checkid'))->where('warehouse_id', $warehouseId)->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))]);
         }
         $today_print = $this->model->whereBetween('print_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
         $allocate = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])
@@ -52,9 +54,10 @@ class PickListController extends Controller
                         return $single->pick_by != 0;
                     })->count();
         request()->flash();
+        $tmp = $this->model->where('warehouse_id', $warehouseId);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList(!empty($model) ? $model : $this->model),
+            'data' => $this->autoList($this->model, !empty($model) ? $model : ($this->model->where('warehouse_id', $warehouseId))),
             'mixedSearchFields' => $this->model->mixed_search,
             'today_print' => $today_print,
             'allocate' => $allocate,
@@ -615,10 +618,14 @@ class PickListController extends Controller
      */
     public function createPick()
     {
+        $userId = request()->user()->id;
+        $user = UserModel::find($userId);
+        $warehouseId = $user->warehouse_id;
+        $logisticses = WarehouseModel::find($warehouseId)->logistics;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
-            'logisticses' => LogisticsModel::all()->groupBy('template.size'),
+            'logisticses' => $logisticses->groupBy('template.size'),
             'count' => PackageModel::where('status','PROCESSING')->count(),
         ];
 

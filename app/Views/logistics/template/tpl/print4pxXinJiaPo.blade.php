@@ -246,17 +246,17 @@
         <tr height="25">
             <td width="225">
                 <p style="height:25px;font-size:11px;text-align:center;">
-                    {{ $model->declared_en }}
+                    {{ $model->declared_en }}*{{ $model->items ? $model->items->sum('quantity') : 0 }}
                 </p>
             </td>
             <td width="80">
                 <p style="height:25px;font-size:11px;text-align:center;line-height:25px;">
-                    {{ $model->items ? $model->items->sum('quantity') : 0 }}*{{ $model->total_weight }}
+                    {{ $model->signal_weight }}
                 </p>
             </td>
             <td width="70">
                 <p style="height:25px;font-size:11px;text-align:center;line-height:25px;">
-                    {{ $model->total_price > 20 ? 20 : $model->total_price }}USD
+                    {{ $model->signal_price > 20 ? 20 : $model->signal_price }}USD
                 </p>
             </td>
         </tr>
@@ -283,7 +283,7 @@
         <tr height="25">
             <td>
                 <p style="height:25px;font-size:11px;text-align:center;line-height:25px;">
-                    {{ $model->items ? $model->items->sum('quantity') : 0 }}*{{ $model->total_weight }}
+                    {{ $model->total_weight }}
                 </p>
             </td>
             <td>

@@ -650,9 +650,6 @@ class PickListController extends Controller
             foreach(request()->input('logistics') as $logistic_id) {
                 foreach(request('package') as $key => $type) {
                     $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
-                    ->filter(function($query){
-                        return !empty($query->items->first()->warehouse_position_id);
-                    })
                     ->where(function($query){
                         if(request()->has('channel')) {
                             $query =$query->whereIn('channel_id', request('channel'));
@@ -670,9 +667,6 @@ class PickListController extends Controller
         } elseif(request()->has('mixed') && request()->has('logistics')) {
             foreach(request('package') as $key => $type) {
                $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
-               ->filter(function($query){
-                    return !empty($query->items->first()->warehouse_position_id);
-                })
                ->where(function($query){
                     if(request()->has('logistics')) {
                         $query = $query->whereIn('logistics_id', request('logistics'));

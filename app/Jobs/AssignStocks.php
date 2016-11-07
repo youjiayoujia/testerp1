@@ -36,7 +36,7 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if (in_array($this->package->status, ['NEW', 'NEED', 'PROCESSING']) && $this->package->createPackageItems()) {
+        if (in_array($this->package->status, ['NEW', 'NEED']) && $this->package->createPackageItems()) {
             if (in_array($this->package->status, ['WAITASSIGN', 'NEED'])) {
                 $job = new AssignLogistics($this->package);
                 $job = $job->onQueue('assignLogistics');

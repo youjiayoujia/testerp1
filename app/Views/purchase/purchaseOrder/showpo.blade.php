@@ -18,7 +18,7 @@
         <div>
             <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
         </div>
-       <br /> <span style="font-size:10px;">{{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]</span> </td> 
+        <span style="font-size:10px;">{{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]</span> </td> 
      </tr> 
     </tbody>
    </table> 
@@ -45,7 +45,7 @@
                         <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
                     </div>
                     
-                    <br />
+                    
                     <span style="font-size:10px;">
                         {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]
                     </span>
@@ -71,7 +71,7 @@
                             <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'26' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.19' ])}}">
                         </div>
                         
-                        <br />
+                        
                         <div style="font-weight:bold; font-size:2.8mm; text-align:center; width:40mm;">
                             {{$model->sku}}
                         </div>
@@ -101,7 +101,7 @@
                             <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
                         </div>
                         <?php //echo Tool::barcodePrint($model->sku) ?>
-                        <br />
+                        
                         <span style="font-size:8px;">
                             {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]
                         </span>

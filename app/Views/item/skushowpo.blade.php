@@ -16,7 +16,7 @@
          {{$model->c_name}}
         </div> 
         <div>
-            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '0.75' ])}}">
+            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
         </div>
         <span style="font-size:10px;">
             {{date('m-d',time())}}[{{$model->warehousePosition?$model->warehousePosition->name:''}}][PO:{{$po_id}}]
@@ -44,7 +44,7 @@
                         {{$model->c_name}}
                     </div>
                     <div>
-                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '0.75' ])}}">
+                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
                     </div>
                     <?php //echo Tool::barcodePrint($model->sku,$type = 'C128', $width = '0.835', $height='30') ?>
                     <span style="font-size:10px;">
@@ -66,7 +66,7 @@
                     <td align="center" valign="middle"><b><span style="font-size:4mm;"></span>
                         </b>
                         <div>
-                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'35' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '0.87' ])}}">
+                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'35' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
                         </div>
                         <?php //echo Tool::barcodePrint($model->sku,$type = 'C128', $width = '1.07', $height='30') ?>
                         <div style="font-weight:bold; font-size:2.8mm; text-align:center; width:40mm;">
@@ -96,7 +96,7 @@
                         {{$model->c_name}}
                     </div>
                     <div>
-                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '0.75' ])}}">
+                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'40' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
                     </div>
                     <?php //echo Tool::barcodePrint($model->sku,$type = 'C128', $width = '0.835', $height='30') ?>
                     <span style="font-size:10px;">

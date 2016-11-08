@@ -165,14 +165,21 @@ class PackageModel extends BaseModel
         $data = [];
         if ($isAll) {
             $items = $this->items ? $this->items->item : false;
+            if ($items) {
+                foreach ($items as $item) {
+                    $data['declared_value'] = $item->declared_value;
+                    $data['weight'] = $item->weight;
+                    $data['declared_en'] = $item->product ? $item->product->declared_en : '';
+                    $data['declared_cn'] = $item->product ? $item->product->declared_cn : '';
+                }
+            }
         } else {
             $items = $this->items ? $this->items->first()->item : false;
-        }
-        if ($items->get()) {
-            foreach ($items->get() as $item) {
-                $data['declared_value'] = $item->declared_value;
-                $data['declared_en'] = $item->product ? $item->product->declared_en : '';
-                $data['declared_cn'] = $item->product ? $item->product->declared_cn : '';
+            if ($items) {
+                $data['declared_value'] = $items->declared_value;
+                $data['weight'] = $items->weight;
+                $data['declared_en'] = $items->product ? $items->product->declared_en : '';
+                $data['declared_cn'] = $items->product ? $items->product->declared_cn : '';
             }
         }
 
@@ -236,7 +243,7 @@ class PackageModel extends BaseModel
         $price = 0;
         if ($this->order->rate) {
             foreach ($this->items as $packageItem) {
-                $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+                $price += $packageItem->quantity * ($packageItem->item ? $packageItem->item->declared_value : 0);
             }
             $price = $price / $this->order->rate;
         }

@@ -87,9 +87,29 @@
             </td>
         </tr>
         <tr style="font-size:12px;">
-            <td width="70%" style="border-right:none;">{{ $model->declared_en }}</td>
-            <td width="15%" style="border-right:none;">{{ $model->signal_weight }}</td>
-            <td width="15%">{{ $model->signal_price }}</td>
+            @if($model->logistics->is_express)
+                @foreach($model->getDeclaredInfo($model->logistics->is_express) as $value)
+                    <td width="70%" style="border-right:none;">
+                        {{ $value['declared_en'] }}
+                    </td>
+                    <td width="15%" style="border-right:none;">
+                        {{ $value['weight'] }}
+                    </td>
+                    <td width="15%">
+                        {{ $value['declared_value'] }}
+                    </td>
+                @endforeach
+            @else
+                <td width="70%" style="border-right:none;">
+                    {{ $model->getDeclaredInfo()['declared_en'] }}
+                </td>
+                <td width="15%" style="border-right:none;">
+                    {{ $model->getDeclaredInfo()['weight'] }}
+                </td>
+                <td width="15%">
+                    {{ $model->getDeclaredInfo()['declared_value'] }}
+                </td>
+            @endif
         </tr>
         <tr height="15" style="font-size:12px;">
             <td width="70%" style="border-right:none;font-size:12px;">

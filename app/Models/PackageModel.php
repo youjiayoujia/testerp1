@@ -159,6 +159,26 @@ class PackageModel extends BaseModel
         return $logisticsZone;
     }
 
+    //获取申报信息
+    public function getDeclaredInfo($isAll = false)
+    {
+        $data = [];
+        if ($isAll) {
+            $items = $this->items ? $this->items->item : false;
+        } else {
+            $items = $this->items ? $this->items->first()->item : false;
+        }
+        if ($items->get()) {
+            foreach ($items->get() as $item) {
+                $data['declared_value'] = $item->declared_value;
+                $data['declared_en'] = $item->product ? $item->product->declared_en : '';
+                $data['declared_cn'] = $item->product ? $item->product->declared_cn : '';
+            }
+        }
+
+        return $data;
+    }
+
     //包裹sku信息
     public function getSkuInfoAttribute()
     {

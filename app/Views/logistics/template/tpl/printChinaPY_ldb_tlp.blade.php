@@ -130,7 +130,7 @@
 				<td>{{ date('Y-m-d') }}</td>
 			</tr>
 		</table>
-		<div style="margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
+		<div style="margin:0 auto;font-size:8px;white-space:normal;overflow:hidden;">
 		      {{ $model->sku_info }}
 		</div>
 	</div>		

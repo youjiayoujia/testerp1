@@ -304,8 +304,6 @@ class MessageModel extends BaseModel{
             foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
-                       //dd($content);
-                       //dd($content);
                         foreach ($content as $k => $item){
                            if(!empty($item['Reply']['message'])){
                                if($item['Reply']['sender'] != 'merchant'){
@@ -473,7 +471,7 @@ class MessageModel extends BaseModel{
         switch ($channel){
             case 'aliexpress':
                 $content = $this->ContentDecodeBase64;
-                foreach ($content['aliexpress']->result as $message){
+/*                foreach ($content['aliexpress']->result as $message){
                     $type = $message->messageType;
                     break;
                 }
@@ -481,7 +479,7 @@ class MessageModel extends BaseModel{
                 $html .= '<p>Message type:'.$this->label.'</p>';
                 $html .= '<p>Detail type:'.$type.'</p>';
                 $html .= '<p>Order id:'.$files['order_id'].'</p>';
-                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
+                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';*/
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;

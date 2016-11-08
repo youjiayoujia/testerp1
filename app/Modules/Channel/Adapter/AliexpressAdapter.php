@@ -566,14 +566,12 @@ Class AliexpressAdapter implements AdapterInterface
     
     public function getMessages()
     {
-
         $msgSourcesArr =array('message_center','order_msg');
         $method = 'api.queryMsgRelationList';
         $filter = 'readStat';
         $pageSize = 100; //每页个数
         $j = 0;
         $message_list = [];
-
         foreach ($msgSourcesArr as $Sources){
             for($i=1; $i>0; $i++){
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
@@ -581,7 +579,6 @@ Class AliexpressAdapter implements AdapterInterface
                 $message_array = json_decode($returnJson, true);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
-
                         // 或者  跳过
                         /**
                          * 去除种状态的消息
@@ -593,13 +590,10 @@ Class AliexpressAdapter implements AdapterInterface
                         if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
                             continue;
                         }
-
                         /**
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
-
-                        //dd(json_decode($detailArrJson));
 
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
@@ -608,8 +602,8 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['date'] = $this->changetime($item['messageTime']);
                         $message_list[$j]['subject'] = $item['lastMessageContent'];
                         $message_list[$j]['attachment'] = ''; //附件
-                        $message_list[$j]['labels'] = '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
-
+                        $message_list[$j]['labels'] = '' ;
+                        //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
                         $message_list[$j]['message_type'] = $Sources;
                         $message_list[$j]['rank'] = $item['rank'];
                         $message_list[$j]['dealStat'] = $item['dealStat'];
@@ -617,44 +611,18 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['unreadCount'] = $item['unreadCount'];
                         $message_list[$j]['readStat'] = $item['readStat'];
 
-                        if($Sources == 'order_msg'){
-                            $message_list[$j]['label'] = '订单留言';
-                            $temp_message = json_decode($detailArrJson);
-                            foreach ($temp_message->result as $get_one_detail){
+                        $message_fields_ary = false; //aliexress 平台特殊参数
 
-                                $temp_oreder_url = $get_one_detail->summary->orderUrl;
-                                //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
-                                $message_list[$j]['labels'] = isset($get_one_detail->messageType) ? $get_one_detail->messageType : '' ;
-                                break;
-                            }
-                            //dd($temp_message->result);
-                            foreach ($temp_message->result  as $temp_detail){
-                                $productDetail = '';
-
-                                $detail_type = isset($temp_detail->messageType) ? $temp_detail->messageType : '' ;
-
-                                if($detail_type == 'product'){
-                                    $productDetail['product_img_url']      = isset($temp_detail->summary->productImageUrl) ? $temp_detail->summary->productImageUrl : '';
-                                    $productDetail['product_product_url']  = isset($temp_detail->summary->productDetailUrl) ? $temp_detail->summary->productDetailUrl : '';
-                                    $productDetail['product_product_name'] = isset($temp_detail->summary->productName) ? $temp_detail->summary->productName : '';
+                        if(!empty($detailArray['result'])){
+                            foreach ($detailArray['result'] as $item_detail){
+                                if($item_detail['messageType'] == 'product'){
+                                    $productDetail['product_img_url']      = isset($item_detail->summary->productImageUrl) ? $item_detail->summary->productImageUrl : '';
+                                    $productDetail['product_product_url']  = isset($item_detail->summary->productDetailUrl) ? $item_detail->summary->productDetailUrl : '';
+                                    $productDetail['product_product_name'] = isset($item_detail->summary->productName) ? $item_detail->summary->productName : '';
+                                    break;
                                 }
                             }
-
-                            $message_fields_ary = [
-                                'message_type' => $Sources, //消息类型
-                                'order_id'     => $item['channelId'], //消息类型
-                                'order_url'    => $temp_oreder_url,
-                                'product_info' => $productDetail,
-                            ];
-                        }else{
-                            $message_list[$j]['label'] = '站内信';
-                            $message_fields_ary = [
-                                'message_type' => $Sources, //消息类型
-                                'order_id' => '',
-                                'order_url' =>'',
-                            ];
                         }
-
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
 
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));

@@ -35,24 +35,23 @@ class YwAdapter extends BasicAdapter
     public function doUpload($package){
         $epcode = '';
         $quantity = 0;
-        $requestXmlBody  = '';
-        $products_declared_value = 0;
-        
-        foreach ($package->items as $key => $item) {
-            $quantity += $item->quantity;
-            $products_declared_value += $item->item->product->declared_value;
-            $products_declared_en = $item->item->product->declared_en;
-            $products_declared_cn = $item->item->product->declared_cn;   
-            $products_sku = $item->orderItem->sku;
-            $warehouse_position_id = $item->warehouse_position_id;
+        $requestXmlBody  = '';       
+     
+        foreach ($package->items as $packageItem) {
+            $quantity += $packageItem->quantity;
+            $warehouse_position_id = $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '-';
+            $products_sku = $packageItem->item ? $packageItem->item->sku : '';
         }
+        $products_declared_cn = $package->items ? $package->items->first()->item->product->declared_cn : '';
+        $products_declared_en = $package->items ? $package->items->first()->item->product->declared_en : '';
+        $products_declared_value = $package->items->first()->item->declared_value;
         $memo_str = $products_sku . ' * ' . $quantity . " (". $warehouse_position_id . ")\r\n";      
         $receiver_name = $package->shipping_firstname.' '.$package->shipping_lastname;
         $address = $package->shipping_address.' '.$package->shipping_address1;
-        list($name,$channel) =  explode(',',$package->logistics->logistics_code);
+        list($name,$channel) =  explode(',',$package->logistics->type);
         $userID = $this->userId;
-        $weight = intval($package->weight);
-        
+        $order_number = $package->id . $this->rand_string(5);
+        $weight = $package->total_weight * 1000;
         $requestXmlBody =   "<ExpressType>
                                 <Epcode>$epcode</Epcode>
                                 <Userid>$userID</Userid>
@@ -75,21 +74,20 @@ class YwAdapter extends BasicAdapter
                                 </Receiver>
                                 <Memo>$memo_str</Memo>
                                 <Quantity>$quantity</Quantity>
-                                <GoodsName>                                   
+                                <GoodsName>  
+                                    <Id></Id>
                                     <Userid>$userID</Userid>
                                     <NameCh>". $products_declared_cn ."</NameCh>
-                                    <NameEn>" . substr($products_declared_en, 0, 190) . "</NameEn>                                                
+                                    <NameEn>" . substr($products_declared_en, 0, 190) . "</NameEn>   
+                                    <MoreGoodsName>" . $products_declared_cn . "</MoreGoodsName>
                                     <Weight> $weight </Weight>
                                     <DeclaredValue>$products_declared_value</DeclaredValue>
-                                    <DeclaredCurrency>". $package->order->currency ."</DeclaredCurrency>
-                                    <MoreGoodsName>" . $products_declared_cn . "</MoreGoodsName>   
+                                    <DeclaredCurrency>". $package->order->currency ."</DeclaredCurrency>                                  
                                 </GoodsName>
-                            </ExpressType>";
-        var_export($requestXmlBody);
+                            </ExpressType>"; 
         $url = $this->serverUrl . 'Users/'.$this->userId.'/Expresses';
-        $result = $this->sendHttpRequest($url, 1, $requestXmlBody);
+        $result = $this->sendHttpRequest($url, 1, $requestXmlBody);      
         $result_xml = simplexml_load_string($result);
-
         if ( $result_xml->Response->Success == 'true' ) {      
             $epcodeNode = $result_xml->CreatedExpress->Epcode;
             $YWcode = $result_xml->CreatedExpress->YanwenNumber;
@@ -130,6 +128,18 @@ class YwAdapter extends BasicAdapter
     
         return $response;
     }
+    
+    public function rand_string($len, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+    {
+        $string = '';
+        for ($i = 0; $i < $len; $i++)
+        {
+            $pos = rand(0, strlen($chars)-1);
+            $string .= $chars{$pos};
+        }
+        return $string;
+    }
+    
     
 }
 

@@ -119,8 +119,11 @@
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
-                	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
-                         <span class="glyphicon glyphicon-ok-sign">审核</span>
+                	<a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/1" title="审核" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">审核通过</span>
+                    </a>
+                    <a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/3" title="审核不通过" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">审核不通过</span>
                     </a>
                 @endif
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">

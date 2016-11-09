@@ -330,7 +330,33 @@ class MessageModel extends BaseModel{
                         break;
                     case 'aliexpress':
                         $message_content = array_reverse($content->result); //逆序
+                        $product_html = '';
+                        $message_fields_ary = false;
                         foreach ($message_content as $k => $item){
+
+                            if($message_fields_ary == false && $item->messageType == 'product'){
+                                $message_fields_ary['product_img_url']      = isset($item->summary->productImageUrl) ? $item->summary->productImageUrl : '';
+                                $message_fields_ary['product_product_url']  = isset($item->summary->productDetailUrl) ? $item->summary->productDetailUrl : '';
+                                $message_fields_ary['product_product_name'] = isset($item->summary->productName) ? $item->summary->productName : '';
+
+                                $product_html .= '<div class="col-lg-12 alert-default">';
+                                $product_html .= '<table class="table table-bordered table-striped table-hover sortable">';
+                                $product_html .= '<tr>';
+                                $product_html .= '<th>产品图片</th>';
+                                $product_html .= '<th>产品名称</th>';
+                                $product_html .= '<th>产品连接</th>';
+                                $product_html .= '</tr>';
+                                $product_html .= '<tr>';
+                                $product_html .= '<td><img src ="'.$message_fields_ary['product_img_url'] .'"/></td>';
+                                $product_html .= '<td>'.$message_fields_ary['product_product_name'] .'</td>';
+                                $product_html .= '<td><a href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
+                                $product_html .= '</tr>';
+                                $product_html .= '</table>';
+                                $product_html .= '</div>';
+
+                            }
+
+                            //dd($message_fields_ary);
                             $row_html = '';
                             if($item->content == '< img >'){
                                 foreach ($item->filePath as $item_path){
@@ -384,7 +410,7 @@ class MessageModel extends BaseModel{
                 }
             }
 
-            return $html;
+            return empty($product_html) ? $html : $product_html.$html;
         }else{
             return '';
         }

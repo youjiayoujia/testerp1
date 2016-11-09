@@ -612,13 +612,18 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['readStat'] = $item['readStat'];
 
                         $message_fields_ary = false; //aliexress 平台特殊参数
-
+                        if($Sources == 'order_msg'){
+                            $message_list[$j]['label'] = '订单留言';
+                        }else{
+                            $message_list[$j]['label'] = '站内信';
+                        }
+                        $detailArray = json_decode($detailArrJson,true);
                         if(!empty($detailArray['result'])){
                             foreach ($detailArray['result'] as $item_detail){
                                 if($item_detail['messageType'] == 'product'){
-                                    $productDetail['product_img_url']      = isset($item_detail->summary->productImageUrl) ? $item_detail->summary->productImageUrl : '';
-                                    $productDetail['product_product_url']  = isset($item_detail->summary->productDetailUrl) ? $item_detail->summary->productDetailUrl : '';
-                                    $productDetail['product_product_name'] = isset($item_detail->summary->productName) ? $item_detail->summary->productName : '';
+                                    $message_fields_ary['product_img_url']      = isset($item_detail->summary->productImageUrl) ? $item_detail->summary->productImageUrl : '';
+                                    $message_fields_ary['product_product_url']  = isset($item_detail->summary->productDetailUrl) ? $item_detail->summary->productDetailUrl : '';
+                                    $message_fields_ary['product_product_name'] = isset($item_detail->summary->productName) ? $item_detail->summary->productName : '';
                                     break;
                                 }
                             }

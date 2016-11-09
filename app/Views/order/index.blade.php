@@ -4,11 +4,12 @@
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="ordernum">订单号</th>
     <th class="sort" data-field="channel_ordernum">渠道订单号</th>
-    <th class="sort" data-field="channel">渠道</th>
+    {{--<th class="sort" data-field="channel">渠道</th>--}}
     <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th>邮箱</th>
     <th>买家ID</th>
     <th>物流</th>
+    <th>追踪号</th>
     <th>收货人</th>
     <th>国家</th>
     <th class="sort" data-field="amount">总金额</th>
@@ -33,11 +34,12 @@
                     <span class="label label-danger">亚马逊配送</span>
                 @endif
             </td>
-            <td>{{ $order->channel ? $order->channel->name : '' }}</td>
+            {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
-            <td>{{ $order->by_id }}</td>
-            <td>{{ $order->shipping }}</td>
+            <td>{{ $order->aliexpress_loginId }}</td>
+            <td>{{ $order->channel ? $order->channel->name : '' }}<br>{{ $order->shipping . ' ' }}<br>{{ $order->logistics }}</td>
+            <td>{{ $order->code }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
@@ -63,13 +65,13 @@
                    role="button"
                    data-toggle="collapse"
                    href=".collapseExample{{$order->id}}"
-                   aria-expanded="true"
+                   aria-expanded="false"
                    aria-controls="collapseExample">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
             </td>
         </tr>
-        <tr class="collapse in collapseExample{{$order->id}} {{ $order->status_color }}">
+        <tr class="collapse collapseExample{{$order->id}} {{ $order->status_color }} fb">
             <td colspan="3">
                 <address>
                     <strong>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</strong><br>
@@ -212,7 +214,7 @@
                 </div>
             </td>
         </tr>
-        <tr class="collapse in collapseExample{{$order->id}} {{ $order->status_color }}">
+        <tr class="collapse collapseExample{{$order->id}} {{ $order->status_color }} fb">
             <td colspan="30" class="row">
                 <div class="col-lg-6">
                     <div class="row">
@@ -824,6 +826,16 @@
             <option value="yes">有特殊要求</option>
         </select>
     </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            展示类型
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="javascript:" class='easy' data-type='easy'>简洁</a></li>
+            <li><a href="javascript:" class='easy' data-type='full'>全貌</a></li>
+        </ul>
+    </div>
     <div class="btn-group">
         <button class="btn btn-info"
                 data-toggle="modal"
@@ -877,6 +889,15 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('#start_date, #end_date').cxCalendar();
+
+            $(document).on('click', '.easy', function () {
+                type = $(this).data('type');
+                if (type == 'easy') {
+                    $('.fb').hide();
+                } else {
+                    $('.fb').show();
+                }
+            });
 
             //审核
             $('.review').click(function () {

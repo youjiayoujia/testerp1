@@ -65,13 +65,13 @@
                    role="button"
                    data-toggle="collapse"
                    href=".collapseExample{{$order->id}}"
-                   aria-expanded="true"
+                   aria-expanded="false"
                    aria-controls="collapseExample">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
             </td>
         </tr>
-        <tr class="collapse in collapseExample{{$order->id}} {{ $order->status_color }}">
+        <tr class="collapse collapseExample{{$order->id}} {{ $order->status_color }} fb">
             <td colspan="3">
                 <address>
                     <strong>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</strong><br>
@@ -214,7 +214,7 @@
                 </div>
             </td>
         </tr>
-        <tr class="collapse in collapseExample{{$order->id}} {{ $order->status_color }}">
+        <tr class="collapse collapseExample{{$order->id}} {{ $order->status_color }} fb">
             <td colspan="30" class="row">
                 <div class="col-lg-6">
                     <div class="row">
@@ -826,6 +826,16 @@
             <option value="yes">有特殊要求</option>
         </select>
     </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            展示类型
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="javascript:" class='easy' data-type='easy'>简洁</a></li>
+            <li><a href="javascript:" class='easy' data-type='full'>全貌</a></li>
+        </ul>
+    </div>
     <div class="btn-group">
         <button class="btn btn-info"
                 data-toggle="modal"
@@ -879,6 +889,15 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('#start_date, #end_date').cxCalendar();
+
+            $(document).on('click', '.easy', function () {
+                type = $(this).data('type');
+                if (type == 'easy') {
+                    $('.fb').hide();
+                } else {
+                    $('.fb').show();
+                }
+            });
 
             //审核
             $('.review').click(function () {

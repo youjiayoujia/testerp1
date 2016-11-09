@@ -11,8 +11,6 @@ use App\Models\Order\ItemModel;
 
 use App\Models\PackageModel;
 
-use App\Models\Publish\Wish\WishSellerCodeModel;
-
 use Illuminate\Support\Facades\DB;
 
 set_time_limit(1800);
@@ -36,48 +34,42 @@ Class DiouAdapter extends BasicAdapter
     {
 		$status = "no";
     	$err_msg = '';
-    	if (!$orderInfo) {
-    		$err_msg = '订单号为空';
-    		return $err_msg;
+    	if (!$orderInfo->id) {
+            return $result = [
+                'code' => 'error',
+                'result' => 'The data is empty！'
+            ];
     	}
 		$orderdata = $this->createOrderdata($orderInfo);
-		if($orderdata == 'no'){
-            //物流渠道不对
-            $msg = array('status'=>$status,'err_msg'=>'订单号:'.$orderInfo->id.'物流渠道不对');
-            return $msg;
-        }
+
 		$url =$this->_server_url.urlencode($orderdata);
     	$result=$this->postCurlData( $url);
-        $result =json_decode($result,true);print_r($result);exit;
+        $result =json_decode($result,true);print_r($result);
         if($result['Ack'] == 'Success'){
-            //上传获取跟踪号成功
-            $orders_shipping_code = $result['Trackingnumber'];
-            $res = DB::table("packages")->where('id',$orderInfo->id)->update(
-					['tracking_no' => serialize($orders_shipping_code),
-					]);
-            if($res){
-                 $err_msg = '订单号为'.$orderInfo->num.'的订单上传成功，追踪码为'.$orders_shipping_code;
-              }else{
-                 $err_msg = '订单号为'.$orderInfo->num.'的订单数据更新失败，追踪码为'.$orders_shipping_code;
-              }
-            $status = "ok";
-            //$sqlOp = "INSERT INTO erp_operate_log(operateUser,operateType,operateMod,operateKey,operateText) VALUES('".$_COOKIE[ 'id' ]."','update','ordersManage','". $orderId ."','上传上传递欧物流成功，追踪号".$orders_shipping_code."')";
-            //$this->doSql->query($sqlOp);         
+            return $result = [
+                'code' => 'success',
+                'result' => isset($result['Trackingnumber']) ? $result['Trackingnumber'] : ''
+            ];
         }else{
-            $errormsg = $result['Message'];
-              $err_msg = '订单号为'.$orderInfo->num.'的订单上传失败,原因errorMsg:'.$errormsg;
+            return $result = [
+                'code' => 'error',
+                'result' => $result['Message']
+            ];
         }
-        $msg = array('status'=>$status,'err_msg'=>$err_msg);
-        return $msg;
-		
 	}
 	//创建订单所需要的数据
     public function createOrderdata($orderInfo){
-		
+
 		$total_weight = 0;
         $total_count = 0;	
         $products="[";
-		
+        $channel_arr = array(502,508);
+        if(!in_array($orderInfo->logistics->logistics_code,$channel_arr)){    //渠道是否符合
+            return $result = [
+                'code' => 'error',
+                'result' => 'channel error！'
+            ];
+        }
         foreach($orderInfo->items as $key => $item){
             $total_weight += $item->quantity * $item->item->weight;
             $total_count += $item->quantity;
@@ -94,6 +86,7 @@ Class DiouAdapter extends BasicAdapter
                 $products .=',';
             }
         }
+
         $products .="]";
         $products = str_replace("\r",'',$products);
         $products = str_replace("\n",'',$products);
@@ -113,15 +106,15 @@ Class DiouAdapter extends BasicAdapter
         $json='[{
             "CustomerCode":"'.$this->CustomerCode.'",
             "Token":"'.$this->token.'",
-            "CustomerOrderId":"'.$orderInfo->num.'",
+            "CustomerOrderId":"'.$orderInfo->id.'",
             "RecipientName":"'.$orderInfo->shipping_firstname.'",
-            "Province":"'.$orderInfo->shipping_state.'",
+            "Province":"'.$orderInfo->shipping_firstname.'",
             "City":"'.$orderInfo->shipping_city.'",
             "PostCode":"'.$orderInfo->shipping_zipcode.'",
             "PhoneNum":"'.$orderInfo->shipping_phone.'",
             "Address":"'.$buyer_address_1.$buyer_address_2.'",
-            "Country":"'.$orderInfo->shipping_country.'",
-            "CountryCode":"'.$orderInfo->shipping_country.'",
+            "Country":"'.$orderInfo->country->cn_name.'",
+            "CountryCode":"'.$orderInfo->country->code.'",
             "ParcelPcs":1,
             "ShippingMethodKey":56,
             "Company":"'.$orderInfo->shipping_firstname.'",

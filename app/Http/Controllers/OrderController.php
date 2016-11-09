@@ -366,6 +366,9 @@ class OrderController extends Controller
         }
         if($this->model->find($id)->packages) {
             foreach($this->model->find($id)->packages as $package) {
+                foreach($package->items as $item) {
+                    $item->delete();
+                }
                 $package->delete();
             }
         }
@@ -553,6 +556,9 @@ class OrderController extends Controller
             }
             if($this->model->find($id)->packages) {
                 foreach($this->model->find($id)->packages as $package) {
+                    foreach($package->items as $item) {
+                        $item->delete();
+                    }
                     $package->delete();
                 }
             }
@@ -569,6 +575,9 @@ class OrderController extends Controller
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
         if($this->model->find($id)->packages->count()) {
             foreach($this->model->find($id)->packages as $package) {
+                foreach($package->items as $item) {
+                    $item->delete();
+                }
                 $package->delete();
             }
         }

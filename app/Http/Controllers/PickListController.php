@@ -46,6 +46,12 @@ class PickListController extends Controller
         $warehouseId = $user->warehouse_id;
         if(request()->has('checkid')) {
             $model = $this->model->where('pick_by', request('checkid'))->where('warehouse_id', $warehouseId)->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))]);
+            if(request()->has('twenty')) {
+                $model = $this->model->where('pick_by', request('checkid'))->where('created_at', '<', date('Y-m-d', strtotime('-1 day')));
+            }
+            if(request()->has('flag')) {
+                $model = $this->model->where('pick_by', request('checkid'))->whereBetween('created_at', [date('Y-m-d', strtotime('now')),date('Y-m-d', strtotime('1 day'))])->whereNotIn('status', ['PACKAGED']);
+            }
         }
         $today_print = $this->model->whereBetween('print_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
         $allocate = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])

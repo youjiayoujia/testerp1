@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 
 header('Content-type: text/html; charset=UTF-8');
 
+use Session;
 use App\Models\ChannelModel;
 use App\Models\Message\MessageModel;
 use Test;
@@ -65,6 +66,7 @@ use Illuminate\Support\Facades\Storage;
 use BarcodeGen;
 
 use App\Models\ProductModel;
+use Cache;
 
 class TestController extends Controller
 {
@@ -79,9 +81,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(530);
-        var_dump($package->logistics_zone->toarray());
-        exit;
+        $item = ItemModel::find(23767);
+        var_dump($item->getStockQuantity(4,1));
     }
 
     // public function test2()

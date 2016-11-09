@@ -25,6 +25,7 @@ use Exception;
 use App\Jobs\AssignStocks;
 use App\Models\NumberModel;
 use App\Models\UserModel;
+use Cache;
 
 class PackageController extends Controller
 {
@@ -341,6 +342,10 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
         }
+        if(!empty($model->tracking_no)) {
+            Cache::put('package'.$model->id.'logisticsId', $model->logistics_id, 10);
+            Cache::put('package'.$model->id.'trackingNo', $model->tracking_no, 10);
+        }
         $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0', 'is_auto' => '1']);
         $package = $this->model->find($id);
         $job = new AssignLogistics($package);
@@ -582,7 +587,7 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['tracking_no' => request('tracking_no')]);
+        $model->update(['tracking_no' => request('tracking_no'), 'shipping_address' => request('shipping_address')]);
         $to = base64_encode(serialize($model));
         $this->eventLog($name, '修改追踪号', $to, $from);
         return redirect($this->mainIndex);
@@ -1172,7 +1177,6 @@ class PackageController extends Controller
                 $buf = 0;
             }
         }
-
         if ($buf) {
             foreach ($package->items as $packageItem) {
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);

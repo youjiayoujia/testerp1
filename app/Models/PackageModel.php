@@ -16,6 +16,7 @@ use App\Models\LogisticsModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Product\ProductLogisticsLimitModel;
 use Queue;
+use Cache;
 
 class PackageModel extends BaseModel
 {
@@ -571,8 +572,8 @@ class PackageModel extends BaseModel
                     $arr = $this->explodePackage();
                     if ($arr) {
                         $this->createChildPackage($arr);
-                        return true;
                     }
+                    return true;
                 }
             }
         }
@@ -1288,13 +1289,36 @@ class PackageModel extends BaseModel
                 $object = $logistics->logisticsChannels->where('channel_id', $this->channel_id)->first();
                 $trackingUrl = $object ? $object->url : '';
                 $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
-                return $this->update([
-                    'status' => 'ASSIGNED',
-                    'logistics_id' => $rule->logistics->id,
-                    'tracking_link' => $trackingUrl,
-                    'logistics_assigned_at' => date('Y-m-d H:i:s'),
-                    'is_auto' => $is_auto,
-                ]);
+                if(Cache::has('package'.$this->id.'logisticsId') && Cache::get('package'.$this->id.'logisticsId') == $rule->logistics->id) {
+                    $item = $this->items->first();
+                    if(empty($item->warehouse_position_id)) {
+                        return $this->update([
+                            'logistics_id' => $rule->logistics->id,
+                            'tracking_link' => $trackingUrl,
+                            'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                            'is_auto' => $is_auto,
+                            'status' => 'NEED',
+                            'tracking_no' => Cache::get('package'.$this->id.'trackingNo'),
+                        ]);
+                    } else {
+                        return $this->update([
+                            'logistics_id' => $rule->logistics->id,
+                            'tracking_link' => $trackingUrl,
+                            'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                            'is_auto' => $is_auto,
+                            'status' => 'PROCESSING',
+                            'tracking_no' => Cache::get('package'.$this->id.'trackingNo'),
+                        ]);
+                    }
+                } else {
+                    return $this->update([
+                        'status' => 'ASSIGNED',
+                        'logistics_id' => $rule->logistics->id,
+                        'tracking_link' => $trackingUrl,
+                        'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                        'is_auto' => $is_auto,
+                    ]);
+                }
             }
             return $this->update([
                 'status' => 'ASSIGNFAILED',
@@ -1357,7 +1381,6 @@ class PackageModel extends BaseModel
                             'logistics_order_at' => date('Y - m - d H:i:s'),
                         ]);
                     }
-                    
                 }
             }
             if ($result['status'] == 'again') {

@@ -175,6 +175,12 @@ class ItemModel extends BaseModel
         return '/default.jpg';
     }
 
+    public function getStockQuantity($warehouseId, $flag = 0)
+    {
+        $stocks = $this->stocks->where('warehouse_id', $warehouseId);
+        return count($stocks) ? ($flag ? $stocks->sum('available_quantity') : $stocks->sum('all_quantity')) : 0;
+    }
+
     //实库存
     public function getAllQuantityAttribute()
     {
@@ -309,11 +315,16 @@ class ItemModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        $catalogs = CatalogModel::all();
+        $arr = [];
+        foreach($catalogs as $key => $single) {
+            $arr[$single->id] = $single->c_name;
+        }
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'],'warehouse' => ['name'] ],
+            'relatedSearchFields' => ['supplier' => ['name'], 'warehouse' => ['name'] ],
             'filterFields' => [],
             'filterSelects' => ['status' => config('item.status'),],
-            'selectRelatedSearchs' => [],
+            'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'sectionSelect' => [],
         ];
     }

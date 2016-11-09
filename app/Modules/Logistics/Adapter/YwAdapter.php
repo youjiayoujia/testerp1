@@ -2,7 +2,7 @@
 namespace App\Modules\Logistics\Adapter;
 
 /**
- * 
+ * 燕文物流下单
  * @author guoou
  * @abstract 2016/8/11
  */
@@ -19,16 +19,16 @@ class YwAdapter extends BasicAdapter
         $response = $this->doUpload($package);
         if ($response['status'] != 0) {
             $result = [
-                'code' => 'success',
-                'result' =>$response['trackingNum'] //跟踪号
+                'code'         => 'success',
+                'result'       => $response['tracking_no'],                    //跟踪号
+                'result_other' => $response['logistics_order_number']   //燕文自编号
             ];            
         }else{
             $result =[
-                'code' => 'error',
+                'code'   => 'error',
                 'result' => $response['msg']
             ];
-        }
-        
+        }        
         return $result;
     }
     
@@ -75,7 +75,7 @@ class YwAdapter extends BasicAdapter
                                 <Memo>$memo_str</Memo>
                                 <Quantity>$quantity</Quantity>
                                 <GoodsName>  
-                                    <Id></Id>
+                                    <Id>$order_number</Id>
                                     <Userid>$userID</Userid>
                                     <NameCh>". $products_declared_cn ."</NameCh>
                                     <NameEn>" . substr($products_declared_en, 0, 190) . "</NameEn>   
@@ -86,15 +86,15 @@ class YwAdapter extends BasicAdapter
                                 </GoodsName>
                             </ExpressType>"; 
         $url = $this->serverUrl . 'Users/'.$this->userId.'/Expresses';
-        $result = $this->sendHttpRequest($url, 1, $requestXmlBody);      
+        $result = $this->sendHttpRequest($url, 1, $requestXmlBody);     
         $result_xml = simplexml_load_string($result);
         if ( $result_xml->Response->Success == 'true' ) {      
             $epcodeNode = $result_xml->CreatedExpress->Epcode;
             $YWcode = $result_xml->CreatedExpress->YanwenNumber;
-            return array('status'=>1,'trackingNum'=>$YWcode);                             
+            return array('status' => 1,'tracking_no' => $epcodeNode,'logistics_order_number' => $YWcode);                             
         }else{
-            $errorMsg = $result_xml->Response->ReasonMessage;
-            return array('status'=>0,'msg'=>$errorMsg);
+            $errorMsg = $result_xml->Response->ReasonMessage;            
+            return array('status' => 0,'msg' => $errorMsg);
         }
     }
     

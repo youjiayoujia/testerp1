@@ -617,7 +617,7 @@ Class AliexpressAdapter implements AdapterInterface
                         }else{
                             $message_list[$j]['label'] = '站内信';
                         }
-                        $detailArray = json_decode($detailArrJson,true);
+/*                        $detailArray = json_decode($detailArrJson,true);
                         if(!empty($detailArray['result'])){
                             foreach ($detailArray['result'] as $item_detail){
                                 if($item_detail['messageType'] == 'product'){
@@ -627,7 +627,7 @@ Class AliexpressAdapter implements AdapterInterface
                                     break;
                                 }
                             }
-                        }
+                        }*/
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
 
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));

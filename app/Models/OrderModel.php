@@ -418,16 +418,26 @@ class OrderModel extends BaseModel
         return $arr[$this->withdraw];
     }
 
-    public function getLogisticsCodeAttribute()
+    public function getLogisticsAttribute()
     {
-        $logisticsCode = '';
+        $logistics = '';
         foreach($this->packages as $package) {
             $logisticsName = $package->logistics ? $package->logistics->name : '';
-            $info = $logisticsName . '(' . $package->tracking_no . ')  ';
-            $logisticsCode .= $info;
+            $logistics .= $logisticsName . ' ';
         }
 
-        return $logisticsCode;
+        return $logistics;
+    }
+
+    public function getCodeAttribute()
+    {
+        $code = '';
+        foreach($this->packages as $package) {
+            $trackingNo = $package->tracking_no;
+            $code .= $trackingNo . ' ';
+        }
+
+        return $code;
     }
 
     /**

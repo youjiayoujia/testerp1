@@ -9,6 +9,7 @@
     <th>邮箱</th>
     <th>买家ID</th>
     <th>物流</th>
+    <th>追踪号</th>
     <th>收货人</th>
     <th>国家</th>
     <th class="sort" data-field="amount">总金额</th>
@@ -37,7 +38,8 @@
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
             <td>{{ $order->aliexpress_loginId }}</td>
-            <td>{{ $order->shipping . ' ' }}<br>{{ $order->channel ? $order->channel->name : '' }}<br>{{ $order->logistics_code }}</td>
+            <td>{{ $order->channel ? $order->channel->name : '' }}<br>{{ $order->shipping . ' ' }}<br>{{ $order->logistics }}</td>
+            <td>{{ $order->code }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>

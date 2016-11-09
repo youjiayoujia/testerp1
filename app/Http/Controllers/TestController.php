@@ -79,10 +79,21 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(530);
-        var_dump($package->logistics_zone->toarray());
-        exit;
+        $package = PackageModel::find(270);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $package,
+        ];
+
+        return view('logistics.template.tpl.smtLineShippingTemplate', $response);
     }
+
+//    public function test2()
+//    {
+//        $package = PackageModel::find(530);
+//        var_dump($package->logistics_zone->toarray());
+//        exit;
+//    }
 
     // public function test2()
     // {

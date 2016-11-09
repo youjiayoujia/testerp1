@@ -290,15 +290,11 @@ class PackageController extends Controller
             'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function ($single) {
                 return $single->packages()->count() == 0;
             })->count(),
-            'weatherNum' => $this->model->where('status', 'PROCESSING')->get()->filter(function($single){
-                return empty($single->items->first()->warehouse_position_id);
-            })->count(),
-            'assignNum' => $this->model->whereIn('status', ['WAITASSIGN', 'NEED'])->count(),
+            'weatherNum' => $this->model->where('status', 'NEED')->count(),
+            'assignNum' => $this->model->where('status', 'WAITASSIGN')->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
-            'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->get()->filter(function($single){
-                return !empty($single->items->first()->warehouse_position_id);
-            })->count(),
+            'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
             'singlePack' => PickListModel::where('type', 'SINGLE')->whereIn('status',
                 ['PACKAGEING', 'PICKING'])->count(),
@@ -328,9 +324,7 @@ class PackageController extends Controller
 
     public function processingAssignStocks()
     {
-        $packages = $this->model->where('status', 'PROCESSING')->get()->filter(function($single){
-            return empty($single->items->first()->warehouse_position_id);
-        });
+        $packages = $this->model->where('status', 'NEED')->get();
         foreach($packages as $package) {
             $job = new AssignStocks($package);
             $job = $job->onQueue('assignStocks');

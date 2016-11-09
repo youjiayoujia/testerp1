@@ -90,9 +90,6 @@ class SentReturnTrack extends Command
                 }
                 $packages_result = $list->orderBy('id','desc')->get();
                 foreach($packages_result as $package){
-                    if(!empty($re->expired_time)){ //判断速卖通的最后发货时间
-                        $package->expired_time  = $re->expired_time;
-                    }
                     $job = new ReturnTrack($package,$re);
                     $job = $job->onQueue('returnTrack');
                     $this->dispatch($job);

@@ -36,6 +36,7 @@ class GetAliShipmentNumber extends Command
     }
 
     /**
+     * 采购有阿里巴巴外部单号但是外部物流单号缺失的情况，系统自动获取
      * Execute the console command.
      *
      * @return mixed
@@ -43,64 +44,47 @@ class GetAliShipmentNumber extends Command
     public function handle()
     {
         $ali = new Alibaba(); //初始化阿里账号
-        $purchaseOrders =  PurchaseOrderModel::all();
-        $orderids = '';
-        $orderids_ary = [];
-        $count = 0;
-
-        foreach ($purchaseOrders as $key => $order){
-            $count += 1;
-            if(!empty($order->post_coding) && !empty($order->user_id)){
-                if(($count) % 20 == 0 || $count == count($purchaseOrders)){
-                    if(!empty($orderids)){
-                        $orderids_ary[$order->user_id][] = $orderids;
-                        $orderids =  '';
+        $ali_accounts = AlibabaSupliersAccountModel::all();
+        $purchase_orders =  PurchaseOrderModel::whereIn('status',[1,2,3])->where('post_coding','!=','')->get();
+        foreach ($purchase_orders as $purchase_order) {
+                foreach ($ali_accounts as $account){
+                    if(empty($account->access_token)){
+                        continue;
                     }
-                }
-                $orderids = empty($orderids) ? $order->post_coding : $orderids . ',' . $order->post_coding ;
-            }
-        }
-        if(!empty($orderids_ary)){
-            foreach ($orderids_ary as $user_id => $orderids){
-                $account = AlibabaSupliersAccountModel::where('purchase_user_id',$user_id)->first();
-                if(!empty($account)){
-                    foreach ($orderids as $item){
-                        //根据采购人 获取对应的阿里账号
-                        $curl_params['access_token']  =$account->access_token;
-                        $curl_params['buyerMemberId'] =$account->memberId;
-                        $curl_params['orderIdSet']    = '['.$item.']';
+                    $curl_params['access_token'] = $account->access_token;
+                    $curl_params['id']           =  $purchase_order->post_coding;
 
-                        $param['buyerMemberId'] = $curl_params['buyerMemberId'];
-                        $param['access_token']  = $curl_params['access_token'];
-                        $param['orderIdSet']    = $curl_params['orderIdSet'];
-                        $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
-                        $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
+                    $param['access_token']  = $curl_params['access_token'];
+                    $param['id']            = $curl_params['id'];
+                    $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
+                    $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
+                    $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
 
-                        $orderList = json_decode($ali->get($crul_url,$curl_params),true);
-
-                        if(is_array($orderList['orderListResult']['modelList'])){
-                            foreach ($orderList['orderListResult']['modelList'] as $modellist){
-                                if(!empty($modellist['logisticsOrderList']) && is_array($modellist['logisticsOrderList'])){ //如果存在物流列表
-                                    foreach ($modellist['logisticsOrderList'] as $logistic){
-                                        if(!empty($logistic['logisticsOrderNo'])){
-                                            $postage = PurchasePostageModel::where('post_coding','=',$logistic['logisticsOrderNo'])->first();
-                                            if(empty($postage)){
-                                                $new_postage = new PurchasePostageModel;
-                                                $new_postage->purchase_order_id = $modellist['id'];
-                                                $new_postage->post_coding       = $logistic['logisticsOrderNo'];
-                                                $new_postage->user_id           = $user_id;
-                                                $new_postage->save();
-                                                $this->info('#Order:'.$modellist['id'].' add logisticsOrderNo :'. $logistic['logisticsOrderNo'].' insert success');
-                                            }
-                                        }
+                    if(!empty($order_detail['orderModel']['logisticsOrderList'])){
+                        foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
+                            if(!empty($item_logistics['logisticsBillNo'])) {
+                                $postage = PurchasePostageModel::where('post_coding','=',$item_logistics['logisticsBillNo'])->first();
+                                if(empty($postage)){
+                                    $postage_by_purcahse_order =  PurchasePostageModel::where('purchase_order_id',$purchase_order->id)->where('post_coding','!=','')->first();
+                                    if(!empty($postage_by_purcahse_order)){ //存在记录的话
+                                        $postage_by_purcahse_order->post_coding = $item_logistics['logisticsBillNo'];
+                                        $postage_by_purcahse_order->save();
+                                        $this->info('#Order:'.$purchase_order->id.' add logisticsOrderNo :'. $item_logistics['logisticsBillNo'].' insert success');
+                                    }else{
+                                        $new_postage = new PurchasePostageModel;
+                                        $new_postage->purchase_order_id = $purchase_order->id;
+                                        $new_postage->post_coding       = $item_logistics['logisticsBillNo'];
+                                        //$new_postage->user_id           = $user_id;
+                                        $new_postage->save();
+                                        $this->info('#Order:'.$purchase_order->id.' add logisticsOrderNo :'. $item_logistics['logisticsBillNo'].' insert success');
                                     }
+                                }else{ //如果已经存在此物流单号  直接break;
+                                    break;
                                 }
                             }
                         }
-
                     }
                 }
-            }
         }
         $this->info('finish.');
     }

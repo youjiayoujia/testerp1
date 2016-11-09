@@ -20,11 +20,7 @@ Class WishyouAdapter extends BasicAdapter
 {
 	public  $senderInfo;//发件人信息
 	private $API_key;//密钥
-	
-	private $tokenArr = array(
-						1 => '5c9d523e2c7140357b7d632f63510da3118',
-						2 => 'da19c164f051fdf623af41412fba368e247'
-					   );	   
+
 	//wish邮的分仓代码
 	private $warehouseArr = array(
 								'sh'=>1,//上海仓
@@ -101,7 +97,15 @@ Class WishyouAdapter extends BasicAdapter
         )
     );
 
-    public function __construct($config)
+	private $channel_info = array('370'=>'wish邮,yw,sh,0','469'=>'wish邮,yw,yw,0','481'=>'wish邮,sz,sz,0','487'=>'wish邮,sz,sz,11-0','512'=>'wish邮,sz,gz,0','549'=>'wish邮,yw,nj,0');
+	private $tokenArr = array(
+		1 => '2c65dc39df8a49e0aaaac552076f138f',
+		2 => 'ea474a4efc1645bead26b16bc7c98535',
+		3 => '2c65dc39df8a49e0aaaac552076f138f',
+		4 => 'ea474a4efc1645bead26b16bc7c98535'
+	);
+
+	public function __construct($config)
     {
         
     }
@@ -113,41 +117,70 @@ Class WishyouAdapter extends BasicAdapter
 	*/
     public function getTracking($orderInfo)
     {
-		
+
 		if(!$orderInfo){
-	     $result_arr['msg']="订单数据为空";
-	     return $result_arr;
+			return $result = [
+				'code' => 'error',
+				'result' => 'empty data!'
+			];
 	    }
 		$result_arr['status'] = 0;
 	 	$result_arr['msg'] = '';
 		$otype = '0';
-		if(($orderInfo->order->channel_id == '486') || ($orderInfo->order->channel_id == '487')) {  //根据物流渠道区分 here (测试渠道数据)
-			$otype ='11-0';
+
+		if(isset($orderInfo->logistics_order_number) && $orderInfo->logistics_order_number !== '' && isset($orderInfo->tracking_no) && $orderInfo->tracking_no !== ''){
+			return $result = [
+				'code' => 'error',
+				'result' => 'Purple tracking number already exists'
+			];
 		}
-		if(($orderInfo->order->channel_id == '515') || ($orderInfo->order->channel_id == '516')) {  //渠道 here test
-			$otype ='10-0';
-		}
-		if($orderInfo->tracking_no){
-	     $result_arr['msg']="订单{$orderInfo->id}的追踪号已存在";
-	     return $result_arr;
-	    }
 		if(!$orderInfo->warehouse_id){
-			continue;
+			return $result = [
+				'code' => 'error',
+				'result' => 'warehouse_id is null'
+			];
 		}
-		$this->API_key = $this->tokenArr[$orderInfo->warehouse_id];  //根据仓库选择对应  test here
-		
-		$order_xml=$this->createRequestXmlFile($orderInfo,$otype);  //xml
+		$shipInfo = explode(',',$this->channel_info[$orderInfo->logistics->logistics_code]);
+		if($shipInfo[0] != 'wish邮'){
+			return $result = [
+				'code' => 'error',
+				'result' => 'channel error'
+			];
+		}
+		//WISH邮的渠道代码
+		/* WISH邮平邮=0
+		WISH邮挂号=1
+		DLP平邮=9-0
+		DLP挂号=9-1
+		DLE=10-0
+		E邮宝=11-0
+		欧洲经济小包=200-0
+		欧洲标准小包=201-0*/
+		$otype = $shipInfo[3];
+		$wish_type = array('0','1','9-0','9-1','10-0','11-0','200-0','201-0');
+		if(!isset($otype)  || !in_array($otype,$wish_type)){
+			return $result = [
+				'code' => 'error',
+				'result' => 'Channel code error'
+			];
+		}
+
+		$this->API_key = $this->tokenArr[$orderInfo->warehouse_id];  //根据仓库选择对应
+
+		$order_xml=$this->createRequestXmlFile($orderInfo,$shipInfo);  //xml
 		
 		 if(!$order_xml){
-		     $result_arr['msg']="订单xml创建失败";
-		     return $result_arr;
+			 return $result = [
+				 'code' => 'error',
+				 'result' => 'xml error'
+			 ];
 		 }
-	   $url = 'http://www.shpostwish.com/api_order.asp';
+		$url = 'https://wishpost.wish.com/api/v2/create_order';
 
 	   $call=$this->postCurlData($url,$order_xml);
 
 	   $result=simplexml_load_string($call);
-	   $mess = '';
+	   $mess = '';print_r($result);
 	   foreach($result as $key=>$v){
 	   		if(preg_match("/error/",$key)){
 	   			$mess = $v;
@@ -155,28 +188,25 @@ Class WishyouAdapter extends BasicAdapter
 	   }
 	   if( ($result->status == 0) && !empty($result->barcode) ){
 	   	  $result->barcode = trim($result->barcode);
-		  $re = DB::table("packages")->where('id',$orderInfo->id)->update(
-					['tracking_no' => $result->barcode,
-					]);
-	   	  if($re){
-	   	     $result_arr['msg'] = '订单号为'.$orderInfo->id.'的订单上传成功，运单号为'.$result->barcode;
-	   	  }else{
-	   	     $result_arr['msg'] = '订单号为'.$orderInfo->id.'的订单数据更新失败，运单号为'.$result->barcode;
-	   	  }
-	   	  $result_arr['status'] = 1;
+		   return $result = [
+			   'code' => 'success',
+			   'result' => isset($result->barcode) ? $result->barcode : ''
+		   ];
 	   }else{
 	   		if($result->error_message == ''){
 	   			$result->error_message = $mess;
 	   		}
-	        $result_arr['msg'] = '订单号为'.$orderInfo->id.'的订单上传失败，错误信息'.$result->error_message;
+		   return $result = [
+			   'code' => 'error',
+			   'result' => $result->error_message
+		   ];
 	   }
-	   return $result_arr;
     }
 	/**
 	 * 构造添加订单的请求xml文件
 	 */
-	public function createRequestXmlFile($orderInfo,$otype){
-		 
+	public function createRequestXmlFile($orderInfo,$shipInfo){
+
 		 $xmlStr = '<?xml version="1.0" encoding="UTF-8"?>';
 		 $xmlStr .='
 		 			<orders>
@@ -185,22 +215,10 @@ Class WishyouAdapter extends BasicAdapter
 		 			  <bid>'.rand(0,99999).'</bid>
 		 		   ';
 			$buyer_address = $orderInfo->shipping_address.' '.$orderInfo->shipping_address1;  //test here two address
-		    $buyer_country = '';
-		    $buyer_country_code = '';
-		    if($orderInfo->order->billing_country){
-				$country_info = DB::table("wish_base_country")->where("country_code",$orderInfo->order->billing_country)->first();  //create wish_base_country object
-		      }else{
-				$country_info = DB::table("wish_base_country")->where("country_code",$orderInfo->order->shipping_country)->first();  
-		      }
-		    
-		    if(!empty($country_info)){
-		      $buyer_country = $country_info->country_en;
-		      $buyer_country_code = $country_info->country_code;
-		    }else{
-		      $buyer_country = $orderInfo->order->shipping_country;
-		      $buyer_country_code = $orderInfo->order->shipping_country;
-		    }
-			
+
+		    $buyer_country = $orderInfo->country ? $orderInfo->country->name : '';
+		    $buyer_country_code = $orderInfo->country ? $orderInfo->country->code : '';
+
 		    $total_count = 0;//内件数量
 		    $total_weight = 0;//货品重量，千克（三位小数）
 		    $total_value = 0;//货品申报价值(两位小数)
@@ -209,31 +227,34 @@ Class WishyouAdapter extends BasicAdapter
 		    if(!empty($orderInfo->shipping_phone)){
 		      $buyer_phone=$orderInfo->shipping_phone;
 		    }
-		    $wishID = $orderInfo->id;//wish订单号  here test
-		    $buyer_state = $orderInfo->shipping_city;//上传的省，默认是用城市名代替
+		    foreach($orderInfo->items as $k=>$v){
+				$wishIDArr = explode('+',$v->orderItem->channel_order_id);
+				$wishID = $wishIDArr[0];              //wish_id
+				continue;
+			}
+
+		    $buyer_state = $orderInfo->shipping_city ? $orderInfo->shipping_city : ',';//上传的省，默认是用城市名代替
 		    
 			$wishID = $orderInfo->transaction_number;   //交易编号
 		    //上传的省为空用逗号代替
-		    if(!empty($orderInfo->shipping_state)){
-		      $buyer_state = $orderInfo->shipping_state;
-		    }
+		    $buyer_state = $orderInfo->shipping_state ? $orderInfo->shipping_state :',';
 		     foreach($orderInfo->items  as $key => $item){
 		      $total_count += $item->quantity;
 		      $total_weight += $item->quantity*$item->item->weight;
 		    }
+
 		    $total_value = round($orderInfo->order->amount,2);
 		    $content = $item->item->product->declared_en;   //申报英文名  test $allNeedData['productsInfo'][0]['products_declared_en']
-		    
-		    //here test senderAndLanShou  $shipInfo   yw_channel   $orderInfo->logistics->type  = type字段
+
 		    $xmlStr .='
 		      <order>
-		        <guid>'.$orderInfo->order->ordernum.'</guid>
-		        <otype>'.$otype.'</otype>
-		        <from>'.$this->senderAndLanShou[$orderInfo->logistics->type]['en']['username'].'</from>
-		        <sender_province>'.$this->senderAndLanShou[$orderInfo->logistics->type]['en']['province'].'</sender_province>
-		        <sender_city>'.$this->senderAndLanShou[$orderInfo->logistics->type]['en']['city'].'</sender_city>
-		        <sender_addres>'.$this->senderAndLanShou[$orderInfo->logistics->type]['en']['address'].'</sender_addres>
-		        <sender_phone>'.$this->senderAndLanShou[$orderInfo->logistics->type]['en']['phone'].'</sender_phone>
+		        <guid>'.$orderInfo->id.'</guid>
+		        <otype>'.$shipInfo[3].'</otype>
+		        <from>'.$this->senderAndLanShou[$shipInfo[1]]['en']['username'].'</from>
+		        <sender_province>'.$this->senderAndLanShou[$shipInfo[1]]['en']['province'].'</sender_province>
+		        <sender_city>'.$this->senderAndLanShou[$shipInfo[1]]['en']['city'].'</sender_city>
+		        <sender_addres>'.$this->senderAndLanShou[$shipInfo[1]]['en']['address'].'</sender_addres>
+		        <sender_phone>'.$this->senderAndLanShou[$shipInfo[1]]['en']['phone'].'</sender_phone>
 		        <to>'.$orderInfo->shipping_firstname.'</to>
 		        <recipient_country>'.$buyer_country.'</recipient_country>
 		        <recipient_country_short>'.$buyer_country_code.'</recipient_country_short>
@@ -256,12 +277,12 @@ Class WishyouAdapter extends BasicAdapter
 		        <single_price>'.$total_value.'</single_price>
 		        <trande_no>'.$wishID.'</trande_no>
 		        <trade_amount>'.$total_value.'</trade_amount>
-		        <receive_from>'.$this->senderAndLanShou[$orderInfo->logistics->type]['cn']['username'].'</receive_from>
-		        <receive_province>'.$this->senderAndLanShou[$orderInfo->logistics->type]['cn']['province'].'</receive_province>
-		        <receive_city>'.$this->senderAndLanShou[$orderInfo->logistics->type]['cn']['city'].'</receive_city>
-		        <receive_addres>'.$this->senderAndLanShou[$orderInfo->logistics->type]['cn']['address'].'</receive_addres>
-		        <receive_phone>'.$this->senderAndLanShou[$orderInfo->logistics->type]['cn']['phone'].'</receive_phone>
-		        <warehouse_code>'.$this->warehouseArr[$orderInfo->logistics->type].'</warehouse_code>
+		        <receive_from>'.$this->senderAndLanShou[$shipInfo[1]]['cn']['username'].'</receive_from>
+		        <receive_province>'.$this->senderAndLanShou[$shipInfo[1]]['cn']['province'].'</receive_province>
+		        <receive_city>'.$this->senderAndLanShou[$shipInfo[1]]['cn']['city'].'</receive_city>
+		        <receive_addres>'.$this->senderAndLanShou[$shipInfo[1]]['cn']['address'].'</receive_addres>
+		        <receive_phone>'.$this->senderAndLanShou[$shipInfo[1]]['cn']['phone'].'</receive_phone>
+		        <warehouse_code>'.$this->warehouseArr[$shipInfo[2]].'</warehouse_code>
 		        <doorpickup>1</doorpickup>
 		      </order>
 		    ';

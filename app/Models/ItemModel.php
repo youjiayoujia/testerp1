@@ -633,13 +633,18 @@ class ItemModel extends BaseModel
         return $stockData;
     }
 
-    public function createPurchaseNeedData()
+    public function createPurchaseNeedData($item_id_array=null)
     {
         ini_set('memory_limit', '2048M');
-        $items = $this->all();
+        if(!$item_id_array){
+            $items = $this->all();
+        }else{
+            $items = $this->find($item_id_array);
+        }
+        
         //$crr = array('21372','21373','29644','30974','32076','42437','47534','54980','57370','57616','59186');
         //$items = $this->find($crr);
-
+        
         $requireModel = new RequireModel();
         foreach ($items as $item) {
             $data['item_id'] = $item->id;

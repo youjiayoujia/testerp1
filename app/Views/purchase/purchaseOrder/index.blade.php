@@ -49,7 +49,7 @@
                 {{ $purchaseOrder->supplier?$purchaseOrder->supplier->name:''}}
             </td>
             <td>
-            @if($purchaseOrder->status <4)
+            
                 <table class="table table-bordered table-striped table-hover sortable">
                 <thead>
                 <tr>
@@ -112,7 +112,7 @@
                 </tr>
                 </tbody>
                 </table>
-                @endif
+                
             </td>
             <td>{{ $purchaseOrder->warehouse ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
                  

@@ -304,8 +304,6 @@ class MessageModel extends BaseModel{
             foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
-                       //dd($content);
-                       //dd($content);
                         foreach ($content as $k => $item){
                            if(!empty($item['Reply']['message'])){
                                if($item['Reply']['sender'] != 'merchant'){
@@ -331,9 +329,16 @@ class MessageModel extends BaseModel{
                         }
                         break;
                     case 'aliexpress':
-                        //dd($content->result);exit;
                         $message_content = array_reverse($content->result); //逆序
                         foreach ($message_content as $k => $item){
+                            $row_html = '';
+                            if($item->content == '< img >'){
+                                foreach ($item->filePath as $item_path){
+                                    if($item_path->mPath){
+                                        $row_html .='<img src="'.$item_path->mPath.'" /><a href="'.$item_path->lPath.'" target="_blank">查看大图</a>';
+                                    }
+                                }
+                            }
                             $content = $item->content;
                             $content = str_replace("&nbsp;", ' ', $content);
                             $content = str_replace("&amp;nbsp;", ' ', $content);
@@ -346,14 +351,20 @@ class MessageModel extends BaseModel{
 
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
                             if($this->from_name != $item->summary->receiverName){
-                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
-                                $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
-                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
+                                if($row_html != ''){
+                                    $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$row_html;
+                                    $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
+                                    $html .= '</div>';
+                                }else{
+                                    $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
+                                    $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
+                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
                                     翻译
                                 </button>
-                                <p id="content-'.$k.'" style="color:green"></p>
-                                ';
-                                $html .= '</div>';
+                                <p id="content-'.$k.'" style="color:green"></p>';
+                                    $html .= '</div>';
+                                }
+
                             }else{
                                 $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                 $html .= '<p class="time"><strong>Time: </strong> '.$datetime.'</p>';
@@ -460,7 +471,7 @@ class MessageModel extends BaseModel{
         switch ($channel){
             case 'aliexpress':
                 $content = $this->ContentDecodeBase64;
-                foreach ($content['aliexpress']->result as $message){
+/*                foreach ($content['aliexpress']->result as $message){
                     $type = $message->messageType;
                     break;
                 }
@@ -468,7 +479,7 @@ class MessageModel extends BaseModel{
                 $html .= '<p>Message type:'.$this->label.'</p>';
                 $html .= '<p>Detail type:'.$type.'</p>';
                 $html .= '<p>Order id:'.$files['order_id'].'</p>';
-                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
+                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';*/
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;

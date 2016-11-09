@@ -6,8 +6,8 @@
 <?php switch ($size) {
     case 'big':
 ?>
-<body>
-  <div style="width:100%;height:29mm;margin-bottom:2px;">
+<body style="margin-bottom:-30px;">
+  <div style="width:100%;height:24mm;margin-bottom:2px;">
    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0"> 
     <tbody>
      <tr> 
@@ -28,8 +28,8 @@
     break;   
     case 'small':
 ?>
-<body onLoad="printpage_zzjs()">
-    <div style="width:100%;height:29mm;margin-bottom:2px;">
+<body  style="margin-bottom:-30px;">
+    <div style="width:70mm;height:24mm;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td align="center" valign="middle">
@@ -58,7 +58,7 @@
     <?php  break;
         case 'middle':
     ?>
-    <body>
+    <body style="margin-bottom:-30px;">
         <div style="width:40mm;height:15mm;margin-bottom:2px;">
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
@@ -84,7 +84,7 @@
     <?php  break;
     case 'middleSmall':
     ?>
-    <body>
+    <body style="margin-bottom:-30px;">
         <div style="width:100%;height:20mm;margin-bottom:2px;">
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
@@ -114,5 +114,7 @@
 </html>
 
 <script type="text/javascript">
-    window.onload = function(){window.print();}
+    window.onload = function(){
+        //window.print();
+    }
 </script>

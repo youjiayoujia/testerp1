@@ -418,6 +418,28 @@ class OrderModel extends BaseModel
         return $arr[$this->withdraw];
     }
 
+    public function getLogisticsAttribute()
+    {
+        $logistics = '';
+        foreach($this->packages as $package) {
+            $logisticsName = $package->logistics ? $package->logistics->name : '';
+            $logistics .= $logisticsName . ' ';
+        }
+
+        return $logistics;
+    }
+
+    public function getCodeAttribute()
+    {
+        $code = '';
+        foreach($this->packages as $package) {
+            $trackingNo = $package->tracking_no;
+            $code .= $trackingNo . ' ';
+        }
+
+        return $code;
+    }
+
     /**
      * 订单成本获取器
      * @return int

@@ -29,7 +29,7 @@ class ShunfengAdapter extends BasicAdapter
         $this->sendInfo['custid'] = '';
 
         $this->_express_type = !empty($config['type']) ? $config['type'] : 9; // 9是平邮 10是挂号
-        $this->_order_prefix = 'S';
+        $this->_order_prefix = 'V3S';
         $this->SoapClient = new  \SoapClient($this->_url);
 
     }

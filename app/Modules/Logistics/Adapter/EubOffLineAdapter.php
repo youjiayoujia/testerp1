@@ -22,7 +22,7 @@ class EubofflineAdapter extends BasicAdapter
         $this->_version = 'international_eub_us_1.1';
        // $this->_url = $config['url'];
 
-        $this->_url ='http://shipping2.ems.com.cn/partner/api/public/p/order/';//发送地址
+        $this->_url ='http://shipping.ems.com.cn/partner/api/public/p/order/';//发送地址
 
 
 
@@ -55,8 +55,7 @@ class EubofflineAdapter extends BasicAdapter
 
     public function getTracking($package)
     {
-        $emailTemplateInfo = $package->emailTemplate;
-
+        $emailTemplateInfo = $package->logistics->emailTemplate;
         $apiInfoArr=explode(',',$emailTemplateInfo->eub_api);
         $this->_authenticate = $apiInfoArr[0];//授权码
         $this->_customer_code = $apiInfoArr[1];//客户编码
@@ -83,12 +82,8 @@ class EubofflineAdapter extends BasicAdapter
         $this->_company = $emailTemplateInfo->eub_contact_company_name;
         $this->_street = $emailTemplateInfo->eub_street;
         $this->_email = $emailTemplateInfo->eub_email;
-
-
+    
         $response = $this->doUpload($package);
-
-
-
         if ($response['status'] != 0) {
             $result = [
                 'code' => 'success',
@@ -100,13 +95,13 @@ class EubofflineAdapter extends BasicAdapter
                 'result' =>$response['msg']
             ];
         }
-        return $response;
+        return $result;
     }
 
 
     public function doUpload($package)
     {
-        $items = '';
+        $items = '';        
         foreach ($package->items as $key => $item) {
             $products_declared_en = $item->item->product->declared_en;//产品申报英文名称
             $products_declared_en = str_replace("'", " ", $products_declared_en);
@@ -114,22 +109,23 @@ class EubofflineAdapter extends BasicAdapter
             if (!$products_declared_en || !$products_declared_cn) {
                 return array('status' => '0', 'msg' => $item->item->product->model . '缺少申报的中英文名');
             }
-            $weight = $item->quantity * $item->item->product->weight;
+            //$weight = $item->quantity * $item->item->product->weight;
+            $weight = $item->item->weight;
             $weight = number_format($weight, 3, '.', '');//保留三位小数
             $delcarevalue = $item->item->product->declared_value * $item->quantity;
-            $delcarevalue = number_format($delcarevalue, 2, '.', '');//保留两位小数
-            $items .= '<item>
+            $delcarevalue = number_format($delcarevalue, 2, '.', '');//保留两位小数           
+        }
+        $items .= '<item>
       				<cnname>' . $products_declared_cn . ' ' . $item->item->product->model . '*' . $item->quantity . '</cnname><enname>' . $products_declared_en . '</enname>
 					<count>' . $item->quantity . '</count><weight>' . $weight . '</weight>
 					<delcarevalue>' . $delcarevalue . '</delcarevalue><origin>CN</origin>
 				</item>
       			';
-        }
         $street = htmlspecialchars($package->shipping_address . ' ' . $package->shipping_address1);//收件人街道
         $xmlStr = '';
         $xmlStr .= '<?xml version="1.0" encoding="UTF-8"?>
 		   		<orders xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><order>';
-        $xmlStr .= '<orderid>' . $package->id . '</orderid><operationtype>0</operationtype><producttype>0</producttype>
+        $xmlStr .= '<orderid>SLME' . $package->id . '</orderid><operationtype>0</operationtype><producttype>0</producttype>
 	  			 <customercode>' . $this->_customer_code . '</customercode><vipcode>' . $this->_vip_code . '</vipcode><clcttype>1</clcttype>
 	  			 <pod>false</pod><untread>Returned</untread>
 	  			 <printcode>01</printcode>';
@@ -185,7 +181,8 @@ class EubofflineAdapter extends BasicAdapter
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,
         );
-        $result = $this->sendHttpRequest($this->_url, $xmlStr, $headers);;
+        
+        $result = $this->sendHttpRequest($this->_url, $xmlStr, $headers);
         return $result;
 
     }
@@ -209,8 +206,12 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
 
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);
-        //Send the Request
-        $data = curl_exec($connection);
+        //Send the Request  
+        $data = curl_exec($connection); 
+        if (curl_errno($connection)) {
+            // $this->setCurlErrorLog(curl_error ( $curl ));
+            die(curl_error($connection)); //异常错误
+        }
         curl_close($connection);
         $result = simplexml_load_string($data);
         if ($result->status == 'error') {

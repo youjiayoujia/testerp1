@@ -92,15 +92,13 @@
 				<td colspan="2">{{ $model->country ? $model->country->cn_name : '' }}</td>
 			</tr>
 			<tr style="height:16mm;" valign="center">
-				<td style="font-size:16px;text-align:center;" valign="top">
-				@if($model->logistics_order_number)
-				<p style="text-align:left;height:4mm;border-bottom:1px solid black;line-height:4mm;">{{ $model->logistics_order_number }}  </p>
-				@endif
+				<td style="font-size:16px;text-align:center;" valign="top">				
+				<p style="text-align:left;height:4mm;border-bottom:1px solid black;line-height:4mm;">{{ $model->tracking_no }}  </p>
 				<p style="font-size:16px;font-weight:bold;text-align:center;">UNTRACKED</p>
 				</td>
 				<td colspan="3" >
-					<p style="margin-top:2px;"><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="max-height:200px;"></p>
-					<p style="margin-top:3px;">{{ $model->tracking_no }}</p>
+					<p style="margin-top:2px;"><img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}" style="max-height:200px;"></p>
+					<p style="margin-top:3px;">{{ $model->logistics_order_number }}</p>
 				</td>
 			</tr>
 			<tr style="height:5mm;">
@@ -132,7 +130,7 @@
 				<td>{{ date('Y-m-d') }}</td>
 			</tr>
 		</table>
-		<div style="margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
+		<div style="margin:0 auto;font-size:8px;white-space:normal;overflow:hidden;">
 		      {{ $model->sku_info }}
 		</div>
 	</div>		

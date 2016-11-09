@@ -635,6 +635,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/processingAssignStocks',
+        ['uses' => 'PackageController@processingAssignStocks', 'as' => 'package.processingAssignStocks']);
     Route::get('package/ajaxRealTime',
         ['uses' => 'PackageController@ajaxRealTime', 'as' => 'package.ajaxRealTime']);
     Route::get('package/recycle',

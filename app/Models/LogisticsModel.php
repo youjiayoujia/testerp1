@@ -37,6 +37,7 @@ class LogisticsModel extends BaseModel
         'driver',
         'logistics_code',
         'priority',
+        'is_express',
     ];
 
     public $rules = [

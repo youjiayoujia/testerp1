@@ -159,6 +159,33 @@ class PackageModel extends BaseModel
         return $logisticsZone;
     }
 
+    //获取申报信息
+    public function getDeclaredInfo($isAll = false)
+    {
+        $data = [];
+        if ($isAll) {
+            $items = $this->items ? $this->items->item : false;
+            if ($items) {
+                foreach ($items as $item) {
+                    $data['declared_value'] = $item->declared_value;
+                    $data['weight'] = $item->weight;
+                    $data['declared_en'] = $item->product ? $item->product->declared_en : '';
+                    $data['declared_cn'] = $item->product ? $item->product->declared_cn : '';
+                }
+            }
+        } else {
+            $items = $this->items ? $this->items->first()->item : false;
+            if ($items) {
+                $data['declared_value'] = $items->declared_value;
+                $data['weight'] = $items->weight;
+                $data['declared_en'] = $items->product ? $items->product->declared_en : '';
+                $data['declared_cn'] = $items->product ? $items->product->declared_cn : '';
+            }
+        }
+
+        return $data;
+    }
+
     //包裹sku信息
     public function getSkuInfoAttribute()
     {
@@ -216,7 +243,7 @@ class PackageModel extends BaseModel
         $price = 0;
         if ($this->order->rate) {
             foreach ($this->items as $packageItem) {
-                $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+                $price += $packageItem->quantity * ($packageItem->item ? $packageItem->item->declared_value : 0);
             }
             $price = $price / $this->order->rate;
         }
@@ -546,7 +573,7 @@ class PackageModel extends BaseModel
                         }
                         //todo v3测试，正式上线删除
                         $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
-                        $this->update(['status' => 'NEED', 'warehouse_id' => $warehouse_id]);
+                        $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
                         $this->order->update(['status' => 'NEED']);
                         return true;
                     }
@@ -562,7 +589,7 @@ class PackageModel extends BaseModel
                     }
                     //todo v3测试，正式上线删除
                     $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
-                    $this->update(['status' => 'NEED', 'warehouse_id' => $warehouse_id]);
+                    $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
                     $this->order->update(['status' => 'NEED']);
                     return true;
                 }
@@ -587,6 +614,7 @@ class PackageModel extends BaseModel
             $this->order->update(['status' => 'PARTIAL']);
         }
         foreach ($arr as $warehouseId => $stockInfo) {
+            $weight = 0;
             $newPackage = $this->create($this->toArray());
             foreach ($stockInfo as $stockId => $info) {
                 $item = $items->where('item_id', $info['item_id'])->first();
@@ -594,12 +622,18 @@ class PackageModel extends BaseModel
                     $item->delete();
                     continue;
                 }
+                $weight += $item->item->weight * $info['quantity'];
                 $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 $newPackage->items()->create($info);
             }
-            $newPackage->update(['status' => 'WAITASSIGN', 'warehouse_id' => $info['warehouse_id']]);
+            $newPackage->update(['status' => 'WAITASSIGN', 'warehouse_id' => $info['warehouse_id'], 'weight' => $weight]);
             //加入订单状态部分发货
         }
+        $oldWeight = 0;
+        foreach($this->items as $item) {
+            $oldWeight += $item->item->weight * $item->quantity;
+        }
+        $this->update(['weight' => $oldWeight]);
     }
 
     public function atLeastTimes($arr)
@@ -851,6 +885,11 @@ class PackageModel extends BaseModel
 
     public function createPackageDetail($items)
     {
+        $oldStatus = $this->status;
+        $oldWarehouseId = $this->warehouse_id;
+        $oldLogisticsId = $this->logistics_id;
+        $oldTrackingNo = $this->tracking_no;
+        $oldWeight = $this->weight;
         foreach ($this->items as $packageItem) {
             $packageItem->delete();
         }
@@ -874,7 +913,23 @@ class PackageModel extends BaseModel
                     }
                     DB::commit();
                 }
-                $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                if(empty($oldWarehouseId)) {
+                    $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                } else {
+                    if($oldWarehouseId != $warehouseId) {
+                        $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                    } else {
+                        if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                            if($weight == $oldWeight) {
+                                $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
+                            } else {
+                                $this->update(['status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                            }
+                        } else {
+                            $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                        }
+                    }
+                }
                 $i = false;
             } else {
                 $newPackage = $this->create($this->toArray());
@@ -900,6 +955,23 @@ class PackageModel extends BaseModel
                         'status' => 'WAITASSIGN',
                         'weight' => $weight
                     ]);
+                    if(empty($oldWarehouseId)) {
+                        $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                    } else {
+                        if($oldWarehouseId != $warehouseId) {
+                            $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                        } else {
+                            if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                if($weight == $oldWeight) {
+                                    $newPackage->update(['weight' => $weight, 'status' => 'PROCESSING']);
+                                } else {
+                                    $newPackage->update(['status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                                }
+                            } else {
+                                $newPackage->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -938,8 +1010,8 @@ class PackageModel extends BaseModel
      */
     public function canAssignLogistics()
     {
-        //判断订单状态
-        if (!in_array($this->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
+        //判断包裹状态
+        if (!in_array($this->status, ['WAITASSIGN', 'ASSIGNFAILED', 'NEED'])) {
             return false;
         }
 
@@ -1296,12 +1368,23 @@ class PackageModel extends BaseModel
                         'logistics_order_at' => date('Y - m - d H:i:s'),
                     ]);
                 } else {
-                    $this->update([
-                        'status' => 'PROCESSING',
-                        'tracking_no' => $result['tracking_no'],
-                        'logistics_order_number' => $result['logistics_order_number'],
-                        'logistics_order_at' => date('Y - m - d H:i:s'),
-                    ]);
+                    $item = $this->items->first();
+                    if(empty($item->warehouse_position_id)) {
+                        $this->update([
+                            'status' => 'NEED',
+                            'tracking_no' => $result['tracking_no'],
+                            'logistics_order_number' => $result['logistics_order_number'],
+                            'logistics_order_at' => date('Y - m - d H:i:s'),
+                        ]);
+                    } else {
+                        $this->update([
+                            'status' => 'PROCESSING',
+                            'tracking_no' => $result['tracking_no'],
+                            'logistics_order_number' => $result['logistics_order_number'],
+                            'logistics_order_at' => date('Y - m - d H:i:s'),
+                        ]);
+                    }
+                    
                 }
             }
             if ($result['status'] == 'again') {

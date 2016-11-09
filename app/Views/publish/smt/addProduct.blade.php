@@ -847,6 +847,7 @@ $template['name'].'</option>';
                         </div>
                       </div>
                     </div>
+                    <!-- 
                     <div class="row">
                         <label class="col-sm-2 control-label">自定义关联产品：</label>
                          <div class="col-sm-10">
@@ -868,6 +869,7 @@ $template['name'].'</option>';
                         </ul>
                     </div>
                     </div>
+                    -->
                     <div class="row">
                         <div class="form-group clearfix ">
                             <label for="detail" class=" col-sm-2 control-label">详情描述:</label>                       
@@ -883,10 +885,8 @@ $template['name'].'</option>';
         				            }else if ($detail) {
         				                echo $smtApi->replaceSmtModuleToImg($detail);
         				            }
-        				        }
-                                
-                                                        
-                                
+        				        }                               
+                                                                                      
                                 ?>
 					       </textarea>
                     </div>                   

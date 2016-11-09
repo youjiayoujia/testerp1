@@ -35,7 +35,6 @@
                 <button class="btn btn-{{ $package->status_color }} btn-xs">
                     {{ $package->status_name }}
                 </button>
-
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>

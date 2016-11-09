@@ -32,7 +32,7 @@ class MessageModel extends BaseModel{
         'label',
     ];
 
-    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱'];
+    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱' ,'label' => '消息类型'];
 
     public $rules = [];
 

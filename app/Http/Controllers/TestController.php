@@ -79,14 +79,22 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(270);
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $package,
-        ];
-
-        return view('logistics.template.tpl.smtLineShippingTemplate', $response);
+        foreach (\App\Models\Order\ItemModel::all() as $item) {
+            $status = ItemModel::where('sku', $item->sku)->first()->status;
+            $item->update(['item_status' => $status]);
+        }
     }
+
+//    public function test2()
+//    {
+//        $package = PackageModel::find(270);
+//        $response = [
+//            'metas' => $this->metas(__FUNCTION__),
+//            'model' => $package,
+//        ];
+//
+//        return view('logistics.template.tpl.smtLineShippingTemplate', $response);
+//    }
 
 //    public function test2()
 //    {

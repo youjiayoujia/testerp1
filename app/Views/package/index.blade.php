@@ -35,7 +35,6 @@
                 <button class="btn btn-{{ $package->status_color }} btn-xs">
                     {{ $package->status_name }}
                 </button>
-
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
@@ -85,7 +84,7 @@
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
-                @if($package->status == 'ASSIGNED' || $package->status == 'TRACKINGFAILED')
+                @if(in_array($package->status, ['NEED', 'PROCESSING', 'ASSIGNED', 'TRACKINGFAILED']))
                     <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
                         <span class="glyphicon glyphicon-random"></span>
                     </a>

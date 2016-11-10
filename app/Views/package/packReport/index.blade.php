@@ -6,8 +6,15 @@
     </div>
     <button type='button' class='btn btn-info search'>查找</button>
 </div>
+<div class='row'>
+    <div class='form-group col-lg-1'>
+        <button class="btn btn-primary btn-lg download">
+            数据下载
+        </button>
+    </div>
+</div>
 <div class="panel panel-default">
-    <div class="panel-heading">包装排行榜</div>
+    <div class="panel-heading">包装排行榜<a href="{{ route('packReport.createData')}}">生成数据</a></div>
     <div class="panel-body">
         <table class="table table-bordered">
             <thead>
@@ -123,6 +130,11 @@ $(document).ready(function(){
     $(document).on('click', '.search', function(){
         time = $('#expected_date').val();
         location.href = "{{ route('packReport.index')}}/?report=" + time;
+    })
+
+    $(document).on('click', '.download', function(){
+        date = $('#expected_date').val();
+        location.href="{{ route('packReport.download')}}/?date=" + date;
     })
 })
 </script>

@@ -25,7 +25,7 @@
 @section('tableBody')
     @if(count($data)>0)
     @foreach($data as $purchaseOrder)
-
+        <?php $out_of_stock = 0; ?>
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$purchaseOrder->id}}"></td>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
@@ -49,7 +49,7 @@
                 {{ $purchaseOrder->supplier?$purchaseOrder->supplier->name:''}}
             </td>
             <td>
-            @if($purchaseOrder->status <4)
+            
                 <table class="table table-bordered table-striped table-hover sortable">
                 <thead>
                 <tr>
@@ -72,6 +72,7 @@
                 </thead>
                 <tbody>
                 @foreach($purchaseOrder->purchase_items as $purchase_item)
+                <?php if($purchase_item->productItem->out_of_stock){$out_of_stock=1;} ?>
                 <tr>
                     <td>{{$purchase_item->sku}}</td>
                     <td>{{config('item.status')[$purchase_item->productItem?$purchase_item->productItem->status:'notFound']}}</td>
@@ -112,15 +113,21 @@
                 </tr>
                 </tbody>
                 </table>
-                @endif
+                
             </td>
             <td>{{ $purchaseOrder->warehouse ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
                  
-            <td>{{ $purchaseOrder->created_at }}</td>
+            <td>{{ $purchaseOrder->created_at }}
+                @if($out_of_stock ==1) 
+                    <font color="red">(有欠货)</font>
+                @endif</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
-                	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
-                         <span class="glyphicon glyphicon-ok-sign">审核</span>
+                	<a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/1" title="审核" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">审核通过</span>
+                    </a>
+                    <a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/3" title="审核不通过" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">审核不通过</span>
                     </a>
                 @endif
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">
@@ -199,21 +206,21 @@
         
         <div class="panel-body" id="itemDiv">
             <div class='row'>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <label  class='control-label'>物流号</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div> 
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <label  class='control-label'>物流费</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
             </div>                   
             <div class='row'>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
                
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
             </div>   

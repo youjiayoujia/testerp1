@@ -69,6 +69,18 @@
         </div>
         <div class="row">
             <div class="col-lg-4">
+                <a type="button" class="btn btn-info" href="{{ route('package.processingAssignStocks') }}">
+                    尚需匹配库存 <span class="badge">{{ $weatherNum }}</span>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
                 <a type="button" class="btn btn-primary" href="{{ route('pickList.createPick') }}">
                     生成拣货单 <span class="badge">{{ $pickNum }}</span>
                 </a>

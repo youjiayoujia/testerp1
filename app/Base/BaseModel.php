@@ -34,4 +34,14 @@ class BaseModel extends Model
 
         return substr($str, 0, strlen($str) - 1);
     }
+
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
+    }
 }

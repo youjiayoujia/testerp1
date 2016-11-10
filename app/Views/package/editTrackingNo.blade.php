@@ -26,10 +26,6 @@
                     <input type='text' class='form-control' value="{{ $model->shipping_zipcode }}" readonly>
                 </div>
                 <div class="col-lg-2">
-                    <label>发货地址</label>
-                    <input type='text' class='form-control' value="{{ $model->shipping_address }}" readonly>
-                </div>
-                <div class="col-lg-2">
                     <label>城市</label>
                     <input type='text' class='form-control' value="{{ $model->shipping_city }}" readonly>
                 </div>
@@ -80,7 +76,11 @@
         <div class="panel-body">
             <div class="col-lg-2">
                 <label>修改追踪号</label>
-                <input type='text' class='form-control' name='tracking_no'>
+                <input type='text' class='form-control' name='tracking_no' value="{{ $model->tracking_no }}">
+            </div>
+            <div class="col-lg-2">
+                <label>发货地址</label>
+                <input type='text' class='form-control' name='shipping_address' value="{{ $model->shipping_address }}">
             </div>
         </div>
     </div>

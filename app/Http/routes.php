@@ -74,11 +74,13 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('fbaStock', 'Oversea\StockController');
 
     //包装排行榜
+    Route::get('packReport/download', ['uses' => 'PackReportController@download', 'as' => 'packReport.download']);
     Route::get('packReport/changeData', ['uses' => 'PackReportController@changeData', 'as' => 'packReport.changeData']);
     Route::get('packReport/createData', ['uses' => 'PackReportController@createData', 'as' => 'packReport.createData']);
     Route::resource('packReport', 'PackReportController');
 
     //拣货排行榜
+    Route::get('pickReport/download', ['uses' => 'PickReportController@download', 'as' => 'pickReport.download']);
     Route::get('pickReport/createData', ['uses' => 'PickReportController@createData', 'as' => 'pickReport.createData']);
     Route::resource('pickReport', 'PickReportController');
     //海外仓箱子
@@ -635,6 +637,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/processingAssignStocks',
+        ['uses' => 'PackageController@processingAssignStocks', 'as' => 'package.processingAssignStocks']);
     Route::get('package/ajaxRealTime',
         ['uses' => 'PackageController@ajaxRealTime', 'as' => 'package.ajaxRealTime']);
     Route::get('package/recycle',

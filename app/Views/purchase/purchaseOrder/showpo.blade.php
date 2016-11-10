@@ -6,7 +6,7 @@
 <?php switch ($size) {
     case 'big':
 ?>
-<body>
+<body style="margin-bottom:-30px;">
   <div style="width:100%;height:24mm;margin-bottom:2px;">
    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0"> 
     <tbody>
@@ -16,7 +16,7 @@
          {{$model->productItem->c_name}}
        </div> 
         <div>
-            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
+            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
         </div>
         <span style="font-size:10px;">{{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]</span> </td> 
      </tr> 
@@ -28,8 +28,8 @@
     break;   
     case 'small':
 ?>
-<body onLoad="printpage_zzjs()">
-    <div style="width:100%;height:24mm;margin-bottom:2px;">
+<body  style="margin-bottom:-30px;">
+    <div style="width:70mm;height:24mm;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td align="center" valign="middle">
@@ -42,7 +42,7 @@
                         {{$model->productItem->c_name}}
                     </div>
                     <div>
-                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
+                        <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
                     </div>
                     
                     
@@ -58,7 +58,7 @@
     <?php  break;
         case 'middle':
     ?>
-    <body>
+    <body style="margin-bottom:-30px;">
         <div style="width:40mm;height:15mm;margin-bottom:2px;">
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
@@ -68,7 +68,7 @@
                             </span>
                         </b>
                         <div>
-                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'26' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.19' ])}}">
+                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'26' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
                         </div>
                         
                         
@@ -84,7 +84,7 @@
     <?php  break;
     case 'middleSmall':
     ?>
-    <body>
+    <body style="margin-bottom:-30px;">
         <div style="width:100%;height:20mm;margin-bottom:2px;">
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
@@ -98,7 +98,7 @@
                            {{$model->productItem->c_name}}
                         </div>
                         <div>
-                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128', 'length' => '1.02' ])}}">
+                            <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
                         </div>
                         <?php //echo Tool::barcodePrint($model->sku) ?>
                         
@@ -114,5 +114,7 @@
 </html>
 
 <script type="text/javascript">
-    window.onload = function(){window.print();}
+    window.onload = function(){
+        //window.print();
+    }
 </script>

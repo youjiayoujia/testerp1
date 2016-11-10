@@ -72,7 +72,7 @@ return [
         'userService.name' => '客服人员',
         'email' => '邮箱',
         'currency' => '币种',
-        'name' => '姓名',
+        'name' => '名称',
         'zipcode' => '邮编',
         'type' => '类型',
         'purchaseOrder.status' => '采购单状态状态',
@@ -164,6 +164,7 @@ return [
 		'joom_publish_product_detail.productID'=>'Joom产品ID',
         'joom_publish_product_detail.sku'=>'Joom原始sku',
         'enabled'=>'Joom平台状态',
-
+        'catalog.id' => '品类',
+        'spu_id' => 'SPU'
     ],
 ];

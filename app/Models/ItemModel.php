@@ -175,6 +175,12 @@ class ItemModel extends BaseModel
         return '/default.jpg';
     }
 
+    public function getStockQuantity($warehouseId, $flag = 0)
+    {
+        $stocks = $this->stocks->where('warehouse_id', $warehouseId);
+        return count($stocks) ? ($flag ? $stocks->sum('available_quantity') : $stocks->sum('all_quantity')) : 0;
+    }
+
     //实库存
     public function getAllQuantityAttribute()
     {
@@ -309,11 +315,18 @@ class ItemModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        $catalogs = CatalogModel::all();
+        $arr = [];
+        foreach($catalogs as $key => $single) {
+            $arr[$single->id] = $single->c_name;
+        }
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'],'warehouse' => ['name'] ],
+            'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
-            'filterSelects' => ['status' => config('item.status'),],
-            'selectRelatedSearchs' => [],
+            'filterSelects' => ['status' => config('item.status'),
+                                'warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+                               ],
+            'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'sectionSelect' => [],
         ];
     }
@@ -622,13 +635,18 @@ class ItemModel extends BaseModel
         return $stockData;
     }
 
-    public function createPurchaseNeedData()
+    public function createPurchaseNeedData($item_id_array=null)
     {
         ini_set('memory_limit', '2048M');
-        $items = $this->all();
+        if(!$item_id_array){
+            $items = $this->all();
+        }else{
+            $items = $this->find($item_id_array);
+        }
+        
         //$crr = array('21372','21373','29644','30974','32076','42437','47534','54980','57370','57616','59186');
         //$items = $this->find($crr);
-
+        
         $requireModel = new RequireModel();
         foreach ($items as $item) {
             $data['item_id'] = $item->id;

@@ -36,7 +36,7 @@
             <td>{{ $productRequire->needer_shop_id }}</td>
             <td>{{ $productRequire->createdByName ? $productRequire->createdByName->name : '' }}</td>
             <td>{{ $productRequire->created_at }}</td>
-            <td>{{ $productRequire->status ? ($productRequire->status == '1' ? '未找到' : '已找到') : '新需求'}}</td>
+            <td>{{ $productRequire->status ? ($productRequire->status == '1' ? '未找到' : ($productRequire->status == '2' ? '已找到' : ('已创建'))) : '新需求'}}</td>
             <td>{{ $productRequire->userName ? $productRequire->userName->name : '' }}</td>
             <td>{{ $productRequire->handle_time }}</td>
             <td>

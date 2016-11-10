@@ -321,9 +321,11 @@ class ItemModel extends BaseModel
             $arr[$single->id] = $single->c_name;
         }
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'warehouse' => ['name'] ],
+            'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
-            'filterSelects' => ['status' => config('item.status'),],
+            'filterSelects' => ['status' => config('item.status'),
+                                'warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+                               ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'sectionSelect' => [],
         ];

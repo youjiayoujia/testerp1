@@ -83,13 +83,15 @@ class ReturnTrack extends Job implements SelfHandling, ShouldQueue
                         $is_pass = false;
                         $item_array = [];
                         $order = OrderModel::where('id', $package->order_id)->first();
-                        if(isset($this->package->expired_time)){
-                            if(strtotime($order->orders_expired_time)-time()> $this->package->expired_time*24*3600){ // 需要跳过
+
+                        if(!empty($this->orderMarkLogic->expired_time)){
+                            if(strtotime($order->orders_expired_time)-time()> $this->orderMarkLogic->expired_time*24*3600){ // 需要跳过
                                 $is_success = false;
                                 $is_pass = true;//跳过标记发货
-                                $remark ='未满足最后发货期'.$this->package->expired_time.'天，所以跳过发货';
+                                $remark ='未满足最后发货期'.$this->orderMarkLogic->expired_time.'天，所以跳过发货';
                             }
                         }
+
                         if(!$is_pass){
                             $account = AccountModel::findOrFail($order->channel_account_id);
                             $channel = Channel::driver($account->channel->driver, $account->api_config);

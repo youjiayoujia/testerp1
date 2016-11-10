@@ -308,8 +308,10 @@ class SmtController extends Controller{
   
        $draft_detail['imageURLs']              = implode(';', $imageURLs);   //图片
        $draft_detail['isImageDynamic']         = count($imageURLs) > 1 ? 1 : 0; //是否动态图      
-       /**自定义产品关联信息开始**/
+      
+     
        //自定义关联产品
+       /*
        $relationProductArr = array_key_exists('relationProduct', $posts) ? $posts['relationProduct'] : array();
        $relationProductIds = '';
        if ($relationProductArr) {
@@ -320,18 +322,17 @@ class SmtController extends Controller{
        $draft_detail['relationProductIds'] = $relationProductIds;
        
        //关联产品的位置
-      // $relationLocation = $posts['relation_loction'];
-      // $draft_detail['relationLocation'] = $posts['relation_loction'];
+       $relationLocation = $posts['relation_loction'];
+       $draft_detail['relationLocation'] = $posts['relation_loction'];
+       */   
        
-       //详情信息
-       $detail_str = trim($posts['detail']);
        
        //这个账号的token信息
        $token_id = $posts['token_id'];
        $token_info = AccountModel::findOrFail($token_id);
        $smtApi = Channel::driver($token_info->channel->driver, $token_info->api_config);
-       /**自定义产品关联信息结束**/
-       
+
+       $detail_str = trim($posts['detail']);
        $draft_detail['detail']                 = htmlspecialchars($detail_str); //详情
        $draft_detail['detailLocal']            = $draft_detail['detail'];
        $draft_detail['keyword']                = $smtApi->filterForSmtProduct($posts['keyword']);      //关键字
@@ -465,8 +466,7 @@ class SmtController extends Controller{
                    }
                }
                $smtProductSkuModel = new smtProductSku();
-               foreach ($aeopAeProductSKUs as $per_sku) {
-                    
+               foreach ($aeopAeProductSKUs as $per_sku) {                    
                    $valId                      = $smtApi->checkProductSkuAttrIsOverSea($per_sku['aeopSKUProperty']); //海外仓属性ID
                    $per_sku['aeopSKUProperty'] = $per_sku['aeopSKUProperty'] ? serialize($per_sku['aeopSKUProperty']) : '';
                    $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;
@@ -491,16 +491,14 @@ class SmtController extends Controller{
                            $where['skuCode']      = $per_sku['skuCode'];
                            $where['overSeaValId'] = $valId;                          
                            smtProductSku::where($where)->update($per_sku);                    
-                       } else { //增加
-                           
+                       } else { //增加                           
                            $per_sku['productId'] = $posts['id'];
                            $per_sku['skuMark']   = $posts['id'] . ':' . $per_sku['skuCode'];
                            $smtProductSkuModel->create($per_sku);                         
                        }
                    }
                    unset($newSkus);
-                   if ($withErr) break;   
-                  
+                   if ($withErr) break;                   
                }                   
                //没有变更的数据直接删除吧，说明已经变了，只使用最新的就好了
                $smtProductSkuModel->delete(array('productId' => $posts['id'], 'updated' => 0));
@@ -521,37 +519,23 @@ class SmtController extends Controller{
            }                            
         } else { //add
            DB::beginTransaction();
-           $productId = date('ymdHis').rand(1000, 9999).'-'.$posts['token_id']; //临时的产品ID           	
-           $draft_product['productId'] = $productId;
-           //$draft_product['user_id'] = $smtApi->_customer_service_id;         
-           $draft_product['productStatusType'] = ($action == 'saveToPost') ? 'waitPost' : 'newData';    //新增产品的状态
-           
-           $result = $this->model->create($draft_product);   
-           
-           if (!$result->id){
-               DB::rollback();
-               $this->ajax_return('保存到产品列表出错', false);
-           }         
-           
-       
+           $productId = date('ymdHis').rand(1000, 9999).'-'.$posts['token_id'];     //临时的产品ID           	
+           $draft_product['productId'] = $productId;          
+           $draft_product['productStatusType'] = ($action == 'saveToPost') ? 'waitPost' : 'newData';  
+           $result = $this->model->create($draft_product);  
+                  
            //保存到详情表中
            $draft_detail['productId'] = $productId;
-           $detail_result = $this->smtProductDetailModel->create($draft_detail);
-           if (!$detail_result->id){
-               DB::rollback();
-               $this->ajax_return('保存到产品详情表出错', false);
-           }
+           $detail_result = $this->smtProductDetailModel->create($draft_detail);          
        
            $sku_flag = true;
-           $withErr = false;
-           //保存到SKU明细表中
+           $withErr = false;      
            foreach ($aeopAeProductSKUs as $per_sku) {
                $valId                      = $smtApi->checkProductSkuAttrIsOverSea($per_sku['aeopSKUProperty']); //发货地属性ID 值ID：201336100为中国
                $per_sku['overSeaValId']    = $valId;
                $per_sku['aeopSKUProperty'] = $per_sku['aeopSKUProperty'] ? serialize($per_sku['aeopSKUProperty']) : '';
                $per_sku['productId']       = $productId;
-               $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;
-               //$per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
+               $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;     
                $per_sku['smtSkuCode'] = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] ;
                $newSkus = $smtApi->buildSysSku($per_sku['skuCode']);
                foreach($newSkus as $sku){
@@ -633,17 +617,15 @@ class SmtController extends Controller{
     {
         if ($id) {
             $product = array();
-            $draft_info = $this->model->where('productId',$id)->first();           
-            //读取待发布产品详情信息
-            $draft_detail = $draft_info->details;            
-            //读取待发布产品SKU信息
-            $draft_skus = $draft_info->productSku; 
+            $draft_info = $this->model->where('productId',$id)->first();                   
+            $draft_detail = $draft_info->details;      //读取待发布产品详情信息                      
+            $draft_skus = $draft_info->productSku;     //读取待发布产品SKU信息
+            
             $token_id = $draft_info->token_id;
             $account = AccountModel::findOrFail($token_id);
             $smtApi = Channel::driver($account->channel->driver, $account->api_config);
             $firstSku = $smtApi->rebuildSmtSku($draft_skus[0]['smtSkuCode']); //简单解析下第一个SKU
-
-            //账号ID            
+                   
             if (!$token_id) {
                 if ($auto) {
                     return array('status' => false, 'info' => '产品:' . $id . '刊登账号不存在');
@@ -661,19 +643,18 @@ class SmtController extends Controller{
 	        }
 	        $skudatastr = implode( $skudatastr,',');//价格属性字符串
 	     
-            $checkeinfo['token_id'] = $token_id;   //
-            $checkeinfo['categoryId']=$draft_info->categoryId; //获取分类ID
-            $checkeinfo['subject']=$draft_info->subject;  //获取标题
+            $checkeinfo['token_id'] = $token_id;   
+            $checkeinfo['categoryId']=$draft_info->categoryId;                           //获取分类ID
+            $checkeinfo['subject']=$draft_info->subject;                                 //获取标题
             $checkeinfo['aeopAeProductPropertys']=$draft_detail->aeopAeProductPropertys; //获取属性
-            $checkeinfo['keyword']=$draft_detail->keyword; //获取关键字1
-            $checkeinfo['productMoreKeywords1']=$draft_detail->productMoreKeywords1; //获取关键字2
-            $checkeinfo['productMoreKeywords2']=$draft_detail->productMoreKeywords2; //获取关键字3
-            $checkeinfo['detail']=$draft_detail->detail;//获取详情
+            $checkeinfo['keyword']=$draft_detail->keyword;                               //获取关键字1
+            $checkeinfo['productMoreKeywords1']=$draft_detail->productMoreKeywords1;     //获取关键字2
+            $checkeinfo['productMoreKeywords2']=$draft_detail->productMoreKeywords2;     //获取关键字3
+            $checkeinfo['detail']=$draft_detail->detail;                                 //获取详情
 
             //侵权验证
             $re = $this->findAeProductProhibitedWords($checkeinfo);  
-            if($re!='success')
-            {
+            if($re!='success'){
                 $re =   str_replace("FORBIDEN_TYPE", "禁用", $re);
                 $re =   str_replace("RESTRICT_TYPE", "限定", $re);
                 $re =   str_replace("BRAND_TYPE", "品牌", $re);
@@ -692,10 +673,8 @@ class SmtController extends Controller{
             //对价格属性进行检测
             $checkeinfoss = $checkeinfo;
             $checkeinfoss['detail'] = $skudatastr;
-            $re = $this->findAeProductProhibitedWords($checkeinfoss);
-            
-            if($re!='success')
-            {
+            $re = $this->findAeProductProhibitedWords($checkeinfoss);            
+            if($re!='success'){
                 $re =   str_replace("FORBIDEN_TYPE", "禁用", $re);
                 $re =   str_replace("RESTRICT_TYPE", "限定", $re);
                 $re =   str_replace("BRAND_TYPE", "品牌", $re);
@@ -707,20 +686,19 @@ class SmtController extends Controller{
                 if ($auto) {
                     return array('status' => false, 'info' => '产品:' . $id . $re);
                 }else {
-
                     return $this->ajax_return( '产品:' . $id.$re,false);
                 }
             }                     
             
             //ERP违禁商标名检测
             $copyworld = array();
-            $copyworld[] = $draft_info->subject;  //获取标题
-            $copyworld[] = $draft_detail->detail;//获取详情
+            $copyworld[] = $draft_info->subject;                  //获取标题
+            $copyworld[] = $draft_detail->detail;                 //获取详情
             $copyworld[] = $draft_detail->aeopAeProductPropertys; //获取属性
-            $copyworld[] = $skudatastr;//价格属性
-            $copyworld['skuCode'] = $skuCode;//对SKU检测
+            $copyworld[] = $skudatastr;                           //价格属性
+            $copyworld['skuCode'] = $skuCode;                     //对SKU检测
             $checkres = $this->copycheck($copyworld);
-            $copysure = Input::get('copysure');//是否忽略ERP违禁商标名检测
+            $copysure = Input::get('copysure');                   //是否忽略ERP违禁商标名检测
             if($checkres != 'success'){
                 $resmsg = '的数据含有违禁的'.$checkres;
                 if($copysure != 'yes'){
@@ -728,15 +706,12 @@ class SmtController extends Controller{
                     if ($auto) {
                         return array('status' => 'copyright', 'info' => '产品:' . $id .$resmsg );
                     }else {
-
                         return $this->ajax_return( '产品:' . $id.$resmsg,'copyright');
                     }                    
                 }
-
             }
  
             $replace_flag = false; //是否替换图片的标识
-
             if ($isAdd) { //新增的话，该替换的还是要替换
                 //旧账号ID存在，同时(2个账号不一致或者原产品ID存在)
                 if ($draft_info->old_token_id && ($draft_info->old_token_id <> $draft_info->token_id || $draft_info->old_productId)) {
@@ -750,6 +725,7 @@ class SmtController extends Controller{
             /**************产品详情信息开始**************/
 
             //看是否有关联产品的图片，有的话，直接上传并替换到里边去
+            /*
             $relationFlag = false; //关联产品标识         
             if (!empty($draft_detail->relationProductIds)){
                 $relationFlag = true;
@@ -764,18 +740,16 @@ class SmtController extends Controller{
                         $relationHtml = str_replace('<img src="'.$top_pic.'" style="width: 100.0%;">', '', $relationHtml);
                     }
                 }
-            }
+            }*/
 
-            $detail = htmlspecialchars_decode($draft_detail->detail);
-            //替换产品模型
-            $detail = $smtApi->replaceSmtImgToModule($detail);
+            $detail = htmlspecialchars_decode($draft_detail->detail);          
+            $detail = $smtApi->replaceSmtImgToModule($detail);    //替换产品模型
             if ($replace_flag) {
                 $detail = $this->replaceDetailPics($detail, $firstSku, $draft_info->productId);
             }
             $product['detail'] = $detail; //用来更新本地数据
 
-            //把模板，标题，售后模板等套进来
-            //$templateId = $this->input->get_post('templateId');
+            //把模板，标题，售后模板等套进来          
             $templateId = $draft_detail->templateId;         
             $templateInfo = smtTemplates::where('id',$templateId)->first();
             if ($templateInfo && $templateInfo->id) {
@@ -793,56 +767,27 @@ class SmtController extends Controller{
                         } else {
                             $picStr .= '<img src="'.$imgPath.'" alt="aeProduct.getSubject()" title="aeProduct.getSubject()" />';
                         }
-
                     }
                 }
 
-                $layout = htmlspecialchars_decode($templateInfo->content);
-                //替换模板ID
-                $layout = str_replace('{my_template_id}', $templateId, $layout);
-
-
-                $detail_title = $draft_detail['detail_title'];///$this->input->get_post('detail_title');
-                //替换标题
-                $layout = str_replace('{my_layout_title}', $detail_title, $layout);
-
-                //售后模板
-                $shouhouId    = $draft_detail->shouhouId;//$this->input->get_post('shouhouId');
-                $shouhouInfo  = afterSalesService::where('id',$shouhouId)->first();
-                $layout       = str_replace('{my_shouhou_id}', $shouhouId, $layout);
+                $layout = htmlspecialchars_decode($templateInfo->content);             
+                $layout = str_replace('{my_template_id}', $templateId, $layout);       //替换模板ID                
+                $detail_title = $draft_detail->detail_title;                
+                $layout = str_replace('{my_layout_title}', $detail_title, $layout);    //替换标题                
+                $shouhouId    = $draft_detail->shouhouId;                              //售后模板
+                $shouhouInfo  = afterSalesService::where('id',$shouhouId)->first();                
+                $layout       = str_replace('{my_shouhou_id}', $shouhouId, $layout);   //替换售后模板                
                 $shouhou_html = $shouhouInfo ? htmlspecialchars_decode($shouhouInfo->content) : '';
                 $layout       = str_replace('{my_layout_shouhou}', $shouhou_html, $layout);
-
-                //替换描述
-                $layout = str_replace('{my_layout_detail}', $detail, $layout);
-
-                //替换描述图片
-                $layout = str_replace('{my_layout_pic}', $picStr, $layout);
-
-                if ($relationFlag){
-                    if ($draft_detail->relationLocation == 'header'){ //在前边就加在最前
-                        $layout = str_replace('{my_layout_relation}', '', $layout); //加在最前也得把这个标识去掉
-                        $layout = $relationHtml.$layout;
-                    }else { //在后边就替换下
-                        $layout = str_replace('{my_layout_relation}', $relationHtml, $layout);
-                    }
-                }else { //不需要替换也得把这个标识去掉
-                    $layout = str_replace('{my_layout_relation}', '', $layout);
-                }
-
+                
+                $layout = str_replace('{my_layout_detail}', $detail, $layout);         //替换描述                
+                $layout = str_replace('{my_layout_pic}', $picStr, $layout);            //替换描述图片
+                $layout = str_replace('{my_layout_relation}', '', $layout);              
                 $html = $layout;
                 unset($detail);
                 unset($layout);
-            } else {
-                //这是没有使用自定义售后模板的情况
-                if ($relationFlag){
-                    if ($draft_detail->relationLocation == 'header'){
-                        $detail = $relationHtml.$detail;
-                    }else {
-                        $detail .= $relationHtml;
-                    }
-                }
-                $html = $detail;
+            } else {                           
+                $html = $detail;    //这是没有使用自定义售后模板的情况    
                 unset($detail);
             }
             unset($relationHtml);
@@ -850,10 +795,8 @@ class SmtController extends Controller{
             unset($html);
             /**************产品详情信息结束**************/
 
-
             /*************产品主图信息开始**************/
             if ($replace_flag) { //需要上传主图
-
                 $imgLists    = explode(';', $draft_detail->imageURLs);
                 $newImgLists = array();
                 foreach ($imgLists as $k => $img) {
@@ -870,32 +813,24 @@ class SmtController extends Controller{
                 $product_arr['isImageDynamic'] = count($newImgLists) > 1 ? 'true' : 'false';
                 $product['imageURLs']          = $product_arr['imageURLs'];
                 $product['isImageDynamic']     = $product_arr['isImageDynamic'];
-            } else {
-                //主图列表,用';'连接上传
-                $product_arr['imageURLs'] = $draft_detail['imageURLs'];
-
-                //商品主图类型 --多图用动态，单图静态
-                $product_arr['isImageDynamic'] = stripos($draft_detail['imageURLs'], ';') !== false ? 'true' : 'false';
+            } else {                
+                $product_arr['imageURLs'] = $draft_detail['imageURLs'];                
+                $product_arr['isImageDynamic'] = stripos($draft_detail['imageURLs'], ';') !== false ? 'true' : 'false'; //商品主图类型 --多图用动态，单图静态
             }
             /*************产品主图组装结束*************/
 
-
             /*************产品SKU属性组装开始***********/
             $aeopAeProductSKUs = array(); //需要组装下SKU信息
-
             foreach ($draft_skus as $sku) {
                 $temp_property = array();
                 if ($sku['aeopSKUProperty']) {
                     $temp = unserialize($sku['aeopSKUProperty']);
                     if ($replace_flag && $temp) { //图片等自定义信息存在，同时需要替换
-
                         foreach ($temp as $j => $t) {
                             if (array_key_exists('skuImage', $t) && $t['skuImage']) {
                                 //上传图片处理 --还是上传到临时图片
                                 $pic = $this->replaceTempPics($t['skuImage'], $firstSku . '-cust'.$j, $id);
-
                                 $t['skuImage'] = $pic;
-
                             }
                             $temp_property[$j] = $t;
                         }
@@ -915,84 +850,64 @@ class SmtController extends Controller{
             }
 
             $product_arr['aeopAeProductSKUs'] = json_encode($aeopAeProductSKUs);
-            $product['aeopAeProductSKUs']     = $aeopAeProductSKUs; //直接就用数组
+            $product['aeopAeProductSKUs']     = $aeopAeProductSKUs; 
 
             if (count($aeopAeProductSKUs) == 1) { //只有一个是要传一口价的
                 $product_arr['productPrice'] = $aeopAeProductSKUs[0]['skuPrice'];
             }
             unset($aeopAeProductSKUs);
             /*************产品SKU属性组装结束***********/
-
-            
-            //分类ID
+               
             $product_arr['categoryId'] = $draft_info->categoryId;
-
             $product_arr['deliveryTime'] = $draft_info->deliveryTime;   //备货期
-
-
             if ($draft_detail->promiseTemplateId) {
                 $product_arr['promiseTemplateId'] = $draft_detail->promiseTemplateId; //服务模板ID
-            }
-
-            //标题
-            $product_arr['subject'] = $draft_info->subject;
-
-            //关键词 --过滤下';'和','
-            $product_arr['keyword'] = $smtApi->filterForSmtProduct($draft_detail->keyword);
-
-            //更多关键词
-            $productMoreKeywords1 = $smtApi->filterForSmtProduct($draft_detail->productMoreKeywords1);
+            }            
+            $product_arr['subject'] = $draft_info->subject;            
+            /*$product_arr['keyword'] = $smtApi->filterForSmtProduct($draft_detail->keyword); //关键词 --过滤下';'和','           
+            $productMoreKeywords1 = $smtApi->filterForSmtProduct($draft_detail->productMoreKeywords1);   //更多关键词
             if ($productMoreKeywords1) {
                 $product_arr['productMoreKeywords1'] = $productMoreKeywords1;
             }
             $productMoreKeywords2 = $smtApi->filterForSmtProduct($draft_detail->productMoreKeywords2);
             if ($productMoreKeywords2) {
                 $product_arr['productMoreKeywords2'] = $productMoreKeywords2;
-            }
+            }*/
 
             if ($draft_info->groupId) {              
-                $product_arr['groupId'] = $draft_info->groupId;   //产品组ID
+                $product_arr['groupId'] = $draft_info->groupId;                    //产品组ID
             }
             $product_arr['freightTemplateId'] = $draft_detail->freightTemplateId;  //运费模板ID            
-            $product_arr['isImageWatermark'] = 'false'; //是否添加水印            
-            $product_arr['productUnit'] = $draft_detail->productUnit; //单位         
+            $product_arr['isImageWatermark'] = 'false';                            //是否添加水印            
+            $product_arr['productUnit'] = $draft_detail->productUnit;              //单位         
             if ($draft_detail->packageType) {                
-                $lotNum                = $draft_detail->lotNum; //每包件数
+                $lotNum                = $draft_detail->lotNum;                    //每包件数
                 $product_arr['lotNum'] = intval($lotNum) > 1 ? intval($lotNum) : 2;   
             }
-            $product_arr['packageType'] = $draft_detail->packageType ? 'true' : 'false';     //是否打包
+            $product_arr['packageType'] = $draft_detail->packageType ? 'true' : 'false'; //是否打包
 
             //包装长宽高
             $product_arr['packageLength'] = (int)$draft_info->packageLength;
             $product_arr['packageWidth']  = (int)$draft_info->packageWidth;
             $product_arr['packageHeight'] = (int)$draft_info->packageHeight;            
-            $product_arr['grossWeight'] = $draft_info->grossWeight;   //商品毛重
-
-            //是否自定义记重 -- 自定义记重暂时未作
-            $isPackSell = $draft_detail->isPackSell;
+            $product_arr['grossWeight'] = $draft_info->grossWeight;                //商品毛重           
+            $isPackSell = $draft_detail->isPackSell;                               //是否自定义记重 -- 自定义记重暂时未作
             $isPackSell = $isPackSell == '1' ? 'true' : 'false';
             $baseUnit   = '';
             $addUnit    = '';
             $addWeight  = '';
-            $product_arr['isPackSell'] = false; // api变动 暂时都设置成false
-            
-            $product_arr['wsValidNum'] = $draft_info->wsValidNum;   //有效期
-
-            if ($isAdd) {
-                //商品来源 --固定死
-                $api                = 'api.postAeProduct';
-                $product_arr['src'] = 'isv';
-            } else {
-                //调用edit的方法
+            $product_arr['isPackSell'] = false;                                    // api变动 暂时都设置成false            
+            $product_arr['wsValidNum'] = $draft_info->wsValidNum;                  //有效期
+            if ($isAdd) {                
+                $api                = 'api.postAeProduct';  
+                $product_arr['src'] = 'isv';                                       //商品来源 --固定死
+            } else {                
                 $api                      = 'api.editAeProduct';
                 $product_arr['productId'] = $id;
-
-                if ($draft_detail->src) { //修改的
-                    //修改用原样的
-                    $product_arr['src'] = $draft_detail->src;
+                if ($draft_detail->src) {                    
+                    $product_arr['src'] = $draft_detail->src;                      //修改用原样的
                 }
             }
-
 
             /*******************产品属性封装开始***************************/
             $aeopAeProductPropertys                = unserialize($draft_detail['aeopAeProductPropertys']);
@@ -1000,46 +915,37 @@ class SmtController extends Controller{
             unset($aeopAeProductPropertys);
             /***********************产品属性封装结束**********************/
 
-            if ($draft_detail->bulkOrder && $draft_detail->bulkDiscount) {
-                //最小批发数量
-                $product_arr['bulkOrder'] = (int)$draft_detail->bulkOrder;
-                //批发折扣
-                $product_arr['bulkDiscount'] = (int)$draft_detail->bulkDiscount;
-            }
-
-            //尺码表模板ID
+            if ($draft_detail->bulkOrder && $draft_detail->bulkDiscount) {                
+                $product_arr['bulkOrder'] = (int)$draft_detail->bulkOrder;          //最小批发数量                
+                $product_arr['bulkDiscount'] = (int)$draft_detail->bulkDiscount;    //批发折扣
+            }            
             if (!empty($draft_detail->sizechartId) && $draft_detail->sizechartId > 0) {
-                $product_arr['sizechartId'] = $draft_detail->sizechartId;
-            }
-            //发布或者修改
-            $result = $smtApi->getJsonDataUsePostMethod($api, $product_arr);
-            $data   = json_decode($result, true);   
-            //$data = array('success'=>true,'productId'=>123);
-            //不管成功还是失败，都把数据保存下来
+                $product_arr['sizechartId'] = $draft_detail->sizechartId;           //尺码表模板ID
+            }           
+            $result = $smtApi->getJsonDataUsePostMethod($api, $product_arr);        //发布或者修改
+            $data   = json_decode($result, true);          
+           
             $product_arr['productId'] = $draft_info->productId;
             $product['productId']     = $draft_info->productId;
-            $return                   = $this->hanleProductData($product);
-            if (!$return['status']) {
-                //写错误日志
-            }
+            $return                   = $this->hanleProductData($product);          //不管成功还是失败，都把数据保存下来
+            if (!$return['status']) {   //写错误日志 
+            }              
             unset($draft_info);
             unset($draft_detail);
-            if (array_key_exists('success', $data) && $data['success']) { //操作成功了
+            if (array_key_exists('success', $data) && $data['success']) {
                 if ($isAdd) { //是新刊登的产品            
-                    $realProductId = $data['productId'];               
-
-                    $newListData['productId'] = $realProductId;
+                    $realProductId = $data['productId'];                           //速卖通平台返回的产品ID        
+                    $newListData['productId']         = $realProductId;
                     $newListData['productStatusType'] = 'onSelling';
                     $newListData['old_token_id']      = 0;
                     $newListData['old_productId']     = '';
                     $newListData['product_url']       = 'http://www.aliexpress.com/item/-/'.$realProductId.'.html';
-                    //$newListData['ownerMemberId']     = $smtApi->_aliexpress_member_id;
-                    
-                    //更新详情表的产品ID
+                    //$newListData['ownerMemberId']     = $smtApi->_aliexpress_member_id;                    
+
                     DB::beginTransaction();
                     $newData['productId'] = $realProductId;
                     $this->smtProductDetailModel->where('productId',$id)->update($newData);
-             
+                    
                     $plat_info = $smtApi->getDefinedPlatInfo(); //SMT平台信息                  
 
                     //SMT销售前缀列表
@@ -1054,12 +960,11 @@ class SmtController extends Controller{
                     $draft_skus = $draft_skus->toArray();
                     $productId = $id;
                     foreach ($draft_skus as $sku) {
-                        $skus = $smtApi->buildSysSku($sku['smtSkuCode']); //还是会带{YY}
-                        
-                        foreach ($skus as $skuCode) { //发布成功了，更新现有的数据
+                        $skus = $smtApi->buildSysSku($sku['smtSkuCode']); //还是会带{YY}                        
+                        foreach ($skus as $skuCode) {                     //发布成功了，更新现有的数据
                             $newData['skuMark'] = $realProductId . ':' . $skuCode;
                             $oldMark            = $productId . ':' . $skuCode;                             
-                            $id = $this->smtProductSkuModel->where(['productId'=>$productId,'overSeaValId'=>$sku['overSeaValId'],'skuMark'=>$oldMark])->update($newData);
+                            $this->smtProductSkuModel->where(['productId'=>$productId,'overSeaValId'=>$sku['overSeaValId'],'skuMark'=>$oldMark])->update($newData);
                             $common = new common_helper();
                             $prefix = $common->get_skucode_prefix($sku['smtSkuCode']); //产品的前缀
                             if ($prefix) {
@@ -1073,19 +978,17 @@ class SmtController extends Controller{
                                 'publishTime'    => date('Y-m-d H:i:s'),
                                 'platTypeID'     => $plat_info['platTypeID'],
                                 'publishPlat'    => $plat_info['platID'],
-                                'sellerAccount'  => $account->account, //账号，通过tokenid来吧
+                                'sellerAccount'  => $account->account,  //账号，通过tokenid来吧
                                 'itemNumber'     => $realProductId,
                                 'publishViewUrl' => 'http://www.aliexpress.com/item/-/' . $realProductId . '.html' //链接，处理下吧
                             );
                          
                             SkuPublishRecords::create($publishRecord);
                             /****插入一条记录到刊登记录内结束****/
-                        }
-        
+                        }        
                         //更新列表页的产品信息
                         $newListData['user_id'] = $user_id; //用老账号的用户id --不要通过session处理，怕以后会跑计划任务
-                        $this->model->where('productId',$productId)->update($newListData);
-                       
+                        $this->model->where('productId',$productId)->update($newListData);                       
                     }
                     DB::commit();
                     unset($newListData);
@@ -1100,8 +1003,7 @@ class SmtController extends Controller{
                 }
             } else {
                 unset($product_arr);
-                unset($draft_skus);
-                
+                unset($draft_skus);                
                 if ($auto){
                     return array('info' => '产品:' . $id . ($isAdd ? '发布' : '修改') . '失败,'.(isset($data['error_code']) ? $data['error_code'] : '').$data['error_message'], 'status' => false);
                 }else {

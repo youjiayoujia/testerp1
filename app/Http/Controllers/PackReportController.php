@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PackReportModel;
 use App\Models\PickListModel;
+use Excel;
 
 class PackReportController extends Controller
 {
@@ -91,6 +92,32 @@ class PackReportController extends Controller
         }
         
         return redirect($this->mainIndex);
+    }
+
+    public function download()
+    {
+        $date = date('Y-m', time());
+        if(!empty(request('date'))){
+            $date = request('date');
+        }
+        $model = $this->model->whereBetween('day_time', [date('Y-m-d', strtotime($date)), date('Y-m-d', strtotime($date) + strtotime('1 month') - strtotime('now'))])->get()->groupBy('user_id');
+        $i = 0;
+        $rows = [];
+        foreach($model as $userId => $block) {
+            $single = $block->first();
+            $rows[$i] = [
+                '包装人' => $single->user->name,
+                '仓库' => $single->warehouse ? $single->warehouse->name : '无所属仓库',
+                '本月包装sku数(分单单，单多，多多)' => (($block->sum('single') + $block->sum('singleMulti') + $block->sum('multi')).'(单单:'.$block->sum('single').',单多:'.$block->sum('singleMulti').',多多:'.$block->sum('multi').')'),
+            ];
+            $i++;
+        }
+        $name = '包装排行榜';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
     }
 
     public function changeData()

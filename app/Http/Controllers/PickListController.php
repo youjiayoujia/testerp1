@@ -46,6 +46,12 @@ class PickListController extends Controller
         $warehouseId = $user->warehouse_id;
         if(request()->has('checkid')) {
             $model = $this->model->where('pick_by', request('checkid'))->where('warehouse_id', $warehouseId)->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))]);
+            if(request()->has('twenty')) {
+                $model = $this->model->where('pick_by', request('checkid'))->where('created_at', '<', date('Y-m-d', strtotime('-1 day')));
+            }
+            if(request()->has('flag')) {
+                $model = $this->model->where('pick_by', request('checkid'))->whereBetween('created_at', [date('Y-m-d', strtotime('now')),date('Y-m-d', strtotime('1 day'))])->whereNotIn('status', ['PACKAGED']);
+            }
         }
         $today_print = $this->model->whereBetween('print_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
         $allocate = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])
@@ -649,7 +655,8 @@ class PickListController extends Controller
         if(!request()->has('mixed') && request()->has('logistics')) {
             foreach(request()->input('logistics') as $logistic_id) {
                 foreach(request('package') as $key => $type) {
-                    $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])->where(function($query){
+                    $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
+                    ->where(function($query){
                         if(request()->has('channel')) {
                             $query =$query->whereIn('channel_id', request('channel'));
                         }
@@ -665,8 +672,8 @@ class PickListController extends Controller
             }
         } elseif(request()->has('mixed') && request()->has('logistics')) {
             foreach(request('package') as $key => $type) {
-               $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])->
-                where(function($query){
+               $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
+               ->where(function($query){
                     if(request()->has('logistics')) {
                         $query = $query->whereIn('logistics_id', request('logistics'));
                     }

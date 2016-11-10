@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 
 header('Content-type: text/html; charset=UTF-8');
 
+use Session;
 use App\Models\ChannelModel;
 use App\Models\Message\MessageModel;
 use Test;
@@ -65,6 +66,8 @@ use Illuminate\Support\Facades\Storage;
 use BarcodeGen;
 
 use App\Models\ProductModel;
+use Cache;
+
 
 class TestController extends Controller
 {
@@ -79,9 +82,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(530);
-        var_dump($package->logistics_zone->toarray());
-        exit;
+        $item = ItemModel::find(23767);
+        var_dump($item->getStockQuantity(4,1));
     }
 
     // public function test2()
@@ -663,6 +665,156 @@ class TestController extends Controller
     public function jdtestCrm()
     {
 
+        $ali = new Alibaba(); //初始化阿里账号
+        $ali_accounts = AlibabaSupliersAccountModel::all();
+
+        $purchase_orders =  PurchaseOrderModel::whereIn('status',[1,2,3])->whereNotNull('post_coding')->get();
+        foreach ($purchase_orders as $purchase_order){
+
+            if(!empty($purchase_order->post_coding)){
+
+                foreach ($ali_accounts as $account){
+
+                    if(empty($account->access_token)){
+                        continue;
+                    }
+                    if($account->resource_owner != 'slme18'){
+                        continue;
+                    }
+                    //根据采购人 获取对应的阿里账号
+                    $curl_params['access_token']  =$account->access_token;
+                    //$curl_params['buyerMemberId'] =$account->memberId;
+                    $curl_params['id']    = $purchase_order->post_coding;
+
+                    //$param['buyerMemberId'] = $curl_params['buyerMemberId'];
+                    $param['access_token']  = $curl_params['access_token'];
+                    $param['id']    = $curl_params['id'];
+
+                    $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
+                    $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
+
+                    $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
+
+                    if(!empty($order_detail['orderModel']['logisticsOrderList'])){
+                        foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
+                            if(!empty($item_logistics['logisticsBillNo'])) {
+
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+
+
+
+        dd(22);
+
+        $orderids = '';
+        $orderids_ary = [];
+        $count = 0;
+
+        /**
+         * 获取所有缺失物流单号的采购单中的单号
+         *
+         */
+        $purchasePostages = PurchasePostageModel::where('post_coding',Null)->get();
+        if(!$purchasePostages->isEmpty()){
+            foreach ($purchasePostages as $purchasePostage){
+                if(!empty($purchasePostage->purchaseOrder->post_coding)){ //外部单号不为空
+                    $orderids_ary[$purchasePostage->purchaseOrder->post_coding] = $purchasePostage->purchaseOrder->post_coding;
+                }
+            }
+        }
+
+        //dd($orderids_ary);
+
+        $ali_accounts = AlibabaSupliersAccountModel::all();
+        foreach($orderids_ary as $ali_order_id){
+            foreach ($ali_accounts as $account){
+                if(empty($account->access_token)){
+                    continue;
+                }
+                if($account->resource_owner != 'slme18'){
+                    continue;
+                }
+                //根据采购人 获取对应的阿里账号
+                $curl_params['access_token']  =$account->access_token;
+                //$curl_params['buyerMemberId'] =$account->memberId;
+                $curl_params['id']    = $ali_order_id;
+
+                //$param['buyerMemberId'] = $curl_params['buyerMemberId'];
+                $param['access_token']  = $curl_params['access_token'];
+                $param['id']    = $curl_params['id'];
+
+                $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
+                $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
+
+                $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
+
+                if(!empty($order_detail['orderModel']['logisticsOrderList'])){
+                    foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
+                        if(!empty($item_logistics['logisticsBillNo'])) {
+
+                        }
+
+                    }
+
+                }
+
+
+
+
+                //dd($orderList);
+
+
+
+
+
+
+
+                if(isset($orderList['orderListResult']['modelList'])){
+                    if(count($orderList['orderListResult']['modelList']) != 0){
+                        foreach ($orderList['orderListResult']['modelList'] as $modellist){
+                            if(!empty($modellist['logisticsOrderList']) && is_array($modellist['logisticsOrderList'])){ //如果存在物流列表
+                                foreach ($modellist['logisticsOrderList'] as $logistic){
+                                    if(!empty($logistic['logisticsBillNo'])){
+
+                                        dd($logistic['logisticsOrderNo']);
+
+
+                                        /*                                    $postage = PurchasePostageModel::where('post_coding','=',$logistic['logisticsOrderNo'])->first();
+                                                                            if(empty($postage)){
+                                                                                $new_postage = new PurchasePostageModel;
+                                                                                $new_postage->purchase_order_id = $modellist['id'];
+                                                                                $new_postage->post_coding       = $logistic['logisticsOrderNo'];
+                                                                                $new_postage->user_id           = $user_id;
+                                                                                $new_postage->save();
+                                                                                $this->info('#Order:'.$modellist['id'].' add logisticsOrderNo :'. $logistic['logisticsOrderNo'].' insert success');
+                                                                            }*/
+
+
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+
+
+
+
+
+                }
+            }
+        }
+
 
         /*        $message_obj = MessageModel::find(36336);
                 //$tt = $message_obj->ChannelMessageFields();
@@ -694,7 +846,7 @@ class TestController extends Controller
          *
          */
         foreach (AccountModel::all() as $account) {
-            if ($account->account == 'hkdajin@126.com') { //测试diver
+            if ($account->account == 'darli04@126.com') { //测试diver
 
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);

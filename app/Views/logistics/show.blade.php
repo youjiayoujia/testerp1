@@ -43,6 +43,9 @@
                 <strong>物流编码</strong>: {{ $model->logistics_code }}
             </div>
             <div class="col-lg-4">
+                <strong>平邮or快递</strong>: {{ $model->is_express == '1' ? '快递' : '平邮' }}
+            </div>
+            <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
             <div class="col-lg-4">

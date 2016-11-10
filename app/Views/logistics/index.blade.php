@@ -13,6 +13,7 @@
     {{--<th class="sort" data-field="pool_quantity">号码池数量(未用/已用/总数)</th>--}}
     <th>物流限制</th>
     <th>物流编码</th>
+    <th>平邮or快递</th>
     <th>是否启用</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -34,6 +35,7 @@
             {{--<td>{{ $logistics->pool_quantity }}</td>--}}
             <td>{{ $logistics->limit($logistics->limit) }}</td>
             <td>{{ $logistics->logistics_code }}</td>
+            <td>{{ $logistics->is_express == '1' ? '快递' : '平邮' }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
             <td>{{ $logistics->created_at }}</td>
             <td>{{ $logistics->updated_at }}</td>

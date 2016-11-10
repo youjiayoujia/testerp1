@@ -346,6 +346,7 @@ class OrderController extends Controller
                 $this->model->find($id)->update(['status' => 'ERROR']);
             } else {
                 $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['item_status'] = productItem::where('sku', $item['sku'])->first()->status;
             }
             $orderItems = $this->model->find($id)->items;
             if (count($data['items']) == count($orderItems)) {
@@ -360,6 +361,7 @@ class OrderController extends Controller
                 }
                 foreach ($data['items'] as $value) {
                     $value['item_id'] = productItem::where('sku', $value['sku'])->first()->id;
+                    $value['item_status'] = productItem::where('sku', $value['sku'])->first()->status;
                     $this->model->find($id)->items()->create($value);
                 }
             }

@@ -114,6 +114,21 @@ class PurchaseOrderController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $yiwu = 0;
+        $brr = array('2','4','5','6');
+        foreach($model->purchaseItem as $p_item){
+            foreach($p_item->productItem->product->logisticsLimit->toArray() as $key=>$arr){
+                if(in_array($arr['pivot']['logistics_limits_id'], $brr)){
+                    $yiwu = 1;break;
+                }
+            }
+        }
+        if($yiwu){
+            $notIn = array('2','4');
+            $warehouse = WarehouseModel::whereNotIn('id',$notIn)->get();
+        }else{
+            $warehouse = WarehouseModel::all();
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -121,8 +136,9 @@ class PurchaseOrderController extends Controller
             'purchasePostage'=>PurchasePostageModel::where('purchase_order_id',$id)->get(),
             'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
             'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
-            'warehouses' =>WarehouseModel::all(),
-            'hideUrl' => $hideUrl
+            'warehouses' =>$warehouse,
+            'hideUrl' => $hideUrl,
+            'yiwu' => $yiwu,
         ];
         return view($this->viewPath . 'edit', $response);   
     }
@@ -245,7 +261,7 @@ class PurchaseOrderController extends Controller
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
-        return redirect($url);
+        return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'编辑成功.'));
     }
     
     /**
@@ -293,6 +309,7 @@ class PurchaseOrderController extends Controller
     
     public function changeExamineStatus($id,$examineStatus)
     {
+        $url = $_SERVER['HTTP_REFERER'];
         $model=$this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -304,7 +321,7 @@ class PurchaseOrderController extends Controller
         $model->update($data);
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单审核,id='.$model->id, $to, $from);
-        return redirect( route('purchaseOrder.edit', $id));
+        return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'审核通过.'));
     }
     /**
      * 导出3天未到货采购单

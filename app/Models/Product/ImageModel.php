@@ -41,6 +41,17 @@ class ImageModel extends BaseModel
         'update' => [],
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => ['spu_id'],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
+
     public function getSrcAttribute()
     {
         return $this->path . $this->name;

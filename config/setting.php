@@ -118,7 +118,7 @@ return [
         'shipping_firstname' => '名',
         'shipping_lastname' => '姓',
         'profit_rate' => '利润率',
-        'items.item.status' => 'SKU状态',
+        'items.item_status' => 'SKU状态',
         'outer_type' => '出库/入库', 
         'inner_type' => '出入库类型',
         'warehouse_id' => '仓库',

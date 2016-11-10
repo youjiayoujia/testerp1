@@ -112,7 +112,7 @@ class EubofflineAdapter extends BasicAdapter
             //$weight = $item->quantity * $item->item->product->weight;
             $weight = $item->item->weight;
             $weight = number_format($weight, 3, '.', '');//保留三位小数   
-            $delcarevalue = $item->item->declared_value * $item->quantity;
+            $delcarevalue = $item->first()->item->declared_value;
             $delcarevalue = number_format($delcarevalue, 2, '.', '');//保留两位小数           
         }
         $items .= '<item>

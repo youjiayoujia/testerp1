@@ -310,9 +310,11 @@ class ItemModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'],'warehouse' => ['name'] ],
+            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'] ],
             'filterFields' => [],
-            'filterSelects' => ['status' => config('item.status'),],
+            'filterSelects' => ['status' => config('item.status'),
+                                'warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+            ],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];

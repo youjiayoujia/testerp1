@@ -123,6 +123,12 @@ class PurchaseOrderController extends Controller
                 }
             }
         }
+        if($yiwu){
+            $notIn = array('2','4');
+            $warehouse = WarehouseModel::whereNotIn('id',$notIn)->get();
+        }else{
+            $warehouse = WarehouseModel::all();
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -130,7 +136,7 @@ class PurchaseOrderController extends Controller
             'purchasePostage'=>PurchasePostageModel::where('purchase_order_id',$id)->get(),
             'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
             'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
-            'warehouses' =>WarehouseModel::all(),
+            'warehouses' =>$warehouse,
             'hideUrl' => $hideUrl,
             'yiwu' => $yiwu,
         ];

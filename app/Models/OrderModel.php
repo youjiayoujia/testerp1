@@ -254,6 +254,8 @@ class OrderModel extends BaseModel
                 'channel_ordernum',
                 'email',
                 'by_id',
+                'shipping_firstname',
+                'shipping_lastname',
                 'currency',
                 'profit_rate'
             ],

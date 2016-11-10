@@ -3,6 +3,7 @@
 namespace App\Models\Product;
 
 use App\Base\BaseModel;
+use App\Models\CatalogModel;
 
 class RequireModel extends BaseModel
 {
@@ -28,6 +29,27 @@ class RequireModel extends BaseModel
                 //'needer_shop_id' => 'required',
         ]
     ];
+
+    public function getMixedSearchAttribute()
+    {
+        $catalogs = CatalogModel::all();
+        $arr = [];
+        foreach($catalogs as $key => $single) {
+            $arr[$single->id] = $single->c_name;
+        }
+        return [
+            'relatedSearchFields' => [
+            ],
+            'filterFields' => ['name'],
+            'filterSelects' => [
+                'status' => ['0' => '新需求', '1' => '未找到', '2' => '已找到', '3' => '已创建']
+            ],
+            'selectRelatedSearchs' => [
+                'catalog' => ['id' => $arr]
+            ],
+            'sectionSelect' => [],
+        ];
+    }
 
     //查询
     public $searchFields = ['name'=>'名称'];

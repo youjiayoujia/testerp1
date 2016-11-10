@@ -30,19 +30,25 @@
             拣货单产量转移
         </button>
     </div>
+    <div class='form-group col-lg-1'>
+        <button class="btn btn-primary btn-lg download">
+            数据下载
+        </button>
+    </div>
 </div>
 <div class="panel panel-default">
-    <div class="panel-heading">拣货排行榜</div>
+    <div class="panel-heading">拣货排行榜<a href="{{ route('pickReport.createData')}}">生成数据</a></div>
     <div class="panel-body">
         <table class="table table-bordered">
             <thead>
             <tr>
                 <td>拣货人员</td>
                 <td>拣货组</td>
+                <td>今日已分配未完成:已分配(拣货单)</td>
+                <td>超过24小时未完成拣货单</td>
                 <td>本月总拣货完成数(各类型sku数)</td>
                 <td>漏检sku数</td>
                 <td>今日sku拣货数</td>
-                <td>今日分配拣货单</td>
             </tr>
             </thead>
             <tbody>
@@ -51,6 +57,11 @@
                 <tr>
                     <td>{{$block->first()->user ? $block->first()->user->name : ''}}</td>
                     <td>{{$block->first()->warehouse ? $block->first()->warehouse->name : ''}}</td>
+                    <td>
+                        <a href="javascript:" data-userid="{{$userId}}" class='pick_undone'>{{$block->sum('today_picklist_undone')}}</a>:
+                        <a href="javascript:" data-userid="{{$userId}}" class='pick'>{{$block->sum('today_picklist')}}</a>
+                    </td>
+                    <td><a href="javascript:" data-userid="{{$userId}}" class='twenty'>{{$block->sum('more_than_twenty_four')}}</a></td>
                     <td>{{count($monthModel) ? ($monthModel->get($userId)->sum('single') + $monthModel->get($userId)->sum('singleMulti') + $monthModel->get($userId)->sum('multi')) : ''}}
                     (单单:{{ count($monthModel) ? $monthModel->get($userId)->sum('single') : ''}},
                      单多:{{ count($monthModel) ? $monthModel->get($userId)->sum('singleMulti') : ''}},
@@ -62,9 +73,7 @@
                                                 round($monthModel->get($userId)->sum('missing_pick')/($monthModel->get($userId)->sum('single') + $monthModel->get($userId)->sum('singleMulti') + $monthModel->get($userId)->sum('multi'))*100,2) : 0))
                         : ''}}%)
                     </td>
-
                     <td>{{$block->sum('today_pick')}}</td>
-                    <td><a href="javascript:" data-userid="{{$userId}}" class='pick'>{{$block->sum('today_picklist')}}</a></td>
                 </tr>
                 @endforeach
             @endif
@@ -161,6 +170,16 @@ $(document).ready(function(){
         location.href="{{ route('pickList.index')}}/?checkid=" + id;
     });
 
+    $(document).on('click', '.pick_undone', function(){
+        id = $(this).data('userid');
+        location.href="{{ route('pickList.index')}}/?flag=undone&checkid=" + id;
+    });
+
+    $(document).on('click', '.twenty', function(){
+        id = $(this).data('userid');
+        location.href="{{ route('pickList.index')}}/?twenty=undone&checkid=" + id;
+    });
+
     $('#expected_date').cxCalendar();
 
     $(document).on('click', '.search', function(){
@@ -168,5 +187,11 @@ $(document).ready(function(){
         warehouseid = $('.warehouse_id').val();
         location.href="{{ route('pickReport.index')}}/?date=" + date + "&warehouseid=" + warehouseid;
     });
+
+    $(document).on('click', '.download', function(){
+        date = $('#expected_date').val();
+        warehouseid = $('.warehouse_id').val();
+        location.href="{{ route('pickReport.download')}}/?date=" + date + "&warehouseid=" + warehouseid;
+    })
 })
 </script>

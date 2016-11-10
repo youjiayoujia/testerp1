@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Models\PickReportModel;
 use App\Models\PickListModel;
 use App\Models\WarehouseModel;
+use Excel;
 
 class PickReportController extends Controller
 {
@@ -65,11 +66,48 @@ class PickReportController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    //目前生成数据没有仓库，有仓库后将会变正常
+    public function download()
+    {
+        $warehouseId = '3';
+        $date = date('Y-m', time());
+        if(!empty(request('date'))){
+            $date = request('date');
+        }
+        if(!empty(request('warehouseid'))) {
+            $warehouseId = request('warehouseid');
+        }
+        $model = $this->model->where('warehouse_id', $warehouseId)->whereBetween('day_time', [date('Y-m-d', strtotime($date)), date('Y-m-d', strtotime($date) + strtotime('1 month') - strtotime('now'))])->get()->groupBy('user_id');
+        $i = 0;
+        $rows = [];
+        foreach($model as $userId => $block) {
+            $single = $block->first();
+            $rows[$i] = [
+                '拣货人' => $single->user->name,
+                '仓库' => $single->warehouse ? $single->warehouse->name : '无所属仓库',
+                '本月拣货sku数(分单单，单多，多多)' => (($block->sum('single') + $block->sum('singleMulti') + $block->sum('multi')).'(单单:'.$block->sum('single').',单多:'.$block->sum('singleMulti').',多多:'.$block->sum('multi').')'),
+                '本月漏检SKU数' => $block->sum('missing_pick'),
+                '漏检率' => ($block->sum('single') + $block->sum('singleMulti') + $block->sum('multi')) ? round($block->sum('missing_pick')/($block->sum('single') + $block->sum('singleMulti') + $block->sum('multi'))*100, 2).'%' : ''
+            ];
+            $i++;
+        }
+        $name = '拣货排行榜';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     public function createData()
     {
         $model = PickListModel::wherebetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->get()->groupBy('pick_by');
+        $errors = PickListModel::all()->filter(function($single){
+            return $single->status != 'PACKAGED' && strtotime('-1 day') > strtotime($single->created_at);
+        })->groupBy('pick_by');
         foreach($model as $userId => $block) {
-            $this->model->create([
+            if(!empty($userId)) {
+                $this->model->create([
                     'user_id' => $userId,
                     'single' => $block->filter(function($single){
                         return $single->type == 'SINGLE';
@@ -93,7 +131,12 @@ class PickReportController extends Controller
                                strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')));
                     })->count(),
                     'day_time' => date('Y-m-d H:i:s', time()),
+                    'today_picklist_undone' => $block->filter(function($single){
+                        return in_array($single->status, ['PICKING', 'INBOXED', 'PACKAGEING']);
+                    })->count(),
+                    'more_than_twenty_four' => isset($errors[$userId]) ? $errors->get($userId)->count() : 0,
                 ]);
+            }
         }
         
         return redirect($this->mainIndex);

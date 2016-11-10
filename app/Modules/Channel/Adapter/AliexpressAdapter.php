@@ -614,20 +614,12 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_fields_ary = false; //aliexress 平台特殊参数
                         if($Sources == 'order_msg'){
                             $message_list[$j]['label'] = '订单留言';
+                            $message_list[$j]['channel_order_number'] =$item['channelId'];
                         }else{
                             $message_list[$j]['label'] = '站内信';
+                            $message_list[$j]['channel_order_number'] ='';
                         }
-/*                        $detailArray = json_decode($detailArrJson,true);
-                        if(!empty($detailArray['result'])){
-                            foreach ($detailArray['result'] as $item_detail){
-                                if($item_detail['messageType'] == 'product'){
-                                    $message_fields_ary['product_img_url']      = isset($item_detail->summary->productImageUrl) ? $item_detail->summary->productImageUrl : '';
-                                    $message_fields_ary['product_product_url']  = isset($item_detail->summary->productDetailUrl) ? $item_detail->summary->productDetailUrl : '';
-                                    $message_fields_ary['product_product_name'] = isset($item_detail->summary->productName) ? $item_detail->summary->productName : '';
-                                    break;
-                                }
-                            }
-                        }*/
+
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
 
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));

@@ -665,6 +665,20 @@ class TestController extends Controller
     public function jdtestCrm()
     {
 
+        foreach (AccountModel::all() as $account) {
+            if ($account->account == 'darli04@126.com') { //测试diver
+
+                //dd($account);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getMessages();
+                print_r($messageList);
+                exit;
+
+            }
+        }
+
+        dd('end');
+
         $ali = new Alibaba(); //初始化阿里账号
         $ali_accounts = AlibabaSupliersAccountModel::all();
 
@@ -708,11 +722,6 @@ class TestController extends Controller
             }
 
         }
-
-
-
-
-        dd(22);
 
         $orderids = '';
         $orderids_ary = [];

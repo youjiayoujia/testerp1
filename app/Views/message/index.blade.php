@@ -79,6 +79,7 @@
     <th>渠道</th>
     <th>账号</th>
     <th>主题</th>
+    <th>平台订单号</th>
     <th>状态</th>
     <th class="sort" data-field="from_name">用户昵称</th>
     <th class="sort" data-field="from">用户ID</th>
@@ -98,6 +99,9 @@
             <td>{{ $message->account->account }}</td>
             <td>
                {{ str_limit($message->subject,30) }}
+            </td>
+            <td>
+                {{$message->channel_order_number}}
             </td>
             <td>{{ $message->status_text }}</td>
             <td>{{ $message->from_name }}</td>

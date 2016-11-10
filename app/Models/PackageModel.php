@@ -1649,7 +1649,7 @@ class PackageModel extends BaseModel
 
     public function getStatusTextAttribute()
     {
-        return config('package . ' . $this->status);
+        return !empty(config('package' )[$this->status]) ? config('package' )[$this->status] : '';
     }
 
     public function shipping()

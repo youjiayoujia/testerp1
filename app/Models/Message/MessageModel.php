@@ -32,7 +32,7 @@ class MessageModel extends BaseModel{
         'label',
     ];
 
-    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱' ,'label' => '消息类型'];
+    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱' ,'label' => '消息类型' , 'channel_order_number' => '平台订单号'];
 
     public $rules = [];
 
@@ -496,16 +496,7 @@ class MessageModel extends BaseModel{
         $channel = $this->getChannelDiver();
         switch ($channel){
             case 'aliexpress':
-                $content = $this->ContentDecodeBase64;
-/*                foreach ($content['aliexpress']->result as $message){
-                    $type = $message->messageType;
-                    break;
-                }
-                $files = $this->MessageFieldsDecodeBase64;
-                $html .= '<p>Message type:'.$this->label.'</p>';
-                $html .= '<p>Detail type:'.$type.'</p>';
-                $html .= '<p>Order id:'.$files['order_id'].'</p>';
-                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';*/
+                $html .= '<span class="label label-warning">'.$this->label.'</span>';
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;

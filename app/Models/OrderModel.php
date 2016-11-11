@@ -750,7 +750,7 @@ class OrderModel extends BaseModel
     {
         $orderItems = $this->items;
         $this->update(['status' => 'REVIEW']);
-        $this->remarks->create(['remark' => 'profit is less than 0', 'user_id' => request()->user()->id]);
+        $this->remarks()->create(['remark' => 'profit is less than 0', 'user_id' => request()->user()->id]);
         foreach ($orderItems as $orderItem) {
             $orderItem->update(['is_active' => '0']);
         }

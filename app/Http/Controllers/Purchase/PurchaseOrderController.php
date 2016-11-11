@@ -825,6 +825,72 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+    * 新品待入库界面入库
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function newProductupdateArriveLog(){
+        $global = 1;
+        $data = request()->all();
+        $arrivel_log = PurchaseItemArrivalLogModel::where('purchase_item_id',$data['purchase_item_id'])->get()->first();
+        $purchase_item = $arrivel_log->purchaseItem;
+
+        $warehousePosition = StockModel::where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->where('item_id',$purchase_item->item_id)->get()->first();
+                
+        if(!$warehousePosition){ 
+            $purchase_item->update(['status'=>'6']);
+            $global = 0;
+        }else{
+            $filed['good_num'] = $data['num'];
+            $filed['quality_time'] = date('Y-m-d H:i:s',time());
+            
+            $arrivel_log->update($filed);
+            //purchaseitem
+            $datas['status'] = 3;
+            $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+            //$datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
+            if($datas['storage_qty']>=$purchase_item->purchase_num){
+                $datas['status'] = 4;
+            }
+            
+            $purchase_item->update($datas);
+            $purchase_item->item->in($warehousePosition->warehouse_position_id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
+            
+        }
+        //need包裹分配库存
+        $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
+        if(count($packageItem)>0){
+            foreach ($packageItem as $_packageItem) {
+                if($_packageItem->package->status=='NEED'){
+                    $job = new AssignStocks($_packageItem->package);
+                    $job = $job->onQueue('assignStocks');
+                    $this->dispatch($job);
+                }  
+            }
+        } 
+
+        if($global){
+            $p_status = 4;
+            $purchasrOrder = $this->model->find($data['purchase_order_id']);
+            foreach($purchasrOrder->purchaseItem as $p_item){
+                if($p_item->status!=4){
+                    $p_status = 3;
+                }
+            }
+            $purchasrOrder->update(['status'=>$p_status]);
+        }
+
+        //更新采购需求
+        $temp_arr = [];
+        foreach($this->model->find($data['purchase_order_id'])->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
+        return redirect(route('purchaseItemIndex')); 
+    }
+
+    /**
      * ajax请求  sku
      *
      * @param none

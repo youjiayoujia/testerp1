@@ -145,6 +145,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Product\SupplierController@createLevel', 'as' => 'productSupplier.createLevel']);
     Route::resource('productSupplier', 'Product\SupplierController');
     //选款需求
+    Route::post('productRequire/excelStore',
+        ['uses' => 'Product\RequireController@excelStore', 'as' => 'productRequire.excelStore']);
+    Route::get('productRequire/getExcel',
+        ['uses' => 'Product\RequireController@getExcel', 'as' => 'productRequire.getExcel']);
+    Route::get('productRequire/importByExcel',
+        ['uses' => 'Product\RequireController@importByExcel', 'as' => 'productRequire.importByExcel']);
     Route::get('productRequire/ajaxQuantityProcess',
         ['uses' => 'Product\RequireController@ajaxQuantityProcess', 'as' => 'productRequire.ajaxQuantityProcess']);
     Route::get('productRequire/ajaxProcess',
@@ -321,6 +327,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('purchaseOrder/updateArriveLog',
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveLog', 'as' => 'updateArriveLog']);
+    //新品待入库界面入库
+    Route::any('purchaseOrder/newProductupdateArriveLog',
+        ['uses' => 'Purchase\PurchaseOrderController@newProductupdateArriveLog', 'as' => 'newProductupdateArriveLog']);
+
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
     Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
     Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');
@@ -637,6 +647,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/exportInfo',
+        ['uses' => 'PackageController@exportInfo', 'as' => 'package.exportInfo']);
+    Route::get('package/ajaxReturnInShelf',
+        ['uses' => 'PackageController@ajaxReturnInShelf', 'as' => 'package.ajaxReturnInShelf']);
+    Route::get('package/returnGoodsInShelf',
+        ['uses' => 'PackageController@returnGoodsInShelf', 'as' => 'package.returnGoodsInShelf']);
     Route::get('package/processingAssignStocks',
         ['uses' => 'PackageController@processingAssignStocks', 'as' => 'package.processingAssignStocks']);
     Route::get('package/ajaxRealTime',

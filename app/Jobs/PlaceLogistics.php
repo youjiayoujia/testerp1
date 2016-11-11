@@ -42,16 +42,19 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
         if ($result['status'] == 'success') {
             $this->result['status'] = 'success';
             $this->result['remark'] = 'packages tracking_no:' . $result['tracking_no'];
+            $this->package->eventLog('队列', 'packages tracking_no:' . $result['tracking_no'],json_encode($this->package));
         } elseif ($result['status'] == 'again') {
             $this->result['status'] = 'success';
             $this->result['remark'] = 'packages logistics_order_number:' . $result['logistics_order_number'] . ' need  get tracking_no ';
             $job = new PlaceLogistics($this->package, $this->type);
             $job = $job->onQueue('placeLogistics')->delay(600); //暂设10分钟
             $this->dispatch($job);
+            $this->package->eventLog('队列', 'packages logistics_order_number:' . $result['logistics_order_number'] . ' need  get tracking_no ',json_encode($this->package));
         } else {
             $this->release();
             $this->result['status'] = 'fail';
             $this->result['remark'] = $result['tracking_no'];
+            $this->package->eventLog('队列', '下单失败'.$result['tracking_no'],json_encode($this->package));
         }
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('PlaceLogistics');

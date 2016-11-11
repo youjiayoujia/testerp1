@@ -165,6 +165,7 @@ return [
         'joom_publish_product_detail.sku'=>'Joom原始sku',
         'enabled'=>'Joom平台状态',
         'catalog.id' => '品类',
-        'spu_id' => 'SPU'
+        'spu_id' => 'SPU',
+        'logistics.catalog.name' => '物流分类',
     ],
 ];

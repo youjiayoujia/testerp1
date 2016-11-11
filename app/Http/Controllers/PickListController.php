@@ -115,7 +115,7 @@ class PickListController extends Controller
         $id = request('id');
         $model = $this->model->where('picknum', $picklist)->with('pickListItem')->first();
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if(!$model) {
             return json_encode(false);
         }
@@ -128,7 +128,7 @@ class PickListController extends Controller
         } else {
             $model->update(['pick_by' => $pickBy]);
         }
-        $to = base64_encode(serialize($model));;
+        $to = json_encode($model);
         $this->eventLog($name, '修改拣货人员,id='.$model->id, $to, $from);
 
         return json_encode(true);
@@ -147,7 +147,7 @@ class PickListController extends Controller
         $html = '';
         foreach($ids as $id) {
             $model = $this->model->find($id);
-            $from = base64_encode(serialize($model));
+            $from = json_encode($model);
             $name = UserModel::find(request()->user()->id)->name;
             if (!$model) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -174,7 +174,7 @@ class PickListController extends Controller
     public function confirmPickBy()
     {
         $model = $this->model->find(request('pickId'));
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         $name = UserModel::find(request()->user()->id)->name;
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -187,7 +187,7 @@ class PickListController extends Controller
             }
         }
         $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time()), 'status' => 'PICKING']);
-        $to = base64_encode(serialize($model));;
+        $to = json_encode($model);
         $this->eventLog($name, '修改拣货人员,id='.$model->id, $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
@@ -450,7 +450,7 @@ class PickListController extends Controller
     {
         $obj = $this->model->find($id);
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_encode(serialize($obj));
+        $from = json_encode($obj);
         $obj->update(['status' => 'INBOXED', 'inbox_by' => request()->user()->id, 'inbox_at' => date('Y-m-d H:i:s', time())]);
         foreach($obj->package as $package)
         {

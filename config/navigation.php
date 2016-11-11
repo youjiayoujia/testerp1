@@ -166,6 +166,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '退货上架',
+                    'url' => 'package.returnGoodsInShelf',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流对账',
                     'url' => 'shipmentCost.index',
                     'icon' => '',

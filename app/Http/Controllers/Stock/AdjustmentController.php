@@ -120,7 +120,7 @@ class AdjustmentController extends Controller
             AdjustFormModel::create($buf);
         }
         $to = $this->model->with('adjustments')->find($obj->id);
-        $to = base64_encode(serialize($to));
+        $to = json_encode($to);
         $this->eventLog($name, '新增调整记录,id='.$obj->id, $to);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
@@ -176,7 +176,7 @@ class AdjustmentController extends Controller
         $buf = request()->all();
         $model = $this->model->with('adjustments')->find($id);
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         foreach($model->adjustments as $single) {
             if($single->type == 'OUT') {
                 $item = ItemModel::find($single->item_id);
@@ -210,7 +210,7 @@ class AdjustmentController extends Controller
                 $item->hold($single->warehouse_position_id, $single->quantity, 'ADJUSTMENT', $model->id);
             }
         }
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '调整记录更新,id='.$model->id, $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
@@ -311,12 +311,12 @@ class AdjustmentController extends Controller
                 DB::rollback();
             }
             DB::commit();
-            $to = base64_encode(serialize($obj));
+            $to = json_encode($obj);
             $this->eventLog($name, '审核通过', $to, $to);
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
         } else {
             $obj->update(['status'=>'1', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']);
-            $to = base64_encode(serialize($obj));
+            $to = json_encode($obj);
             $this->eventLog($name, '审核未通过', $to, $to);
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核未通过...'));
         }

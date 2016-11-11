@@ -86,7 +86,7 @@ class ItemController extends Controller
         $data = request()->all();
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -165,7 +165,7 @@ class ItemController extends Controller
         $sync->times = 0;
         $sync->save();
 
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, 'item信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex);
     }

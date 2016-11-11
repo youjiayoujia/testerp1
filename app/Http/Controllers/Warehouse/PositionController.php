@@ -88,7 +88,7 @@ class PositionController extends Controller
     {
         $model = $this->model->find($id);
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -104,7 +104,7 @@ class PositionController extends Controller
                 }
             }
         }
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '库位信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }

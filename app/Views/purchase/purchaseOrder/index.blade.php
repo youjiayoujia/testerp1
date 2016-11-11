@@ -1,8 +1,9 @@
 @extends('common.table')
 @section('tableToolButtons')
     <div class="btn-group" >
-        <a href="/purchaseOrder/purchaseOrdersOut" class="btn btn-info" id="orderExcelOut"> 采购单导出
-        </a>
+        <a href="javascript:" class="btn btn-warning download">采购单导出
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </a>
     </div>
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
@@ -354,6 +355,7 @@
             }
         }
 
+        //批量操作
         $('.examine').click(function () {
             
             var url = "{{route('purchaseExmaine')}}";
@@ -376,6 +378,32 @@
                 }
             })
         });
+
+        //采购单导出
+        /*$('#orderExcelOut').click(function () { 
+            var url = "{{route('purchaseOrder.purchaseOrdersOut')}}";
+            var checkbox = document.getElementsByName("tribute_id");
+            var purchase_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                purchase_ids += checkbox[i].value + ",";
+            }
+            purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
+            location.href = "{{ route('purchaseOrder.purchaseOrdersOut') }}?purchase_ids=" + purchase_ids;
+        });*/
+
+        $(document).ready(function(){
+            $(document).on('click', '.download', function(){
+                var checkbox = document.getElementsByName("tribute_id");
+                var purchase_ids = "";
+                for (var i = 0; i < checkbox.length; i++) {
+                    if (!checkbox[i].checked)continue;
+                    purchase_ids += checkbox[i].value + ",";
+                }
+                purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
+                location.href="{{ route('purchaseOrder.purchaseOrdersOut')}}?purchase_ids="+purchase_ids;
+            })
+        })
 
         $('.view').click(function () {
             var purchaseOrder_id = $(this).attr('id');

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Illuminate\Bus\Queueable;
 use App\Models\Log\QueueModel as QueueLog;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use App\Models\Event\CategoryModel;
 
 abstract class Job
 {
@@ -37,5 +38,17 @@ abstract class Job
             'result' => $this->result['status'],
             'remark' => $this->result['remark']
         ]);
+    }
+
+    public function eventLog($user, $content = '', $to = '', $from = '')
+    {
+        $modelName = $this->table;
+        if($modelName) {
+            $category = CategoryModel::where('model_name', $modelName)->first();
+            if(!$category) {
+                $category = CategoryModel::create(['model_name' => $modelName]);
+            }
+            $category->child()->create(['type_id' => ($to ? unserialize(base64_decode($to))->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user]);
+        }
     }
 }

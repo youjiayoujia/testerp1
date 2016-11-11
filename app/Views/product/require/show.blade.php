@@ -87,6 +87,9 @@
         <div class="col-lg-2">
             <strong>需求帐号</strong>: {{ $model->channelAccount?$model->channelAccount->account : '' }}
         </div>
+        <div class="col-lg-2">
+            <strong>采购人</strong>: {{ $model->purchase?$model->purchase->name : '' }}
+        </div>
     </div>
 </div>
 <div class="panel panel-default">

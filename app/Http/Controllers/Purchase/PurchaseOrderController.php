@@ -264,42 +264,6 @@ class PurchaseOrderController extends Controller
         return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'编辑成功.'));
     }
     
-    /**
-     * 导出采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function purchaseOrdersOut()
-    {
-        $p_id = request()->input('purchaseOrder_id');
-        $purchaseOrder = PurchaseOrderModel::where('id',$p_id)->get();
-        $rows = [];
-        
-        foreach($purchaseOrder as $model) {
-            $rows[] = [
-                '采购单号' => $model->id,
-                '外部单号' => $warehouse->post_coding,
-                '付款方式' => config('purchase.purchaseOrder.pay_type')[$model->pay_type],
-                '物流方式' => config('purchase.purchaseOrder.carriage_type')[$model->purchaseUser->name],
-                '采购负责人' => $model->purchaseUser->name,
-                '入库仓库' => $model->warehouse->name,
-                '商品总金额' => $model->total_purchase_cost,
-                '总数量' => 1,
-                '运费' => $model->total_postage,
-                '订单总金额' => $model->out_of_stock_time,
-                '供应商编号' => $model->supplier_id,
-                '下单时间' => $model->created_at,
-            ];          
-        }
-        $name = 'export_exception';
-        Excel::create($name, function($excel) use ($rows){
-            $excel->sheet('', function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');    
-    }
-
      /**
      * 审核采购单
      *
@@ -825,6 +789,72 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+    * 新品待入库界面入库
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function newProductupdateArriveLog(){
+        $global = 1;
+        $data = request()->all();
+        $arrivel_log = PurchaseItemArrivalLogModel::where('purchase_item_id',$data['purchase_item_id'])->get()->first();
+        $purchase_item = $arrivel_log->purchaseItem;
+
+        $warehousePosition = StockModel::where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->where('item_id',$purchase_item->item_id)->get()->first();
+                
+        if(!$warehousePosition){ 
+            $purchase_item->update(['status'=>'6']);
+            $global = 0;
+        }else{
+            $filed['good_num'] = $data['num'];
+            $filed['quality_time'] = date('Y-m-d H:i:s',time());
+            
+            $arrivel_log->update($filed);
+            //purchaseitem
+            $datas['status'] = 3;
+            $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+            //$datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
+            if($datas['storage_qty']>=$purchase_item->purchase_num){
+                $datas['status'] = 4;
+            }
+            
+            $purchase_item->update($datas);
+            $purchase_item->item->in($warehousePosition->warehouse_position_id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
+            
+        }
+        //need包裹分配库存
+        $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
+        if(count($packageItem)>0){
+            foreach ($packageItem as $_packageItem) {
+                if($_packageItem->package->status=='NEED'){
+                    $job = new AssignStocks($_packageItem->package);
+                    $job = $job->onQueue('assignStocks');
+                    $this->dispatch($job);
+                }  
+            }
+        } 
+
+        if($global){
+            $p_status = 4;
+            $purchasrOrder = $this->model->find($data['purchase_order_id']);
+            foreach($purchasrOrder->purchaseItem as $p_item){
+                if($p_item->status!=4){
+                    $p_status = 3;
+                }
+            }
+            $purchasrOrder->update(['status'=>$p_status]);
+        }
+
+        //更新采购需求
+        $temp_arr = [];
+        foreach($this->model->find($data['purchase_order_id'])->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
+        return redirect(route('purchaseItemIndex')); 
+    }
+
+    /**
      * ajax请求  sku
      *
      * @param none
@@ -1160,6 +1190,48 @@ class PurchaseOrderController extends Controller
                 $sheet->fromArray($rows);
             });
         })->download('csv');        
+    }
+
+    /**
+     * 导出采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function purchaseOrdersOut()
+    {
+        $purchase_ids = request()->input('purchase_ids');
+        $product_id_arr = explode(',', $purchase_ids);
+
+        $purchaseOrder = PurchaseOrderModel::whereIn('id',$product_id_arr)->get();
+        $rows = [];
+        
+        foreach($purchaseOrder as $model) {
+            $total_num = 0;
+            foreach($model->purchaseItem as $purchase_item){
+                $total_num += $purchase_item->purchase_num;
+            }
+            $rows[] = [
+                '采购单号' => $model->id,
+                '外部单号' => $model->post_coding,
+                '付款方式' => config('purchase.purchaseOrder.pay_type')[$model->pay_type],
+                '物流方式' => $model->carriage_type>-1?config('purchase.purchaseOrder.carriage_type')[$model->carriage_type]:'',
+                '采购负责人' => $model->purchaseUser->name,
+                '入库仓库' => $model->warehouse->name,
+                '商品总金额' => $model->total_purchase_cost,
+                '总数量' => $total_num,
+                '运费' => $model->total_postage,
+                '订单总金额' => $model->total_purchase_cost,
+                '供应商编号' => $model->supplier_id,
+                '下单时间' => $model->created_at,
+            ];          
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');    
     }
 
     /**

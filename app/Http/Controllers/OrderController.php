@@ -167,6 +167,13 @@ class OrderController extends Controller
             $subtotal += $value->amount * $value->rate;
         }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
+        //订单首页不显示数据
+        $url = 'http://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $orderUrl = route('order.index');
+        if ($url == $orderUrl) {
+            $order = $this->model->where('id', 0);
+            $subtotal = 0;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
@@ -346,6 +353,7 @@ class OrderController extends Controller
                 $this->model->find($id)->update(['status' => 'ERROR']);
             } else {
                 $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['item_status'] = productItem::where('sku', $item['sku'])->first()->status;
             }
             $orderItems = $this->model->find($id)->items;
             if (count($data['items']) == count($orderItems)) {
@@ -360,6 +368,7 @@ class OrderController extends Controller
                 }
                 foreach ($data['items'] as $value) {
                     $value['item_id'] = productItem::where('sku', $value['sku'])->first()->id;
+                    $value['item_status'] = productItem::where('sku', $value['sku'])->first()->status;
                     $this->model->find($id)->items()->create($value);
                 }
             }

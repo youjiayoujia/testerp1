@@ -67,6 +67,7 @@ use BarcodeGen;
 
 use App\Models\ProductModel;
 use Cache;
+use Crypt;
 
 
 class TestController extends Controller
@@ -82,9 +83,18 @@ class TestController extends Controller
 
     public function test2()
     {
-        $item = ItemModel::find(23767);
-        var_dump($item->getStockQuantity(4,1));
+
+        foreach (\App\Models\Order\ItemModel::all() as $item) {
+            $status = ItemModel::where('sku', $item->sku)->first()->status;
+            $item->update(['item_status' => $status]);
+        }
     }
+
+//    public function test2()
+//    {
+//        $item = ItemModel::find(23767);
+//        var_dump($item->getStockQuantity(4,1));
+//    }
 
     // public function test2()
     // {

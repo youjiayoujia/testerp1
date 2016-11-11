@@ -112,7 +112,7 @@ class EubofflineAdapter extends BasicAdapter
             //$weight = $item->quantity * $item->item->product->weight;
             $weight = $item->item->weight;
             $weight = number_format($weight, 3, '.', '');//保留三位小数   
-            $delcarevalue = $item->item->declared_value * $item->quantity;
+            $delcarevalue = $item->first()->item->declared_value;
             $delcarevalue = number_format($delcarevalue, 2, '.', '');//保留两位小数           
         }
         $items .= '<item>
@@ -208,10 +208,10 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);
         //Send the Request  
         $data = curl_exec($connection); 
-        if (curl_errno($connection)) {
+        /*if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
             die(curl_error($connection)); //异常错误
-        }
+        }*/
         curl_close($connection);
         $result = simplexml_load_string($data);
         if ($result->status == 'error') {

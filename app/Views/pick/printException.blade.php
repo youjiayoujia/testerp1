@@ -10,6 +10,7 @@
     </div>
     <div class='row'>
         <div class='form-group'>
+            <p>{{ $packages[$key]->picklist->pickByName->name}}</p>
             @foreach($packages[$key]->items as $k1 => $v1)
                 <p>sku:{{$v1->item->sku}} 数量:{{$v1->quantity}}</p>
             @endforeach

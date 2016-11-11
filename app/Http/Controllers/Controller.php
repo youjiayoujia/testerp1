@@ -82,7 +82,7 @@ abstract class Controller extends BaseController
             if(!$category) {
                 $category = CategoryModel::create(['model_name' => $modelName]);
             }
-            $category->child()->create(['type_id' => ($to ? unserialize(base64_decode($to))->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user]);
+            $category->child()->create(['type_id' => ($to ? json_decode($to)->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user]);
         }
     }
 
@@ -247,7 +247,7 @@ abstract class Controller extends BaseController
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->create(request()->all());
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
         return redirect($this->mainIndex);
     }
 
@@ -279,14 +279,14 @@ abstract class Controller extends BaseController
     public function update($id)
     {
         $model = $this->model->find($id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update(request()->all());
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据更新', $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功.'));
     }

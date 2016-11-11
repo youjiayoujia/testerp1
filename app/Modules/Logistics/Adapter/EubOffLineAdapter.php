@@ -208,10 +208,10 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);
         //Send the Request  
         $data = curl_exec($connection); 
-        if (curl_errno($connection)) {
+        /*if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
             die(curl_error($connection)); //异常错误
-        }
+        }*/
         curl_close($connection);
         $result = simplexml_load_string($data);
         if ($result->status == 'error') {

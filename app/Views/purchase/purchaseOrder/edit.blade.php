@@ -244,7 +244,7 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">编辑基本信息</div>
-        <div class="panel-body" id="itemDiv">
+        <div class="panel-body" id="itemDiv1">
               <!-- <div class='row'>
                 <div class="form-group col-md-3">
                     <label for="size">订单类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>

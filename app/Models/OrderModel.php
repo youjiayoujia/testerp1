@@ -254,6 +254,8 @@ class OrderModel extends BaseModel
                 'channel_ordernum',
                 'email',
                 'by_id',
+                'shipping_firstname',
+                'shipping_lastname',
                 'currency',
                 'profit_rate'
             ],
@@ -268,13 +270,13 @@ class OrderModel extends BaseModel
             ],
             'relatedSearchFields' => [
                 'country' => ['code'],
-                'items' => ['item' => ['status' => config('item.status')]],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => $arr],
+                'items' => ['item_status' => config('item.status')],
             ]
         ];
     }
@@ -559,6 +561,7 @@ class OrderModel extends BaseModel
                 $item = ItemModel::where('sku', $orderItem['sku'])->first();
                 if ($item) {
                     $orderItem['item_id'] = $item->id;
+                    $orderItem['item_status'] = $item->status;
                 }
             }
             if (!isset($orderItem['item_id'])) {

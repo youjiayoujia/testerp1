@@ -23,6 +23,7 @@ class ItemModel extends BaseModel
         'item_id',
         'sku',
         'status',
+        'item_status',
         'ship_status',
         'is_refund',
     ];

@@ -327,6 +327,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('purchaseOrder/updateArriveLog',
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveLog', 'as' => 'updateArriveLog']);
+    //新品待入库界面入库
+    Route::any('purchaseOrder/newProductupdateArriveLog',
+        ['uses' => 'Purchase\PurchaseOrderController@newProductupdateArriveLog', 'as' => 'newProductupdateArriveLog']);
+
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
     Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
     Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');

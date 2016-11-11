@@ -832,8 +832,8 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class='easy' data-type='easy'>简洁</a></li>
-            <li><a href="javascript:" class='easy' data-type='full'>全貌</a></li>
+            <li><a href="javascript:" class='easy' data-type='easy'>简单</a></li>
+            <li><a href="javascript:" class='easy' data-type='full'>完整</a></li>
         </ul>
     </div>
     <div class="btn-group">

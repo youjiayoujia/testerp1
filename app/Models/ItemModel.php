@@ -181,6 +181,19 @@ class ItemModel extends BaseModel
         return count($stocks) ? ($flag ? $stocks->sum('available_quantity') : $stocks->sum('all_quantity')) : 0;
     }
 
+    //所有库位
+    public function getAllWarehousePositionAttribute()
+    {
+        $result = [];
+        foreach ($this->stocks as $key => $stock) {
+            $result[$key]['warehouse_position'] = $stock->position->name;
+            $result[$key]['warehouse_position_id'] = $stock->position->id;
+            $result[$key]['warehouse_name'] = $stock->warehouse->name;
+        }
+
+        return $result;
+    }
+
     //实库存
     public function getAllQuantityAttribute()
     {
@@ -321,9 +334,11 @@ class ItemModel extends BaseModel
             $arr[$single->id] = $single->c_name;
         }
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'warehouse' => ['name'] ],
+            'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
-            'filterSelects' => ['status' => config('item.status'),],
+            'filterSelects' => ['status' => config('item.status'),
+                                'warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+                               ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'sectionSelect' => [],
         ];

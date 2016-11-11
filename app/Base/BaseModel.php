@@ -47,4 +47,14 @@ class BaseModel extends Model
             $category->child()->create(['type_id' => ($to ? json_decode($to)->id : $this->id), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user]);
         }
     }
+    
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
+    }
 }

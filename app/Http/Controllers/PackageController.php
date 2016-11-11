@@ -637,7 +637,7 @@ class PackageController extends Controller
                 $model->items()->create($info);
             }
         }
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '合并包裹', $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));

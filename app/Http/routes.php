@@ -154,6 +154,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['as' => 'product.ajaxReturnLogistics', 'uses' => 'ProductController@ajaxReturnLogistics']);
     Route::any('ajaxReutrnCatalogs',
         ['uses' => 'ProductController@ajaxReutrnCatalogs', 'as' => 'ajaxReutrnCatalogs']);
+    Route::any('submitItemEdit',
+        ['uses' => 'ProductController@submitItemEdit', 'as' => 'product.submitItemEdit']);
+    Route::any('edititemattribute/{id}', ['uses' => 'ProductController@editItemAttribute']);
+
     //通关报关
     Route::post('customsClearance/exportProduct',
         ['uses' => 'CustomsClearanceController@exportProduct', 'as' => 'customsClearance.exportProduct']);

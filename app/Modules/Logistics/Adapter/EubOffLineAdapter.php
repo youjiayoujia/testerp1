@@ -212,7 +212,9 @@ class EubofflineAdapter extends BasicAdapter
         $data = curl_exec($connection); 
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
-            die(curl_error($connection)); //异常错误
+            $return['status'] = 0;
+            $return['msg'] = curl_error($connection);
+            return $return;
         }
         curl_close($connection);
         $result = simplexml_load_string($data);

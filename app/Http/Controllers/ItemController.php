@@ -578,4 +578,10 @@ class ItemController extends Controller
         echo json_encode(['msg'=>'修改库位成功']);exit;
     }
 
+    public function oneKeyUpdateSku()
+    {
+        $this->model->oneKeyUpdateSku();
+
+    }
+
 }

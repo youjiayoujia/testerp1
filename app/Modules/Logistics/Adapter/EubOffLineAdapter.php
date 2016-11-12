@@ -179,10 +179,10 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
 
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);
+        curl_setopt($connection, CURLOPT_HTTPHEADER, array('Expect:'));
         //Send the Request  
         $data = curl_exec($connection); 
-        $httpcode = curl_getinfo($connection, CURLINFO_HTTP_CODE);
-        dd($httpcode);
+        $httpcode = curl_getinfo($connection, CURLINFO_HTTP_CODE);        
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
             $return['status'] = 0;

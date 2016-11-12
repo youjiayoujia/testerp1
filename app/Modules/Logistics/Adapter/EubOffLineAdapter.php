@@ -163,6 +163,7 @@ class EubofflineAdapter extends BasicAdapter
     public function sendHttpRequest($url, $requestBody, $headers)
     {
         $connection = curl_init();
+        curl_setopt($connection, CURLOPT_HTTPHEADER, array('Expect:'));
         curl_setopt($connection, CURLOPT_VERBOSE, 1);
         //set the server we are using (could be Sandbox or Production server)
         curl_setopt($connection, CURLOPT_URL, $url);
@@ -179,10 +180,10 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
 
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);
-        curl_setopt($connection, CURLOPT_HTTPHEADER, array('Expect:'));
+   
         //Send the Request  
         $data = curl_exec($connection); 
-        $httpcode = curl_getinfo($connection, CURLINFO_HTTP_CODE);        
+       
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
             $return['status'] = 0;

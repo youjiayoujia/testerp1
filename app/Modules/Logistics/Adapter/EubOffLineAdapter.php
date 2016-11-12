@@ -149,9 +149,9 @@ class EubofflineAdapter extends BasicAdapter
 
 
         $headers = array(
-            'authenticate:' . $this->_authenticate,
-            'version:' . $this->_version,
             'Expect:',
+            'authenticate:' . $this->_authenticate,
+            'version:' . $this->_version,            
         );
         /*echo "<pre>";
         print_r($xmlStr);
@@ -175,7 +175,8 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
         $data = curl_exec($connection);                             //Send the Request  
         $httpcode = curl_getinfo($connection);  
-        dd($httpcode);
+        echo "<pre>";
+        print_r($httpcode);
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
             $return['status'] = 0;

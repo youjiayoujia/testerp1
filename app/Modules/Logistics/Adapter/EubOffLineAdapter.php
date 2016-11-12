@@ -151,6 +151,7 @@ class EubofflineAdapter extends BasicAdapter
         $headers = array(
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,
+            'Expect:',
         );
         /*echo "<pre>";
         print_r($xmlStr);
@@ -163,26 +164,19 @@ class EubofflineAdapter extends BasicAdapter
     public function sendHttpRequest($url, $requestBody, $headers)
     {
         $connection = curl_init();
-        curl_setopt($connection, CURLOPT_VERBOSE, 1);
-        //set the server we are using (could be Sandbox or Production server)
-        curl_setopt($connection, CURLOPT_URL, $url);
-        //stop CURL from verifying the peer's certificate
-        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
-        //set the headers using the array of headers
-        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
-        //set method as POST
-        curl_setopt($connection, CURLOPT_POST, 1);
-        //set the XML body of the request
-        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
-        //set it to return the transfer as a string from curl_exec
-        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
-
+        curl_setopt($connection, CURLOPT_VERBOSE, 1);        
+        curl_setopt($connection, CURLOPT_URL, $url);                //set the server we are using (could be Sandbox or Production server)       
+        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);        //stop CURL from verifying the peer's certificate
+        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);        
+        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);     //set the headers using the array of headers        
+        curl_setopt($connection, CURLOPT_POST, 1);                  //set method as POST        
+        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody); //set the XML body of the request       
+        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);        //set it to return the transfer as a string from curl_exec
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);
-        curl_setopt($connection, CURLOPT_HTTPHEADER, array('Expect:'));
-        //Send the Request  
-        $data = curl_exec($connection); 
-        $httpcode = curl_getinfo($connection, CURLINFO_HTTP_CODE);        
+        curl_setopt($connection, CURLOPT_HTTPHEADER, array('Expect:'));        
+        $data = curl_exec($connection);                             //Send the Request  
+        $httpcode = curl_getinfo($connection, CURLINFO_HTTP_CODE);  
+        dd($httpcode);
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
             $return['status'] = 0;

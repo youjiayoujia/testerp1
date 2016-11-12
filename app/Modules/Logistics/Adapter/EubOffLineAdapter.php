@@ -149,9 +149,9 @@ class EubofflineAdapter extends BasicAdapter
 
 
         $headers = array(
-            'authenticate:' . $this->_authenticate,
-            'version:' . $this->_version,
             'Expect:',
+            'authenticate:' . $this->_authenticate,
+            'version:' . $this->_version,            
         );
         /*echo "<pre>";
         print_r($xmlStr);
@@ -172,11 +172,11 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_POST, 1);                  //set method as POST        
         curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody); //set the XML body of the request       
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);        //set it to return the transfer as a string from curl_exec
-        curl_setopt($connection, CURLOPT_TIMEOUT, 200);
-        curl_setopt($connection, CURLOPT_HTTPHEADER, array('Expect:'));        
+        curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
         $data = curl_exec($connection);                             //Send the Request  
-        $httpcode = curl_getinfo($connection, CURLINFO_HTTP_CODE);  
-        dd($httpcode);
+        $httpcode = curl_getinfo($connection);  
+        echo "<pre>";
+        print_r($httpcode);
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
             $return['status'] = 0;

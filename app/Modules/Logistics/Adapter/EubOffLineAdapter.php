@@ -151,6 +151,7 @@ class EubofflineAdapter extends BasicAdapter
         $headers = array(
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,
+            'Expect:',
         );
         /*echo "<pre>";
         print_r($xmlStr);
@@ -163,7 +164,6 @@ class EubofflineAdapter extends BasicAdapter
     public function sendHttpRequest($url, $requestBody, $headers)
     {
         $connection = curl_init();
-        curl_setopt($connection, CURLOPT_HTTPHEADER, array('Expect:'));
         curl_setopt($connection, CURLOPT_VERBOSE, 1);
         //set the server we are using (could be Sandbox or Production server)
         curl_setopt($connection, CURLOPT_URL, $url);

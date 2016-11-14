@@ -6,7 +6,7 @@
  * Time: 下午4:54
  */
 
-namespace App\Models\product;
+namespace App\Models\Product;
 
 use App\Base\BaseModel;
 

@@ -264,42 +264,6 @@ class PurchaseOrderController extends Controller
         return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'编辑成功.'));
     }
     
-    /**
-     * 导出采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function purchaseOrdersOut()
-    {
-        $p_id = request()->input('purchaseOrder_id');
-        $purchaseOrder = PurchaseOrderModel::where('id',$p_id)->get();
-        $rows = [];
-        
-        foreach($purchaseOrder as $model) {
-            $rows[] = [
-                '采购单号' => $model->id,
-                '外部单号' => $warehouse->post_coding,
-                '付款方式' => config('purchase.purchaseOrder.pay_type')[$model->pay_type],
-                '物流方式' => config('purchase.purchaseOrder.carriage_type')[$model->purchaseUser->name],
-                '采购负责人' => $model->purchaseUser->name,
-                '入库仓库' => $model->warehouse->name,
-                '商品总金额' => $model->total_purchase_cost,
-                '总数量' => 1,
-                '运费' => $model->total_postage,
-                '订单总金额' => $model->out_of_stock_time,
-                '供应商编号' => $model->supplier_id,
-                '下单时间' => $model->created_at,
-            ];          
-        }
-        $name = 'export_exception';
-        Excel::create($name, function($excel) use ($rows){
-            $excel->sheet('', function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');    
-    }
-
      /**
      * 审核采购单
      *
@@ -1226,6 +1190,48 @@ class PurchaseOrderController extends Controller
                 $sheet->fromArray($rows);
             });
         })->download('csv');        
+    }
+
+    /**
+     * 导出采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function purchaseOrdersOut()
+    {
+        $purchase_ids = request()->input('purchase_ids');
+        $product_id_arr = explode(',', $purchase_ids);
+
+        $purchaseOrder = PurchaseOrderModel::whereIn('id',$product_id_arr)->get();
+        $rows = [];
+        
+        foreach($purchaseOrder as $model) {
+            $total_num = 0;
+            foreach($model->purchaseItem as $purchase_item){
+                $total_num += $purchase_item->purchase_num;
+            }
+            $rows[] = [
+                '采购单号' => $model->id,
+                '外部单号' => $model->post_coding,
+                '付款方式' => config('purchase.purchaseOrder.pay_type')[$model->pay_type],
+                '物流方式' => $model->carriage_type>-1?config('purchase.purchaseOrder.carriage_type')[$model->carriage_type]:'',
+                '采购负责人' => $model->purchaseUser->name,
+                '入库仓库' => $model->warehouse->name,
+                '商品总金额' => $model->total_purchase_cost,
+                '总数量' => $total_num,
+                '运费' => $model->total_postage,
+                '订单总金额' => $model->total_purchase_cost,
+                '供应商编号' => $model->supplier_id,
+                '下单时间' => $model->created_at,
+            ];          
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');    
     }
 
     /**

@@ -167,6 +167,13 @@ class OrderController extends Controller
             $subtotal += $value->amount * $value->rate;
         }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
+        //订单首页不显示数据
+        $url = 'http://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $orderUrl = route('order.index');
+        if ($url == $orderUrl) {
+            $order = $this->model->where('id', 0);
+            $subtotal = 0;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),

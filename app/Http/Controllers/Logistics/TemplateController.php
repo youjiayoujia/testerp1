@@ -48,7 +48,7 @@ class TemplateController extends Controller
         $model = $this->model->create(request()->all());
 //        $path = '../app/Views/logistics/template/tpl/';
 //        fopen($path . request()->all()['view'], 'w');
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
         return redirect($this->mainIndex);
     }
 

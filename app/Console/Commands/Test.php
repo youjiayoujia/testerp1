@@ -41,10 +41,11 @@ class Test extends Command
     {
         $begin = microtime(true);
         $itemModel = new ItemModel();
-        $itemModel->updateWarehouse();
-        $itemModel->updateUser();
-        $itemModel->updateOldData();
-        $itemModel->updateBasicData();
+        $itemModel->oneKeyUpdateSku();
+        // $itemModel->updateWarehouse();
+        // $itemModel->updateUser();
+        // $itemModel->updateOldData();
+        // $itemModel->updateBasicData();
         $end = microtime(true);
     }
 }

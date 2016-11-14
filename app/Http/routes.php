@@ -160,6 +160,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['as' => 'product.ajaxReturnLogistics', 'uses' => 'ProductController@ajaxReturnLogistics']);
     Route::any('ajaxReutrnCatalogs',
         ['uses' => 'ProductController@ajaxReutrnCatalogs', 'as' => 'ajaxReutrnCatalogs']);
+    Route::any('submitItemEdit',
+        ['uses' => 'ProductController@submitItemEdit', 'as' => 'product.submitItemEdit']);
+    Route::any('edititemattribute/{id}', ['uses' => 'ProductController@editItemAttribute']);
+
     //通关报关
     Route::post('customsClearance/exportProduct',
         ['uses' => 'CustomsClearanceController@exportProduct', 'as' => 'customsClearance.exportProduct']);
@@ -340,7 +344,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
     Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
     Route::any('purchaseOrder/write_off/{id}', 'Purchase\PurchaseOrderController@write_off');
-    Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
+    //采购单导出
+    Route::any('purchaseOrder/purchaseOrdersOut',
+        ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
+    
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
     Route::any('/purchaseOrder/printOrder/{id}', 'Purchase\PurchaseOrderController@printOrder');
@@ -421,6 +428,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('item/batchDelete', ['uses' => 'ItemController@batchDelete', 'as' => 'item.batchDelete']);
     Route::any('item/batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('item/batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
+    Route::any('item/oneKeyUpdateSku', ['uses' => 'ItemController@oneKeyUpdateSku', 'as' => 'item.oneKeyUpdateSku']);
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');

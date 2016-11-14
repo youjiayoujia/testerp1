@@ -79,7 +79,9 @@
             <td>{{ $item->purchaseAdminer?$item->purchaseAdminer->name:''}}</td>
             <td>
                 @if($item->product)
-                    {{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}
+                    @if($item->product->spu)
+                        {{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}
+                    @endif
                 @endif
             </td>
             <td>{{--<button class ="btn btn-success" >计算</button>--}}

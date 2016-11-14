@@ -20,36 +20,7 @@ class EubofflineAdapter extends BasicAdapter
         //$this->_customer_code = $config['userId'];
         //$this->_vip_code = $config['userPassword'];
         $this->_version = 'international_eub_us_1.1';
-       // $this->_url = $config['url'];
-
         $this->_url ='http://shipping.ems.com.cn/partner/api/public/p/order/';//发送地址
-
-
-
-
-       /* //寄件人信息
-        $this->_sender = 'HUANGCHAOYUN';
-        $this->_senderZip = '518129';
-        $this->_senderMobile = '18565631099';
-        $this->_senderProvinceCode = '440000';
-        $this->_senderCityCode = '440300';
-        $this->_senderAreaCode = '440307';
-        $this->_senderCompany = ' Salamoer Tech';
-        $this->_senderStreet = 'B3-4 Hekan Industrial Zone, No.41, Wuhe Road South';
-        $this->_senderEmail = 'wuliu@moonarstore.com';
-
-        //揽收人信息
-        $this->_contacter = '黄超云';
-        $this->_zipCode = '518129';
-        $this->_phone = '18565631099';
-        $this->_mobilePhone = '18565631099';
-        $this->_provinceCode = '440000';
-        $this->_cityCode = '440300';
-        $this->_areaCode = '440307';
-        $this->_company = '深圳市萨拉摩尔科技有限公司';
-        $this->_street = '坂田五和大道南41号 和堪工业区B3栋4楼';
-        $this->_email = 'wuliu@moonarstore.com';*/
-
     }
 
 
@@ -178,10 +149,11 @@ class EubofflineAdapter extends BasicAdapter
 
 
         $headers = array(
+            'Expect:100-continue',
             'authenticate:' . $this->_authenticate,
-            'version:' . $this->_version,
+            'version:' . $this->_version,            
         );
-        
+
         $result = $this->sendHttpRequest($this->_url, $xmlStr, $headers);
         return $result;
 
@@ -189,28 +161,26 @@ class EubofflineAdapter extends BasicAdapter
 
     public function sendHttpRequest($url, $requestBody, $headers)
     {
-        $connection = curl_init();
-        curl_setopt($connection, CURLOPT_VERBOSE, 1);
-        //set the server we are using (could be Sandbox or Production server)
-        curl_setopt($connection, CURLOPT_URL, $url);
-        //stop CURL from verifying the peer's certificate
-        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
-        //set the headers using the array of headers
-        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
-        //set method as POST
-        curl_setopt($connection, CURLOPT_POST, 1);
-        //set the XML body of the request
-        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
-        //set it to return the transfer as a string from curl_exec
-        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
 
-        curl_setopt($connection, CURLOPT_TIMEOUT, 200);
-        //Send the Request  
-        $data = curl_exec($connection); 
+        $connection = curl_init();
+        curl_setopt($connection, CURLOPT_VERBOSE, 1);        
+        curl_setopt($connection, CURLOPT_URL, $url);                //set the server we are using (could be Sandbox or Production server)       
+        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);        //stop CURL from verifying the peer's certificate
+        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);        
+        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);     //set the headers using the array of headers        
+        curl_setopt($connection, CURLOPT_POST, 1);                  //set method as POST        
+        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody); //set the XML body of the request       
+        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);        //set it to return the transfer as a string from curl_exec
+        curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
+        $data = curl_exec($connection);                             //Send the Request  
+        $httpcode = curl_getinfo($connection);  
+        echo "<pre>";
+        print_r($httpcode);
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
-            die(curl_error($connection)); //异常错误
+            $return['status'] = 0;
+            $return['msg'] = curl_error($connection);
+            return $return;
         }
         curl_close($connection);
         $result = simplexml_load_string($data);

@@ -167,7 +167,7 @@ class LogisticsController extends Controller
         }
         $model->channelName()->sync($buf);
         $model = $this->model->with('logisticsChannels')->find($model->id);
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
         return redirect($this->mainIndex);
     }
 
@@ -237,7 +237,7 @@ class LogisticsController extends Controller
     {
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -284,7 +284,7 @@ class LogisticsController extends Controller
         }
         $model->channelName()->sync($buf);
         $model = $this->model->with('logisticsChannels')->find($id);
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         return redirect($this->mainIndex);
     }

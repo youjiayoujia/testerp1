@@ -319,9 +319,9 @@ class ProductController extends Controller
         //print_r($data);exit;
         $productModel = $this->model->with('productMultiOption')->find($data['product_id']);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($productModel));
+        $from = json_encode($productModel);
         $productModel->updateMulti($data);
-        $to = base64_encode(serialize($productModel));
+        $to = json_encode($productModel);
         $this->eventLog($userName->name, '小语言信息更新,id='.$productModel->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
     }

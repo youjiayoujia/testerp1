@@ -13,7 +13,7 @@ class AddPurchaseOutofstockTable extends Migration
     public function up()
     {
         Schema::table('purchases', function (Blueprint $table) {
-            $table->string('need_total_num')->comment('缺货数量')->default(NULL);
+            $table->integer('need_total_num')->comment('缺货数量')->default(NULL);
         });
     }
 

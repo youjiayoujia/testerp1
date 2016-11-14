@@ -1216,7 +1216,10 @@ class PackageController extends Controller
         $logistic_id = request()->input('logistic_id');
         $package = PackageModel::where(['tracking_no' => $track_no, 'status' => 'PACKED'])->first();
         if (!$package) {
-            return json_encode('error');
+            $package = PackageModel::where(['logistics_order_number' => $track_no, 'status' => 'PACKED'])->first();
+            if(!$package) {
+               return json_encode('error'); 
+            }
         }
         $name = UserModel::find(request()->user()->id)->name;
         $from = json_encode($package);

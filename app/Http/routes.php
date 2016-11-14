@@ -918,6 +918,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
             ['uses' => 'SmtProductController@copyAllAccountNew', 'as' => 'smtProduct.copyAllAccountNew']);
         Route::post('getCategoryInfo',
             ['uses' => 'SmtProductController@getCategoryInfo', 'as' => 'smtProduct.getCategoryInfo']);
+        Route::post('getCategoryAttributesById',
+            ['uses' => 'SmtProductController@getCategoryAttributesById', 'as' => 'smtProduct.getCategoryAttributesById']);
+        Route::post('batchModifyBand',
+            ['uses' => 'SmtProductController@batchModifyBand', 'as' => 'smtProduct.batchModifyBand']);
+        
+        
 
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');

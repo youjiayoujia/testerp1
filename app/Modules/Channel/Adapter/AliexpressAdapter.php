@@ -680,11 +680,10 @@ Class AliexpressAdapter implements AdapterInterface
                     
                     $category_attribute = smtCategoryAttribute::where('category_id',$category_id)->first();
                     $smtCategoryAttribute = new smtCategoryAttribute;
-                    if ($category_attribute) {
-                        $options['id'] = $category_attribute->id;
-                        $smtCategoryAttribute->update($options);
+                    if ($category_attribute) {                      
+                        smtCategoryAttribute::where('category_id',$category_id)->update($options);
                     } else {
-                        $smtCategoryAttribute->create($options);
+                        $smtCategoryAttribute->create($options);                      
                     }
                     return $rs['attributes'];
                 }else {

@@ -83,7 +83,9 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(270);
+        $package = PackageModel::find(582);
+        $model = $package->getDeclaredInfo();
+        dd($model);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $package,

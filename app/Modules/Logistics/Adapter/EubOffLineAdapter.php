@@ -30,7 +30,7 @@ class EubofflineAdapter extends BasicAdapter
         $apiInfoArr=explode(',',$emailTemplateInfo->eub_api);
         $this->_authenticate = $apiInfoArr[0];//授权码
         $this->_customer_code = $apiInfoArr[1];//客户编码
-        $this->_vip_code = $apiInfoArr[2];//大客户编码;
+        //$this->_vip_code = $apiInfoArr[2];//大客户编码;
         //寄件人信息
         $this->_sender = $emailTemplateInfo->eub_sender;
         $this->_senderZip = $emailTemplateInfo->eub_sender_zipcode;
@@ -173,17 +173,15 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);        //set it to return the transfer as a string from curl_exec
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
         $data = curl_exec($connection);                             //Send the Request  
-        echo "<pre>";
+        /*echo "<pre>";
         $httpcode = curl_getinfo($connection);  
-        print_r($httpcode);
-        if (curl_errno($connection)) {
-            // $this->setCurlErrorLog(curl_error ( $curl ));
+        print_r($httpcode);*/
+        if (curl_errno($connection)) {            
             $return['status'] = 0;
             $return['msg'] = curl_error($connection);
             return $return;
         }
         curl_close($connection);
-        print_r($data);
         $result = simplexml_load_string($data);
         if ($result->status == 'error') {
             $return['status'] = 0;

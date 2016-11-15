@@ -1586,7 +1586,6 @@ class SmtProductController extends Controller
         $token_id = $post['token_id'];
         $group_id = $post['group_id'];
         $band_id  = $post['band_id'];
-        dd($post);
         $export_data = array();
         $account_name = array();
         

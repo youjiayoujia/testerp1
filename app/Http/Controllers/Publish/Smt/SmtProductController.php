@@ -1586,6 +1586,7 @@ class SmtProductController extends Controller
         $token_id = $post['token_id'];
         $group_id = $post['group_id'];
         $band_id  = $post['band_id'];
+        dd($post);
         $export_data = array();
         $account_name = array();
         
@@ -1594,12 +1595,12 @@ class SmtProductController extends Controller
         foreach($account_arr as $account){
             $account_name[$account->id] = $account->account;
         }
-        /*if($group_id == 'none'){
+        if($group_id == 'none'){
             $product_arr = smtProductList::where(['token_id' => $token_id,'isRemove' => 0 ,'productStatusType' => 'onSelling'])->get();
         }else{
             $product_arr = smtProductList::where(['token_id' => $token_id,'groupId' => $group_id,'isRemove' => 0 ,'productStatusType' => 'onSelling'])->get();
-        }   */
-        $product_arr = smtProductList::where('productId','32736001000')->get();
+        } 
+        //$product_arr = smtProductList::where('productId','32736001000')->get();
         if($product_arr){
             $account = AccountModel::findOrFail($token_id);
             $smtApi = Channel::driver($account->channel->driver, $account->api_config);
@@ -1697,7 +1698,9 @@ class SmtProductController extends Controller
                     $sheet->fromArray($rows);
                 });
             })->download('csv');
+            unset($export_data);
             return redirect($this->mainIndex)->with('alert', $this->alert('success', ' 操作完成.'));*/
+            
             $this->ajax_return('操作完成!',true);
         }else{
             $this->ajax_return('没有符合条件的广告信息',false);

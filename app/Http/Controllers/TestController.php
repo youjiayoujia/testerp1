@@ -982,8 +982,8 @@ class TestController extends Controller
     public function getEbayProduct()
     {
         //$package = PackageModel::findOrFail(3113);
-        //$id = request()->get('id');
-        $package = PackageModel::where('id', 17)->first();
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
         if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
             $result = $package->placeLogistics('UPDATE');
         } else {

@@ -149,7 +149,7 @@ class EubofflineAdapter extends BasicAdapter
         $xmlStr .= '</order></orders>';
 
         $headers = array(     
-            'Expect:100-continue',
+            'Content-Type: text/xml; charset=UTF-8',
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,            
         );

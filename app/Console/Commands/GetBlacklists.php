@@ -51,7 +51,7 @@ class GetBlacklists extends Command
             ->get()
             ->groupBy('shipping_zipcode', 'shipping_lastname', 'shipping_firstname');
         foreach($orders as $key => $order) {
-            if(count($order) >= 5) {
+            if($order->count() >= 5) {
                 $count = 0;
                 foreach($order as $value) {
                     $refunds = RefundModel::where('order_id', $value->id)->get();
@@ -66,7 +66,7 @@ class GetBlacklists extends Command
                     $obj = OrderModel::where('shipping_zipcode', $key)->orderBy('id', 'DESC')->first();
                     $data['channel_id'] = $channel_id;
                     $data['ordernum'] = $obj->ordernum;
-                    $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
+                    $data['name'] = trim($obj->shipping_lastname . ' ' . $obj->shipping_firstname);
                     $data['email'] = $obj->email;
                     $data['by_id'] = $obj->by_id;
                     $data['zipcode'] = $obj->shipping_zipcode;
@@ -95,7 +95,7 @@ class GetBlacklists extends Command
             ->get()
             ->groupBy('email');
         foreach($orders2 as $key2 => $order2) {
-            if(count($order2) >= 5) {
+            if($order2->count() >= 5) {
                 $count2 = 0;
                 foreach($order2 as $val) {
                     $refund = RefundModel::where('order_id', $val->id)->get();
@@ -107,15 +107,15 @@ class GetBlacklists extends Command
                     $channels2 = [];
                     foreach($order2 as $v2) {
                         $v2->update(['blacklist' => '0']);
-                        if(!in_array($v2['channel_id'], $channels2)) {
-                            $channels2[] = $v2['channel_id'];
+                        if(!in_array($v2->channel_id, $channels2)) {
+                            $channels2[] = $v2->channel_id;
                         }
                     }
                     foreach($channels2 as $channel2) {
                         $obj = OrderModel::where('email', $key2)->where('channel_id', $channel2)->orderBy('id', 'DESC')->first();
                         $data['channel_id'] = $channel2;
                         $data['ordernum'] = $obj->ordernum;
-                        $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
+                        $data['name'] = trim($obj->shipping_lastname . ' ' . $obj->shipping_firstname);
                         $data['email'] = $obj->email;
                         $data['by_id'] = $obj->by_id;
                         $data['zipcode'] = $obj->shipping_zipcode;

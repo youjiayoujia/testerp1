@@ -12,9 +12,9 @@
     <th>追踪号</th>
     <th>收货人</th>
     <th>国家</th>
-    <th class="sort" data-field="amount">总金额</th>
+    <th class="sort" data-field="amount"><strong class="text-success">总金额</strong></th>
     <th class="sort" data-field="amount_shipping"><strong class="text-danger">运费</strong></th>
-    <th>预测毛利率</th>
+    <th class="sort" data-field="profit_rate"><strong class="text-success">预测毛利率</strong></th>
     <th>订单状态</th>
     <th>客服人员</th>
     <th class="sort" data-field="created_at">创建时间</th>

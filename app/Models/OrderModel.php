@@ -528,9 +528,13 @@ class OrderModel extends BaseModel
 
     public function checkBlack()
     {
-        $channel = $this->channel->find($this->channel_id);
-        if ($channel->driver == 'wish') {
-            $name = $this->shipping_lastname . ' ' . $this->shipping_firstname;
+        $channel = $this->channel->where('id', $this->channel_id)->get();
+        $driver = '';
+        foreach ($channel as $val) {
+            $driver = $val->driver;
+        }
+        if ($driver == 'wish') {
+            $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
             $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
         } else {
             $blacklist = BlacklistModel::where('email', $this->email);
@@ -538,7 +542,7 @@ class OrderModel extends BaseModel
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
             foreach ($blacklist->get() as $value) {
-                if ($value->type == 'CONFIRMED') {
+                if ($value->type == 'CONFIRMED' || $value->type == 'SUSPECTED') {
                     return true;
                 }
             }
@@ -580,15 +584,23 @@ class OrderModel extends BaseModel
                                           'create_time' => $order->create_time]);
             }
         }
+
+        //客户留言需审核
+        if ($order->customer_remark != null && $order->customer_remark != '') {
+            $order->update(['status' => 'REVIEW']);
+        }
+
         //客户备注需审核
         if (isset($data['remark']) and !empty($data['remark'])) {
             $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
         }
+
         //黑名单需审核
-//        if ($order->status != 'UNPAID' && $order->checkBlack()) {
-//            $order->update(['status' => 'REVIEW']);
-//            $order->remark('黑名单订单.');
-//        }
+        if ($order->status != 'UNPAID' && $order->checkBlack()) {
+            $order->update(['status' => 'REVIEW']);
+            $order->remark('黑名单订单.');
+        }
+
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }

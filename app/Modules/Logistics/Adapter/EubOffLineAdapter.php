@@ -30,7 +30,7 @@ class EubofflineAdapter extends BasicAdapter
         $apiInfoArr=explode(',',$emailTemplateInfo->eub_api);
         $this->_authenticate = $apiInfoArr[0];//授权码
         $this->_customer_code = $apiInfoArr[1];//客户编码
-        //$this->_vip_code = $apiInfoArr[2];//大客户编码;
+        $this->_vip_code = array_key_exists('2', $apiInfoArr) ? $apiInfoArr[2] : '';  //大客户编码;
         //寄件人信息
         $this->_sender = $emailTemplateInfo->eub_sender;
         $this->_senderZip = $emailTemplateInfo->eub_sender_zipcode;

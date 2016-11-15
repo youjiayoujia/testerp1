@@ -147,9 +147,8 @@ class EubofflineAdapter extends BasicAdapter
 
         $xmlStr .= '</order></orders>';
 
-
-        $headers = array(
-            //'Expect:100-continue',
+        //'Expect:100-continue',
+        $headers = array(          
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,            
         );
@@ -163,6 +162,8 @@ class EubofflineAdapter extends BasicAdapter
     {
 
         $connection = curl_init();
+        echo "<pre>";
+        print_r($connection);
         curl_setopt($connection, CURLOPT_VERBOSE, 1);        
         curl_setopt($connection, CURLOPT_URL, $url);                //set the server we are using (could be Sandbox or Production server)       
         curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);        //stop CURL from verifying the peer's certificate
@@ -174,7 +175,6 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
         $data = curl_exec($connection);                             //Send the Request  
         $httpcode = curl_getinfo($connection);  
-        echo "<pre>";
         print_r($httpcode);
         if (curl_errno($connection)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));
@@ -183,6 +183,7 @@ class EubofflineAdapter extends BasicAdapter
             return $return;
         }
         curl_close($connection);
+        print_r($data);
         $result = simplexml_load_string($data);
         if ($result->status == 'error') {
             $return['status'] = 0;

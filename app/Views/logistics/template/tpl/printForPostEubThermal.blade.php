@@ -58,7 +58,7 @@
                                         </td>
                                     </tr>
                                      <tr>
-                                        <td align="center" style="height:20px;"><font style="font-family:Arial; font-size:20px; margin-right:15px;"><strong>areaid</strong></font>&nbsp;</td>
+                                        <td align="center" style="height:20px;"><font style="font-family:Arial; font-size:20px; margin-right:15px;"><strong>{{ $model->fen_jian }}</strong></font>&nbsp;</td>
                                      </tr>
                                 </table>
                              </td>
@@ -74,10 +74,10 @@
         <tr>
           <td width="59%" valign="top" style="border-right:#000 1px solid">
           <div style="font-family:Arial, Helvetica, sans-serif; font-size:11px; line-height:12px">
-              &nbsp;{{ $model->shipping_firstname . ' ' . $model->shipping_lastname}}<br />
-              &nbsp;{{ $model->shipping_city }}<br />
-              &nbsp;{{ $model->shipping_address. ' ' . $model->shipping_state}}<br />
-              &nbsp;{{ $model->shipping_country . ' ' . $model->shipping_zipcode }}<br/>
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->sender) : '') : '' }}<br />
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}<br />
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->province) : '') : '' }}<br />
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->country_code) : '') : '' }}{{ ' ' . $model->shipping_zipcode }}<br />
           </div>
           <div style="font-family:Arial, Helvetica, sans-serif; height:13px;" align="center">
           &nbsp;<strong style="font-size:16px;">{{ $model->order ? $model->order->ordernum : '' }}</strong>
@@ -114,8 +114,10 @@
                      </td>
           <td width="85%" valign="top">
               <div style="font-family:Arial; font-size:12px;">
-                  {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>{{ $model->shipping_address . ' ' . $model->shipping_address1 }}
-                  <br/>{{ $model->shipping_city . ' ' . $model->shipping_state . ' ' . $model->shipping_zipcode }}<br/>{{ $model->shipping_country }}
+                  {{ strtoupper($model->shipping_firstname . ' ' . $model->shipping_lastname) }}<br/>
+                  {{ strtoupper($model->shipping_address) . ' ' . strtoupper($model->shipping_address1) }}<br/>
+                  {{ strtoupper($model->shipping_city) . ' ' . strtoupper($model->shipping_state) . ' ' . $model->shipping_zipcode }}<br/>
+                  {{ $model->shipping_country }}
               </div>
             </td>
         </tr>

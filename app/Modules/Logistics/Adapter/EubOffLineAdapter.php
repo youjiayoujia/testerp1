@@ -149,7 +149,7 @@ class EubofflineAdapter extends BasicAdapter
 
 
         $headers = array(
-            'Expect:100-continue',
+            //'Expect:100-continue',
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,            
         );

@@ -172,7 +172,7 @@ class RequireModel extends BaseModel
             if($v['warehouse_id']==2){
                 $data['warehouse_id']=4;
             }
-            $data['warehouse_id']=UserModel::find($v->purchase_adminer)->warehouse_id;
+            $data['warehouse_id']=UserModel::find($v->purchase_adminer)->warehouse_id?UserModel::find($v->purchase_adminer)->warehouse_id:'3';
             $data['sku']=$itemModel->sku;
             $data['item_id']=$itemModel->id;
             $data['purchase_cost']=$itemModel->purchase_price;

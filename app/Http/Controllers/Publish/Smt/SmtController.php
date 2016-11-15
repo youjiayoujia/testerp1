@@ -91,12 +91,16 @@ class SmtController extends Controller{
            'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
            'accountList' => AccountModel::where('channel_id',$this->channel_id)->get(),
+           'categoryList' => smtCategoryModel::where('pid',0)->get(),
        ];
        return view($this->viewPath . 'onlinIndex', $response);
    }
       
-   public function create()   {
-       
+   public function create(){
+       $a = smtCategoryAttribute::where('id',57)->first();
+       echo "<pre>";
+       print_r(unserialize($a->attribute));
+       exit;
        $this->mainTitle='SMT产品';
        $response = [
            'metas' => $this->metas(__FUNCTION__),

@@ -58,7 +58,7 @@ class ProductImage extends Command
                 $queue->forceDelete();
             }
         } else {
-            foreach ($product->all() as $model) {
+            foreach ($product->where('id','>','51725')->get() as $model) {
                 $job = new ImportImages($model);
                 $job = $job->onQueue('importImages');
                 $this->dispatch($job);

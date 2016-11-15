@@ -1033,11 +1033,11 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        $erp_products_data = DB::select('select distinct(products_sku),pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
+        $erp_products_data = DB::select('select distinct(products_sku),products_id,pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1 and spu!=""');
+                                        from erp_products_data where productsIsActive = 1 and spu!="" order by products_id desc');
 
         foreach($erp_products_data as $data){
             $itemModel = $this->where('sku',$data->products_sku)->get()->first();
@@ -1133,7 +1133,7 @@ class ItemModel extends BaseModel
                 if(count(SpuModel::where('spu',$data->spu)->get())){
                     $spu_id = SpuModel::where('spu',$data->spu)->get()->toArray()[0]['id'];
                 }else{
-                    $spuModel = $this->create($spuData);
+                    $spuModel = SpuModel::create($spuData);
                     $spu_id = $spuModel->id;
                 }
 

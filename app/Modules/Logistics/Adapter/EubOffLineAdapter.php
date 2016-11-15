@@ -55,6 +55,7 @@ class EubofflineAdapter extends BasicAdapter
         $this->_email = $emailTemplateInfo->eub_email;
     
         $response = $this->doUpload($package);
+        print_r($response);
         if ($response['status'] != 0) {
             $result = [
                 'code' => 'success',
@@ -161,9 +162,7 @@ class EubofflineAdapter extends BasicAdapter
     public function sendHttpRequest($url, $requestBody, $headers)
     {
 
-        $connection = curl_init();
-        echo "<pre>";
-        print_r($connection);
+        $connection = curl_init();     
         curl_setopt($connection, CURLOPT_VERBOSE, 1);        
         curl_setopt($connection, CURLOPT_URL, $url);                //set the server we are using (could be Sandbox or Production server)       
         curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);        //stop CURL from verifying the peer's certificate

@@ -74,10 +74,11 @@
         <tr>
           <td width="59%" valign="top" style="border-right:#000 1px solid">
           <div style="font-family:Arial, Helvetica, sans-serif; font-size:11px; line-height:12px">
-              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->sender) : '') : '' }}<br />
-              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}<br />
-              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->province) : '') : '' }}<br />
-              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->country_code) : '') : '' }}{{ ' ' . $model->shipping_zipcode }}<br />
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender) : '') : '' }}<br />
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_street) : '') : '' }}<br />
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_province) : '') : '' }}<br />
+              &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_country) : '') : '' }}
+              {{ ' ' . $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_zipcode) : '') : ''  }}<br />
           </div>
           <div style="font-family:Arial, Helvetica, sans-serif; height:13px;" align="center">
           &nbsp;<strong style="font-size:16px;">{{ $model->order ? $model->order->ordernum : '' }}</strong>
@@ -167,7 +168,7 @@
                 </div></td>
                 <td width="49%"><table width="36" height="32" border="0" align="center" cellpadding="0" cellspacing="0" style="border:1px solid #000; text-align:center; margin-right:">
                   <tr>
-                    <td width="100" height="20" ><font style="font-family:Arial; font-size:24px">areaid</font>&nbsp;</td>
+                    <td width="100" height="20" ><font style="font-family:Arial; font-size:24px">{{ $model->fen_jian }}</font>&nbsp;</td>
                   </tr>
                 </table></td>
               </tr>
@@ -189,16 +190,20 @@
         <tr>
           <td width="42%" valign="top" style="border-bottom: 1px solid #000; border-right: 1px #000 solid"><div style="font-family:Arial; font-size:9px; padding-left:6px;"> 
             FROM:<br />
-                  &nbsp;{{ $model->shipping_firstname . ' ' . $model->shipping_lastname}}<br />
-                  &nbsp;{{ $model->shipping_city }}<br />
-                  &nbsp;{{ $model->shipping_state }}<br />
-                  &nbsp;{{ $model->shipping_country . ' ' . $model->shipping_zipcode }}<br /> 
+                  &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender) : '') : '' }}<br />
+                  &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_street) : '') : '' }}<br />
+                  &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_province) : '') : '' }}<br />
+                  &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_country) : '') : '' }}
+                  {{ ' ' . $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_zipcode) : '') : ''  }}<br />
             <div style="font-size:16px;" align="center"><strong>{{ $model->order ? $model->order->ordernum : ''}}</strong></div>
             PHONE:{{ $model->shipping_phone }}</div></td>
           <td width="58%" rowspan="2" valign="top" style="border-top:#000 solid 1px">
                   <div style=" font-size:11px">
-          SHIP TO:  {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>{{ $model->shipping_address . ' ' . $model->shipping_address1 }}
-                      <br/>{{ $model->shipping_city . ' ' . $model->shipping_state . ' ' . $model->shipping_zipcode }}<br/>{{ $model->shipping_country }}
+          SHIP TO:
+                      {{ strtoupper($model->shipping_firstname . ' ' . $model->shipping_lastname) }}<br/>
+                      {{ strtoupper($model->shipping_address) . ' ' . strtoupper($model->shipping_address1) }}<br/>
+                      {{ strtoupper($model->shipping_city) . ' ' . strtoupper($model->shipping_state) . ' ' . $model->shipping_zipcode }}<br/>
+                      {{ $model->shipping_country }}
                   </div>
           </td>
         </tr>
@@ -232,8 +237,7 @@
               <td height="" align="left" valign="top" style="border-bottom:#000 1px solid; ">
                   <div style=" font-size:10px;color#000;">
                       <strong>
-                      {{ $model->items()->first()->item->name }}' '{{ $model->items()->first()->item->c_name }} ' '
-
+                          {{ $model->getDeclaredInfo()['declared_en'] }}
                       @foreach($model->items as $packageItem)
                         {{ $packageItem->item->sku }}'_'{{ $packageItem->quantity }}<br/>
                       @endforeach
@@ -243,20 +247,22 @@
               </td>
 
               <td align="center" valign="top" style=" border-right:#000 1px solid;border-bottom:#000 1px solid;border-left:#000 1px solid; font-size:10px; ">
-              {{ $model->items()->first()->item->weight }}
+                  {{ $model->getDeclaredInfo()['weight'] }}
               </td>
 
               <td align="center" valign="top" style= "border-right:#000 1px solid; border-bottom:#000 1px solid; font-size:10px;">
-               {{ $model->items()->first()->item->cost }}
+                  {{ $model->getDeclaredInfo()['declared_value'] }}
               </td>
-              <td align="left" valign="top" style="font-size:10px; border-top:#000 1px solid; border-bottom:#000 1px solid;">{{ $model->shipping_country }}</td>
+              <td align="left" valign="top" style="font-size:10px; border-top:#000 1px solid; border-bottom:#000 1px solid;">
+                  {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_country) : '') : '' }}
+              </td>
           </tr>   
              <tr>
               <td align="center"  style="border-right:#000 1px solid;  font-size:10px;">&nbsp;</td>
               <td align="center"  style="border-right:#000 1px solid; font-size:10px; ">&nbsp;{{ $model->items()->sum('quantity')}}</td>
               <td align="left"  style=" "><div style=" font-size:10px">Total Gross Weight (Kg.):</div></td>
-              <td align="center"  style=" border-right:#000 1px solid; font-size:10px; border-left:#000 1px solid; ">&nbsp;{{ $model->weight }}</td>
-              <td align="center"  style= "border-right:#000 1px solid; font-size:10px;">&nbsp;{{ $model->self_value }}</td>
+              <td align="center"  style=" border-right:#000 1px solid; font-size:10px; border-left:#000 1px solid; ">&nbsp;{{ $model->total_weight }}</td>
+              <td align="center"  style= "border-right:#000 1px solid; font-size:10px;">&nbsp;{{ $model->total_price }}</td>
               <td align="center"  style="font-size:10px;">&nbsp;</td>
             </tr>
           </table>

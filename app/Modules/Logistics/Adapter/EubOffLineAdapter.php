@@ -148,8 +148,8 @@ class EubofflineAdapter extends BasicAdapter
 
         $xmlStr .= '</order></orders>';
 
-        //'Expect:100-continue',
-        $headers = array(          
+        $headers = array(     
+            'Expect:100-continue',
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,            
         );
@@ -173,7 +173,7 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);        //set it to return the transfer as a string from curl_exec
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
         $data = curl_exec($connection);                             //Send the Request  
-        echo "<pr>";
+        echo "<pre>";
         $httpcode = curl_getinfo($connection);  
         print_r($httpcode);
         if (curl_errno($connection)) {

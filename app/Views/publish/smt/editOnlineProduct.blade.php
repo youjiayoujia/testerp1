@@ -846,6 +846,7 @@ $template['name'].'</option>';
                         </div>
                       </div>
                     </div>
+
                     <div class="row">
                         <label class="col-sm-2 control-label">自定义关联产品：</label>
                          <div class="col-sm-10">

@@ -1156,7 +1156,7 @@ class SmtController extends Controller{
                 if ($return)
                     $category_attributes = $return;
             }else { //属性存在但不是最新的
-                $category_attributes = unserialize($attributes->attribute);
+                $category_attributes = unserialize(base64_decode($attributes->attribute));
                  
                 //这个属性今天还没更新呢，更新下吧
                 if (!$attributes->last_update_time || date('Y-m-d') != date('Y-m-d', strtotime($attributes->last_update_time))) {

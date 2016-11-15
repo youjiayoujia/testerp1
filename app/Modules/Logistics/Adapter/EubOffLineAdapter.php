@@ -173,6 +173,7 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);        //set it to return the transfer as a string from curl_exec
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
         $data = curl_exec($connection);                             //Send the Request  
+        echo "<pr>";
         $httpcode = curl_getinfo($connection);  
         print_r($httpcode);
         if (curl_errno($connection)) {

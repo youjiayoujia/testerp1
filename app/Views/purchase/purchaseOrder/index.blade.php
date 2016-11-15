@@ -57,6 +57,7 @@
                 <th>sku</th>
                 <th>状态</th>
                 <th>名称</th>
+                <th>注意事项</th>
                 <th>采购数量</th>
                 <th>已到货数量</th>
                 <th>入库数量</th>
@@ -78,6 +79,7 @@
                     <td>{{$purchase_item->sku}}</td>
                     <td>{{config('item.status')[$purchase_item->productItem?$purchase_item->productItem->status:'notFound']}}</td>
                     <td>{{$purchase_item->item?$purchase_item->item->c_name:''}}</td>
+                    <td>{{$purchase_item->item?$purchase_item->item->product->notify:''}}</td>
                     <td>{{$purchase_item->purchase_num}}</td>
                     <td>{{$purchase_item->arrival_num}}</td>
                     <td>{{$purchase_item->storage_qty}}</td>
@@ -99,10 +101,12 @@
                 <tr>
                     <th>合计</th>
                     <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
                     <th>{{ $purchaseOrder->sum_purchase_num}}</th>
                     <th>{{ $purchaseOrder->sum_arrival_num}}</th>
                     <th>{{ $purchaseOrder->sum_storage_qty}}</th>
-                    <th>&nbsp;</th>
+                    
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>

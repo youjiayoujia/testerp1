@@ -93,6 +93,9 @@ class ItemController extends Controller
 
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
+        $data['sku_history_values'] = $model->sku_history_values;
+        $data['sku_history_values'] .= ','.$data['purchase_price'];
+        
         $model->updateItem($data);
 
         $data['products_with_battery'] = 0;

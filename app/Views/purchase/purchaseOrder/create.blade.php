@@ -64,8 +64,8 @@
 			    <div class="form-group col-md-3">
 			        <label for="size">付款凭证</label>
 			         <select  class="form-control" name="is_certificate">
-		                <option value="1">需要</option>
-		                <option value="0">不需要</option>
+						 <option value="0">不需要</option>
+						 <option value="1">需要</option>
 		            </select>
 			    </div>
 			    

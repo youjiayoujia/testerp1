@@ -115,6 +115,7 @@
                         row = $(this).parent();
                         if (parseInt(row.find('.quantity').text()) > parseInt(row.find('.picked_quantity').text())) {
                             outflag = 1;
+                            packageid = row.data('id');
                             row.find('.picked_quantity').text(parseInt(row.find('.picked_quantity').text()) + 1);
                             $.get("{{route('item.getImage')}}",
                                     {sku: row.find('.sku').text()},
@@ -128,16 +129,18 @@
                             $('.result_sku').html("<div class='row'>" + row.find('.sku').text() + "</div>");
                             if (parseInt(row.find('.quantity').text()) == parseInt(row.find('.picked_quantity').text())) {
                                 flag = '1';
-                                $.each(row.find('.picked_quantity'), function () {
-                                    if (parseInt($(this).text()) != parseInt($(this).parent().find('.quantity').text())) {
-                                        flag = '0';
-                                    }
-                                });
+                                $.each($('tr[data-id='+packageid+']'), function(k,v){
+                                    $.each($(v).find('.picked_quantity'), function (k1, v1) {
+                                        if (parseInt($(v1).text()) != parseInt($(v1).parent().find('.quantity').text())) {
+                                            flag = '0';
+                                        }
+                                    });
+                                })
                                 if (flag == '1') {
                                     row.find('.status').text('待包装');
                                 }
+                                return false;
                             }
-                            return 2;
                         }
                     }
                 });
@@ -146,6 +149,7 @@
                 }
                 $('.searchSku').val('');
                 $('.searchSku').focus();
+                return false;
             }
         });
     });

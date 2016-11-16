@@ -1667,17 +1667,17 @@ class SmtProductController extends Controller
                     $update = array();
                     $update['aeopAeProductPropertys'] = $aeopAeProductPropertys;
                     smtProductDetail::where('productId',$product->productId)->update($update);
-                    $export_data[] = array('productId' => $product->productId,
+                    /*$export_data[] = array('productId' => $product->productId,
                                            'account'   => $account_name[$token_id],
                                            'status'    => 1,
                                            'time'      => date('Y-m-d H:i:s'),
-                                           'error_msg' => '');
+                                           'error_msg' => '');*/
                 }else{
-                    $export_data[] = array( 'productId' => $product->productId,
+                    /*$export_data[] = array( 'productId' => $product->productId,
                                             'account'   => $account_name[$token_id],
                                             'status'    => 2,
                                             'time'      => date('Y-m-d H:i:s'),
-                                            'error_msg' => $result['error_message']);
+                                            'error_msg' => $result['error_message']);*/
                 }                      
             }
             

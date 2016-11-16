@@ -93,14 +93,15 @@ class SmtController extends Controller{
            'accountList' => AccountModel::where('channel_id',$this->channel_id)->get(),
            'categoryList' => smtCategoryModel::where('pid',0)->get(),
        ];
+       $response['mixedSearchFields']
+       ['filterSelects'] = [
+           'token_id' => $this->model->getAccountNumber('App\Models\Channel\AccountModel','account'),
+           'productStatusType' => config('smt_product.productStatusType'),
+       ];
        return view($this->viewPath . 'onlinIndex', $response);
    }
       
-   public function create(){
-       $a = smtCategoryAttribute::where('id',57)->first();
-       echo "<pre>";
-       print_r(unserialize($a->attribute));
-       exit;
+   public function create(){   
        $this->mainTitle='SMT产品';
        $response = [
            'metas' => $this->metas(__FUNCTION__),

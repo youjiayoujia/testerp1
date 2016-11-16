@@ -971,9 +971,7 @@ class PackageModel extends BaseModel
                         'status' => 'WAITASSIGN',
                         'weight' => $weight
                     ]);
-                    if(empty($oldWarehouseId)) {
-                        $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
-                    } else {
+                    if(!empty($oldWarehouseId)) {
                         if($oldWarehouseId != $warehouseId) {
                             $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
                         } else {

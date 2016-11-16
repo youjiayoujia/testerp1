@@ -1,6 +1,7 @@
 @extends('common.form')
 @section('formAction') {{ route('package.editTrackStore', ['id' => $model->id]) }} @stop
 @section('formBody')
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="panel panel-default">
         <div class="panel-heading">包裹基础信息</div>
         <div class="panel-body">

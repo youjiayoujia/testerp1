@@ -1029,4 +1029,214 @@ class ItemModel extends BaseModel
 
     }
 
+    public function oneKeyUpdateSku()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $erp_products_data = DB::select('select distinct(products_sku),products_id,pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
+                                        product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
+                                        products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
+                                        products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
+                                        from erp_products_data where productsIsActive = 1 and spu!="" order by products_id desc');
+
+        foreach($erp_products_data as $data){
+            $itemModel = $this->where('sku',$data->products_sku)->get()->first();
+            if(count($itemModel)){
+                //存在sku,更新操作
+                //更新物流包装限制
+                $arr = [];
+                if($data->pack_method){
+                    $arr[] = $data->pack_method;
+                    $itemModel->product->wrapLimit()->sync($arr);
+                }
+                $brr = [];
+                if($data->products_with_battery){
+                    $brr[] = 1;
+                }
+                if($data->products_with_adapter){
+                    $brr[] = 4;
+                }
+                if($data->products_with_fluid){
+                    $brr[] = 5;
+                }
+                if($data->products_with_powder){
+                    $brr[] = 2;
+                }
+                $itemModel->product->logisticsLimit()->sync($brr);
+                //更新数据
+                $old_data['notify'] = $data->products_warring_string;
+                $old_data['name'] = $data->products_name_en;
+                $old_data['c_name'] = $data->products_name_cn;
+                $old_data['declared_en'] = $data->products_declared_en;
+                $old_data['declared_cn'] = $data->products_declared_cn;
+                $old_data['purchase_price'] = $data->products_value;
+                $old_data['weight'] = 0.6;
+                $old_data['package_weight'] = $data->weightWithPacket;
+                $old_data['supplier_id'] = $data->products_suppliers_id;
+                $old_data['quality_standard'] = $data->products_check_standard;
+                $old_data['warehouse_id'] = $data->product_warehouse_id==1000?1:2;
+                $old_data['warehouse_position'] = $data->products_location;
+                $old_data['purchase_url'] = $data->products_more_img;
+                $old_data['competition_url'] = $data->productsPhotoStandard;
+                $old_data['notify'] = $data->products_remark_2;
+                $old_data['is_available'] = $data->productsIsActive;
+                $old_data['status'] =$data->products_status_2;
+                $volume = unserialize($data->products_volume);
+                //长宽高
+                if($volume!=''){
+                    if(!array_key_exists('bp', $volume)){
+                        $volume['bp']['length'] = 0;
+                        $volume['bp']['width'] =0;
+                        $volume['bp']['height'] =0;
+                    }
+                    if(!array_key_exists('ap', $volume)){
+                        $volume['ap']['length'] = 0;
+                        $volume['ap']['width'] =0;
+                        $volume['ap']['height'] =0;
+                    }    
+                    $old_data['package_height'] = $volume['ap']['length'];
+                    $old_data['package_width'] = $volume['ap']['width'];
+                    $old_data['package_length'] = $volume['ap']['height'];
+                    $old_data['height'] = $volume['bp']['length'];
+                    $old_data['width'] = $volume['bp']['width'];
+                    $old_data['length'] = $volume['bp']['height'];
+                }else{
+                    $old_data['package_height'] = 0;
+                    $old_data['package_width'] = 0;
+                    $old_data['package_length'] = 0;
+                    $old_data['height'] = 0;
+                    $old_data['width'] = 0;
+                    $old_data['length'] = 0;
+                }
+                //采购历史
+                $old_data['sku_history_values'] = $data->products_history_values;
+
+                $crr =[];
+                $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+
+                $itemModel->update($old_data);
+                $itemModel->product->update($old_data);
+                $itemModel->skuPrepareSupplier()->sync($crr);
+            }else{
+                //新增
+                //添加库位
+                if($data->products_location!=''){
+                    $position['warehouse_id'] = $data->product_warehouse_id==1000?'1':'2';
+                    $position['name'] = $data->products_location;
+                    $position['is_available'] = 1;
+                    if(!count(PositionModel::where('name',$data->products_location)->get())){
+                        PositionModel::create($position);
+                    }
+                }
+                //创建spu
+                $spuData['spu'] = $data->spu;
+                if(count(SpuModel::where('spu',$data->spu)->get())){
+                    $spu_id = SpuModel::where('spu',$data->spu)->get()->toArray()[0]['id'];
+                }else{
+                    $spuModel = SpuModel::create($spuData);
+                    $spu_id = $spuModel->id;
+                }
+
+                //model数据
+                $productData['model'] = $data->model;
+                $productData['spu_id'] = $spu_id;
+                $productData['name'] = $data->products_name_en;
+                $productData['c_name'] = $data->products_name_cn;
+                $productData['supplier_id'] = $data->products_suppliers_id;
+                $productData['purchase_url'] = $data->products_more_img;
+                $productData['notify'] = $data->products_warring_string;
+                //采购价
+                $productData['purchase_price'] = $data->products_value;
+                $productData['warehouse_id'] = $data->product_warehouse_id==1000?'1':'2';
+                $volume = unserialize($data->products_volume);
+                //长宽高
+                if($volume!=''){
+                    if(!array_key_exists('bp', $volume)){
+                        $volume['bp']['length'] = 0;
+                        $volume['bp']['width'] =0;
+                        $volume['bp']['height'] =0;
+                    }
+                    if(!array_key_exists('ap', $volume)){
+                        $volume['ap']['length'] = 0;
+                        $volume['ap']['width'] =0;
+                        $volume['ap']['height'] =0;
+                    }    
+                    $productData['package_height'] = $volume['ap']['length'];
+                    $productData['package_width'] = $volume['ap']['width'];
+                    $productData['package_length'] = $volume['ap']['height'];
+                    $productData['height'] = $volume['bp']['length'];
+                    $productData['width'] = $volume['bp']['width'];
+                    $productData['length'] = $volume['bp']['height'];
+                }else{
+                    $productData['package_height'] = 0;
+                    $productData['package_width'] = 0;
+                    $productData['package_length'] = 0;
+                    $productData['height'] = 0;
+                    $productData['width'] = 0;
+                    $productData['length'] = 0;
+                }
+                //创建model
+                if(count(ProductModel::where('model',$data->model)->get())){
+                    $product_id = ProductModel::where('model',$data->model)->get()->toArray()[0]['id'];
+                }else{
+                    $productModel = ProductModel::create($productData);
+                    $product_id = $productModel->id;
+                    //包装限制
+                    if($data->pack_method!=''){
+                        $wrr['wrap_limits_id'] = $data->pack_method;
+                        $productModel->wrapLimit()->sync($wrr); 
+                    }
+                    //物流限制
+                    $brr = [];
+                    if($data->products_with_battery){
+                        $brr[] = 1;
+                    }
+                    if($data->products_with_adapter){
+                        $brr[] = 4;
+                    }
+                    if($data->products_with_fluid){
+                        $brr[] = 5;
+                    }
+                    if($data->products_with_powder){
+                        $brr[] = 2;
+                    }
+                    $productModel->logisticsLimit()->sync($brr);
+
+                }
+
+                //数据
+                $skuData['product_id'] = $product_id;
+                $skuData['sku'] = $data->products_sku;
+                $skuData['name'] = $data->products_name_en;
+                $skuData['c_name'] = $data->products_name_cn;
+                $skuData['weight'] = $data->products_weight;
+                $skuData['warehouse_id'] = $data->product_warehouse_id==1000?'1':'2';
+                $skuData['warehouse_position'] = $data->products_location;
+                $skuData['supplier_id'] = $data->products_suppliers_id;
+                $skuData['purchase_url'] = $data->products_more_img;
+                $skuData['purchase_price'] = $data->products_value;
+                $skuData['cost'] = $data->products_value;
+                $skuData['height'] = $productData['height'];
+                $skuData['width'] = $productData['width'];
+                $skuData['length'] = $productData['length'];
+                $skuData['package_height'] = $productData['package_height'];
+                $skuData['package_width'] = $productData['package_width'];
+                $skuData['package_length'] =$productData['package_length'];
+                //采购历史
+                $skuData['sku_history_values'] = $data->products_history_values;  
+                $skuData['status'] =$data->products_status_2;
+                $skuData['is_available'] = $data->productsIsActive; 
+                //创建sku
+                $itemModel = ItemModel::create($skuData);
+                foreach(explode(',',$data->products_suppliers_ids) as $_supplier_id){
+                    $arr['supplier_id'] = $_supplier_id;
+                    $itemModel->skuPrepareSupplier()->attach($arr);
+                }
+            }
+            
+            
+        }
+
+    }
+
 }

@@ -846,27 +846,7 @@ $template['name'].'</option>';
                         </div>
                       </div>
                     </div>
-                    <div class="row">
-                        <label class="col-sm-2 control-label">自定义关联产品：</label>
-                         <div class="col-sm-10">
-                        <div>
-                            <a href="javascript:void(0);" class="btn btn-default btn-sm relate-product">选择产品</a>
-                            &nbsp;&nbsp;
-                            <a class="btn btn-xs btn-primary pic-del-all" title="全部删除"><i class="glyphicon glyphicon-refresh"></i></a>
-                            &nbsp;&nbsp;
-                            插入到位置：
-                            <label>
-                                <input type="radio" name="relation_loction" value="header" <?php echo $smtApi->filterData('relationLocation', $draft_detail) == 'header' ? 'checked' : '';?>/>在前
-                            </label>
-                            <label>
-                                <input type="radio" name="relation_loction" value="footer" <?php echo ($smtApi->filterData('relationLocation', $draft_detail) == 'footer' || !$smtApi->filterData('relationLocation', $draft_detail)) ? 'checked' : '';?>/>在后
-                            </label>
-                        </div>
-                        <ul class="list-inline relate-list">
-                            
-                        </ul>
-                    </div>
-                    </div>
+                    
                     <div class="row">
                         <div class="form-group clearfix ">
                             <label for="detail" class=" col-sm-2 control-label">详情描述:</label>                       

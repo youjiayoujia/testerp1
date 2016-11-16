@@ -20,7 +20,7 @@ class CreateItemsTable extends Migration
 			$table->string('sku')->nullable()->default('0');
 			$table->string('name')->nullable();
 			$table->string('c_name')->nullable();
-			$table->string('competition_url');
+			$table->text('competition_url');
 			$table->decimal('weight', 5)->nullable()->default(0.00);
 			$table->decimal('package_weight', 5)->nullable();
 			$table->string('inventory')->nullable();
@@ -33,7 +33,7 @@ class CreateItemsTable extends Migration
 			$table->string('second_supplier_id')->nullable();
 			$table->string('second_supplier_sku')->nullable();
 			$table->string('supplier_info')->nullable();
-			$table->string('purchase_url')->nullable();
+			$table->text('purchase_url')->nullable();
 			$table->decimal('purchase_price', 7)->nullable();
 			$table->decimal('purchase_carriage', 5)->nullable();
 			$table->integer('purchase_adminer')->nullable();

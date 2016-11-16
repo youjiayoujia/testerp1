@@ -60,7 +60,7 @@ class SupplierController extends Controller
 			return redirect(route('productSupplier.create'))->with('alert', $this->alert('danger', '图片格式不正确.'));
 		}else{
             $name = UserModel::find(request()->user()->id)->name;
-            $to = base64_encode(serialize($model));
+            $to = json_encode($model);
             $this->eventLog($name, '数据更新', $to, '');
 
 			SupplierChangeHistoryModel::create([
@@ -102,7 +102,7 @@ class SupplierController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
 
 
         if (!$model) {
@@ -122,7 +122,7 @@ class SupplierController extends Controller
 		if($res == true){
             $name = UserModel::find(request()->user()->id)->name;
             $to = $this->model->find($id);
-            $to = base64_encode(serialize($to));
+            $to = json_encode($to);
             $this->eventLog($name, '数据更新', $to, $from);
             return redirect($this->mainIndex);
         }else{

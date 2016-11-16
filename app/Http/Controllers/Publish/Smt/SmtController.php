@@ -91,12 +91,16 @@ class SmtController extends Controller{
            'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
            'accountList' => AccountModel::where('channel_id',$this->channel_id)->get(),
+           'categoryList' => smtCategoryModel::where('pid',0)->get(),
        ];
        return view($this->viewPath . 'onlinIndex', $response);
    }
       
-   public function create()   {
-       
+   public function create(){
+       $a = smtCategoryAttribute::where('id',57)->first();
+       echo "<pre>";
+       print_r(unserialize($a->attribute));
+       exit;
        $this->mainTitle='SMT产品';
        $response = [
            'metas' => $this->metas(__FUNCTION__),
@@ -1152,6 +1156,7 @@ class SmtController extends Controller{
                 if ($return)
                     $category_attributes = $return;
             }else { //属性存在但不是最新的
+                //$data = preg_replace('!s:(\d+):"(.*?)";!e', "'s:'.strlen('$2').':\"$2\";'", $data);
                 $category_attributes = unserialize($attributes->attribute);
                  
                 //这个属性今天还没更新呢，更新下吧

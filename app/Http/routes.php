@@ -428,6 +428,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('item/batchDelete', ['uses' => 'ItemController@batchDelete', 'as' => 'item.batchDelete']);
     Route::any('item/batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('item/batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
+    Route::any('item/oneKeyUpdateSku', ['uses' => 'ItemController@oneKeyUpdateSku', 'as' => 'item.oneKeyUpdateSku']);
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');
@@ -943,6 +944,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
             ['uses' => 'SmtProductController@copyAllAccountNew', 'as' => 'smtProduct.copyAllAccountNew']);
         Route::post('getCategoryInfo',
             ['uses' => 'SmtProductController@getCategoryInfo', 'as' => 'smtProduct.getCategoryInfo']);
+        Route::post('getCategoryAttributesById',
+            ['uses' => 'SmtProductController@getCategoryAttributesById', 'as' => 'smtProduct.getCategoryAttributesById']);
+        Route::post('batchModifyBand',
+            ['uses' => 'SmtProductController@batchModifyBand', 'as' => 'smtProduct.batchModifyBand']);
+        
+        
 
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');

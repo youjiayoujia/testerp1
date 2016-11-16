@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddPurchaseOutofstockTable extends Migration
+class CreateErpEub extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,12 @@ class AddPurchaseOutofstockTable extends Migration
      */
     public function up()
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->integer('need_total_num')->comment('缺货数量')->default(NULL);
+        Schema::create('erp_eub', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('code');
+            $table->string('zip');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -24,8 +28,6 @@ class AddPurchaseOutofstockTable extends Migration
      */
     public function down()
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->dropColumn('need_total_num');
-        });
+        Schema::drop('erp_eub');
     }
 }

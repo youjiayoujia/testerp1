@@ -162,7 +162,7 @@ class RuleController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->create(request()->all());
         $model->createAll(request()->all());
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
         return redirect($this->mainIndex);
     }
 
@@ -239,7 +239,7 @@ class RuleController extends Controller
     {
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -247,7 +247,7 @@ class RuleController extends Controller
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateAll(request()->all());
         $model = $this->model->with('rule_transports')->with('rule_limits')->with('rule_countries')->with('rule_accounts')->with('rule_channels')->with('rule_catalogs')->find($id);
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url);

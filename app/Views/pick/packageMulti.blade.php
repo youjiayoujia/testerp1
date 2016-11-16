@@ -185,10 +185,10 @@ $(document).ready(function(){
             }
         });
         buf = new Array();
-        n = 0;
         $.each($('.sku'), function(){
             if($(this).parent().find('.picked_quantity').text() == '0' && $(this).text() == arr[0]) {
                 package_id = $(this).parent().data('id');
+                n = 0;
                 $.each($('.'+package_id), function(k,v){
                     quantity = $(v).find('.quantity').text();
                     quantity = parseInt(quantity);

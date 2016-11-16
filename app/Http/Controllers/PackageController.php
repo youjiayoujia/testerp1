@@ -684,7 +684,12 @@ class PackageController extends Controller
                     $newPackage->items()->create($packageItem);
                     $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
                 }
-                $newPackage->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                $position = $newPackage->items->first()->warehouse_position_id;
+                if($position) {
+                    $newPackage->update(['weight' => $weight, 'status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0']);
+                } else {
+                    $newPackage->update(['weight' => $weight, 'status' => 'NEW', 'logistics_id' => '0', 'tracking_no' => '0']);
+                }
                 $this->eventLog($name, '拆分包裹', $to);
                 $newPackage->order->update(['status' => 'REVIEW']);
             }
@@ -1334,7 +1339,7 @@ class PackageController extends Controller
         if($model->status != 'ERROR') {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹状态不是异常.'));
         }
-        $model->update(['status' => 'SHIPPED']);
+        $model->update(['status' => 'PACKED']);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功.'));
     }

@@ -90,7 +90,7 @@
                     </a>
                 @endif
                 @if($package->status == 'ERROR')
-                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已发货'>
+                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
                         <span class="glyphicon glyphicon-check"></span>
                     </a>
                 @endif

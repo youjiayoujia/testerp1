@@ -577,6 +577,7 @@ class PackageController extends Controller
 
     public function editTrackingNo($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -584,6 +585,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, '修改追踪号'),
             'model' => $model,
+            'hideUrl' => $hideUrl
         ];
 
         return view($this->viewPath . 'editTrackingNo', $response);
@@ -654,7 +656,8 @@ class PackageController extends Controller
         $model->update(['tracking_no' => request('tracking_no'), 'shipping_address' => request('shipping_address')]);
         $to = json_encode($model);
         $this->eventLog($name, '修改追踪号', $to, $from);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url);
     }
 
     public function actSplitPackage($arr, $id)
@@ -1328,6 +1331,21 @@ class PackageController extends Controller
 
             return view($this->viewPath . 'excelResult', $response);
         }
+    }
+
+    public function errorToShipped()
+    {
+        $id = request('id');
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
+        }
+        if($model->status != 'ERROR') {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹状态不是异常.'));
+        }
+        $model->update(['status' => 'SHIPPED']);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功.'));
     }
 
     /**

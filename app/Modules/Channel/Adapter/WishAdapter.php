@@ -642,27 +642,39 @@ Class WishAdapter implements AdapterInterface
 
     }
 
-    public function isResetAccesstoken()
+    public function isResetAccesstoken($is_now=false)
     {
         $now = date("Y-m-d H:i:s");
         $hours = (strtotime($now) - strtotime($this->expiry_time)) / 60 / 60;
-
-        if ($hours > 10) {
+        if($is_now){
             $json = $this->getAccessTokenByRefresh(); //获取最新的access_token
             $data = json_decode($json, true);
-
-            if ($data['code'] == 0 && !empty($data['data'])) {
+            if(isset($data['data']["access_token"])){
                 DB::table('channel_accounts')->where('wish_client_id', $this->client_id)->update([
                     'wish_access_token' => $data['data']["access_token"],
                     'wish_refresh_token' => $data['data']['refresh_token'],
                     'wish_expiry_time' => date('Y-m-d H:i:s', $data['data']['expiry_time'])
                 ]);
+                $this->sendToSlme($data['data']["access_token"],$this->client_id,$data['data']['expiry_time']);
+            }
+        }else{
+            if ($hours > 10) {
+                $json = $this->getAccessTokenByRefresh(); //获取最新的access_token
+                $data = json_decode($json, true);
+
+                if ($data['code'] == 0 && !empty($data['data'])) {
+                    DB::table('channel_accounts')->where('wish_client_id', $this->client_id)->update([
+                        'wish_access_token' => $data['data']["access_token"],
+                        'wish_refresh_token' => $data['data']['refresh_token'],
+                        'wish_expiry_time' => date('Y-m-d H:i:s', $data['data']['expiry_time'])
+                    ]);
+                } else {
+                    return false;
+                }
+                return $data['data']["access_token"];
             } else {
                 return false;
             }
-            return $data['data']["access_token"];
-        } else {
-            return false;
         }
     }
 
@@ -684,6 +696,33 @@ Class WishAdapter implements AdapterInterface
         return $result;
     }
 
+    public function checkToken($data){
+        $data = json_decode($data,true);
+        if(isset($data['code'])){
+            if($data['code']==1016){
+                $this->isResetAccesstoken(true);
+            }
+        }
+    }
+    public function sendToSlme($access_token,$client_id,$expiry_time){
+        $url = 'http://v2.erp.moonarstore.com/admin/auto/auto_wish_get_tokens/get_v3_access_token?key=SLME5201314&access_token='.$access_token.'&client_id='.$client_id.'&expiry_time='.$expiry_time;
+        $this-> getCurlDataSlme($url);
+    }
+
+    public function getCurlDataSlme($remote_server)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $remote_server);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true); // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $output = curl_exec($ch);
+        if (curl_errno($ch)) {
+            die(curl_error($ch)); //异常错误
+        }
+        curl_close($ch);
+        return $output;
+    }
     /**
      * Curl http Get 数据
      * 使用方法：
@@ -716,6 +755,7 @@ Class WishAdapter implements AdapterInterface
             echo $error . '<br/>';
         }
         curl_close($curl); // 关闭CURL会话
+        $this->checkToken($tmpInfo);
         return $tmpInfo; // 返回数据
     }
 

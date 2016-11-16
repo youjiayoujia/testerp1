@@ -49,7 +49,7 @@ class PackageController extends Controller
     {
         $len = 1000;
         $start = 0;
-        $packages = $this->model->whereIn('status', ['NEED', 'NEW'])->skip($start)->take($len)->get();
+        $packages = $this->model->where('status', 'NEW')->skip($start)->take($len)->get();
         $name = UserModel::find(request()->user()->id)->name;
         while ($packages->count()) {
             foreach ($packages as $package) {
@@ -678,22 +678,26 @@ class PackageController extends Controller
             foreach ($tmp as $packageId => $info) {
                 if (!$packageId) {
                     $from = json_encode($model);
+                    $weight = 0;
                     foreach ($info as $itemId => $packageItem) {
                         $packageItem['item_id'] = $itemId;
                         $model->items()->create($packageItem);
+                        $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
                     }
-                    $model->update(['status' => 'NEW']);
+                    $model->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
                     $to = json_encode($model);
                     $this->eventLog($name, '拆分包裹', $to, $from);
                     $model->order->update(['status' => 'REVIEW']);
                 } else {
                     $newPackage = $this->model->create($model->toArray());
                     $to = json_encode($newPackage);
+                    $weight = 0;
                     foreach ($info as $itemId => $packageItem) {
                         $packageItem['item_id'] = $itemId;
                         $newPackage->items()->create($packageItem);
+                        $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
                     }
-                    $newPackage->update(['status' => 'NEW']);
+                    $newPackage->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
                     $this->eventLog($name, '拆分包裹', $to);
                     $newPackage->order->update(['status' => 'REVIEW']);
                 }

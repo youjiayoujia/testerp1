@@ -77,7 +77,6 @@ Class WishAdapter implements AdapterInterface
         $url = $url . $apiString;
         $orderjson = $this->getCurlData($url);
         $orderList = json_decode($orderjson, true);
-        var_dump($orderList);
         if (isset($orderList['code']) && ($orderList['code'] == 0) && !empty($orderList['data'])) {
             foreach ($orderList['data'] as $order) {
                 $orders[$order['Order']['transaction_id']][] = $order;

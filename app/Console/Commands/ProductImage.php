@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\ProductModel;
+use App\Models\Product\ImageModel;
 use App\Models\Log\QueueModel;
 use App\Jobs\ImportImages;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -58,7 +59,8 @@ class ProductImage extends Command
                 $queue->forceDelete();
             }
         } else {
-            foreach ($product->where('id','>','51725')->get() as $model) {
+            $image_id = ImageModel::all()->last()->product_id;
+            foreach ($product->where('id','>',$image_id)->get() as $model) {
                 $job = new ImportImages($model);
                 $job = $job->onQueue('importImages');
                 $this->dispatch($job);

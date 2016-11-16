@@ -719,7 +719,7 @@ $("#batchModifyBand").click(function(){
 })
 
 $('#modify').click(function () {
-	$('#modifyBand').modal('hide');
+	$('#modify').addClass('disabled');
 })
 
 $(document).on('change', '#select2-mixedSearchFieldsfilterSelectstoken_id-rs-container', function(){

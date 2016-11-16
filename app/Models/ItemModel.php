@@ -1070,6 +1070,7 @@ class ItemModel extends BaseModel
                 $old_data['c_name'] = $data->products_name_cn;
                 $old_data['declared_en'] = $data->products_declared_en;
                 $old_data['declared_cn'] = $data->products_declared_cn;
+                $old_data['declared_value'] = $data->products_declared_value;
                 $old_data['purchase_price'] = $data->products_value;
                 $old_data['weight'] = 0.6;
                 $old_data['package_weight'] = $data->weightWithPacket;

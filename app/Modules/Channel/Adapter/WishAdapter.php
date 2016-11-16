@@ -168,7 +168,7 @@ Class WishAdapter implements AdapterInterface
             $orderInfo['shipping_zipcode'] = isset($orderSingle['ShippingDetail']['zipcode']) ? $orderSingle['ShippingDetail']['zipcode'] : '';
             $orderInfo['shipping_phone'] = isset($orderSingle['ShippingDetail']['phone_number']) ? $orderSingle['ShippingDetail']['phone_number'] : '';
             $orderInfo['payment_date'] = $this->getPayTime($orderSingle['order_time']);
-            if(date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)<'2016-11-15 18:00:00'){
+            if(date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)<'2016-11-16 10:00:00'){
                 continue;
             }
             $orderInfo['status'] = 'PAID';
@@ -716,8 +716,6 @@ Class WishAdapter implements AdapterInterface
             echo $error . '<br/>';
         }
         curl_close($curl); // 关闭CURL会话
-
-
         return $tmpInfo; // 返回数据
     }
 

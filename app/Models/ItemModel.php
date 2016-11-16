@@ -14,6 +14,7 @@ use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\UserModel;
 use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
+use App\Models\Spu\SpuMultiOptionModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -1232,9 +1233,19 @@ class ItemModel extends BaseModel
                     $arr['supplier_id'] = $_supplier_id;
                     $itemModel->skuPrepareSupplier()->attach($arr);
                 }
-            }
-            
-            
+            }    
+        }
+        $last_id = SpuMultiOptionModel::all()->last()->spu_id;
+        $spus = SpuModel::where('id','>',$last_id)->get();
+        foreach ($spus as $spu) {
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>1]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>2]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>3]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>4]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>5]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>6]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>7]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>8]);
         }
 
     }

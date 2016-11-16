@@ -676,32 +676,19 @@ class PackageController extends Controller
                 $item->delete();
             }
             foreach ($tmp as $packageId => $info) {
-                if (!$packageId) {
-                    $from = json_encode($model);
-                    $weight = 0;
-                    foreach ($info as $itemId => $packageItem) {
-                        $packageItem['item_id'] = $itemId;
-                        $model->items()->create($packageItem);
-                        $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
-                    }
-                    $model->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
-                    $to = json_encode($model);
-                    $this->eventLog($name, '拆分包裹', $to, $from);
-                    $model->order->update(['status' => 'REVIEW']);
-                } else {
-                    $newPackage = $this->model->create($model->toArray());
-                    $to = json_encode($newPackage);
-                    $weight = 0;
-                    foreach ($info as $itemId => $packageItem) {
-                        $packageItem['item_id'] = $itemId;
-                        $newPackage->items()->create($packageItem);
-                        $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
-                    }
-                    $newPackage->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
-                    $this->eventLog($name, '拆分包裹', $to);
-                    $newPackage->order->update(['status' => 'REVIEW']);
+                $newPackage = $this->model->create($model->toArray());
+                $to = json_encode($newPackage);
+                $weight = 0;
+                foreach ($info as $itemId => $packageItem) {
+                    $packageItem['item_id'] = $itemId;
+                    $newPackage->items()->create($packageItem);
+                    $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
                 }
+                $newPackage->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                $this->eventLog($name, '拆分包裹', $to);
+                $newPackage->order->update(['status' => 'REVIEW']);
             }
+            $model->delete();
         }
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '包裹拆分成功.'));

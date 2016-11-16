@@ -263,8 +263,9 @@ class SpuController extends Controller
      */
     public function insertLan()
     {
-        $spus = $this->model->all();
-
+        ini_set('memory_limit','2048M');
+        $last_id = SpuMultiOptionModel::all()->last()->spu_id;
+        $spus = $this->model->where('id','>',$last_id)->get();
         foreach ($spus as $spu) {
             SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>1]);
             SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>2]);

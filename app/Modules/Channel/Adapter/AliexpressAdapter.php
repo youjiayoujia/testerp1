@@ -655,7 +655,7 @@ Class AliexpressAdapter implements AdapterInterface
                     //判断分类ID是否存在，不存在就插入，存在就UPdate
                     $options = array(
                         'category_id'      => $category_id,
-                        'attribute'        => base64_encode(serialize($rs['attributes'])),
+                        'attribute'        => serialize($rs['attributes']),
                         'last_update_time' => date('Y-m-d H:i:s')
                     );
                     

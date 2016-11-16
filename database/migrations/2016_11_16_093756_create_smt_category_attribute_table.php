@@ -16,7 +16,7 @@ class CreateSmtCategoryAttributeTable extends Migration
         Schema::create('smt_category_attribute', function(Blueprint $table) {
             $table->increments('id');
 			$table->integer('category_id');
-			$table->text('attribute', 16777215);
+			$table->mediumText('attribute');
 			$table->dateTime('last_update_time');
 			$table->timestamps();
 			$table->softDeletes();

@@ -17,6 +17,7 @@ use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseRequireModel;
 use App\Models\Product\SupplierModel;
 use App\Models\StockModel;
+use App\Models\UserModel;
 use App\Models\PackageModel;
 use App\Models\Package\ItemModel;
 use App\Models\ItemModel as ProductItemModel;
@@ -83,12 +84,15 @@ class RequireController extends Controller
 			$data['type']=0;
 			//$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
 			//测试专用仓库
-			if($v['warehouse_id']==1){
+			/*if($v['warehouse_id']==1){
                 $data['warehouse_id']=3;
             }
             if($v['warehouse_id']==2){
                 $data['warehouse_id']=4;
-            }
+            }*/
+
+            //根据采购人绑定仓库
+            $data['warehouse_id'] = UserModel::find($v->purchase_adminer)->warehouse_id?UserModel::find($v->purchase_adminer)->warehouse_id:'3';
             
 			$data['sku']=$v->sku;
 			$data['item_id']=$v->id;
@@ -131,8 +135,11 @@ class RequireController extends Controller
                     $data['warehouse_id']=4;
                 }		 
 				$data['supplier_id']=$v['supplier_id'] ? $v['supplier_id'] : 0;
+				$data['user_id'] = $v['user_id'];
 				$supplier=SupplierModel::find($v['supplier_id']);
 				$data['assigner']=$supplier->purchase_id ? $supplier->purchase_id : 0;
+				//echo '<pre>';
+				//print_r($data);exit;
 				$purchaseOrder=PurchaseOrderModel::create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){

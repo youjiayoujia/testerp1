@@ -30,7 +30,10 @@ class EubofflineAdapter extends BasicAdapter
         $apiInfoArr=explode(',',$emailTemplateInfo->eub_api);
         $this->_authenticate = $apiInfoArr[0];//授权码
         $this->_customer_code = $apiInfoArr[1];//客户编码
-        $this->_vip_code = $apiInfoArr[2];//大客户编码;
+        $this->_vip_code = '';  //大客户编码;
+        if(array_key_exists('2', $apiInfoArr)){
+            $this->_vip_code = $apiInfoArr[2];
+        }         
         //寄件人信息
         $this->_sender = $emailTemplateInfo->eub_sender;
         $this->_senderZip = $emailTemplateInfo->eub_sender_zipcode;
@@ -55,6 +58,7 @@ class EubofflineAdapter extends BasicAdapter
         $this->_email = $emailTemplateInfo->eub_email;
     
         $response = $this->doUpload($package);
+        print_r($response);
         if ($response['status'] != 0) {
             $result = [
                 'code' => 'success',
@@ -147,15 +151,12 @@ class EubofflineAdapter extends BasicAdapter
 
         $xmlStr .= '</order></orders>';
 
-
-        $headers = array(
-            'Expect:',
+        $headers = array(     
+            'Content-Type: text/xml; charset=UTF-8',
             'authenticate:' . $this->_authenticate,
             'version:' . $this->_version,            
         );
-        /*echo "<pre>";
-        print_r($xmlStr);
-        exit;*/
+
         $result = $this->sendHttpRequest($this->_url, $xmlStr, $headers);
         return $result;
 
@@ -163,7 +164,8 @@ class EubofflineAdapter extends BasicAdapter
 
     public function sendHttpRequest($url, $requestBody, $headers)
     {
-        $connection = curl_init();
+
+        $connection = curl_init();     
         curl_setopt($connection, CURLOPT_VERBOSE, 1);        
         curl_setopt($connection, CURLOPT_URL, $url);                //set the server we are using (could be Sandbox or Production server)       
         curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);        //stop CURL from verifying the peer's certificate
@@ -174,11 +176,10 @@ class EubofflineAdapter extends BasicAdapter
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);        //set it to return the transfer as a string from curl_exec
         curl_setopt($connection, CURLOPT_TIMEOUT, 200);       
         $data = curl_exec($connection);                             //Send the Request  
+        /*echo "<pre>";
         $httpcode = curl_getinfo($connection);  
-        echo "<pre>";
-        print_r($httpcode);
-        if (curl_errno($connection)) {
-            // $this->setCurlErrorLog(curl_error ( $curl ));
+        print_r($httpcode);*/
+        if (curl_errno($connection)) {            
             $return['status'] = 0;
             $return['msg'] = curl_error($connection);
             return $return;

@@ -160,6 +160,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['as' => 'product.ajaxReturnLogistics', 'uses' => 'ProductController@ajaxReturnLogistics']);
     Route::any('ajaxReutrnCatalogs',
         ['uses' => 'ProductController@ajaxReutrnCatalogs', 'as' => 'ajaxReutrnCatalogs']);
+    Route::any('submitItemEdit',
+        ['uses' => 'ProductController@submitItemEdit', 'as' => 'product.submitItemEdit']);
+    Route::any('edititemattribute/{id}', ['uses' => 'ProductController@editItemAttribute']);
+
     //通关报关
     Route::post('customsClearance/exportProduct',
         ['uses' => 'CustomsClearanceController@exportProduct', 'as' => 'customsClearance.exportProduct']);
@@ -942,6 +946,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
             ['uses' => 'SmtProductController@copyAllAccountNew', 'as' => 'smtProduct.copyAllAccountNew']);
         Route::post('getCategoryInfo',
             ['uses' => 'SmtProductController@getCategoryInfo', 'as' => 'smtProduct.getCategoryInfo']);
+        Route::post('getCategoryAttributesById',
+            ['uses' => 'SmtProductController@getCategoryAttributesById', 'as' => 'smtProduct.getCategoryAttributesById']);
+        Route::post('batchModifyBand',
+            ['uses' => 'SmtProductController@batchModifyBand', 'as' => 'smtProduct.batchModifyBand']);
+        
+        
 
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');

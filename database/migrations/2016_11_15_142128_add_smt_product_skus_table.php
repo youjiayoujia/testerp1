@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterPurchaseTable extends Migration
+class AddSmtProductSkusTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,8 @@ class AlterPurchaseTable extends Migration
      */
     public function up()
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->integer('need_total_num')->comment('缺货数量')->default(0);
+        Schema::table('smt_product_skus', function (Blueprint $table) {
+            $table->integer('propertyValueId');
         });
     }
 
@@ -24,8 +24,8 @@ class AlterPurchaseTable extends Migration
      */
     public function down()
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->dropColumn('need_total_num');
+        Schema::table('smt_product_skus', function (Blueprint $table) {
+            $table->dropColumn('propertyValueId');
         });
     }
 }

@@ -28,6 +28,7 @@ use App\Models\Catalog\SetModel;
 use App\Models\Catalog\SetValueModel;
 use App\Models\Catalog\VariationModel;
 use App\Models\Catalog\VariationValueModel;
+use App\Models\Product\ProductLogisticsLimitModel;
 class ProductController extends Controller
 {
     public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel,WarehouseModel $warehouse)
@@ -78,7 +79,7 @@ class ProductController extends Controller
      */
     public function store()
     {
-        $attributesAry = request()->input('modelSet');
+        $attributesAry  = request()->input('modelSet');
         /*if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
         }*/
@@ -87,7 +88,7 @@ class ProductController extends Controller
         if(!array_key_exists('modelSet',request()->all())){
             return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
         }
-        //创建新添加的SET 和 Variation属性
+        //如果包含没有添加的属性就创建新添加的SET 和 Variation属性
         if(!empty($attributesAry)){
             $setId = SetModel::where('catalog_id',request()->input('catalog_id'))->where('name','颜色')->first()->id;
             $variationObj  = VariationModel::where('catalog_id',request()->input('catalog_id'))->first();
@@ -139,9 +140,80 @@ class ProductController extends Controller
             }
         }
 
-        $this->model->createProduct(request()->all(),request()->files);
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
+        $VarValues     = VariationValueModel::where('variation_id',$variationObj->id)->get();
+        foreach ($attributesAry as $key_color => $attributes){
+            $tmpVariation  = '';
+            foreach ($attributes['variations'] as $varkey => $var_ary){
+                foreach ($var_ary as $varitem){
+                    //写入对应的id值
+                    foreach ($VarValues as $varObj){
+                        if($varitem == $varObj->name){
+                            $tmpVariation[$varkey][$varObj->id] = $varObj->name;
+                        }
+                    }
+                }
+            }
+            $attributesAry[$key_color]['variations'] = $tmpVariation;
+        }
+        $tmpDataAry = request()->all();
+        $tmpDataAry['modelSet'] = $attributesAry;
+        $productIdCreated =  $this->model->createProduct($tmpDataAry,request()->files);
+
+        return redirect('edititemattribute/'.$productIdCreated);
     }
+
+    public function editItemAttribute($productId = false){
+        if($productId){
+            $product = $this->model->find($productId);
+            $limits  = $product->logisticsLimit;
+            $items = $product->item;
+            $response = [
+                'metas'   => $this->metas(__FUNCTION__),
+                'items'   => $items,
+                'limits'  => $limits,
+                'product' => $product
+            ];
+
+            return view($this->viewPath . 'edit_item_attribute', $response);
+            //return redirect($this->viewPath . 'edit_item_attribute')->with($response);
+        }
+    }
+
+    public function submitItemEdit(){
+        $form            = request()->input();
+        $product         = $this->model->find($form['product_id']);
+        $product->notify = $form['notify'];
+        $product->save();
+
+        $items = $product->item;
+        if(!empty($form['limits'])){
+            $limit_ary = '';
+            foreach ($form['limits'] as $key => $form_list){
+                $limit_ary[] = $key;
+            }
+            ProductLogisticsLimitModel::where('product_id',$form['product_id'])->whereNotIn('logistics_limits_id',$limit_ary)->delete();
+        }else{
+            ProductLogisticsLimitModel::where('product_id',$form['product_id'])->delete();
+        }
+        if(!$items->isEmpty()){
+            foreach ($items as  $item){
+                foreach ($form['items'] as $item_id => $form_item){
+                    if($item_id == $item->id){
+                        $item->c_name          = $form_item['c_name'];
+                        $item->purchase_price  = $form_item['purchase_price'];
+                        $item->purchase_url    = $form_item['purchase_url'];
+                        $item->competition_url = $form_item['competition_url'];
+                        $item->save();
+                    }
+                }
+            }
+        }
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
+
+
+    }
+
     /**
      * 产品编辑页面
      *

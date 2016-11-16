@@ -24,6 +24,7 @@ use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
 use App\Models\SyncApiModel;
+use App\Models\Channel\CatalogRatesModel;
 
 class ItemController extends Controller
 {
@@ -93,6 +94,9 @@ class ItemController extends Controller
 
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
+        $data['sku_history_values'] = $model->sku_history_values;
+        $data['sku_history_values'] .= ','.$data['purchase_price'];
+        
         $model->updateItem($data);
 
         $data['products_with_battery'] = 0;
@@ -476,7 +480,7 @@ class ItemController extends Controller
             'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit'),$field = ['*'],$pageSize='10'),
             'mixedSearchFields' => $this->model->mixed_search,
 
-            'Compute_channels' => ChannelModel::all(),
+            'Compute_channels' => CatalogRatesModel::all(),
 
         ];
         return view($this->viewPath . 'index', $response);

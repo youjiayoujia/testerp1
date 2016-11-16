@@ -14,6 +14,7 @@ use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\UserModel;
 use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
+use App\Models\Spu\SpuMultiOptionModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -1033,11 +1034,11 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        $erp_products_data = DB::select('select distinct(products_sku),pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
+        $erp_products_data = DB::select('select distinct(products_sku),products_id,pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1');
+                                        from erp_products_data where productsIsActive = 1 and spu!="" order by products_id desc');
 
         foreach($erp_products_data as $data){
             $itemModel = $this->where('sku',$data->products_sku)->get()->first();
@@ -1117,10 +1118,6 @@ class ItemModel extends BaseModel
                 $itemModel->update($old_data);
                 $itemModel->product->update($old_data);
                 $itemModel->skuPrepareSupplier()->sync($crr);
-
-
-
-
             }else{
                 //新增
                 //添加库位
@@ -1137,7 +1134,7 @@ class ItemModel extends BaseModel
                 if(count(SpuModel::where('spu',$data->spu)->get())){
                     $spu_id = SpuModel::where('spu',$data->spu)->get()->toArray()[0]['id'];
                 }else{
-                    $spuModel = $this->create($spuData);
+                    $spuModel = SpuModel::create($spuData);
                     $spu_id = $spuModel->id;
                 }
 
@@ -1236,9 +1233,19 @@ class ItemModel extends BaseModel
                     $arr['supplier_id'] = $_supplier_id;
                     $itemModel->skuPrepareSupplier()->attach($arr);
                 }
-            }
-            
-            
+            }    
+        }
+        $last_id = SpuMultiOptionModel::all()->last()->spu_id;
+        $spus = SpuModel::where('id','>',$last_id)->get();
+        foreach ($spus as $spu) {
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>1]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>2]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>3]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>4]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>5]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>6]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>7]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>8]);
         }
 
     }

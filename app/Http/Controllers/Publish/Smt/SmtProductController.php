@@ -1581,7 +1581,8 @@ class SmtProductController extends Controller
     /**
      * 修改指定帐号、分组的在线广告品牌属性
      */
-    public function batchModifyBand(){
+    public function batchModifyBand(){     
+        set_time_limit(0);
         $post = request()->input();
         $token_id = $post['token_id'];
         $group_id = $post['group_id'];
@@ -1598,7 +1599,7 @@ class SmtProductController extends Controller
             $product_arr = smtProductList::where(['token_id' => $token_id,'isRemove' => 0 ,'productStatusType' => 'onSelling'])->get();
         }else{
             $product_arr = smtProductList::where(['token_id' => $token_id,'groupId' => $group_id,'isRemove' => 0 ,'productStatusType' => 'onSelling'])->get();
-        } 
+        }
         //$product_arr = smtProductList::where('productId','32736001000')->get();
         if($product_arr){
             $account = AccountModel::findOrFail($token_id);
@@ -1667,38 +1668,47 @@ class SmtProductController extends Controller
                     $update = array();
                     $update['aeopAeProductPropertys'] = $aeopAeProductPropertys;
                     smtProductDetail::where('productId',$product->productId)->update($update);
-                    /*$export_data[] = array('productId' => $product->productId,
+                    $export_data[] = array('productId' => $product->productId,
                                            'account'   => $account_name[$token_id],
                                            'status'    => 1,
                                            'time'      => date('Y-m-d H:i:s'),
-                                           'error_msg' => '');*/
+                                           'error_msg' => '');
                 }else{
-                    /*$export_data[] = array( 'productId' => $product->productId,
+                    $export_data[] = array( 'productId' => $product->productId,
                                             'account'   => $account_name[$token_id],
                                             'status'    => 2,
                                             'time'      => date('Y-m-d H:i:s'),
-                                            'error_msg' => $result['error_message']);*/
+                                            'error_msg' => $result['error_message']);
                 }                      
             }
             
             //导出到excel文件中       
-            /*foreach($export_data as $row) {
+            foreach($export_data as $row) {
+                $text = '';
+                if($row['status'] == 1) {
+                    $text = '已执行';
+                }elseif ($row['status'] == 2) {
+                    $text = '执行异常';
+                }else {
+                    $text = '未执行';
+                }      
                 $rows[] = [
                     '产品ID'  => $row['productId'],
                     '帐号'    => $row['account'],
-                    '状态'    => $row['status'] = 1 ? '已执行' : ($row['status'] = 2 ? '执行异常' : '未执行'),
+                    '状态'    => $text,
                     '执行时间' => $row['time'],
-                    '失败原因' => $row['error_msg'],                                
+                    '失败原因' => $row['error_msg'],
                 ];
             }
             $name = 'export_modify_band';
             Excel::create($name, function($excel) use ($rows){
-                $excel->sheet('', function($sheet) use ($rows){
+                $nameSheet = '广告品牌修改结果';
+                $excel->sheet($nameSheet, function($sheet) use ($rows){
                     $sheet->fromArray($rows);
                 });
             })->download('csv');
             unset($export_data);
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', ' 操作完成.'));*/
+            //return redirect($this->mainIndex)->with('alert', $this->alert('success', ' 操作完成.'));
             
             $this->ajax_return('操作完成!',true);
         }else{

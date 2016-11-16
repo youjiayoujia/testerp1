@@ -26,7 +26,7 @@
 @section('tableBody')
     @if(count($data)>0)
     @foreach($data as $purchaseOrder)
-        <?php $out_of_stock = 0; ?>
+        <?php $out_of_stock = 0;$sum_purchase_account = 0;$sum_purchase_storage_account = 0; ?>
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$purchaseOrder->id}}"></td>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
@@ -35,7 +35,7 @@
                 外部单号：
                 {{$purchaseOrder->post_coding }}</br>
                 已打印次数:</br></br>
-                总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchase_post_num}}</br>
+                总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchasePostage->sum('postage')}}</br>
                 运单号:
             </td>
             <td> 
@@ -73,8 +73,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($purchaseOrder->purchase_items as $purchase_item)
-                <?php if($purchase_item->productItem->out_of_stock){$out_of_stock=1;} ?>
+                @foreach($purchaseOrder->purchaseItem as $purchase_item)
+                <?php   
+                    if($purchase_item->productItem->out_of_stock){
+                        $out_of_stock=1;
+                    }
+                    $sum_purchase_account += $purchase_item->purchase_num*$purchase_item->purchase_cost;
+                    $sum_purchase_storage_account += $purchase_item->storage_qty*$purchase_item->purchase_cost
+                ?>
                 <tr>
                     <td>{{$purchase_item->sku}}</td>
                     <td>{{config('item.status')[$purchase_item->productItem?$purchase_item->productItem->status:'notFound']}}</td>
@@ -103,17 +109,17 @@
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
-                    <th>{{ $purchaseOrder->sum_purchase_num}}</th>
-                    <th>{{ $purchaseOrder->sum_arrival_num}}</th>
-                    <th>{{ $purchaseOrder->sum_storage_qty}}</th>
+                    <th>{{ $purchaseOrder->purchaseItem->sum('purchase_num')}}</th>
+                    <th>{{ $purchaseOrder->purchaseItem->sum('arrival_num')}}</th>
+                    <th>{{ $purchaseOrder->purchaseItem->sum('storage_qty')}}</th>
                     
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
-                    <th>{{ $purchaseOrder->sum_purchase_account}}+YF{{$purchaseOrder->total_postage}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->total_postage}}</th>
-                    <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
+                    <th>{{ $sum_purchase_account}}+YF{{$purchaseOrder->total_postage}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->total_postage}}</th>
+                    <th>{{ $sum_purchase_storage_account}}</th>
                     <th id="warn_{{$purchaseOrder->id}}"></th>
                 </tr>
                 </tbody>

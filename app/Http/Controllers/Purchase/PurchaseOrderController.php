@@ -51,22 +51,22 @@ class PurchaseOrderController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->with('supplier','purchaseUser','warehouse','purchaseItem','purchasePostage','purchaseItem.item','purchaseItem.item.product','purchaseItem.productItem')),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
 
-        foreach($response['data'] as $key=>$vo){
-            $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
-            $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
-            $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
-            foreach($response['data'][$key]['purchase_items'] as $v){
-                $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
-                $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
-                $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
-                $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
-                $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
-            }
-        }
+        // foreach($response['data'] as $key=>$vo){
+        //     $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
+        //     $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
+        //     $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
+        //     foreach($response['data'][$key]['purchase_items'] as $v){
+        //         $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
+        //         $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
+        //         $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
+        //         $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
+        //         $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
+        //     }
+        // }
         
         return view($this->viewPath . 'index', $response);
     }

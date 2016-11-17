@@ -51,22 +51,22 @@ class PurchaseOrderController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->with('supplier','purchaseUser','warehouse','purchaseItem','purchasePostage','purchaseItem.item','purchaseItem.item.product','purchaseItem.productItem')),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
 
-        foreach($response['data'] as $key=>$vo){
-            $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
-            $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
-            $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
-            foreach($response['data'][$key]['purchase_items'] as $v){
-                $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
-                $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
-                $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
-                $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
-                $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
-            }
-        }
+        // foreach($response['data'] as $key=>$vo){
+        //     $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
+        //     $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
+        //     $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
+        //     foreach($response['data'][$key]['purchase_items'] as $v){
+        //         $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
+        //         $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
+        //         $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
+        //         $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
+        //         $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
+        //     }
+        // }
         
         return view($this->viewPath . 'index', $response);
     }
@@ -109,9 +109,25 @@ class PurchaseOrderController extends Controller
     
     public function edit($id)
     {   
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $yiwu = 0;
+        $brr = array('2','4','5','6');
+        foreach($model->purchaseItem as $p_item){
+            foreach($p_item->productItem->product->logisticsLimit->toArray() as $key=>$arr){
+                if(in_array($arr['pivot']['logistics_limits_id'], $brr)){
+                    $yiwu = 1;break;
+                }
+            }
+        }
+        if($yiwu){
+            $notIn = array('2','4');
+            $warehouse = WarehouseModel::whereNotIn('id',$notIn)->get();
+        }else{
+            $warehouse = WarehouseModel::all();
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -120,7 +136,9 @@ class PurchaseOrderController extends Controller
             'purchasePostage'=>PurchasePostageModel::where('purchase_order_id',$id)->get(),
             'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
             'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
-            'warehouses' =>WarehouseModel::all(),
+            'warehouses' =>$warehouse,
+            'hideUrl' => $hideUrl,
+            'yiwu' => $yiwu,
         ];
         return view($this->viewPath . 'edit', $response);   
     }
@@ -231,25 +249,21 @@ class PurchaseOrderController extends Controller
         }
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
         $model->update($data);
+        //更新采购需求
+
+        $temp_arr = [];
+        foreach($model->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);  
+
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
-        return redirect( route('purchaseOrder.edit', $id));     
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'编辑成功.'));
     }
     
-    /**
-     * 导出采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function purchaseOrdersOut()
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-        return view($this->viewPath.'excelOut',$response);  
-    }
-
      /**
      * 审核采购单
      *
@@ -259,6 +273,7 @@ class PurchaseOrderController extends Controller
     
     public function changeExamineStatus($id,$examineStatus)
     {
+        $url = $_SERVER['HTTP_REFERER'];
         $model=$this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -270,7 +285,7 @@ class PurchaseOrderController extends Controller
         $model->update($data);
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单审核,id='.$model->id, $to, $from);
-        return redirect( route('purchaseOrder.edit', $id));
+        return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'审核通过.'));
     }
     /**
      * 导出3天未到货采购单
@@ -299,7 +314,16 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此采购单不能取消.'));
             }
         $purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['status'=>5]);
-        $this->model->find($id)->update(['status'=>5,'examineStatus'=>3]);
+        $model = $this->model->find($id);
+        $model->update(['status'=>5,'examineStatus'=>3]);
+        //更新采购需求
+        $temp_arr = [];
+        foreach($model->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
+
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '改采购单已退回'));    
     }
     
@@ -365,6 +389,15 @@ class PurchaseOrderController extends Controller
         if($model->examineStatus >0){
         $model->update(['examineStatus'=>2]);
         }
+
+        //更新采购需求
+        $temp_arr = [];
+        foreach($this->model->find($id)->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
+
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '创建采购条目,id='.$model->id, $to, $from);
         return redirect( route('purchaseOrder.edit', $id)); 
@@ -515,6 +548,13 @@ class PurchaseOrderController extends Controller
             $this->model->find($id)->update(['write_off'=>$off+1]);
             $remark = "待核销成功";
         }
+        //更新采购需求
+        $temp_arr = [];
+        foreach($this->model->find($id)->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
         
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . $remark));
     }
@@ -624,6 +664,14 @@ class PurchaseOrderController extends Controller
                 }
             }
         }
+
+        //更新采购需求
+        $temp_arr = [];
+        foreach($this->model->find($p_id)->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
         
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -724,12 +772,86 @@ class PurchaseOrderController extends Controller
             }
             $purchasrOrder->update(['status'=>$p_status]);
         }
+
+        //更新采购需求
+        $temp_arr = [];
+        foreach($this->model->find($p_id)->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
         
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
         $response['metas']['title']='采购收货';
         return view($this->viewPath . 'recieve', $response);
+    }
+
+    /**
+    * 新品待入库界面入库
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function newProductupdateArriveLog(){
+        $global = 1;
+        $data = request()->all();
+        $arrivel_log = PurchaseItemArrivalLogModel::where('purchase_item_id',$data['purchase_item_id'])->get()->first();
+        $purchase_item = $arrivel_log->purchaseItem;
+
+        $warehousePosition = StockModel::where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->where('item_id',$purchase_item->item_id)->get()->first();
+                
+        if(!$warehousePosition){ 
+            $purchase_item->update(['status'=>'6']);
+            $global = 0;
+        }else{
+            $filed['good_num'] = $data['num'];
+            $filed['quality_time'] = date('Y-m-d H:i:s',time());
+            
+            $arrivel_log->update($filed);
+            //purchaseitem
+            $datas['status'] = 3;
+            $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+            //$datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
+            if($datas['storage_qty']>=$purchase_item->purchase_num){
+                $datas['status'] = 4;
+            }
+            
+            $purchase_item->update($datas);
+            $purchase_item->item->in($warehousePosition->warehouse_position_id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
+            
+        }
+        //need包裹分配库存
+        $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
+        if(count($packageItem)>0){
+            foreach ($packageItem as $_packageItem) {
+                if($_packageItem->package->status=='NEED'){
+                    $job = new AssignStocks($_packageItem->package);
+                    $job = $job->onQueue('assignStocks');
+                    $this->dispatch($job);
+                }  
+            }
+        } 
+
+        if($global){
+            $p_status = 4;
+            $purchasrOrder = $this->model->find($data['purchase_order_id']);
+            foreach($purchasrOrder->purchaseItem as $p_item){
+                if($p_item->status!=4){
+                    $p_status = 3;
+                }
+            }
+            $purchasrOrder->update(['status'=>$p_status]);
+        }
+
+        //更新采购需求
+        $temp_arr = [];
+        foreach($this->model->find($data['purchase_order_id'])->purchaseItem as $p_item){
+            $temp_arr[] = $p_item->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
+        return redirect(route('purchaseItemIndex')); 
     }
 
     /**
@@ -777,30 +899,46 @@ class PurchaseOrderController extends Controller
         $type = request()->input('type');
         $purchase_ids = request()->input("purchase_ids");
         $arr = explode(',', $purchase_ids);
+        $itemModel = new ItemModel();
         switch ($type) {
             case 'examineStatus':
                 foreach($arr as $id){
+                    $temp_arr = [];
                     $purchaseOrder = $this->model->find($id);
                     $purchaseOrder->update(['examineStatus'=>1,'status'=>1]);
                     foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
                         $purchaseitemModel->update(['status'=>1]);
+                        $temp_arr[] = $purchaseitemModel->item_id;
                     }
+                    
+                    $itemModel->createPurchaseNeedData($temp_arr); 
                 }
                 break;
             
             case 'write_off':
                 foreach($arr as $id){
-                    //$this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+                    $temp_arr = [];
                     $purchaseOrder = $this->model->find($id);
                     $purchaseOrder->update(['write_off'=>1,'status'=>4]);
                     foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
                         $purchaseitemModel->update(['status'=>4]);
+                        $temp_arr[] = $purchaseitemModel->item_id;
                     }
+
+                    $itemModel->createPurchaseNeedData($temp_arr);
                 }
                 break;
             case 'close_status':
                 foreach($arr as $id){
+                    $temp_arr = [];
                     $this->model->find($id)->update(['close_status'=>1]);
+
+                    foreach($this->model->find($id)->purchaseItem as $purchaseitemModel){
+                        $purchaseitemModel->update(['status'=>4]);
+                        $temp_arr[] = $purchaseitemModel->item_id;
+                    }
+
+                    $itemModel->createPurchaseNeedData($temp_arr);
                 }
                 break;
         }
@@ -1055,6 +1193,48 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+     * 导出采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function purchaseOrdersOut()
+    {
+        $purchase_ids = request()->input('purchase_ids');
+        $product_id_arr = explode(',', $purchase_ids);
+
+        $purchaseOrder = PurchaseOrderModel::whereIn('id',$product_id_arr)->get();
+        $rows = [];
+        
+        foreach($purchaseOrder as $model) {
+            $total_num = 0;
+            foreach($model->purchaseItem as $purchase_item){
+                $total_num += $purchase_item->purchase_num;
+            }
+            $rows[] = [
+                '采购单号' => $model->id,
+                '外部单号' => $model->post_coding,
+                '付款方式' => config('purchase.purchaseOrder.pay_type')[$model->pay_type],
+                '物流方式' => $model->carriage_type>-1?config('purchase.purchaseOrder.carriage_type')[$model->carriage_type]:'',
+                '采购负责人' => $model->purchaseUser->name,
+                '入库仓库' => $model->warehouse->name,
+                '商品总金额' => $model->total_purchase_cost,
+                '总数量' => $total_num,
+                '运费' => $model->total_postage,
+                '订单总金额' => $model->total_purchase_cost,
+                '供应商编号' => $model->supplier_id,
+                '下单时间' => $model->created_at,
+            ];          
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');    
+    }
+
+    /**
      * 下单7天未到货
      *
      * @param none
@@ -1075,23 +1255,22 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * 已收货未入库
+     * 未入库采购单邮件
      *
      * @param none
      * @return obj
      * 
      */
-/*    public function notWarehouseIn()
+    public function printButNotWarehouseIn()
     {   
-        echo '<pre>';
-        
+        $purchaseOrder = $this->model->where('print_num','>','0')->whereIn('status',['1','2','3'])->get();
         //邮件模板数据
         $data = ['email'=>'549991570@qq.com', 'name'=>'youjiatest@163.com','purchaseOrder'=>$purchaseOrder];
         //发送邮件
-        Mail::send('purchase.purchaseOrder.mailSevenPurchase', $data, function($message) use($data){
-            $message->to($data['email'], $data['name'])->subject('采购单7天未到货');
+        Mail::send('purchase.purchaseOrder.mailPrintButNotWarehouseIn', $data, function($message) use($data){
+            $message->to($data['email'], $data['name'])->subject('已打印入库单,未入库采购单明细');
         });
-    }*/
+    }
         
 }
 

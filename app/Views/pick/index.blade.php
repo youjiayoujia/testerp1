@@ -98,6 +98,20 @@
         <iframe src='' id='iframe_print' style='display:none'></iframe>
         @stop
         @section('tableToolButtons')
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="glyphicon glyphicon-filter"></i>
+                    仓库
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    @foreach($warehouses as $key => $warehouse)
+                        <li>
+                            <a href="{{ DataList::filtersEncode(['warehouse_id','=',$warehouse->id]) }}">{{ $warehouse->name }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
             <div class="btn-group">
                 <a href="javascript:" class="btn btn-success multiPrint">
                     批量打印拣货单

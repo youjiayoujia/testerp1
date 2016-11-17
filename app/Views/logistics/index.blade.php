@@ -13,6 +13,7 @@
     {{--<th class="sort" data-field="pool_quantity">号码池数量(未用/已用/总数)</th>--}}
     <th>物流限制</th>
     <th>物流编码</th>
+    <th>平邮or快递</th>
     <th>是否启用</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -34,6 +35,7 @@
             {{--<td>{{ $logistics->pool_quantity }}</td>--}}
             <td>{{ $logistics->limit($logistics->limit) }}</td>
             <td>{{ $logistics->logistics_code }}</td>
+            <td>{{ $logistics->is_express == '1' ? '快递' : '平邮' }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
             <td>{{ $logistics->created_at }}</td>
             <td>{{ $logistics->updated_at }}</td>
@@ -48,6 +50,9 @@
                    data-id="{{ $logistics->id }}"
                    data-url="{{ route('logistics.destroy', ['id' => $logistics->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
+                </a>
+                <a href="javascript:" class="btn btn-success btn-xs copy" data-id="{{ $logistics->id }}">
+                    <span class="glyphicon glyphicon-pencil"></span> 复制
                 </a>
                 @if($logistics->docking == 'CODE' || $logistics->docking == 'CODEAPI')
                     <a href="{{ route('logisticsCode.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
@@ -65,4 +70,23 @@
             </td>
         </tr>
     @endforeach
+@stop
+@section('childJs')
+    <script type="text/javascript">
+        //复制
+        $('.copy').click(function () {
+            if (confirm("确认复制?")) {
+                var logistics_id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('logistics.createData') }}",
+                    data: {logistics_id: logistics_id},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+    </script>
 @stop

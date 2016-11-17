@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
 
@@ -152,7 +152,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             @if($model->related)
                 @if($model->relatedOrders()->count() > 1)
                     <ul class="nav nav-tabs" role="tablist">
@@ -174,7 +174,7 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     订单:
-                                    <a href="http://ws.jinjidexiaoxuesheng.com/admin/workstation/order/{{ $relatedOrder->order->id }}" target="_blank">
+                                    <a href="{{ route('order.show',$relatedOrder->order->id) }}" target="_blank">
                                         <strong>{{ $relatedOrder->order->ordernum }}</strong>
                                     </a>
                                     <small>{{ '<'.$relatedOrder->order->email.'>' }}</small>
@@ -256,7 +256,7 @@
                                 <div class="panel panel-success">
                                     <div class="panel-heading">
                                         Package:
-                                        <a href="http://ws.jinjidexiaoxuesheng.com/admin/workstation/package/{{ $package->id }}" target="_blank">
+                                        <a href=" {{route('package.show',$package->id) }} " target="_blank">
                                             <strong>#{{ $package->id }}</strong>
                                         </a>
                                         -

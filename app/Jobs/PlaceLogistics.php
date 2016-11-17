@@ -9,20 +9,23 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Jobs\AssignStocks;
 
 class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
     protected $package;
+    protected $type;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($package)
+    public function __construct($package, $type = null)
     {
         $this->package = $package;
+        $this->type = $type;
         $this->relation_id = $this->package->id;
         $this->description = 'Package:' . $this->package->id . ' place logistics order.';
     }
@@ -35,23 +38,23 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        $result = $this->package->placeLogistics();
-
-        if ($result['status']=='success') {
+        $result = $this->package->placeLogistics($this->type);
+        if ($result['status'] == 'success') {
             $this->result['status'] = 'success';
-            $this->result['remark'] = 'packages  tracking_no:'.$result['tracking_no'];
-        }elseif($result['status']=='again'){
+            $this->result['remark'] = 'packages tracking_no:' . $result['tracking_no'];
+            $this->package->eventLog('队列', 'packages tracking_no:' . $result['tracking_no'],json_encode($this->package));
+        } elseif ($result['status'] == 'again') {
             $this->result['status'] = 'success';
-            $this->result['remark'] = 'packages  logistics_order_number:'.$result['logistics_order_number'] .' need  get tracking_no ';
-
-            $job = new PlaceLogistics($this->package);
+            $this->result['remark'] = 'packages logistics_order_number:' . $result['logistics_order_number'] . ' need  get tracking_no ';
+            $job = new PlaceLogistics($this->package, $this->type);
             $job = $job->onQueue('placeLogistics')->delay(600); //暂设10分钟
             $this->dispatch($job);
-
+            $this->package->eventLog('队列', 'packages logistics_order_number:' . $result['logistics_order_number'] . ' need  get tracking_no ',json_encode($this->package));
         } else {
             $this->release();
             $this->result['status'] = 'fail';
             $this->result['remark'] = $result['tracking_no'];
+            $this->package->eventLog('队列', '下单失败'.$result['tracking_no'],json_encode($this->package));
         }
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('PlaceLogistics');

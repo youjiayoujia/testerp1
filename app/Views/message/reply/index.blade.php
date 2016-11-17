@@ -28,7 +28,7 @@
     @foreach($data as $reply)
         <tr>
             <td>{{ $reply->id }}</td>
-            <td>{{ $reply->message->account->name }}</td>
+            <td>{{ $reply->message->account->account }}</td>
             <td>{{ $reply->to }}</td>
             <td>{{ $reply->to_email }}</td>
             <td>{{ $reply->status }}</td>

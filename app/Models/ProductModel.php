@@ -278,6 +278,7 @@ class ProductModel extends BaseModel
      */
     public function createProduct($data = '', $files = '')
     {
+        $tempDataAry = $data['modelSet'];
         DB::beginTransaction();
         try {
             //获取catalog对象,将关联catalog的属性插入数据表
@@ -320,10 +321,14 @@ class ProductModel extends BaseModel
                 'Z'
             );
             $aznum = 0;
-            foreach ($data['modelSet'] as $model) {
+            $temp_c_name = $data['c_name'];
+
+            foreach ($data['modelSet'] as $keySet => $model) {
+                $data['c_name'] = '';
                 //拼接model号
                 $data['model'] = $spuobj->spu . $az[$aznum];
                 $data['examine_status'] = 'pending';
+                $data['c_name'] = $temp_c_name.'_'.$keySet;
                 $product = $this->create($data);
 
                 $data['products_with_battery'] = 0;
@@ -432,6 +437,8 @@ class ProductModel extends BaseModel
             DB::rollBack();
         }
         DB::commit();
+
+        return $product->id;
     }
 
     /**
@@ -569,13 +576,15 @@ class ProductModel extends BaseModel
         $variations = $this->variationValues->toArray();
         //产品model号赋值
         $model = $this->model;
-
         foreach ($variations as $key => $value) {
             $item = $model . ($key + 1);
-            $product_data = $this->toArray();
+            $modelInfo = $this->toArray();
+            $modelInfo['c_name'] = $modelInfo['c_name'].'_'.$value['name'];
+            $product_data = $modelInfo;
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
             $product_data['status'] = 'sellWaiting';
+            $product_data['competition_url'] = $this->spu->productRequire->competition_url;
             unset($product_data['id']);
             $itemModel = $this->item()->create($product_data);
             //初始化

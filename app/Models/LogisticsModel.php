@@ -37,6 +37,7 @@ class LogisticsModel extends BaseModel
         'driver',
         'logistics_code',
         'priority',
+        'is_express',
     ];
 
     public $rules = [
@@ -52,7 +53,7 @@ class LogisticsModel extends BaseModel
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
-            'priority' => 'required|unique:logisticses,priority',
+//            'priority' => 'required|unique:logisticses,priority',
         ],
         'update' => [
             'code' => 'required',
@@ -66,7 +67,7 @@ class LogisticsModel extends BaseModel
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
-            'priority' => 'required',
+//            'priority' => 'required',
         ],
     ];
 
@@ -114,6 +115,11 @@ class LogisticsModel extends BaseModel
     public function logisticsChannels()
     {
         return $this->hasMany('App\Models\Logistics\ChannelModel', 'logistics_id', 'id');
+    }
+
+    public function zones()
+    {
+        return $this->hasMany('App\Models\Logistics\ZoneModel', 'logistics_id');
     }
 
     public function getApiConfigAttribute()

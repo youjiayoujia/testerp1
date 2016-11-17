@@ -104,7 +104,7 @@ class AllotmentController extends Controller
             $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ALLOTMENT', $obj->id);
         }
         $to = $this->model->with('allotmentforms')->find($obj->id);
-        $to = base64_encode(serialize($to));
+        $to = json_encode($to);
         $this->eventLog($name, '新增调拨记录,id='.$obj->id, $to);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
@@ -166,7 +166,7 @@ class AllotmentController extends Controller
         $buf = request()->all();
         $obj = $model->allotmentforms;
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         foreach($obj as $key => $value) {
             $item = ItemModel::find($value->item_id);
             $item->unhold($value->warehouse_position_id, $value->quantity, 'ALLOTMENT', $model->id);
@@ -195,7 +195,7 @@ class AllotmentController extends Controller
             $item = ItemModel::find($value->item_id);
             $item->hold($value->warehouse_position_id, $value->quantity, 'ALLOTMENT', $model->id);
         }
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '调拨记录更新,id='.$model->id, $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
@@ -244,7 +244,7 @@ class AllotmentController extends Controller
         }
         $time = date('Y-m-d',time());       
         $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]); 
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '审核通过', $to, $to);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
     }
@@ -301,7 +301,7 @@ class AllotmentController extends Controller
             DB::rollback();
         }
         DB::commit();
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '确认出库', $to, $to);
         return redirect($this->mainIndex);
     }
@@ -317,7 +317,7 @@ class AllotmentController extends Controller
         $model = $this->model->find($id);
         $model->update(['allotment_status'=>'over']);
         $name = UserModel::find(request()->user()->id)->name; 
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '强制结束调拨单', $to, $to);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '强制结束调拨单成功'));
@@ -357,7 +357,7 @@ class AllotmentController extends Controller
             $model->update(['allotment_status'=>'new', 'check_status'=>'0', 'check_time'=>'0000-00-00',
                 'check_by'=>request()->user()->id]);
             $name = UserModel::find(request()->user()->id)->name; 
-            $to = base64_encode(serialize($model));
+            $to = json_encode($model);
             $this->eventLog($name, '重置信息', $to, $to);
             return json_encode('111');
         }
@@ -407,7 +407,7 @@ class AllotmentController extends Controller
             'model' => $model,
             'allotmentforms' => $allotmentforms,
         ];
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($name, '打印拣货单', $to, $to);
         
         return view($this->viewPath.'printAllotment', $response);
@@ -456,7 +456,7 @@ class AllotmentController extends Controller
         $arr = request()->all();
         $this->model->find($id)->update(['checkform_by'=>request()->user()->id]);
         $name = UserModel::find(request()->user()->id)->name;
-        $from = base64_encode(serialize($this->model->with('allotmentforms')->find($id)));
+        $from = json_encode($this->model->with('allotmentforms')->find($id));
 
         $obj = $this->model->find($id)->allotmentforms;
         DB::beginTransaction();
@@ -512,7 +512,7 @@ class AllotmentController extends Controller
             DB::rollback();
         }
         DB::commit();
-        $to = base64_encode(serialize($this->model->with('allotmentforms')->find($id)));
+        $to = json_encode($this->model->with('allotmentforms')->find($id));
         $this->eventLog($name, '对单', $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '对单成功'));

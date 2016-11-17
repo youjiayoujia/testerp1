@@ -8,11 +8,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logistics\BelongsToModel;
 use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\EmailTemplateModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Logistics\TemplateModel;
+use App\Models\Logistics\Zone\CountriesModel;
+use App\Models\Logistics\Zone\SectionPriceModel;
+use App\Models\Logistics\ZoneModel;
 use App\Models\LogisticsModel;
 use App\Models\UserModel;
 use App\Models\WarehouseModel;
@@ -59,6 +63,72 @@ class LogisticsController extends Controller
     }
 
     /**
+     * 复制信息
+     */
+    public function createData()
+    {
+        $logisticsId = request()->input('logistics_id');
+        $model = $this->model->find($logisticsId);
+        $data = $model->toArray();
+        $data['name'] = $model->name . '[复制]';
+        $data['pool_quantity'] = '';
+        $data['logistics_code'] = '';
+        unset($data['id']);
+        $logistics = $this->model->create($data);
+        if($model->channelName) {
+            foreach($model->channelName as $channelName) {
+                $value['logistics_id'] = $logistics->id;
+                $value['logistics_channel_id'] = $channelName->id;
+                $value['created_at'] = date("Y-m-d H:i:s");
+                $value['updated_at'] = date("Y-m-d H:i:s");
+                $belongsTo = new BelongsToModel();
+                $belongsTo->create($value);
+            }
+        }
+        if($model->logisticsChannels) {
+            foreach($model->logisticsChannels as $logisticsChannel) {
+                $v['logistics_id'] = $logistics->id;
+                $v['channel_id'] = $logisticsChannel->channel_id;
+                $v['url'] = $logisticsChannel->url;
+                $v['is_up'] = $logisticsChannel->is_up;
+                $v['created_at'] = date("Y-m-d H:i:s");
+                $v['updated_at'] = date("Y-m-d H:i:s");
+                $channel = new \App\Models\Logistics\ChannelModel();
+                $channel->create($v);
+            }
+        }
+        if($model->zones) {
+            foreach($model->zones as $zone) {
+                $zone->logistics_id = $logistics->id;
+                $zoneModel = new ZoneModel();
+                $logisticsZone = $zoneModel->create($zone->toArray());
+                if($zone->type == 'second') {
+                    if($zone->zone_section_prices) {
+                        foreach($zone->zone_section_prices as $price) {
+                            unset($price->id);
+                            $price->logistics_zone_id = $logisticsZone->id;
+                            $sectionPrice = new SectionPriceModel();
+                            $sectionPrice->create($price->toArray());
+                        }
+                    }
+                }
+                if($zone->zone_countries) {
+                    foreach($zone->zone_countries as $zoneCountry) {
+                        unset($zoneCountry->id);
+                        $zoneCountry->logistics_zone_id = $logisticsZone->id;
+                        $zoneCountry->created_at = date("Y-m-d H:i:s");
+                        $zoneCountry->updated_at = date("Y-m-d H:i:s");
+                        $country = new CountriesModel();
+                        $country->create($zoneCountry->toArray());
+                    }
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    /**
      * 存储
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -97,7 +167,7 @@ class LogisticsController extends Controller
         }
         $model->channelName()->sync($buf);
         $model = $this->model->with('logisticsChannels')->find($model->id);
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
         return redirect($this->mainIndex);
     }
 
@@ -167,7 +237,7 @@ class LogisticsController extends Controller
     {
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -214,7 +284,7 @@ class LogisticsController extends Controller
         }
         $model->channelName()->sync($buf);
         $model = $this->model->with('logisticsChannels')->find($id);
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
         return redirect($this->mainIndex);
     }

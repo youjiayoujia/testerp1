@@ -19,7 +19,7 @@
         </div>
         <div class="form-group col-md-3">
             <label for="color">采购负责人</label>
-            <select name = "purchase_user_id" class="form-control" >
+            <select name = "purchase_user_id" class="form-control purchase_user_group" >
                 @foreach($users as $user)
                     <option value="{{$user->id}}" @if($user->id == $model->purchase_user_id) selected @endif>{{$user->name}}</option>
                 @endforeach
@@ -31,6 +31,9 @@
 
 @section('pageJs')
     <script type="text/javascript">
+        $(document).ready(function () {
+            $('.purchase_user_group').select2();
+        });
         $('.supplier').select2({
                 ajax: {
                     url: "{{ route('ajaxSupplier') }}",

@@ -32,7 +32,7 @@ class MessageModel extends BaseModel{
         'label',
     ];
 
-    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱'];
+    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱' ,'label' => '消息类型' , 'channel_order_number' => '平台订单号'];
 
     public $rules = [];
 
@@ -260,6 +260,7 @@ class MessageModel extends BaseModel{
     public function reply($data)
     {
         $data['to_email'] = trim($data['to_email']);
+        $data['status'] = 'NEW';
         if ($this->replies()->create($data)) {
             //记录回复邮件类型
             $this->type_id = $data['type_id']?$data['type_id']:"";
@@ -303,8 +304,6 @@ class MessageModel extends BaseModel{
             foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
-                       //dd($content);
-                       //dd($content);
                         foreach ($content as $k => $item){
                            if(!empty($item['Reply']['message'])){
                                if($item['Reply']['sender'] != 'merchant'){
@@ -330,9 +329,42 @@ class MessageModel extends BaseModel{
                         }
                         break;
                     case 'aliexpress':
-                        //dd($content->result);exit;
                         $message_content = array_reverse($content->result); //逆序
+                        $product_html = '';
+                        $message_fields_ary = false;
                         foreach ($message_content as $k => $item){
+
+                            if($message_fields_ary == false && $item->messageType == 'product'){
+                                $message_fields_ary['product_img_url']      = isset($item->summary->productImageUrl) ? $item->summary->productImageUrl : '';
+                                $message_fields_ary['product_product_url']  = isset($item->summary->productDetailUrl) ? $item->summary->productDetailUrl : '';
+                                $message_fields_ary['product_product_name'] = isset($item->summary->productName) ? $item->summary->productName : '';
+
+                                $product_html .= '<div class="col-lg-12 alert-default">';
+                                $product_html .= '<table class="table table-bordered table-striped table-hover sortable">';
+                                $product_html .= '<tr>';
+                                $product_html .= '<th>产品图片</th>';
+                                $product_html .= '<th>产品名称</th>';
+                                $product_html .= '<th>产品连接</th>';
+                                $product_html .= '</tr>';
+                                $product_html .= '<tr>';
+                                $product_html .= '<td><img src ="'.$message_fields_ary['product_img_url'] .'"/></td>';
+                                $product_html .= '<td>'.$message_fields_ary['product_product_name'] .'</td>';
+                                $product_html .= '<td><a href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
+                                $product_html .= '</tr>';
+                                $product_html .= '</table>';
+                                $product_html .= '</div>';
+
+                            }
+
+                            //dd($message_fields_ary);
+                            $row_html = '';
+                            if($item->content == '< img >'){
+                                foreach ($item->filePath as $item_path){
+                                    if($item_path->mPath){
+                                        $row_html .='<img src="'.$item_path->mPath.'" /><a href="'.$item_path->lPath.'" target="_blank">查看大图</a>';
+                                    }
+                                }
+                            }
                             $content = $item->content;
                             $content = str_replace("&nbsp;", ' ', $content);
                             $content = str_replace("&amp;nbsp;", ' ', $content);
@@ -345,14 +377,20 @@ class MessageModel extends BaseModel{
 
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
                             if($this->from_name != $item->summary->receiverName){
-                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
-                                $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
-                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
+                                if($row_html != ''){
+                                    $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$row_html;
+                                    $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
+                                    $html .= '</div>';
+                                }else{
+                                    $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
+                                    $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
+                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
                                     翻译
                                 </button>
-                                <p id="content-'.$k.'" style="color:green"></p>
-                                ';
-                                $html .= '</div>';
+                                <p id="content-'.$k.'" style="color:green"></p>';
+                                    $html .= '</div>';
+                                }
+
                             }else{
                                 $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                 $html .= '<p class="time"><strong>Time: </strong> '.$datetime.'</p>';
@@ -372,7 +410,7 @@ class MessageModel extends BaseModel{
                 }
             }
 
-            return $html;
+            return empty($product_html) ? $html : $product_html.$html;
         }else{
             return '';
         }
@@ -458,16 +496,7 @@ class MessageModel extends BaseModel{
         $channel = $this->getChannelDiver();
         switch ($channel){
             case 'aliexpress':
-                $content = $this->ContentDecodeBase64;
-                foreach ($content['aliexpress']->result as $message){
-                    $type = $message->messageType;
-                    break;
-                }
-                $files = $this->MessageFieldsDecodeBase64;
-                $html .= '<p>Message type:'.$this->label.'</p>';
-                $html .= '<p>Detail type:'.$type.'</p>';
-                $html .= '<p>Order id:'.$files['order_id'].'</p>';
-                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
+                $html .= '<span class="label label-warning">'.$this->label.'</span>';
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;

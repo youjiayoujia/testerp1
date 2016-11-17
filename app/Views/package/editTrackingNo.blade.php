@@ -1,6 +1,7 @@
 @extends('common.form')
 @section('formAction') {{ route('package.editTrackStore', ['id' => $model->id]) }} @stop
 @section('formBody')
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="panel panel-default">
         <div class="panel-heading">包裹基础信息</div>
         <div class="panel-body">
@@ -24,10 +25,6 @@
                 <div class="col-lg-2">
                     <label>发货邮编</label>
                     <input type='text' class='form-control' value="{{ $model->shipping_zipcode }}" readonly>
-                </div>
-                <div class="col-lg-2">
-                    <label>发货地址</label>
-                    <input type='text' class='form-control' value="{{ $model->shipping_address }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>城市</label>
@@ -80,7 +77,11 @@
         <div class="panel-body">
             <div class="col-lg-2">
                 <label>修改追踪号</label>
-                <input type='text' class='form-control' name='tracking_no'>
+                <input type='text' class='form-control' name='tracking_no' value="{{ $model->tracking_no }}">
+            </div>
+            <div class="col-lg-2">
+                <label>发货地址</label>
+                <input type='text' class='form-control' name='shipping_address' value="{{ $model->shipping_address }}">
             </div>
         </div>
     </div>

@@ -24,6 +24,7 @@ use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
 use App\Models\SyncApiModel;
+use App\Models\Channel\CatalogRatesModel;
 
 class ItemController extends Controller
 {
@@ -86,13 +87,16 @@ class ItemController extends Controller
         $data = request()->all();
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
 
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
+        $data['sku_history_values'] = $model->sku_history_values;
+        $data['sku_history_values'] .= ','.$data['purchase_price'];
+        
         $model->updateItem($data);
 
         $data['products_with_battery'] = 0;
@@ -165,7 +169,7 @@ class ItemController extends Controller
         $sync->times = 0;
         $sync->save();
 
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, 'item信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex);
     }
@@ -176,6 +180,8 @@ class ItemController extends Controller
         if($data['type']=='edit'){
             $arr = [];
             $brr = [];
+            $data['purchase_adminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
+            $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['id'];
             $skuModel = $this->model->where('sku',$data['sku'])->get()->first();
             if(count($skuModel)==0){
                 echo json_encode('no sku');exit;
@@ -189,9 +195,14 @@ class ItemController extends Controller
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->sync($arr);
+            $skuModel->product->update($data);
+            $data['status'] = 0;
+            $skuModel->product->spu->update($data);
         }else{
             $arr = [];
             $brr = [];
+            $data['purchase_adminer'] = UserModel::where('name',$data['purchase_name'])->get()->first()['id'];
+            $data['developer'] = UserModel::where('name',$data['dev_name'])->get()->first()['id'];
             $spuModel = SpuModel::create($data);
             $data['spu_id'] = $spuModel->id;
             $productModel = ProductModel::create($data);
@@ -205,6 +216,8 @@ class ItemController extends Controller
                 $arr[] = $wrap_limits_id;         
             }
             $skuModel->product->wrapLimit()->attach($arr);
+            $data['status'] = 0;
+            $skuModel->product->spu->update($data);
         }
         echo json_encode('success');exit;
 
@@ -295,21 +308,21 @@ class ItemController extends Controller
         $user_id = request()->input('purchase_adminer');
         $model = $this->model->find($item_id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if($user_id){
             $model->update(['purchase_adminer'=>$user_id]);
-            $to = base64_encode(serialize($model));
+            $to = json_encode($model);
             $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
         }else{
             $userModel = UserModel::where('name',$user_name)->first();
             if($userModel){
                 $model->update(['purchase_adminer'=>$userModel->id]);
-                $to = base64_encode(serialize($model));
+                $to = json_encode($model);
                 $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
                 return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
             }else{
-                $to = base64_encode(serialize($model));
+                $to = json_encode($model);
                 $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
             }
@@ -467,7 +480,7 @@ class ItemController extends Controller
             'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit'),$field = ['*'],$pageSize='10'),
             'mixedSearchFields' => $this->model->mixed_search,
 
-            'Compute_channels' => ChannelModel::all(),
+            'Compute_channels' => CatalogRatesModel::all(),
 
         ];
         return view($this->viewPath . 'index', $response);
@@ -544,10 +557,10 @@ class ItemController extends Controller
         $supplier_id = request()->input('supplier_id');
         $model = $this->model->with('skuPrepareSupplier')->find($item_id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         $arr['supplier_id'] = $supplier_id;
         $model->skuPrepareSupplier()->attach($arr);
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, '添加供应商,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备选供应商添加成功.'));
     }
@@ -567,6 +580,12 @@ class ItemController extends Controller
         $warehouse_id = $data['product_warehouse_id']==1000?1:2;
         $result = $itemModel->update(['warehouse_id'=>$warehouse_id,'warehouse_position'=>$warehouse_position_id]);
         echo json_encode(['msg'=>'修改库位成功']);exit;
+    }
+
+    public function oneKeyUpdateSku()
+    {
+        $this->model->oneKeyUpdateSku();
+
     }
 
 }

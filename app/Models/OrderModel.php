@@ -87,6 +87,7 @@ class OrderModel extends BaseModel
         'create_time',
         'is_chinese',
         'orders_expired_time',
+        'created_at',
     ];
 
     private $canPackageStatus = ['PREPARED'];
@@ -113,10 +114,7 @@ class OrderModel extends BaseModel
         $items = $this->items;
         $weight = 0;
         foreach($items as $item) {
-            $oldItem = $item->item;
-            if(!$oldItem) {
-                $weight += $oldItem->weight;
-            }
+            $weight += $item->item->weight * $item->quantity;
         }
 
         return $weight;
@@ -254,6 +252,8 @@ class OrderModel extends BaseModel
                 'channel_ordernum',
                 'email',
                 'by_id',
+                'shipping_firstname',
+                'shipping_lastname',
                 'currency',
                 'profit_rate'
             ],
@@ -268,13 +268,13 @@ class OrderModel extends BaseModel
             ],
             'relatedSearchFields' => [
                 'country' => ['code'],
-                'items' => ['item' => ['status' => config('item.status')]],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => $arr],
+                'items' => ['item_status' => config('item.status')],
             ]
         ];
     }
@@ -418,6 +418,28 @@ class OrderModel extends BaseModel
         return $arr[$this->withdraw];
     }
 
+    public function getLogisticsAttribute()
+    {
+        $logistics = '';
+        foreach($this->packages as $package) {
+            $logisticsName = $package->logistics ? $package->logistics->code : '';
+            $logistics .= $logisticsName . ' ';
+        }
+
+        return $logistics;
+    }
+
+    public function getCodeAttribute()
+    {
+        $code = '';
+        foreach($this->packages as $package) {
+            $trackingNo = $package->tracking_no;
+            $code .= $trackingNo . ' ';
+        }
+
+        return $code;
+    }
+
     /**
      * 订单成本获取器
      * @return int
@@ -504,9 +526,13 @@ class OrderModel extends BaseModel
 
     public function checkBlack()
     {
-        $channel = $this->channel->find($this->channel_id);
-        if ($channel->driver == 'wish') {
-            $name = $this->shipping_lastname . ' ' . $this->shipping_firstname;
+        $channel = $this->channel->where('id', $this->channel_id)->get();
+        $driver = '';
+        foreach ($channel as $val) {
+            $driver = $val->driver;
+        }
+        if ($driver == 'wish') {
+            $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
             $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
         } else {
             $blacklist = BlacklistModel::where('email', $this->email);
@@ -514,7 +540,7 @@ class OrderModel extends BaseModel
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
             foreach ($blacklist->get() as $value) {
-                if ($value->type == 'CONFIRMED') {
+                if ($value->type == 'CONFIRMED' || $value->type == 'SUSPECTED') {
                     return true;
                 }
             }
@@ -537,6 +563,7 @@ class OrderModel extends BaseModel
                 $item = ItemModel::where('sku', $orderItem['sku'])->first();
                 if ($item) {
                     $orderItem['item_id'] = $item->id;
+                    $orderItem['item_status'] = $item->status;
                 }
             }
             if (!isset($orderItem['item_id'])) {
@@ -555,15 +582,23 @@ class OrderModel extends BaseModel
                                           'create_time' => $order->create_time]);
             }
         }
+
+        //客户留言需审核
+        if ($order->customer_remark != null && $order->customer_remark != '') {
+            $order->update(['status' => 'REVIEW']);
+        }
+
         //客户备注需审核
         if (isset($data['remark']) and !empty($data['remark'])) {
             $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
         }
+
         //黑名单需审核
-//        if ($order->status != 'UNPAID' && $order->checkBlack()) {
-//            $order->update(['status' => 'REVIEW']);
-//            $order->remark('黑名单订单.');
-//        }
+        if ($order->status != 'UNPAID' && $order->checkBlack()) {
+            $order->update(['status' => 'REVIEW']);
+            $order->remark('黑名单订单.');
+        }
+
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
@@ -725,7 +760,7 @@ class OrderModel extends BaseModel
     {
         $orderItems = $this->items;
         $this->update(['status' => 'REVIEW']);
-        $this->remarks->create(['remark' => 'profit is less than 0', 'user_id' => request()->user()->id]);
+        $this->remarks()->create(['remark' => 'profit is less than 0', 'user_id' => request()->user()->id]);
         foreach ($orderItems as $orderItem) {
             $orderItem->update(['is_active' => '0']);
         }

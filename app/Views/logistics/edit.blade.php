@@ -72,7 +72,7 @@
                 <option value="0">==选择回邮模版==</option>
                 @foreach($emailTemplates as $emailTemplate)
                     <option value="{{$emailTemplate->id}}" {{ $emailTemplate->id == $model->logistics_email_template_id ? 'selected' : '' }}>
-                        {{$emailTemplate->name}}
+                        {{$emailTemplate->name}}{{$emailTemplate->eub_head}}
                     </option>
                 @endforeach
             </select>
@@ -114,6 +114,20 @@
                     <option value="{{ $limit->id }}" {{ $model->hasLimits($limit->id) ? 'selected' : ''}}>{{$limit->name}}</option>
                 @endforeach
             </select>
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="is_express" class="control-label">平邮or快递</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="is_express" value="1" {{ $model->is_express == '1' ? 'checked' : '' }}>快递
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="is_express" value="0" {{ $model->is_express == '0' ? 'checked' : '' }}>平邮
+                </label>
+            </div>
         </div>
         <div class="form-group col-lg-3">
             <label for="is_enable" class="control-label">是否启用</label>

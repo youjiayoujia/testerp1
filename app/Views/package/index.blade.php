@@ -35,7 +35,6 @@
                 <button class="btn btn-{{ $package->status_color }} btn-xs">
                     {{ $package->status_name }}
                 </button>
-
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
@@ -78,16 +77,27 @@
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
-            <td colspan='4'>渠道:  {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
-            <td colspan='4'>拣货单:  {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='7'>
+            <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
+            <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
+            <td colspan='2'>运输方式: {{ $package->order->shipping }}</td>
+            <td colspan='5'>
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
-                @if($package->status == 'ASSIGNED' || $package->status == 'TRACKINGFAILED')
-                <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
-                    <span class="glyphicon glyphicon-random"></span>
-                </a>
+                @if(in_array($package->status, ['NEED', 'PROCESSING', 'ASSIGNED', 'TRACKINGFAILED']))
+                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
+                        <span class="glyphicon glyphicon-random"></span>
+                    </a>
+                @endif
+                @if($package->status == 'ERROR')
+                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
+                        <span class="glyphicon glyphicon-check"></span>
+                    </a>
+                @endif
+                @if(in_array($package->status,['PROCESSING','PICKING','PACKED']))
+                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
+                        <span class="glyphicon glyphicon-refresh"></span>
+                    </a>
                 @endif
                 <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
                     <span class="glyphicon glyphicon-pencil"></span>
@@ -239,23 +249,23 @@
         $(document).ready(function () {
 
             arr = new Array();
-            i=0;
-            $.each($('.packageId'), function(){
+            i = 0;
+            $.each($('.packageId'), function () {
                 arr[i] = $(this).data('id');
                 i++;
             })
             $.get(
-                "{{ route('package.ajaxRealTime')}}",
-                {'arr':arr},
-                function(result){
-                    j=0;
-                    $.each($('.packageId'), function(){
-                        block = $(this).parent();
-                        logisticsReal = block.children('.logisticsReal');
-                        logisticsReal.html(logisticsReal.text() + "   <font color='gray'>" + result[j] + "</font>");
-                        j++;
-                    })
-                }
+                    "{{ route('package.ajaxRealTime')}}",
+                    {'arr': arr},
+                    function (result) {
+                        j = 0;
+                        $.each($('.packageId'), function () {
+                            block = $(this).parent();
+                            logisticsReal = block.children('.logisticsReal');
+                            logisticsReal.html(logisticsReal.text() + "   <font color='gray'>" + result[j] + "</font>");
+                            j++;
+                        })
+                    }
             )
 
             $('.returnTrackno').click(function () {
@@ -267,6 +277,11 @@
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
             })
 
+            $('.error').click(function () {
+                id = $(this).data('id');
+                location.href = "{{ route('package.errorToShipped')}}?id=" + id;
+            })
+
             $('.multiEditTracking').click(function () {
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
@@ -274,7 +289,16 @@
 
             $(document).on('click', '.recycle', function () {
                 id = $(this).data('id');
-                location.href = "{{ route('package.recycle') }}?id=" + id;
+                if (confirm('确认重新匹配物流？')) {
+                    location.href = "{{ route('package.recycle') }}?id=" + id;
+                }
+            })
+
+            $(document).on('click', '.retrack', function () {
+                id = $(this).data('id');
+                if (confirm('确认重下物流单？')) {
+                    location.href = "{{ route('package.retrack') }}?id=" + id;
+                }
             })
 
             $(document).on('click', '.submit_logistics', function () {

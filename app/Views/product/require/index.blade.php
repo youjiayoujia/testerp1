@@ -8,11 +8,8 @@
     <th>货源地(市)</th>
     <th>类似款sku</th>
     <th>竞争产品url</th>
-    <th>需求描述</th>
     <th class='sort' data-field='expected_date'>期待上传时间</th>
-    <th>需求渠道</th>
-    <th>需求帐号</th>
-    <th>创建人</th>
+    <th>采购人</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>处理状态</th>
     <th>处理者id</th>
@@ -30,13 +27,10 @@
             <td>{{ $productRequire->city }}</td>
             <td>{{ $productRequire->similar_sku }}</td>
             <td>{{ $productRequire->competition_url }}</td>
-            <td>{{ $productRequire->remark }}</td>
             <td>{{ $productRequire->expected_date }}</td>
-            <td>{{ $productRequire->neederName ? $productRequire->neederName->name : '' }}</td>
-            <td>{{ $productRequire->needer_shop_id }}</td>
-            <td>{{ $productRequire->createdByName ? $productRequire->createdByName->name : '' }}</td>
+            <td>{{ $productRequire->purchase ? $productRequire->purchase->name : '' }}</td>
             <td>{{ $productRequire->created_at }}</td>
-            <td>{{ $productRequire->status ? ($productRequire->status == '1' ? '未找到' : '已找到') : '新需求'}}</td>
+            <td>{{ $productRequire->status ? ($productRequire->status == '1' ? '未找到' : ($productRequire->status == '2' ? '已找到' : ('已创建'))) : '新需求'}}</td>
             <td>{{ $productRequire->userName ? $productRequire->userName->name : '' }}</td>
             <td>{{ $productRequire->handle_time }}</td>
             <td>
@@ -91,6 +85,16 @@
     </ul>
 </div>
 @parent
+<div class="btn-group">
+    <a class="btn btn-info" href="{{ route('productRequire.getExcel') }}">
+        获取excel
+    </a>
+</div>
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('productRequire.importByExcel') }}">
+        excel导入
+    </a>
+</div>
 @stop
 @section('childJs')
 <script type='text/javascript'>

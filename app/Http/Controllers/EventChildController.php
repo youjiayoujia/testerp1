@@ -24,6 +24,27 @@ class EventChildController extends Controller
         $this->viewPath = 'event.child.';
     }
 
+    public function stdClass_to_array($object)
+    {
+        $arr = (array)$object;
+        foreach($arr as $key => $value) {
+            if(is_object($value)) {
+               $arr[$key] = $this->stdClass_to_array($value); 
+               continue;
+           }
+           if(is_array($value)) {
+                foreach($value as $k => $v) {
+                    if(is_object($v)) {
+                        $value[$k] = $this->stdClass_to_array($v);
+                    }
+                }
+           }
+           $arr[$key] = $value;
+        }
+
+        return $arr;
+    }
+
     /**
      *  返回对应的操作日志,ajax请求 
      *
@@ -42,13 +63,13 @@ class EventChildController extends Controller
         $models = $category->child()->where('type_id', $id)->get()->sortByDesc('when');
         $html = '';
         foreach($models as $model) {
-            $to = unserialize(base64_decode($model->to_arr));
+            $to = json_decode($model->to_arr);
             if($to) {
-                $to = $to->toarray();
+                $to = $this->stdClass_to_array($to);
             }
-            $from = unserialize(base64_decode($model->from_arr));
+            $from = json_decode($model->from_arr);
             if($from) {
-                $from = $from->toarray();
+                $from = $this->stdClass_to_array($from);
             }
             if(!$from) {
                 $html .= "<div class='panel panel-default'>
@@ -60,14 +81,20 @@ class EventChildController extends Controller
                         if(count($value) == count($value,1)) {
                             $html .="<div class='col-lg-12'><div class='row'>";
                             foreach($value as $k => $v) {
-                                $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
+                                if(!is_array($v)) {
+                                    $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
+                                }
                             }
                             $html .= '</div></div>';
                         } else {
                             foreach($value as $k => $v) {
                                 $html .="<div class='col-lg-12'><div class='row'>";
-                                foreach($v as $k1 => $v1) {
-                                    $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                                if(is_array($v)) {
+                                    foreach($v as $k1 => $v1) {
+                                        if(!is_array($v1)) {
+                                            $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                                        }
+                                    }
                                 }
                                 $html .="</div></div>";
                             }
@@ -92,14 +119,18 @@ class EventChildController extends Controller
                     if(count($value) == count($value,1)) {
                         $html .="<div class='row'>";
                         foreach($value as $k => $v) {
-                            $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
+                            if(!is_array($v)) {
+                               $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;"; 
+                           }
                         }
                         $html .="</div></div>";
                     } else {
                         foreach($value as $k => $v) {
                             $html .="<div class='col-lg-12'><div class='row'>";
                             foreach($v as $k1 => $v1) {
-                                $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                                if(!is_array($v1)) {
+                                   $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;"; 
+                               }
                             }
                             $html .="</div></div>";
                         }
@@ -116,14 +147,18 @@ class EventChildController extends Controller
                     if(count($value) == count($value,1)) {
                         $html .="<div class='col-lg-12'><div class='row'>";
                         foreach($value as $k => $v) {
-                            $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";
+                            if(!is_array($v)) {
+                              $html .= "to['".$key."']['".$k."']<span class='glyphicon glyphicon-arrow-right'></span>".$v."&nbsp;&nbsp;&nbsp;&nbsp;";  
+                          }
                         }
                         $html .="</div></div>";
                     } else {
                         foreach($value as $k => $v) {
                             $html .="<div class='col-lg-12'><div class='row'>";
                             foreach($v as $k1 => $v1) {
-                                $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
+                                if(!is_array($v1)) {
+                                   $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;"; 
+                               }
                             }
                             $html .="</div></div>";
                         }

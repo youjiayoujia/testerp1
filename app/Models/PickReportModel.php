@@ -24,7 +24,9 @@ class PickReportModel extends BaseModel
         'missing_pick',
         'today_pick',
         'today_picklist',
-        'day_time'
+        'day_time',
+        'today_picklist_undone',
+        'more_than_twenty_four'
     ];
 
     public function user()

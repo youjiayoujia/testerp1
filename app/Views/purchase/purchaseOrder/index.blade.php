@@ -1,8 +1,9 @@
 @extends('common.table')
 @section('tableToolButtons')
     <div class="btn-group" >
-        <a href="/purchaseOrder/purchaseOrdersOut" class="btn btn-info" id="orderExcelOut"> 采购单导出
-        </a>
+        <a href="javascript:" class="btn btn-warning download">采购单导出
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </a>
     </div>
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
@@ -25,7 +26,7 @@
 @section('tableBody')
     @if(count($data)>0)
     @foreach($data as $purchaseOrder)
-
+        <?php $out_of_stock = 0;$sum_purchase_account = 0;$sum_purchase_storage_account = 0; ?>
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$purchaseOrder->id}}"></td>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
@@ -34,7 +35,7 @@
                 外部单号：
                 {{$purchaseOrder->post_coding }}</br>
                 已打印次数:</br></br>
-                总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchase_post_num}}</br>
+                总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchasePostage->sum('postage')}}</br>
                 运单号:
             </td>
             <td> 
@@ -49,13 +50,14 @@
                 {{ $purchaseOrder->supplier?$purchaseOrder->supplier->name:''}}
             </td>
             <td>
-            @if($purchaseOrder->status <4)
+            
                 <table class="table table-bordered table-striped table-hover sortable">
                 <thead>
                 <tr>
                 <th>sku</th>
                 <th>状态</th>
                 <th>名称</th>
+                <th>注意事项</th>
                 <th>采购数量</th>
                 <th>已到货数量</th>
                 <th>入库数量</th>
@@ -71,11 +73,19 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($purchaseOrder->purchase_items as $purchase_item)
+                @foreach($purchaseOrder->purchaseItem as $purchase_item)
+                <?php   
+                    if($purchase_item->productItem->out_of_stock){
+                        $out_of_stock=1;
+                    }
+                    $sum_purchase_account += $purchase_item->purchase_num*$purchase_item->purchase_cost;
+                    $sum_purchase_storage_account += $purchase_item->storage_qty*$purchase_item->purchase_cost
+                ?>
                 <tr>
                     <td>{{$purchase_item->sku}}</td>
                     <td>{{config('item.status')[$purchase_item->productItem?$purchase_item->productItem->status:'notFound']}}</td>
                     <td>{{$purchase_item->item?$purchase_item->item->c_name:''}}</td>
+                    <td>{{$purchase_item->item?$purchase_item->item->product->notify:''}}</td>
                     <td>{{$purchase_item->purchase_num}}</td>
                     <td>{{$purchase_item->arrival_num}}</td>
                     <td>{{$purchase_item->storage_qty}}</td>
@@ -97,43 +107,51 @@
                 <tr>
                     <th>合计</th>
                     <th>&nbsp;</th>
-                    <th>{{ $purchaseOrder->sum_purchase_num}}</th>
-                    <th>{{ $purchaseOrder->sum_arrival_num}}</th>
-                    <th>{{ $purchaseOrder->sum_storage_qty}}</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>{{ $purchaseOrder->purchaseItem->sum('purchase_num')}}</th>
+                    <th>{{ $purchaseOrder->purchaseItem->sum('arrival_num')}}</th>
+                    <th>{{ $purchaseOrder->purchaseItem->sum('storage_qty')}}</th>
+                    
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    <th>{{ $purchaseOrder->sum_purchase_account}}+YF{{$purchaseOrder->purchase_post_num}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->purchase_post_num}}</th>
-                    <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
+                    <th>{{ $sum_purchase_account}}+YF{{$purchaseOrder->total_postage}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->total_postage}}</th>
+                    <th>{{ $sum_purchase_storage_account}}</th>
                     <th id="warn_{{$purchaseOrder->id}}"></th>
                 </tr>
                 </tbody>
                 </table>
-                @endif
+                
             </td>
             <td>{{ $purchaseOrder->warehouse ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
                  
-            <td>{{ $purchaseOrder->created_at }}</td>
+            <td>{{ $purchaseOrder->created_at }}
+                @if($out_of_stock ==1) 
+                    <font color="red">(有欠货)</font>
+                @endif</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
-                	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
-                         <span class="glyphicon glyphicon-ok-sign"></span>
+                	<a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/1" title="审核" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">审核通过</span>
+                    </a>
+                    <a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/3" title="审核不通过" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">审核不通过</span>
                     </a>
                 @endif
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">
-                     <span class="glyphicon glyphicon-eye-open"></span>  
+                     <span class="glyphicon glyphicon-eye-open">详情</span>  
                 </a>
                 @if($purchaseOrder->status != 4 || ($purchaseOrder->close_status==1&&$purchaseOrder->status==2))
                     <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
-                       <span class="glyphicon glyphicon-pencil"></span>
+                       <span class="glyphicon glyphicon-pencil">修改</span>
                     </a>
                 @endif
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
                     <a  href="javascript:"  title="待核销" class="btn btn-danger btn-xs daihexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
-                         <span class="glyphicon glyphicon-yen"></span>
+                         <span class="glyphicon glyphicon-yen">待核销</span>
                     </a>
                 @endif
 
@@ -145,31 +163,31 @@
 
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
                     <a  href="javascript:" title="核销" class="btn btn-success btn-xs hexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
-                         <span class="glyphicon glyphicon-yen"></span>
+                         <span class="glyphicon glyphicon-yen">核销</span>
                     </a>
                 @endif
                 @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
                 <a data-toggle="modal" data-target="#myModal_{{$purchaseOrder->id}}" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
-                    <span class="glyphicon glyphicon-plus"></span>
+                    <span class="glyphicon glyphicon-plus">添加物流单号</span>
                 </a> 
                 
                 <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-zoom-in"></span>
+                    <span class="glyphicon glyphicon-zoom-in">查询物流单号</span>
                 </a>
                 @endif 
                 @if($purchaseOrder->examineStatus == 1||$purchaseOrder->examineStatus == 2)
                     <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs tuihui">
-                        <span class="glyphicon glyphicon-remove-sign"></span>
+                        <span class="glyphicon glyphicon-remove-sign">退回</span>
                     </a>
                 @endif
                 @if($purchaseOrder->status == 1&&$purchaseOrder->close_status==0)
                 <a href="javascript:" title="付款" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
-                    <span class="glyphicon glyphicon glyphicon-usd"></span>
+                    <span class="glyphicon glyphicon glyphicon-usd">付款</span>
                 </a>
                 @endif 
                 
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
-                    <span class="glyphicon glyphicon-print"></span>
+                    <span class="glyphicon glyphicon-print">打印</span>
                 </a>
                 <!-- <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $purchaseOrder->id }}"
@@ -199,21 +217,21 @@
         
         <div class="panel-body" id="itemDiv">
             <div class='row'>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <label  class='control-label'>物流号</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div> 
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <label  class='control-label'>物流费</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
             </div>                   
             <div class='row'>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
                
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-6">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
             </div>   
@@ -347,6 +365,7 @@
             }
         }
 
+        //批量操作
         $('.examine').click(function () {
             
             var url = "{{route('purchaseExmaine')}}";
@@ -369,6 +388,32 @@
                 }
             })
         });
+
+        //采购单导出
+        /*$('#orderExcelOut').click(function () { 
+            var url = "{{route('purchaseOrder.purchaseOrdersOut')}}";
+            var checkbox = document.getElementsByName("tribute_id");
+            var purchase_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                purchase_ids += checkbox[i].value + ",";
+            }
+            purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
+            location.href = "{{ route('purchaseOrder.purchaseOrdersOut') }}?purchase_ids=" + purchase_ids;
+        });*/
+
+        $(document).ready(function(){
+            $(document).on('click', '.download', function(){
+                var checkbox = document.getElementsByName("tribute_id");
+                var purchase_ids = "";
+                for (var i = 0; i < checkbox.length; i++) {
+                    if (!checkbox[i].checked)continue;
+                    purchase_ids += checkbox[i].value + ",";
+                }
+                purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
+                location.href="{{ route('purchaseOrder.purchaseOrdersOut')}}?purchase_ids="+purchase_ids;
+            })
+        })
 
         $('.view').click(function () {
             var purchaseOrder_id = $(this).attr('id');

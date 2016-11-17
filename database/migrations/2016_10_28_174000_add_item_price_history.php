@@ -13,7 +13,7 @@ class AddItemPriceHistory extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->string('sku_history_values')->comment('采购价格变更历史')->default(NULL);
+            $table->text('sku_history_values')->comment('采购价格变更历史')->default(NULL);
         });
     }
 

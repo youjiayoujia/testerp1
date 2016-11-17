@@ -85,7 +85,82 @@
         <div class="btn-group">
             <a class="btn btn-success export" href="javascript:void(0)"  id="coyp_account">COPY账号在线广告</a>              
         </div>
-        
+        <div class="btn-group">
+            <a class="btn btn-success export" href="javascript:void(0)"  data-toggle="modal" data-target="#modifyBand">
+             批量修改广告品牌属性
+            </a>
+        </div>
+    <div class="modal fade" id="modifyBand"    tabindex="-1" role="dialog"   aria-labelledby="myModalLabel" aria-hidden="true">
+    	<div class="modal-dialog modal-lg">
+    		<div class="modal-content">
+    			<div class="modal-header">
+    				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    				<h4 class="text-left modal-title" >批量修改广告品牌属性</h4>
+    			</div>
+    			<div class="modal-body">
+    			     
+    			      <form class="form-horizontal" id="form-band" action="{{ route('smtProduct.batchModifyBand') }}" method="POST">
+    			      {!! csrf_field() !!}		
+    			     <!-- <form class="form-horizontal" id="form-band" action="{{ route('smtProduct.batchModifyBand') }}" method="POST"> -->				
+            			<div class="form-group">
+    						<label class="col-sm-2">账号:</label>
+    						<div class="col-sm-4">
+    							<select  id="selectaccount" class="form-control" name="token_id">
+    								<option value="">---请选择---</option>
+    								@foreach($accountList as $account)
+            						    <option value="{{ $account->id }}">{{ $account->account}}</option>'
+            						@endforeach
+    							</select>
+    						</div>
+    					</div>
+    					<!-- 
+    					<div class="form-group">
+    					    <label class="col-sm-2">类目属性:</label>
+    					    <div class="col-sm-4">
+        					    <select  id="selectcategory" class="form-control">
+        					       <option value="">---请选择类目---</option>
+        					       @foreach($categoryList as $category)
+        					            <option value="{{ $category->category_id}}">{{ $category->category_name}}</option>'
+        					       @endforeach
+    					       </select>
+    					   </div>
+    					</div>
+    					-->
+    					<div class="form-group">
+    						<label class="col-sm-2">产品分组</label>
+    						<div class="col-sm-4">
+    							<select  id="groupId3"  class="form-control" name="group_id">
+    								<option value="">=所有分组=</option>
+    							</select>
+    
+    						</div>
+    					</div>
+                        <div class="form-group">
+    						<label class="col-sm-2">品牌</label>
+    						<div class="col-sm-4">
+    							<select  id="band_id"  class="form-control" name="band_id">
+    								<option value="">=请选择品牌=</option>
+    								<option value="201563181">Favolook </option>
+    								<option value="201802818">Faddare  </option>
+    								<option value="201569869">Moonar   </option>
+    								<option value="201606963">Woopower </option>
+    								<option value="201606953">RV77     </option>
+    							</select>
+    
+    						</div>
+    					</div>
+            
+    					<div class="modal-footer">
+    					     <button type="submit" class="btn btn-primary" id='modify'>提交</button> 
+    					     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>                                
+    						<!--<a href="#"   class="btn btn-primary " id="batchModifyBand">确定</a>-->
+    						<!--<a href="#" class="btn btn-default" data-dismiss="modal">关闭</a>-->
+    					</div>
+            	   </form>
+    			</div>
+    		</div>
+    	</div>
+    </div>     
    <div class="modal fade" id="myPriceModalSelect"    tabindex="-1" role="dialog"   aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -530,6 +605,27 @@ $(document).on('change', '#selectaccountto', function(){
 	}
 });
 
+$(document).on('change', '#selectcategory', function(){
+	var token_id = $('#selectaccount').val();
+	var category_id = $(this).val();
+	if(!token_id){
+		alert('请先选择帐号');
+		return false;
+	}else{
+		$.ajax({
+			url: "{{ route('smtProduct.getCategoryAttributesById') }}",
+			data: 'token_id='+token_id+'&category_id='+category_id,
+			type: 'POST',
+			dataType: 'JSON',
+			success: function(data){
+				if (data.status){
+					$('#groupId2').append(data.data);
+				}
+			}
+		});	
+	}		
+});
+
 $('#needcategoryone').click(function(){
 	if($('#needcategoryone').is(":checked"))
 	{
@@ -594,5 +690,52 @@ $("#searchcategory").click(function(){
 		}
 	})
 })
+
+$("#batchModifyBand").click(function(){
+	var band_id = $("#band_id").val();
+	var group_id = $("#groupId3").val();
+	var token_id = $("#selectaccount").val();
+	if(!band_id){
+		alert("请选择品牌！");
+		return false;
+	}
+	if(!group_id){
+		alert("请选择分组！");
+		return false;
+	}
+	$.ajax({
+		url: "{{ route('smtProduct.batchModifyBand') }}",
+		data: {'token_id':token_id,'group_id':group_id,'band_id':band_id},
+		type: "POST",
+		dataType:"JSON",
+		beforeSend: function(){
+			 ii = layer.load('更新中。。。');
+		},
+		success:function(data){
+			alert(data.info);
+			$('#modifyBand').modal('hide');
+		}
+	})
+})
+
+$('#modify').click(function () {
+	$('#modify').addClass('disabled');
+})
+
+$(document).on('change', '#select2-mixedSearchFieldsfilterSelectstoken_id-rs-container', function(){
+	var token_id = $(this).val();
+	$.ajax({
+		url: "{{ route('smtProduct.showAccountProductGroup') }}",
+		data: 'token_id='+token_id,
+		type: 'POST',
+		dataType: 'JSON',
+		success: function(data){
+			if (data.status){
+				$('#select2-mixedSearchFieldsfilterSelectsgroupId-em-container').append(data.data);
+			}
+		}
+	});	
+})
+
 </script>
 @stop

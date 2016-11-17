@@ -54,6 +54,11 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tracking No:None
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {{ $model->id }}
             </td>
         </tr>
         <tr height="90">
@@ -62,12 +67,10 @@
                 {{ $model->is_battery ? '是' : '否' }}
                 <br>
                 仓库：
-                @if($model->warehouse)
-                    @if($model->warehouse->name == '深圳仓')
-                        {{ '深圳市宝安区西乡街道水库路111号星宏科技园D栋一层（燕文深圳仓-经济）' }}
-                    @elseif($model->warehouse->name == '义乌仓')
-                        {{ '义乌市206号5号楼3楼（燕文义乌仓-经济）' }}
-                    @endif
+                @if($model->warehouse_id == 3)
+                    {{ '深圳市宝安区西乡街道水库路111号星宏科技园D栋一层（燕文深圳仓-经济）' }}
+                @elseif($model->warehouse_id == 4)
+                    {{ '义乌市206号5号楼3楼（燕文义乌仓-经济）' }}
                 @endif
             </td>
         </tr>

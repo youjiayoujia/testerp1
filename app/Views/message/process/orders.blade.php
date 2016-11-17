@@ -18,7 +18,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     订单:
-                    <a href="http://ws.jinjidexiaoxuesheng.com/admin/workstation/order/{{ $relatedOrder->order->id }}" target="_blank">
+                    <a href="{{ route('order.show',$relatedOrder->order->id) }}" target="_blank">
                         <strong>{{ $relatedOrder->order->ordernum }}</strong>
                     </a>
                     <small>{{ '<'.$relatedOrder->order->email.'>' }}</small>
@@ -75,7 +75,10 @@
                                 </thead>
                                 @foreach($relatedOrder->order->items as $item)
                                     <tr>
-                                        <td>{{ $item->sku }}</td>
+                                        <td>
+
+                                            <a href="{{ route('item.show', $item->sku ) }}" target="_blank">{{$item->sku}}</a>
+                                        </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>{{ $item->price }}</td>
                                         <td>{{ $item->status_text }}</td>
@@ -102,12 +105,12 @@
             @foreach($relatedOrder->order->packages as $package)
                 <div class="panel panel-success">
                     <div class="panel-heading">
-                        Package:
-                        <a href="http://ws.jinjidexiaoxuesheng.com/admin/workstation/package/{{ $package->id }}" target="_blank">
-                            <strong>#{{ $package->id }}</strong>
+                        包裹:
+                        <a href=" {{route('package.show',$package->id) }} " target="_blank">
+                            <strong>{{ $package->id }}</strong>
                         </a>
                         -
-                        <strong>{{ $package->status_text }}</strong>
+                        <strong>{{ $package->StatusText }}</strong>
                     </div>
                         <div class="panel-body">
                             @if($package->shipping)

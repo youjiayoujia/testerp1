@@ -16,9 +16,9 @@ use App\Models\Logistics\Zone\CountriesModel as ZoneCountriesModel;
 
 class ZoneModel extends BaseModel
 {
-    protected $table = 'logistics_zones';
+    public $table = 'logistics_zones';
 
-    protected $fillable = [
+    public $fillable = [
         'zone',
         'logistics_id',
         'type',
@@ -126,13 +126,12 @@ class ZoneModel extends BaseModel
     public function updateData($arr)
     {
         $this->update($arr);
-        $countries = $this->zone_countries;
-        foreach($countries as $country) {
-            $country->forceDelete();
-        }
+        $countries = $this->logistics_zone_countries;
+        $buf = [];
         if(array_key_exists('countrys', $arr)) {
-            $this->logistics_zone_countries()->attach($arr['countrys']);
+            $buf = array_unique($arr['countrys']);
         }
+        $this->logistics_zone_countries()->sync($buf);
         if($arr['type'] == 'second') {
             $sectionPrices = $this->zone_section_prices;
             foreach($sectionPrices as $sectionPrice) {

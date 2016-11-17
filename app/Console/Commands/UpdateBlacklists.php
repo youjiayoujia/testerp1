@@ -45,8 +45,8 @@ class UpdateBlacklists extends Command
         //周日更新黑名单
         foreach(BlacklistModel::all() as $blacklist) {
             if($blacklist->channel->driver == 'wish') {
-                $lastname = explode(' ', $blacklist['name'])[0];
-                $firstname = explode(' ', $blacklist['name'])[1];
+                $lastname = explode(' ', $blacklist->name)[0];
+                $firstname = explode(' ', $blacklist->name)[1];
                 $orders = OrderModel::where('shipping_zipcode', $blacklist->zipcode)
                     ->where('shipping_lastname', $lastname)
                     ->where('shipping_firstname', $firstname)
@@ -60,10 +60,10 @@ class UpdateBlacklists extends Command
             $count3 = 0;
             $ordernum = '';
             foreach($orders as $order) {
-                if(count($order->refunds)) {
+                if($order->refunds->count()) {
                     $count3++;
                 }
-                $ordernum = $order['ordernum'];
+                $ordernum = $order->ordernum;
             }
             $data['ordernum'] = $ordernum;
             $data['refund_order'] = $count3;

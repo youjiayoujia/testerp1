@@ -64,7 +64,7 @@ class SpuModel extends BaseModel
 
     public function productRequire()
     {
-        return $this->hasMany('App\Models\Product\RequireModel', 'product_require_id');
+        return $this->belongsTo('App\Models\Product\RequireModel', 'product_require_id');
     }
 
     public function getMixedSearchAttribute()

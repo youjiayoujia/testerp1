@@ -83,9 +83,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(1481);
-        $model = $package->calculateLogisticsFee();
-        var_dump($model);exit;
+        $test = PickListModel::find(155)->pickListItem()->get();
+        var_dump($test->toarray());exit;
 
     }
 

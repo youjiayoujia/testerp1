@@ -298,6 +298,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
     Route::get('purchaseOrder/sevenPurchaseSku',
         ['uses' => 'Purchase\PurchaseOrderController@sevenPurchaseSku', 'as' => 'purchase.sevenPurchaseSku']);
+
+    Route::get('purchaseOrder/printButNotWarehouseIn',
+        ['uses' => 'Purchase\PurchaseOrderController@printButNotWarehouseIn', 'as' => 'purchase.printButNotWarehouseIn']);
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
     Route::any('PurchaseOrder/trackingNoSearch',
         ['uses' => 'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);

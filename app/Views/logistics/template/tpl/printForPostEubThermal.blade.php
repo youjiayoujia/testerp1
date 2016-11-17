@@ -97,7 +97,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" valign="bottom"><div style="font-size:14px; margin-top:0px;"><strong>420 {{ explode('-', $model->shipping_zipcode)[0] }}</strong></div></td>
+                  <td align="center" valign="bottom"><div style="font-size:14px; margin-top:0px;"><strong>ZIP {{ explode('-', $model->shipping_zipcode)[0] }}</strong></div></td>
                 </tr>
               </table></td>
             </tr>

@@ -112,13 +112,15 @@ class PackageController extends Controller
     {
         $arr = request('arr');
         $buf = [];
-        foreach ($arr as $id) {
+        foreach ($arr as $key => $id) {
             $package = $this->model->find($id);
             if (!$package) {
-                $buf[] = '虚拟匹配未匹配到';
+                $buf[$key][0] = '虚拟匹配未匹配到';
+                $buf[$key][1] = 0;
                 continue;
             }
-            $buf[] = $package->realTimeLogistics();
+            $buf[$key][0] = $package->realTimeLogistics();
+            $buf[$key][1] = ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0).'￥';
         }
 
         return $buf;

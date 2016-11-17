@@ -88,7 +88,7 @@ class PackageModel extends BaseModel
         }
         return [
             'relatedSearchFields' => [
-                'order' => ['ordernum'],
+                'order' => ['ordernum', 'channel_ordernum'],
             ],
             'filterFields' => ['tracking_no'],
             'filterSelects' => [
@@ -1198,6 +1198,7 @@ class PackageModel extends BaseModel
 
             return $rule->logistics->code;
         }
+
         return '虚拟匹配未匹配到';
     }
 
@@ -1215,7 +1216,7 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
-
+            
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
@@ -1247,6 +1248,7 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
+
 
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {

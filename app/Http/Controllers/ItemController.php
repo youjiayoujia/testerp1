@@ -24,6 +24,7 @@ use Excel;
 use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
 use App\Models\SyncApiModel;
+use App\Models\Channel\CatalogRatesModel;
 
 class ItemController extends Controller
 {

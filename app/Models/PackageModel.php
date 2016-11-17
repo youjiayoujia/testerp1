@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Models\Logistics\ErpEubModel;
 use Excel;
 use DB;
 use App\Jobs\AssignStocks;
@@ -187,19 +186,6 @@ class PackageModel extends BaseModel
         }
 
         return $data;
-    }
-
-    //获取分拣码
-    public function getFenJianAttribute()
-    {
-        $code = '';
-        $zip = substr($this->shipping_zipcode, 0, 3);
-        $erpEubs = ErpEubModel::where('zip', $zip)->get();
-        foreach ($erpEubs as $erpEub) {
-            $code = $erpEub->code;
-        }
-
-        return $code;
     }
 
     //包裹sku信息
@@ -971,9 +957,7 @@ class PackageModel extends BaseModel
                         'status' => 'WAITASSIGN',
                         'weight' => $weight
                     ]);
-                    if(empty($oldWarehouseId)) {
-                        $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
-                    } else {
+                    if(!empty($oldWarehouseId)) {
                         if($oldWarehouseId != $warehouseId) {
                             $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
                         } else {

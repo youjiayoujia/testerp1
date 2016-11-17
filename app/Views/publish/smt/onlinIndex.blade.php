@@ -98,10 +98,10 @@
     				<h4 class="text-left modal-title" >批量修改广告品牌属性</h4>
     			</div>
     			<div class="modal-body">
-    			     <!--
+    			     
     			      <form class="form-horizontal" id="form-band" action="{{ route('smtProduct.batchModifyBand') }}" method="POST">
-    			      -->		
-    			     <form class="form-horizontal" id="form-band" action="{{ route('smtProduct.batchModifyBand') }}" method="POST">				
+    			      {!! csrf_field() !!}		
+    			     <!-- <form class="form-horizontal" id="form-band" action="{{ route('smtProduct.batchModifyBand') }}" method="POST"> -->				
             			<div class="form-group">
     						<label class="col-sm-2">账号:</label>
     						<div class="col-sm-4">
@@ -151,7 +151,9 @@
     					</div>
             
     					<div class="modal-footer">
-    						<a href="#"   class="btn btn-primary " id="batchModifyBand">确定</a>
+    					     <button type="submit" class="btn btn-primary" id='modify'>提交</button> 
+    					     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>                                
+    						<!--<a href="#"   class="btn btn-primary " id="batchModifyBand">确定</a>-->
     						<!--<a href="#" class="btn btn-default" data-dismiss="modal">关闭</a>-->
     					</div>
             	   </form>
@@ -706,12 +708,34 @@ $("#batchModifyBand").click(function(){
 		data: {'token_id':token_id,'group_id':group_id,'band_id':band_id},
 		type: "POST",
 		dataType:"JSON",
-		
+		beforeSend: function(){
+			 ii = layer.load('更新中。。。');
+		},
 		success:function(data){
 			alert(data.info);
 			$('#modifyBand').modal('hide');
 		}
 	})
 })
+
+$('#modify').click(function () {
+	$('#modify').addClass('disabled');
+})
+
+$(document).on('change', '#select2-mixedSearchFieldsfilterSelectstoken_id-rs-container', function(){
+	var token_id = $(this).val();
+	$.ajax({
+		url: "{{ route('smtProduct.showAccountProductGroup') }}",
+		data: 'token_id='+token_id,
+		type: 'POST',
+		dataType: 'JSON',
+		success: function(data){
+			if (data.status){
+				$('#select2-mixedSearchFieldsfilterSelectsgroupId-em-container').append(data.data);
+			}
+		}
+	});	
+})
+
 </script>
 @stop

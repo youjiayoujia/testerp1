@@ -89,6 +89,11 @@
                         <span class="glyphicon glyphicon-random"></span>
                     </a>
                 @endif
+                @if($package->status == 'ERROR')
+                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
+                        <span class="glyphicon glyphicon-check"></span>
+                    </a>
+                @endif
                 @if(in_array($package->status,['PROCESSING','PICKING','PACKED']))
                     <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
                         <span class="glyphicon glyphicon-refresh"></span>
@@ -270,6 +275,11 @@
             $('.returnFee').click(function () {
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
+            })
+
+            $('.error').click(function () {
+                id = $(this).data('id');
+                location.href = "{{ route('package.errorToShipped')}}?id=" + id;
             })
 
             $('.multiEditTracking').click(function () {

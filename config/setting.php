@@ -97,6 +97,8 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+        'productStatusType' => '广告状态',
+        'groupId' => '产品分组',
         'productSku.skuCode'=>'产品SKU',
         'product.token_id' => '帐号',
         'product.multiattribute' => '=属性=',

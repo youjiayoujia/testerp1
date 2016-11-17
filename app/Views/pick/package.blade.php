@@ -187,18 +187,18 @@ $(document).ready(function(){
                         out_js = 1;
                         id = tmp.data('id');
                         sku = tmp.find('.sku').text();
-                        $.ajax({
-                            url:"{{ route('pickList.packageItemUpdate')}}",
-                            data:{package_id:package_id, sku:sku},
-                            dataType:'json',
-                            type:'get',
-                            success:function(result) {
-                                if(!result) {
-                                    return false;
-                                }
-                            }
-                        });
                         if(parseInt(tmp.find('.picked_quantity').text()) == quantity) {
+                            $.ajax({
+                                url:"{{ route('pickList.packageItemUpdate')}}",
+                                data:{package_id:package_id},
+                                dataType:'json',
+                                type:'get',
+                                success:function(result) {
+                                    if(!result) {
+                                        return false;
+                                    }
+                                }
+                            });
                             $("."+id).find('.status').text('已包装');
                             $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
                             $('#barcode').load(function(){
@@ -220,18 +220,18 @@ $(document).ready(function(){
                     old_flag = 1;
                     tmp.find('.picked_quantity').text(parseInt(tmp.find('.picked_quantity').text()) + 1);
                     sku = tmp.find('.sku').text();
-                    $.ajax({
-                        url:"{{ route('pickList.packageItemUpdate')}}",
-                        data:{package_id:package_id, sku:sku},
-                        dataType:'json',
-                        type:'get',
-                        success:function(result) {
-                            if(!result) {
-                                return false;
-                            }
-                        }
-                    });
                     if(parseInt(tmp.find('.picked_quantity').text()) == parseInt(tmp.find('.quantity').text())) {
+                        $.ajax({
+                            url:"{{ route('pickList.packageItemUpdate')}}",
+                            data:{package_id:package_id},
+                            dataType:'json',
+                            type:'get',
+                            success:function(result) {
+                                if(!result) {
+                                    return false;
+                                }
+                            }
+                        });
                         needId = tmp.data('id');
                         flag = 1;
                         $.each($('.old tr'), function(){

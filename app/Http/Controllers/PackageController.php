@@ -49,7 +49,7 @@ class PackageController extends Controller
     {
         $len = 1000;
         $start = 0;
-        $packages = $this->model->whereIn('status', ['NEED', 'NEW'])->skip($start)->take($len)->get();
+        $packages = $this->model->where('status', 'NEW')->skip($start)->take($len)->get();
         $name = UserModel::find(request()->user()->id)->name;
         while ($packages->count()) {
             foreach ($packages as $package) {
@@ -577,6 +577,7 @@ class PackageController extends Controller
 
     public function editTrackingNo($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -584,6 +585,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, '修改追踪号'),
             'model' => $model,
+            'hideUrl' => $hideUrl
         ];
 
         return view($this->viewPath . 'editTrackingNo', $response);
@@ -654,7 +656,8 @@ class PackageController extends Controller
         $model->update(['tracking_no' => request('tracking_no'), 'shipping_address' => request('shipping_address')]);
         $to = json_encode($model);
         $this->eventLog($name, '修改追踪号', $to, $from);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url);
     }
 
     public function actSplitPackage($arr, $id)
@@ -673,28 +676,24 @@ class PackageController extends Controller
                 $item->delete();
             }
             foreach ($tmp as $packageId => $info) {
-                if (!$packageId) {
-                    $from = json_encode($model);
-                    foreach ($info as $itemId => $packageItem) {
-                        $packageItem['item_id'] = $itemId;
-                        $model->items()->create($packageItem);
-                    }
-                    $model->update(['status' => 'NEW']);
-                    $to = json_encode($model);
-                    $this->eventLog($name, '拆分包裹', $to, $from);
-                    $model->order->update(['status' => 'REVIEW']);
-                } else {
-                    $newPackage = $this->model->create($model->toArray());
-                    $to = json_encode($newPackage);
-                    foreach ($info as $itemId => $packageItem) {
-                        $packageItem['item_id'] = $itemId;
-                        $newPackage->items()->create($packageItem);
-                    }
-                    $newPackage->update(['status' => 'NEW']);
-                    $this->eventLog($name, '拆分包裹', $to);
-                    $newPackage->order->update(['status' => 'REVIEW']);
+                $newPackage = $this->model->create($model->toArray());
+                $to = json_encode($newPackage);
+                $weight = 0;
+                foreach ($info as $itemId => $packageItem) {
+                    $packageItem['item_id'] = $itemId;
+                    $newPackage->items()->create($packageItem);
+                    $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
                 }
+                $position = $newPackage->items->first()->warehouse_position_id;
+                if($position) {
+                    $newPackage->update(['weight' => $weight, 'status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0']);
+                } else {
+                    $newPackage->update(['weight' => $weight, 'status' => 'NEW', 'logistics_id' => '0', 'tracking_no' => '0']);
+                }
+                $this->eventLog($name, '拆分包裹', $to);
+                $newPackage->order->update(['status' => 'REVIEW']);
             }
+            $model->delete();
         }
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '包裹拆分成功.'));
@@ -1328,6 +1327,21 @@ class PackageController extends Controller
 
             return view($this->viewPath . 'excelResult', $response);
         }
+    }
+
+    public function errorToShipped()
+    {
+        $id = request('id');
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
+        }
+        if($model->status != 'ERROR') {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹状态不是异常.'));
+        }
+        $model->update(['status' => 'PACKED']);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功.'));
     }
 
     /**

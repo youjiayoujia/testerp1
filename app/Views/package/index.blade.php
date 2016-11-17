@@ -215,11 +215,11 @@
             出库复检
         </a>
     </div>
-    <div class="btn-group">
-        <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}">
-            发货统计
-        </a>
-    </div>
+    <!-- <div class="btn-group"> -->
+        <!-- <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}"> -->
+            <!-- 发货统计 -->
+        <!-- </a> -->
+    <!-- </div> -->
 @stop
 @section('childJs')
     <script type='text/javascript'>

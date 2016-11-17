@@ -538,7 +538,7 @@ class PickListController extends Controller
             $package->save();
             $picklistItems = $package->picklistItems;
             foreach($picklistItems as $picklistItem) {
-                $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
+                $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;
                 $picklistItem->save();
             }
             $buf = 1;

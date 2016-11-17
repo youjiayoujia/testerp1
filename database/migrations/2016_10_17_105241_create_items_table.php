@@ -21,8 +21,8 @@ class CreateItemsTable extends Migration
 			$table->string('name')->nullable();
 			$table->string('c_name')->nullable();
 			$table->text('competition_url');
-			$table->decimal('weight', 5)->nullable()->default(0.00);
-			$table->decimal('package_weight', 5)->nullable();
+			$table->decimal('weight', 6,3)->nullable()->default(0.00);
+			$table->decimal('package_weight', 6,3)->nullable();
 			$table->string('inventory')->nullable();
 			$table->integer('warehouse_id')->default(0);
 			$table->string('warehouse_position')->nullable();

@@ -425,7 +425,7 @@ class OrderModel extends BaseModel
     {
         $logistics = '';
         foreach($this->packages as $package) {
-            $logisticsName = $package->logistics ? $package->logistics->name : '';
+            $logisticsName = $package->logistics ? $package->logistics->code : '';
             $logistics .= $logisticsName . ' ';
         }
 

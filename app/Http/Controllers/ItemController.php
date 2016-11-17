@@ -87,7 +87,7 @@ class ItemController extends Controller
         $data = request()->all();
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = json_encode($model);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -169,7 +169,7 @@ class ItemController extends Controller
         $sync->times = 0;
         $sync->save();
 
-        $to = json_encode($model);
+        $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, 'item信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex);
     }
@@ -308,21 +308,21 @@ class ItemController extends Controller
         $user_id = request()->input('purchase_adminer');
         $model = $this->model->find($item_id);
         $userName = UserModel::find(request()->user()->id);
-        $from = json_encode($model);
+        $from = base64_encode(serialize($model));
         if($user_id){
             $model->update(['purchase_adminer'=>$user_id]);
-            $to = json_encode($model);
+            $to = base64_encode(serialize($model));
             $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
         }else{
             $userModel = UserModel::where('name',$user_name)->first();
             if($userModel){
                 $model->update(['purchase_adminer'=>$userModel->id]);
-                $to = json_encode($model);
+                $to = base64_encode(serialize($model));
                 $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
                 return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
             }else{
-                $to = json_encode($model);
+                $to = base64_encode(serialize($model));
                 $this->eventLog($userName->name, '采购人员更新,id='.$model->id, $to, $from);
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
             }
@@ -479,7 +479,7 @@ class ItemController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit'),$field = ['*'],$pageSize='10'),
             'mixedSearchFields' => $this->model->mixed_search,
-
+            'warehouses' => $this->warehouse->all(),
             'Compute_channels' => CatalogRatesModel::all(),
 
         ];
@@ -557,10 +557,10 @@ class ItemController extends Controller
         $supplier_id = request()->input('supplier_id');
         $model = $this->model->with('skuPrepareSupplier')->find($item_id);
         $userName = UserModel::find(request()->user()->id);
-        $from = json_encode($model);
+        $from = base64_encode(serialize($model));
         $arr['supplier_id'] = $supplier_id;
         $model->skuPrepareSupplier()->attach($arr);
-        $to = json_encode($model);
+        $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '添加供应商,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备选供应商添加成功.'));
     }

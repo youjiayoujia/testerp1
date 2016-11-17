@@ -1315,7 +1315,7 @@ class PackageController extends Controller
     {
         $start_time = request()->input('start_time');
         $end_time = request()->input('end_time');
-        $packages = PackageModel::whereBetween('shipped_at', [$start_time, $end_time])->get();
+        $packages = PackageModel::where('status', 'SHIPPED')->whereBetween('shipped_at', [$start_time, $end_time])->get();
         $this->model->exportData($packages);
     }
 

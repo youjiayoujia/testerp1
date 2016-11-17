@@ -169,5 +169,6 @@ return [
         'catalog.id' => '品类',
         'spu_id' => 'SPU',
         'logistics.catalog.name' => '物流分类',
+        'order.channel_ordernum' => '渠道运单号'
     ],
 ];

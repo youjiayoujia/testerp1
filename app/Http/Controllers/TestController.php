@@ -83,15 +83,10 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(582);
-        $model = $package->getDeclaredInfo();
-        dd($model);
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $package,
-        ];
+        $package = PackageModel::find(1481);
+        $model = $package->calculateLogisticsFee();
+        var_dump($model);exit;
 
-        return view('logistics.template.tpl.printForPostEubThermal', $response);
     }
 
 //    public function test2()
@@ -1028,7 +1023,7 @@ class TestController extends Controller
                     foreach ($all_ebay_sku as $ebay_sku_item) {
                         if ($ebay_sku_item->status == 1) { //sku 在线
                             echo $ebay_sku_item->erp_sku;
-                            if (in_array($ebay_sku_item->erpProduct->status, $status)) { //其他sku  不满足状态天剑
+                            if (in_array($ebay_sku_item->erpProduct->status, $status)) { //其他sku  不满足状态
                                 if ($ebay_sku_item->erpProduct->AvailableQuantity + $ebay_sku_item->erpProduct->NormalTransitQuantity > 0) { //其他sku 虚库存+在途 > 0
                                     $is_down = false;
                                 }

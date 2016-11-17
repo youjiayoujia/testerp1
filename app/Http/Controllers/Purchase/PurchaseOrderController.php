@@ -1255,23 +1255,22 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * 已收货未入库
+     * 未入库采购单邮件
      *
      * @param none
      * @return obj
      * 
      */
-/*    public function notWarehouseIn()
+    public function printButNotWarehouseIn()
     {   
-        echo '<pre>';
-        
+        $purchaseOrder = $this->model->where('print_num','>','0')->whereIn('status',['1','2','3'])->get();
         //邮件模板数据
         $data = ['email'=>'549991570@qq.com', 'name'=>'youjiatest@163.com','purchaseOrder'=>$purchaseOrder];
         //发送邮件
-        Mail::send('purchase.purchaseOrder.mailSevenPurchase', $data, function($message) use($data){
-            $message->to($data['email'], $data['name'])->subject('采购单7天未到货');
+        Mail::send('purchase.purchaseOrder.mailPrintButNotWarehouseIn', $data, function($message) use($data){
+            $message->to($data['email'], $data['name'])->subject('已打印入库单,未入库采购单明细');
         });
-    }*/
+    }
         
 }
 

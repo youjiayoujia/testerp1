@@ -81,7 +81,7 @@
               {{ ' ' . $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_zipcode) : '') : ''  }}<br />
           </div>
           <div style="font-family:Arial, Helvetica, sans-serif; height:13px;" align="center">
-          &nbsp;<strong style="font-size:16px;">{{ $model->order ? $model->order->ordernum : '' }}</strong>
+          &nbsp;<strong style="font-size:16px;">{{ $model->id }}</strong>
           </div>
           </td>
           <td width="41%" rowspan="2" valign="top"><table width="100%" border="0" cellspacing="3" cellpadding="0">
@@ -90,12 +90,14 @@
                 <tr>
                   <td align="left">
                       <div style="margin-top:3px; margin-right:5px; ">
-                          <img src="{{ route('barcodeGen', ['content' => explode('-', $model->shipping_zipcode)[0]]) }}">
+                          @if($model->shipping_country == 'US')
+                              <img src="{{ route('barcodeGen', ['content' => '420' . explode('-', $model->shipping_zipcode)[0]]) }}">
+                          @endif
                       </div>
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" valign="bottom"><div style="font-size:14px; margin-top:0px;"><strong>ZIP {{ explode('-', $model->shipping_zipcode)[0] }}</strong></div></td>
+                  <td align="center" valign="bottom"><div style="font-size:14px; margin-top:0px;"><strong>420 {{ explode('-', $model->shipping_zipcode)[0] }}</strong></div></td>
                 </tr>
               </table></td>
             </tr>
@@ -195,8 +197,8 @@
                   &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_province) : '') : '' }}<br />
                   &nbsp;{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_country) : '') : '' }}
                   {{ ' ' . $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_sender_zipcode) : '') : ''  }}<br />
-            <div style="font-size:16px;" align="center"><strong>{{ $model->order ? $model->order->ordernum : ''}}</strong></div>
-            PHONE:{{ $model->shipping_phone }}</div></td>
+            <div style="font-size:16px;" align="center"><strong>{{ $model->id }}</strong></div>
+            PHONE:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->eub_phone) : '') : '' }}</div></td>
           <td width="58%" rowspan="2" valign="top" style="border-top:#000 solid 1px">
                   <div style=" font-size:11px">
           SHIP TO:

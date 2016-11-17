@@ -87,6 +87,7 @@ class OrderModel extends BaseModel
         'create_time',
         'is_chinese',
         'orders_expired_time',
+        'created_at',
     ];
 
     private $canPackageStatus = ['PREPARED'];
@@ -424,7 +425,7 @@ class OrderModel extends BaseModel
     {
         $logistics = '';
         foreach($this->packages as $package) {
-            $logisticsName = $package->logistics ? $package->logistics->name : '';
+            $logisticsName = $package->logistics ? $package->logistics->code : '';
             $logistics .= $logisticsName . ' ';
         }
 

@@ -38,7 +38,7 @@ class EubAdapter extends BasicAdapter
     public function getTracking($package)
     {
         $response = $this->doUpload($package);
-        if ($response['status'] != 0) {0
+        if ($response['status'] != 0) {
             $result = [
                 'code' => 'success',
                 'result' =>$response['msg'] //跟踪号
@@ -64,7 +64,7 @@ class EubAdapter extends BasicAdapter
         $this->callBase['APISellerUserToken'] = $account_info->ebay_token;//eBay token
         $this->callBase['APISellerUserID'] = $account_info->ebay_eub_developer;//卖家eBay帐户
 
-        $emailTemplateInfo = $package->emailTemplate;
+        $emailTemplateInfo = $package->logistics->emailTemplate;
 
         $this->eMSPickUpType = $emailTemplateInfo->eub_transport_type;
 

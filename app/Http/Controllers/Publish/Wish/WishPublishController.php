@@ -7,7 +7,7 @@
  */
 
 namespace App\Http\Controllers\Publish\Wish;
-
+use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Http\Controllers\Controller;
@@ -15,6 +15,8 @@ use App\Models\ChannelModel;
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\Publish\Wish\WishSellerCodeModel;
+use App\Models\ItemModel;
+
 
 class WishPublishController extends Controller
 {
@@ -186,7 +188,7 @@ class WishPublishController extends Controller
             foreach ($post['arr']['sku'] as $key => $variant) {
 
                 //autoFillSuffix
-                $wish_product_detail[$key]['sku'] = $this->autoFillSuffix(trim($variant), $channel_accounts->domain, $channel_accounts->wish_sku_resolve);
+                $wish_product_detail[$key]['sku'] = $this->autoFillSuffix(trim($variant), $channel_accounts->wish_publish_code, $channel_accounts->wish_sku_resolve);
 
                 $wish_product_detail[$key]['account_id'] = intval($account);
                 $wish_product_detail[$key]['price'] = !empty($post['account_price'][$account][$key]) ? $post['account_price'][$account][$key] : $post['arr']['price'][$key];
@@ -604,6 +606,58 @@ class WishPublishController extends Controller
         $picture = str_replace('imgurl.moonarstore.com', $domain, $picture);
         $picture = str_replace('getSkuImageInfo-resize', 'getSkuImageInfo', $picture);
         return $picture;
+    }
+
+    function ajaxGetInfo(){
+        $skuArr = [];
+        $pic = [];
+        $sku = trim(request()->input('sku'));
+        $erpSku =ItemModel:: where('sku', 'like', $sku.'%')->get();
+        foreach($erpSku as $e_sku){
+            $skuArr[] = $e_sku->sku;
+            $pic[] = asset($e_sku->product->Dimage);
+        }
+        $product_sku_pic =[
+            'http://www.v3.slme.com//default.jpg',
+            'http://www.v3.slme.com//default.jpg',
+            'http://www.v3.slme.com//default.jpg',
+            'http://www.v3.slme.com//default.jpg',
+            'http://www.v3.slme.com//default.jpg',
+            'http://www.v3.slme.com//default.jpg',
+        ];
+        $return['sku'] = $skuArr;
+        $return['pic'] = $pic;
+        $return['product_sku_pic'] = $product_sku_pic;
+        unset($skuArr);unset($pic);
+        $this->ajax_return('',true,$return);
+
+    }
+
+
+    function ajaxGetSkuPicture(){
+        $picture = [];
+        $sku = strtoupper(trim(request()->input('sku')));
+        $url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+        $get_data = Tool::curl($url);
+        $result = json_decode($get_data,true);
+        if(!empty($result)){
+            foreach($result as $ke => $v){
+                $photo_name = $v['filename'];
+                $s_url = '/getSkuImageInfo/sku/'.$photo_name;
+                $picture[] = 'http://imgurl.moonarstore.com'.$s_url;
+            }
+        }else{
+            $url ='http://imgurl.moonarstore.com/get_image.php?dirName='.$sku;
+            $get_data = Tool::curl($url);
+            $result = json_decode($get_data,true);
+            if(is_array($result)){
+                foreach($result as $re){
+                    $picture[] = $re;
+                }
+            }
+        }
+        $this->ajax_return('',true,$picture);
+
     }
 
     function ajax_return($info = '', $status = 1, $data = '')

@@ -70,6 +70,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SyncSellmoreApi::class,
         \App\Console\Commands\AutoGetEbayMessage::class,
         \App\Console\Commands\SyncImportApi::class,
+        \App\Console\Commands\AutoEbayAdd::class, //Ebay 自动补货
+
     ];
 
     /**

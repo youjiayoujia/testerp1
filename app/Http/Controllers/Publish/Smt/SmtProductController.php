@@ -21,6 +21,8 @@ use App\Models\Publish\Smt\smtUserSaleCode;
 use Illuminate\Support\Facades\DB;
 use App\Models\Publish\Smt\smtCategoryModel;
 use App\Modules\Common\common_helper;
+use App\models\Publish\Smt\smtCategoryAttribute;
+use Excel;
 
 
 class SmtProductController extends Controller
@@ -1041,11 +1043,54 @@ class SmtProductController extends Controller
                         }
                     }
                 }
+            }else{
+                $account = AccountModel::find($token_id);
+                $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+                $data = $this->getProductGroupList($smtApi);
+                if($data){
+                    foreach ($data as $row){
+                        $options['token_id']         = $token_id;
+                        $options['group_id']         = $row['groupId'];
+                        $options['group_name']       = trim($row['groupName']);
+                        $options['last_update_time'] = date('Y-m-d H:i:s');
+                        $this->Smt_product_group_model->create($options);  
+                        if (array_key_exists('childGroup', $row)) { //含有子分组
+                            foreach ($row['childGroup'] as $child) {
+                                $rs['token_id']         = $token_id;
+                                $rs['group_id']         = $child['groupId'];
+                                $rs['group_name']       = trim($child['groupName']);
+                                $rs['parent_id']        = $row['groupId'];
+                                $rs['last_update_time'] = date('Y-m-d H:i:s');
+                        
+                                $child_group = $this->Smt_product_group_model->where(['token_id'=>$token_id,'group_id'=>$child['groupId']])->first();
+                                if (!$child_group) {
+                                    $this->Smt_product_group_model->create($rs);
+                                } else {
+                                    $cid = $child_group->id;
+                                    $this->Smt_product_group_model->where('id',$cid)->update($rs);
+                                }
+                                unset($rs);
+                                unset($cid);
+                            }
+                        }
+                    }
+                   
+                    $group_list = $this->getLocalProductGroupList($token_id);
+                    foreach($group_list as $id => $item){
+                        $option_str .= '<option value="'.$item['group_id'].'">'.$item['group_name'].'</option>';
+                        if (!empty($item['child'])){
+                    
+                            foreach ($item['child'] as $pid => $row){
+                                $option_str .= '<option value="'.$row['group_id'].'">&nbsp;&nbsp;&nbsp;&nbsp;--'.$row['group_name'].'</option>';
+                            }
+                        }
+                    }
+                }               
             }
             $this->ajax_return('', true, $option_str);
         }
-    
         $this->ajax_return('请先选择账号', false);
+        
     }
     
     /**
@@ -1463,5 +1508,211 @@ class SmtProductController extends Controller
         }
         return $freightTemplate->templateId;
         
+    }
+    
+    public function get_sub_category($category_id,$data){
+        $sub_category = smtCategoryModel::where('pid',$category_id)->get()->toArray();
+        foreach($sub_category as $category){
+            if($category['isleaf']==1){
+                $data[]= $category['category_id'];
+            }else{
+                $data =  $this->get_sub_category($category['category_id'],$data);
+    
+            }
+        }
+        return $data;
+    }
+    
+    public function get_category($pid){
+        $data = array();
+        $childCategory = smtCategoryModel::where('pid',$pid)->get()->toArray();
+        foreach ($childCategory as $item){
+            if($item['isleaf'] == 1){
+                $data[] = $item['category_id'];
+            }else{
+                $data = $this->get_sub_category($item['category_id'],$data);
+            }      
+        }
+        return $data;
+    }
+    public function getCategoryAttributesById(){
+        $token_id = request()->input('token_id');
+        $category_id = request()->input('category_id');
+        $child_category_arr = $this->get_category($category_id);
+        $attributes = smtCategoryAttribute::where('category_id',$category_id)->first();
+        $category_attributes = array();
+        $account = AccountModel::findOrFail($token_id);
+        $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+        $option_str = '';
+        foreach($child_category_arr as $item){
+            $last_category_id = $item;
+            if (!$attributes){ //属性直接不存在
+                $return = $smtApi->getChildAttributesResultByPostCateIdAndPath($token_id,$last_category_id);          
+                if ($return)
+                    $category_attributes = $return;
+            }else { //属性存在但不是最新的
+                $category_attributes = unserialize($attributes->attribute);
+                //这个属性今天还没更新呢，更新下吧
+                if (!$attributes->last_update_time || date('Y-m-d') != date('Y-m-d', strtotime($attributes->last_update_time))) {
+                    $return = $smtApi->getChildAttributesResultByPostCateIdAndPath($token_id, $last_category_id);
+                    if ($return)
+                        $category_attributes = $return;
+                }
+            }            
+            if (!empty($category_attributes)){
+                foreach($category_attributes as $category){
+                    $attributes = unserialize($category->attribute);
+                    foreach($attributes as $attribute){
+                        if($attribute['id'] != 2){  //不是品牌跳过
+                            continue;
+                        }
+                        $bankArr = $attribute['values'];
+                        foreach($bankArr as $bank){
+                            $option_str .= '<option value="'.$bank['id'].'">'.$bank['names'][0].'</option>';
+                        }
+                    }
+                }
+            }
+        }       
+
+        $this->ajax_return('', true, $option_str);
+    }
+    
+    /**
+     * 修改指定帐号、分组的在线广告品牌属性
+     */
+    public function batchModifyBand(){     
+        set_time_limit(0);
+        $post = request()->input();
+        $token_id = $post['token_id'];
+        $group_id = $post['group_id'];
+        $band_id  = $post['band_id'];
+        $export_data = array();
+        $account_name = array();
+        
+        //获取速卖通全部账号
+        $account_arr = AccountModel::where('channel_id',2)->get();
+        foreach($account_arr as $account){
+            $account_name[$account->id] = $account->account;
+        }
+        if($group_id == 'none'){
+            $product_arr = smtProductList::where(['token_id' => $token_id,'isRemove' => 0 ,'productStatusType' => 'onSelling'])->get();
+        }else{
+            $product_arr = smtProductList::where(['token_id' => $token_id,'groupId' => $group_id,'isRemove' => 0 ,'productStatusType' => 'onSelling'])->get();
+        }
+        //$product_arr = smtProductList::where('productId','32731677074')->get();
+        if($product_arr){
+            $account = AccountModel::findOrFail($token_id);
+            $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+            $category_attributes = array();
+            foreach($product_arr as $product){
+                $product_detail = smtProductDetail::where('productId',$product->productId)->first();
+                $attributes = smtCategoryAttribute::where('category_id',$product->categoryId)->first();
+                 if (!$attributes){ //属性直接不存在
+                    $return = $smtApi->getChildAttributesResultByPostCateIdAndPath($token_id,$product->categoryId);
+                    if ($return)
+                        $category_attributes = $return;
+                }else { //属性存在但不是最新的
+                    $category_attributes = unserialize($attributes->attribute);
+                    //这个属性今天还没更新呢，更新下吧
+                    if (!$attributes->last_update_time || date('Y-m-d') != date('Y-m-d', strtotime($attributes->last_update_time))) {
+                        $return = $smtApi->getChildAttributesResultByPostCateIdAndPath($token_id, $product->categoryId);
+                        if ($return)
+                            $category_attributes = $return;
+                    }
+                }
+                $attributeNew = array();
+                $attributes = $category_attributes;
+                foreach ($attributes as $att){
+                    $attNew = array();
+                    $attNew['id'] = $att['id'];
+                    $attNew['required'] = $att['required'];
+                    $attNew['inputType'] = $att['inputType'];
+                    $attNew['customizedName'] = $att['customizedName'];
+                    $attNew['attributeShowTypeValue'] = $att['attributeShowTypeValue'];
+                    $attributeNew[$att['id']] =$attNew;
+                }                
+                $aeopAeProductPropertys = unserialize($product_detail->aeopAeProductPropertys);
+                $aeopAeProductPropertysNew = array();
+                $isAdd = true;
+                foreach($aeopAeProductPropertys as $propertys){
+                    if(isset($propertys['attrNameId'])){
+                        if(!isset($attributeNew[$propertys['attrNameId']])){
+                            continue;
+                        }
+                    }
+                    if(isset($propertys['attrNameId'])&&($propertys['attrNameId']==2)){
+                        $propertys['attrValueId'] = $band_id;
+                        $isAdd= false;
+                    }
+                    $aeopAeProductPropertysNew[] = $propertys;                   
+                }
+                if($isAdd){ // 说明属性里面没有品牌属性 给他加上去
+                    $bank = array();
+                    $bank['attrNameId'] = 2;
+                    $bank['attrValueId'] = $band_id;
+                    array_unshift($aeopAeProductPropertysNew,$bank);
+                }
+                
+                $api='api.editProductCategoryAttributes';
+                $aeopAeProductPropertysNew = json_encode($aeopAeProductPropertysNew);                
+                $parameter= array();
+                $parameter['productId'] = $product->productId;
+                $parameter['productCategoryAttributes'] = $aeopAeProductPropertysNew;               
+                
+                $result = $smtApi->getJsonDataUsePostMethod($api,$parameter);
+                $result=json_decode($result,true);
+         
+                if(array_key_exists('success', $result) && $result['success']){  
+                    $aeopAeProductPropertys = serialize(json_decode($aeopAeProductPropertysNew,true));
+                    $update = array();
+                    $update['aeopAeProductPropertys'] = $aeopAeProductPropertys;
+                    smtProductDetail::where('productId',$product->productId)->update($update);
+                    $export_data[] = array('productId' => $product->productId,
+                                           'account'   => $account_name[$token_id],
+                                           'status'    => 1,
+                                           'time'      => date('Y-m-d H:i:s'),
+                                           'error_msg' => '');
+                }else{
+                    $export_data[] = array( 'productId' => $product->productId,
+                                            'account'   => $account_name[$token_id],
+                                            'status'    => 2,
+                                            'time'      => date('Y-m-d H:i:s'),
+                                            'error_msg' => $result['error_message']);
+                }                      
+            }
+            
+            //导出到excel文件中       
+            foreach($export_data as $row) {
+                $text = '';
+                if($row['status'] == 1) {
+                    $text = '已执行';
+                }elseif ($row['status'] == 2) {
+                    $text = '执行异常';
+                }else {
+                    $text = '未执行';
+                }      
+                $rows[] = [
+                    '产品ID'  => $row['productId'],
+                    '帐号'    => $row['account'],
+                    '状态'    => $text,
+                    '执行时间' => $row['time'],
+                    '失败原因' => $row['error_msg'],
+                ];
+            }
+            $name = 'export_modify_band';
+            Excel::create($name, function($excel) use ($rows){
+                $nameSheet = '广告品牌修改结果';
+                $excel->sheet($nameSheet, function($sheet) use ($rows){
+                    $sheet->fromArray($rows);
+                });
+            })->download('csv');
+            unset($export_data);
+            //return redirect($this->mainIndex)->with('alert', $this->alert('success', ' 操作完成.'));
+            
+            $this->ajax_return('操作完成!',true);
+        }else{
+            $this->ajax_return('没有符合条件的广告信息',false);
+        }
     }
 }

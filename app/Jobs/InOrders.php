@@ -40,10 +40,12 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
             if ($order) {
+                $order->eventLog('队列', '队列已生成包裹');
                 if ($order->status == 'PREPARED') {
                     $job = new DoPackages($order);
                     $job->onQueue('doPackages');
                     $this->dispatch($job);
+                    $order->eventLog('队列', '订单已塞入包裹队列');
                     $this->relation_id = $order->id;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'Success.';
@@ -51,11 +53,13 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                     $this->relation_id = 0;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'Order status is not PREPARED. Can not create package';
+                    $order->eventLog('队列', 'Order status is not PREPARED. Can not create package');
                 }
             } else {
                 $this->relation_id = 0;
                 $this->result['status'] = 'fail';
                 $this->result['remark'] = 'Fail to put order in.';
+                $order->eventLog('队列', 'Fail to put order in.');
             }
         } else {
             $channel = ChannelModel::where('name', 'Ebay')->first();
@@ -72,17 +76,20 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                     $this->relation_id = $oldOrder->id;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'UNPAID to PAID. to PREPARED';
+                    $order->eventLog('队列', 'UNPAID to PAID. to PREPARED');
                 } else {
                     $this->relation_id = 0;
                     $this->result['status'] = 'fail';
                     $this->result['remark'] = 'Fail to update to PAID.';
+                    $order->eventLog('队列', 'Fail to update to PAID.');
                 }
             } else {
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Order has been exist.';
+                $order->eventLog('队列', 'Order has been exist.');
             }
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('InOrders', base64_encode(serialize($this->order)));
+        $this->log('InOrders', json_encode($this->order));
     }
 }

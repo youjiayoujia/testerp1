@@ -12,9 +12,9 @@
     <th>追踪号</th>
     <th>收货人</th>
     <th>国家</th>
-    <th class="sort" data-field="amount">总金额</th>
+    <th class="sort" data-field="amount"><strong class="text-success">总金额</strong></th>
     <th class="sort" data-field="amount_shipping"><strong class="text-danger">运费</strong></th>
-    <th>预测毛利率</th>
+    <th class="sort" data-field="profit_rate"><strong class="text-success">预测毛利率</strong></th>
     <th>订单状态</th>
     <th>客服人员</th>
     <th class="sort" data-field="created_at">创建时间</th>
@@ -38,7 +38,7 @@
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
             <td>{{ $order->aliexpress_loginId }}</td>
-            <td>{{ $order->channel ? $order->channel->name : '' }}<br>{{ $order->shipping . ' ' }}<br>{{ $order->logistics }}</td>
+            <td>{{ $order->logistics }}<br>{{ $order->shipping }}</td>
             <td>{{ $order->code }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
@@ -832,8 +832,8 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class='easy' data-type='easy'>简洁</a></li>
-            <li><a href="javascript:" class='easy' data-type='full'>全貌</a></li>
+            <li><a href="javascript:" class='easy' data-type='easy'>简单</a></li>
+            <li><a href="javascript:" class='easy' data-type='full'>完整</a></li>
         </ul>
     </div>
     <div class="btn-group">

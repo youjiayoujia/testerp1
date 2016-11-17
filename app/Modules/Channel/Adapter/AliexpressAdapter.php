@@ -55,7 +55,6 @@ Class AliexpressAdapter implements AdapterInterface
      */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
-
         if (empty($nextToken)) {
             $nextToken = 1;
         }
@@ -70,7 +69,7 @@ Class AliexpressAdapter implements AdapterInterface
         $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
         
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
-        $orderList = json_decode($orderjson, true);
+        $orderList = json_decode($orderjson, true,512,JSON_BIGINT_AS_STRING);
         unset($orderjson);
         if (isset($orderList['orderList'])) {
             foreach ($orderList['orderList'] as $list) {
@@ -81,7 +80,7 @@ Class AliexpressAdapter implements AdapterInterface
                 }
                 $param = "orderId=" . $list['orderId'];
                 $orderjson = $this->getJsonData('api.findOrderById', $param);
-                $orderDetail = json_decode($orderjson, true);
+                $orderDetail = json_decode($orderjson, true,512,JSON_BIGINT_AS_STRING);
                 if ($orderDetail) {
                     $order = $this->parseOrder($list, $orderDetail);
                     if ($order) {
@@ -220,6 +219,7 @@ Class AliexpressAdapter implements AdapterInterface
             $ship_price = $p["logisticsAmount"] ["amount"]; //多个sku的运费 不进行叠加了 因为这个时候就是总运费了
         }
 
+
         $orderInfo['channel_ordernum'] = $list['orderId'];
         $orderInfo["email"] = isset($list["buyerInfo"]["email"]) ? $list["buyerInfo"]["email"] : '';
         $orderInfo['amount'] = $list ["payAmount"] ["amount"];
@@ -253,9 +253,9 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['aliexpress_loginId'] = $orderDetail['buyerInfo']['loginId'];
 
 
+
         $childProductArr = $orderDetail['childOrderList'];
         foreach ($childProductArr as $childProArr) {
-
             $skuCode = trim($childProArr ["skuCode"]);
             $n = strpos($skuCode, '*');
             $sku_new = $n !== false ? substr($skuCode, $n + 1) : $skuCode;
@@ -276,7 +276,7 @@ Class AliexpressAdapter implements AdapterInterface
 
             $productInfo[$sku_new]["quantity"] = isset($productInfo[$sku_new]["quantity"]) ? $productInfo[$sku_new]["quantity"] : 0;
             $productInfo[$sku_new]["quantity"] += $qty ? $childProArr["productCount"] * $qty : $childProArr["productCount"];
-            $productInfo[$sku_new]['currency'] = $childProArr['initOrderAmt']['currencyCode'];
+            $productInfo[$sku_new]['currency'] = $childProArr['initOrderAmt']['currency']['currencyCode'];
             $productInfo[$sku_new]['orders_item_number'] = $childProArr['productId'];
 
             if (!empty($order_remark) && !empty($order_remark[$childProArr['id']])) { // --各SKU相应的备注信息
@@ -614,20 +614,12 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_fields_ary = false; //aliexress 平台特殊参数
                         if($Sources == 'order_msg'){
                             $message_list[$j]['label'] = '订单留言';
+                            $message_list[$j]['channel_order_number'] =$item['channelId'];
                         }else{
                             $message_list[$j]['label'] = '站内信';
+                            $message_list[$j]['channel_order_number'] ='';
                         }
-/*                        $detailArray = json_decode($detailArrJson,true);
-                        if(!empty($detailArray['result'])){
-                            foreach ($detailArray['result'] as $item_detail){
-                                if($item_detail['messageType'] == 'product'){
-                                    $message_fields_ary['product_img_url']      = isset($item_detail->summary->productImageUrl) ? $item_detail->summary->productImageUrl : '';
-                                    $message_fields_ary['product_product_url']  = isset($item_detail->summary->productDetailUrl) ? $item_detail->summary->productDetailUrl : '';
-                                    $message_fields_ary['product_product_name'] = isset($item_detail->summary->productName) ? $item_detail->summary->productName : '';
-                                    break;
-                                }
-                            }
-                        }*/
+
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
 
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
@@ -669,11 +661,10 @@ Class AliexpressAdapter implements AdapterInterface
                     
                     $category_attribute = smtCategoryAttribute::where('category_id',$category_id)->first();
                     $smtCategoryAttribute = new smtCategoryAttribute;
-                    if ($category_attribute) {
-                        $options['id'] = $category_attribute->id;
-                        $smtCategoryAttribute->update($options);
+                    if ($category_attribute) {                      
+                        smtCategoryAttribute::where('category_id',$category_id)->update($options);
                     } else {
-                        $smtCategoryAttribute->create($options);
+                        $smtCategoryAttribute->create($options);                      
                     }
                     return $rs['attributes'];
                 }else {

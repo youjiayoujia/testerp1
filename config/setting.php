@@ -97,6 +97,8 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+        'productStatusType' => '广告状态',
+        'groupId' => '产品分组',
         'productSku.skuCode'=>'产品SKU',
         'product.token_id' => '帐号',
         'product.multiattribute' => '=属性=',
@@ -115,8 +117,10 @@ return [
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',
         'by_id' => '买家ID',
+        'shipping_firstname' => '名',
+        'shipping_lastname' => '姓',
         'profit_rate' => '利润率',
-        'items.item.status' => 'SKU状态',
+        'items.item_status' => 'SKU状态',
         'outer_type' => '出库/入库', 
         'inner_type' => '出入库类型',
         'warehouse_id' => '仓库',
@@ -163,6 +167,8 @@ return [
         'joom_publish_product_detail.sku'=>'Joom原始sku',
         'enabled'=>'Joom平台状态',
         'catalog.id' => '品类',
-        'spu_id' => 'SPU'
+        'spu_id' => 'SPU',
+        'logistics.catalog.name' => '物流分类',
+        'order.channel_ordernum' => '渠道运单号'
     ],
 ];

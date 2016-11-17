@@ -10,6 +10,7 @@
     <th>状态</th>
     <th>类型</th>
     <th>重量(kg)</th>
+    <th>运费</th>
     <th>物流方式</th>
     <th>物流单号</th>
     <th>发货类型</th>
@@ -38,6 +39,7 @@
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
+            <td class='logisticsFee'></td>
             <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
@@ -73,20 +75,25 @@
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
-                <td colspan='3'>{{ $packageItem->quantity }}</td>
+                <td colspan='4'>{{ $packageItem->quantity }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>运输方式: {{ $package->order->shipping }}</td>
-            <td colspan='5'>
+            <td colspan='6'>
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 @if(in_array($package->status, ['NEED', 'PROCESSING', 'ASSIGNED', 'TRACKINGFAILED']))
                     <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
                         <span class="glyphicon glyphicon-random"></span>
+                    </a>
+                @endif
+                @if($package->status == 'ERROR')
+                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
+                        <span class="glyphicon glyphicon-check"></span>
                     </a>
                 @endif
                 @if(in_array($package->status,['PROCESSING','PICKING','PACKED']))
@@ -102,6 +109,11 @@
                         data-target="#split" data-id="{{ $package->id }}" title='拆分包裹'>
                     <span class="glyphicon glyphicon-tasks"></span>
                 </button>
+                @if($package->logistics_id != 0)
+                    <a href="{{ route('preview', ['id'=>$package->id]) }}" target="_blank" class="btn btn-info btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> 面单预览
+                    </a>
+                @endif
             </td>
         </tr>
     @endforeach
@@ -242,7 +254,6 @@
         });
 
         $(document).ready(function () {
-
             arr = new Array();
             i = 0;
             $.each($('.packageId'), function () {
@@ -256,8 +267,8 @@
                         j = 0;
                         $.each($('.packageId'), function () {
                             block = $(this).parent();
-                            logisticsReal = block.children('.logisticsReal');
-                            logisticsReal.html(logisticsReal.text() + "   <font color='gray'>" + result[j] + "</font>");
+                            block.children('.logisticsReal').html(block.children('.logisticsReal').text() + "   <font color='gray'>" + result[j][0] + "</font>");
+                            block.children('.logisticsFee').text(result[j][1]);
                             j++;
                         })
                     }
@@ -270,6 +281,11 @@
             $('.returnFee').click(function () {
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
+            })
+
+            $('.error').click(function () {
+                id = $(this).data('id');
+                location.href = "{{ route('package.errorToShipped')}}?id=" + id;
             })
 
             $('.multiEditTracking').click(function () {

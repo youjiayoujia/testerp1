@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Logistics\ErpEubModel;
 use Excel;
 use DB;
 use App\Jobs\AssignStocks;
@@ -87,7 +88,7 @@ class PackageModel extends BaseModel
         }
         return [
             'relatedSearchFields' => [
-                'order' => ['ordernum'],
+                'order' => ['ordernum', 'channel_ordernum'],
             ],
             'filterFields' => ['tracking_no'],
             'filterSelects' => [
@@ -101,6 +102,7 @@ class PackageModel extends BaseModel
                 'channelAccount' => ['account' => $arr1]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
+            'doubleRelatedSearchFields' => ['logistics' => ['catalog' => ['name']]],
         ];
     }
 
@@ -185,6 +187,19 @@ class PackageModel extends BaseModel
         }
 
         return $data;
+    }
+
+    //获取分拣码
+    public function getFenJianAttribute()
+    {
+        $code = '';
+        $zip = substr($this->shipping_zipcode, 0, 3);
+        $erpEubs = ErpEubModel::where('zip', $zip)->get();
+        foreach ($erpEubs as $erpEub) {
+            $code = $erpEub->code;
+        }
+
+        return $code;
     }
 
     //包裹sku信息
@@ -918,13 +933,13 @@ class PackageModel extends BaseModel
                     $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                 } else {
                     if($oldWarehouseId != $warehouseId) {
-                        $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                        $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                     } else {
                         if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
                             if($weight == $oldWeight) {
                                 $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
                             } else {
-                                $this->update(['status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                                $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
                             }
                         } else {
                             $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
@@ -956,9 +971,7 @@ class PackageModel extends BaseModel
                         'status' => 'WAITASSIGN',
                         'weight' => $weight
                     ]);
-                    if(empty($oldWarehouseId)) {
-                        $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
-                    } else {
+                    if(!empty($oldWarehouseId)) {
                         if($oldWarehouseId != $warehouseId) {
                             $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
                         } else {
@@ -1185,6 +1198,7 @@ class PackageModel extends BaseModel
 
             return $rule->logistics->code;
         }
+
         return '虚拟匹配未匹配到';
     }
 
@@ -1202,7 +1216,6 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
-
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
@@ -1234,6 +1247,7 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
+
 
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {
@@ -1672,7 +1686,7 @@ class PackageModel extends BaseModel
 
     public function getStatusTextAttribute()
     {
-        return config('package . ' . $this->status);
+        return !empty(config('package' )[$this->status]) ? config('package' )[$this->status] : '';
     }
 
     public function shipping()

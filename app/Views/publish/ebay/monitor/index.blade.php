@@ -36,18 +36,18 @@
 @section('tableBody')
     @foreach($data as $detail)
         <tr class="text-center">
-            <td><input type='checkbox' name='tribute_id'  value="{{ $detail->id }}"></td>
+            <td><input type='checkbox' name='tribute_id' value="{{ $detail->id }}"></td>
             <td>{{ $detail->id }}</td>
             <td>{{ $detail->ebayProduct->site_name}}</td>
             <td>{{ $detail->ebayProduct->channelAccount->account}}</td>
-            <td><a  target=_blank href="{{$detail->ebayProduct->view_item_url}}">{{ $detail->item_id}}</a></td>
+            <td><a target=_blank href="{{$detail->ebayProduct->view_item_url}}">{{ $detail->item_id}}</a></td>
             <td>{{ $detail->ebayProduct->title}}</td>
             <td>{{$detail->ebayProduct->EbayOutControl}}</td>
             <td>{{ $detail->sku}}</td>
             <td>
-            @if(isset($detail->erpProduct->c_name))
-                  {{$detail->erpProduct->c_name}}
-            @endif
+                @if(isset($detail->erpProduct->c_name))
+                    {{$detail->erpProduct->c_name}}
+                @endif
             </td>
             <td>{{ $detail->ebayProduct->location}}</td>
             <td>{{ $detail->ebayProduct->start_time}}</td>
@@ -64,12 +64,12 @@
                     $shipping_details = json_decode($detail->ebayProduct->shipping_details);
                     if (!empty($shipping_details->Shipping)) {
                         foreach ($shipping_details->Shipping as $ship) {
-                            echo $ship->ShippingService . ': ' . $ship->ShippingServiceCost.'<br/>';
+                            echo $ship->ShippingService . ': ' . $ship->ShippingServiceCost . '<br/>';
                         }
                     }
                     if (!empty($shipping_details->InternationalShipping)) {
                         foreach ($shipping_details->InternationalShipping as $ship) {
-                            echo $ship->ShippingService . ': ' . $ship->ShippingServiceCost.'<br/>';
+                            echo $ship->ShippingService . ': ' . $ship->ShippingServiceCost . '<br/>';
                         }
                     }
                     ?>
@@ -81,53 +81,115 @@
 
 
             <td>{{ $detail->ebayProduct->dispatch_time_max}}</td>
-          {{--  <td>
-               <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse"
-                        data-target=".packageDetails{{$detail->id}}" aria-expanded="false"
-                        aria-controls="collapseExample">
-                    <span class="glyphicon glyphicon-eye-open"></span>
-                </button>
-            </td>--}}
+            {{--  <td>
+                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse"
+                          data-target=".packageDetails{{$detail->id}}" aria-expanded="false"
+                          aria-controls="collapseExample">
+                      <span class="glyphicon glyphicon-eye-open"></span>
+                  </button>
+              </td>--}}
         </tr>
     @endforeach
-    <div class="modal fade" id="sku_search" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade " id="addlog" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="width: 50%">
             <div class="modal-content">
-                <div class="panel panel-default">
-                    <div class="panel-heading">sku库存信息</div>
-                    <div class="panel-body">
-                        <div class='buf'></div>
+                <form action="" method="POST">
+                    {!! csrf_field() !!}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">补货日志</h4>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    {{--
 
-    <div class="modal fade" id="split" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="panel panel-default">
-                    <div class="panel-heading">拆分包裹</div>
-                    <div class="panel-body">
-                        <div class='row'>
-                            <div class='col-lg-5'>
-                                <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
+                    --}}
+
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group col-lg-2 ">
+                                <input type="text" class="form-control datetime_select" id="update_time_start_log" placeholder="起始时间">
                             </div>
-                            <div class='col-lg-1'>
-                                <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
+
+                            <div class="form-group col-lg-2 ">
+                                <input type="text" class="form-control  datetime_select" id="update_time_end_log" placeholder="截止时间">
+                            </div>
+                            <div class="form-group col-lg-2">
+                                <input type="text" class="form-control" placeholder="ItemNumber" id="item_id_log">
+                            </div>
+                            <div class="form-group col-lg-2 ">
+                                <input type="text" class="form-control" placeholder="SKU" id="sku_log">
+                            </div>
+                            <div class="form-group col-lg-2 ">
+                                <select class="form-control select_select0" id="token_id_log">
+                                    <option value="">账号</option>
+                                    @foreach($mixedSearchFields['selectRelatedSearchs']['ebayProduct']['account_id'] as $key => $v)
+                                        <option value="{{ $key }}">{{$v}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-2 ">
+                                <select class="form-control select_select0" id="is_api_success_log">
+                                    <option value="">结果</option>
+                                    <option value="1">成功</option>
+                                    <option value="2">失败</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-1 ">
+                                <a class="btn btn-primary" id="checklog">提交</a>
                             </div>
                         </div>
-                        <div class='split_package'></div>
+                        <div class="row">
+                            <div class="form-group col-lg-1 text-center">
+                                <span>编号</span>
+                            </div>
+                            <div class="form-group col-lg-1 text-center">
+                                <span>账号</span>
+                            </div>
+                            <div class="form-group col-lg-2 text-center">
+                                <span>ItemNumber</span>
+                            </div>
+                            <div class="form-group col-lg-2 text-center">
+                                <span>SKU</span>
+                            </div>
+                            <div class="form-group col-lg-2 text-center">
+                                <span>数量设为</span>
+                            </div>
+                            <div class="form-group col-lg-2 text-center">
+                                <span>备注</span>
+                            </div>
+                            <div class="form-group col-lg-2 text-center">
+                                <span>补货时间</span>
+                            </div>
+                        </div>
+                        <div id="datalog">
+                        </div>
                     </div>
-                </div>
+                    <div class="modal-footer">
+                        {{--  <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        --}}
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 @stop
 
 @section('tableToolButtons')
+    <button class="btn btn-info"
+            data-toggle="modal"
+            data-target="#addlog"
+            title="查看补货日志"
+            id="addlogclick">
+        查看补货日志
+    </button>
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 批量操作
             <span class="caret"></span>
         </button>
@@ -154,7 +216,7 @@
                 ids += checkbox[i].value + ",";
             }
             ids = ids.substr(0, (ids.length) - 1);
-            if(ids==''){
+            if (ids == '') {
                 alert("请先勾选");
                 return false;
             }
@@ -173,6 +235,39 @@
                     coll[i].checked = false;
             }
         }
+        $("#addlogclick").click(function(){
+            $("#datalog").empty();
+        });
+        $("#checklog").click(function(){
+            var update_time_start_log = $("#update_time_start_log").val();
+            var update_time_end_log = $("#update_time_end_log").val();
+            var item_id_log = $("#item_id_log").val();
+            var sku_log = $("#sku_log").val();
+            var token_id_log = $("#token_id_log").val();
+            var is_api_success_log = $("#is_api_success_log").val();
+            $.ajax({
+                url: "{{ route('ebayProduct.ajaxGetLog') }}",
+                data: {update_time_start_log: update_time_start_log, update_time_end_log: update_time_end_log, item_id_log: item_id_log,sku_log:sku_log,token_id_log:token_id_log,is_api_success_log:is_api_success_log},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    $("#datalog").empty();
+                    if(result){
+                        for(var i= 0;i<result.length;i++){
+                            var  html = '<div class="row"><div class="form-group col-lg-1 text-center"><span>'+result[i].id+'</span></div>' +
+                            '<div class="form-group col-lg-1 text-center"><span>'+result[i].token_id+'</span></div>' +
+                            '<div class="form-group col-lg-2 text-center"><span>'+result[i].item_id+'</span></div>' +
+                            '<div class="form-group col-lg-2 text-center"><span>'+result[i].sku+'</span></div>' +
+                            '<div class="form-group col-lg-2 text-center"><span>'+result[i].quantity+'</span></div>' +
+                            '<div class="form-group col-lg-2 text-center"><span>'+result[i].remark+'</span></div>'+
+                              '<div class="form-group col-lg-2 text-center"><span>'+result[i].update_time+'</span></div></div>';
+                            $("#datalog").append(html);
+                        }
+
+                    }
+                }
+            });
+        })
     </script>
 @stop
 

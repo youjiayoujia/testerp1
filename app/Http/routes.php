@@ -145,6 +145,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Product\SupplierController@createLevel', 'as' => 'productSupplier.createLevel']);
     Route::resource('productSupplier', 'Product\SupplierController');
     //选款需求
+    Route::post('productRequire/excelStore',
+        ['uses' => 'Product\RequireController@excelStore', 'as' => 'productRequire.excelStore']);
+    Route::get('productRequire/getExcel',
+        ['uses' => 'Product\RequireController@getExcel', 'as' => 'productRequire.getExcel']);
+    Route::get('productRequire/importByExcel',
+        ['uses' => 'Product\RequireController@importByExcel', 'as' => 'productRequire.importByExcel']);
     Route::get('productRequire/ajaxQuantityProcess',
         ['uses' => 'Product\RequireController@ajaxQuantityProcess', 'as' => 'productRequire.ajaxQuantityProcess']);
     Route::get('productRequire/ajaxProcess',
@@ -154,6 +160,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['as' => 'product.ajaxReturnLogistics', 'uses' => 'ProductController@ajaxReturnLogistics']);
     Route::any('ajaxReutrnCatalogs',
         ['uses' => 'ProductController@ajaxReutrnCatalogs', 'as' => 'ajaxReutrnCatalogs']);
+    Route::any('submitItemEdit',
+        ['uses' => 'ProductController@submitItemEdit', 'as' => 'product.submitItemEdit']);
+    Route::any('edititemattribute/{id}', ['uses' => 'ProductController@editItemAttribute']);
+
     //通关报关
     Route::post('customsClearance/exportProduct',
         ['uses' => 'CustomsClearanceController@exportProduct', 'as' => 'customsClearance.exportProduct']);
@@ -648,6 +658,14 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/errorToShipped',
+        ['uses' => 'PackageController@errorToShipped', 'as' => 'package.errorToShipped']);
+    Route::get('package/exportInfo',
+        ['uses' => 'PackageController@exportInfo', 'as' => 'package.exportInfo']);
+    Route::get('package/ajaxReturnInShelf',
+        ['uses' => 'PackageController@ajaxReturnInShelf', 'as' => 'package.ajaxReturnInShelf']);
+    Route::get('package/returnGoodsInShelf',
+        ['uses' => 'PackageController@returnGoodsInShelf', 'as' => 'package.returnGoodsInShelf']);
     Route::get('package/processingAssignStocks',
         ['uses' => 'PackageController@processingAssignStocks', 'as' => 'package.processingAssignStocks']);
     Route::get('package/ajaxRealTime',
@@ -731,6 +749,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'PackageController@placeLogistics', 'as' => 'package.placeLogistics']);
     Route::get('package/flow',
         ['uses' => 'PackageController@flow', 'as' => 'package.flow']);
+    Route::get('preview/{id}',
+        ['uses' => 'PackageController@preview', 'as' => 'preview']);
     Route::resource('package', 'PackageController');
 
     Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);
@@ -759,6 +779,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Wish\WishPublishController@indexOnlineProduct', 'as' => 'wish.indexOnlineProduct']);
     Route::get('wish/editOnlineProduct',
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
+    Route::get('wish/ajaxGetInfo', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetInfo', 'as' => 'wish.ajaxGetInfo']);
+    Route::get('wish/ajaxGetSkuPicture', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetSkuPicture', 'as' => 'wish.ajaxGetSkuPicture']);
     Route::resource('wish', 'Publish\Wish\WishPublishController');
 
     Route::resource('WishQuantityCheck', 'Publish\Wish\WishQuantityCheckController');
@@ -833,21 +855,6 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('ebayDescription', 'Publish\Ebay\EbayDescriptionTemplateController');
     Route::resource('ebayDataTemplate', 'Publish\Ebay\EbayDataTemplateController');
 
-    Route::post('wish/editOnlineProductStore',
-        ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
-    Route::get('wish/ajaxOperateOnlineProduct', [
-        'uses' => 'Publish\Wish\WishPublishController@ajaxOperateOnlineProduct',
-        'as' => 'wish.ajaxOperateOnlineProduct'
-    ]);
-    Route::get('wish/ajaxEditOnlineProduct',
-        ['uses' => 'Publish\Wish\WishPublishController@ajaxEditOnlineProduct', 'as' => 'wish.ajaxEditOnlineProduct']);
-    Route::get('wish/indexOnlineProduct',
-        ['uses' => 'Publish\Wish\WishPublishController@indexOnlineProduct', 'as' => 'wish.indexOnlineProduct']);
-    Route::get('wish/editOnlineProduct',
-        ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
-    Route::resource('wish', 'Publish\Wish\WishPublishController');
-    Route::resource('wishSellerCode', 'Publish\Wish\WishSellerCodeController');
-    // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
 
     Route::group(['prefix' => 'smt', 'namespace' => 'Publish\Smt'], function () {
         Route::get('onlineProductIndex',
@@ -931,6 +938,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
             ['uses' => 'SmtProductController@copyAllAccountNew', 'as' => 'smtProduct.copyAllAccountNew']);
         Route::post('getCategoryInfo',
             ['uses' => 'SmtProductController@getCategoryInfo', 'as' => 'smtProduct.getCategoryInfo']);
+        Route::post('getCategoryAttributesById',
+            ['uses' => 'SmtProductController@getCategoryAttributesById', 'as' => 'smtProduct.getCategoryAttributesById']);
+        Route::post('batchModifyBand',
+            ['uses' => 'SmtProductController@batchModifyBand', 'as' => 'smtProduct.batchModifyBand']);
+        
+        
 
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');

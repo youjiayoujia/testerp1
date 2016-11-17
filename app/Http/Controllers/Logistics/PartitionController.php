@@ -84,7 +84,7 @@ class PartitionController extends Controller
             }
         }
         $model = $this->model->with('partitionSorts')->find($model->id);
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', base64_encode(serialize($model)));
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
         if($remark == null) {
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
         }else {

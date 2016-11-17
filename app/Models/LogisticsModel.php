@@ -53,7 +53,7 @@ class LogisticsModel extends BaseModel
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
-            'priority' => 'required|unique:logisticses,priority',
+//            'priority' => 'required|unique:logisticses,priority',
         ],
         'update' => [
             'code' => 'required',
@@ -67,7 +67,7 @@ class LogisticsModel extends BaseModel
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
-            'priority' => 'required',
+//            'priority' => 'required',
         ],
     ];
 

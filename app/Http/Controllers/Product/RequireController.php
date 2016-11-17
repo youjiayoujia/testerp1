@@ -17,6 +17,7 @@ use App\Models\ChannelModel;
 use App\Models\Channel\AccountModel;
 use App\Models\SpuModel;
 use Tool;
+use Excel;
 
 class RequireController extends Controller
 {
@@ -72,6 +73,60 @@ class RequireController extends Controller
         $buf->update($data);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
+    }
+
+    public function getExcel()
+    {
+        $rows[] = [
+            '产品名' => '',
+            '品类' => 'id',
+            '省' => '',
+            '市' => '',
+            '颜色' => '',
+            '材料' => '',
+            '工艺' => '',
+            '配件' => '',
+            '类似款sku' => '',
+            '竞争产品url' => '',
+            '需求描述' => '',
+            '期望上传日期' => '',
+            '采购人' => 'id',
+            'url1' => '',
+            'url2' => '',
+            'url3' => '',
+        ];
+        $name = 'CatalogRates';
+        Excel::create($name, function ($excel) use ($rows) {
+            $nameSheet = '导出分类税率';
+            $excel->sheet($nameSheet, function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    /**
+     * excel 处理
+     *
+     * @param none
+     *
+     */
+    public function excelStore()
+    {
+        if(request()->hasFile('excel'))
+        {
+           $file = request()->file('excel');
+           $this->model->excelProcess($file);
+           return redirect($this->mainIndex);
+        }
+    }
+
+    public function importByExcel()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__)
+        ];
+
+        return view($this->viewPath.'excel', $response);
     }
 
     /**

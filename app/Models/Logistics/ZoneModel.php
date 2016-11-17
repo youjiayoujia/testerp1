@@ -77,11 +77,11 @@ class ZoneModel extends BaseModel
         return substr($str, 0, -1);
     }
 
-    public function inZone($id)
+    public function inZone($code)
     {
         $countries = $this->logistics_zone_countries;
         foreach($countries as $country) {
-            if($country->id == $id) {
+            if($country->code == $code) {
                 return true;
             }
         }

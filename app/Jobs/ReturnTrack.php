@@ -88,7 +88,7 @@ class ReturnTrack extends Job implements SelfHandling, ShouldQueue
                             if(strtotime($order->orders_expired_time)-time()> $this->orderMarkLogic->expired_time*24*3600){ // 需要跳过
                                 $is_success = false;
                                 $is_pass = true;//跳过标记发货
-                                $remark ='未满足最后发货期'.$this->orderMarkLogic->expired_time.'天，所以跳过发货';
+                                $remark ='未满足最后发货期'.$this->orderMarkLogic->expired_time.'天，暂时跳过标记发货';
                             }
                         }
 

@@ -157,7 +157,7 @@
         <div class="panel-heading">账号选择</div>
         <div class="panel-body">
             <?php
-          //  $account = array('A-FM', 'A-AN', 'A-ME', 'A-SM', 'D-SM', 'H-XH', 'H-LE', 'H-RE', 'A-OY', 'H-TE', 'J-RY', 'I-LT', 'J-MT', 'J-M5', 'M-SP', '226win', '62gbs');
+            //  $account = array('A-FM', 'A-AN', 'A-ME', 'A-SM', 'D-SM', 'H-XH', 'H-LE', 'H-RE', 'A-OY', 'H-TE', 'J-RY', 'I-LT', 'J-MT', 'J-M5', 'M-SP', '226win', '62gbs');
 
             foreach ($account as $key => $a):?>
             <div class="col-lg-2">
@@ -285,7 +285,9 @@
 
         <div class="panel-body" id="itemDiv">
             <div class='row' id="sku_detail">
-                <div class="form-group col-sm-2">(点击相应文字可批量设置)</div>
+                <div class="form-group col-sm-2">(点击相应文字可批量设置)
+                    <a class="btn btn-info" onclick="add_sku_info()">设置SKU</a>
+                </div>
                 <div class="form-group col-sm-2">
                     <label for="sku" class='control-label' onclick="batch_setting('prefix')">sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -299,80 +301,83 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="price" class='control-label' onclick="batch_setting('price')" >单价</label>
+                    <label for="price" class='control-label' onclick="batch_setting('price')">单价</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="status" class='control-label' onclick="batch_setting('color')" >颜色</label>
+                    <label for="status" class='control-label' onclick="batch_setting('color')">颜色</label>
 
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="status" class='control-label' onclick="batch_setting('size')" >尺寸</label>
+                    <label for="status" class='control-label' onclick="batch_setting('size')">尺寸</label>
 
                 </div>
             </div>
 
             @if(isset($details))
                 @foreach($details as $detail)
-                    <div>
-                    <div class="row">
-                        <div class="form-group col-sm-2"></div>
-                        <div class="form-group col-sm-2">
-                            <input type="text" class="form-control prefix" placeholder="sku" name="arr[sku][]"
-                                   value="{{$detail->sku}}">
-                        </div>
-                        <div class="form-group col-sm-2 image">
+                    <div class="need-del">
+                        <div class="row">
+                            <div class="form-group col-sm-2"></div>
                             <div class="form-group col-sm-2">
-                                @if(!empty($detail->main_image))
-                                    <img class="is_del" width="50px" height="50px" src="{{$detail->main_image}}">
+                                <input type="text" class="form-control prefix" placeholder="sku" name="arr[sku][]"
+                                       value="{{$detail->sku}}">
+                            </div>
+                            <div class="form-group col-sm-2 image">
+                                <div class="form-group col-sm-2">
+                                    @if(!empty($detail->main_image))
+                                        <img class="is_del" width="50px" height="50px" src="{{$detail->main_image}}">
+                                    @endif
+                                    <input type="hidden" value="{{$detail->main_image}}" name="arr[main_image][]">
+
+                                </div>
+                                @if(empty($detail->main_image))
+                                    <a class="btn btn-success " title="设置图片" onclick="add_pic(this)"
+                                       href="javascript:void(0);">
+                                        <span class="glyphicon glyphicon-picture"></span>
+                                    </a>
                                 @endif
-                                    <input type="hidden" value="{{$detail->main_image}}" name="arr[main_image][]" >
-
                             </div>
-                            @if(empty($detail->main_image))
-                                <a class="btn btn-success " title="设置图片" onclick="add_pic(this)"
-                                   href="javascript:void(0);">
-                                    <span class="glyphicon glyphicon-picture"></span>
-                                </a>
-                            @endif
-                        </div>
 
-                        <div class="form-group col-sm-1">
-                            <input type="text" class="form-control  quantity" placeholder="数量" name="arr[quantity][]"
-                                   value="{{$detail->inventory}}">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <input type="text" class="form-control  price" placeholder="单价" name="arr[price][]"
-                                   value="{{$detail->price}}">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <input type="text" class="form-control  color" placeholder="颜色" name="arr[color][]"
-                                   value="{{$detail->color}}">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <input type="text" class="form-control  size" placeholder="尺码" name="arr[size][]"
-                                   value="{{$detail->size}}">
-                        </div>
-                        <button type="button" class="btn btn-danger bt_right" title="删除该SKU"><i
-                                    class="glyphicon glyphicon-trash"></i></button>
-                        <button type="button" class="btn " onclick="up_row(this)"  title="上移"><i class="glyphicon glyphicon-arrow-up"></i></button>
-                        <button type="button" class="btn " onclick="down_row(this)"  title="下移"><i class="glyphicon glyphicon-arrow-down"></i></button>
-                        <button type="button" class="btn btn-success zhankai " title="设置多账号价格"
-                                onclick="add_account_price(this)"><i class="glyphicon glyphicon-plus"></i></button>
-                    </div>
-
-                    <div class="form-group account_info hidden">
-                        <div class="row ' + single_account_value + '">
-                            <div class="form-group col-sm-2 text-right">
-                                <label class="text-right">{{$account[$account_id]}}</label>
+                            <div class="form-group col-sm-1">
+                                <input type="text" class="form-control  quantity" placeholder="数量"
+                                       name="arr[quantity][]"
+                                       value="{{$detail->inventory}}">
                             </div>
-                            <div class="form-group col-sm-8">
-                                <input type="text" class="form-control single_price"
-                                       name="account_price[{{$account_id}}][]" placeholder="产品价格">
+                            <div class="form-group col-sm-1">
+                                <input type="text" class="form-control  price" placeholder="单价" name="arr[price][]"
+                                       value="{{$detail->price}}">
                             </div>
+                            <div class="form-group col-sm-1">
+                                <input type="text" class="form-control  color" placeholder="颜色" name="arr[color][]"
+                                       value="{{$detail->color}}">
+                            </div>
+                            <div class="form-group col-sm-1">
+                                <input type="text" class="form-control  size" placeholder="尺码" name="arr[size][]"
+                                       value="{{$detail->size}}">
+                            </div>
+                            <button type="button" class="btn btn-danger bt_right" title="删除该SKU"><i
+                                        class="glyphicon glyphicon-trash"></i></button>
+                            <button type="button" class="btn " onclick="up_row(this)" title="上移"><i
+                                        class="glyphicon glyphicon-arrow-up"></i></button>
+                            <button type="button" class="btn " onclick="down_row(this)" title="下移"><i
+                                        class="glyphicon glyphicon-arrow-down"></i></button>
+                            <button type="button" class="btn btn-success zhankai " title="设置多账号价格"
+                                    onclick="add_account_price(this)"><i class="glyphicon glyphicon-plus"></i></button>
                         </div>
 
-                    </div>
+                        <div class="form-group account_info hidden">
+                            <div class="row ' + single_account_value + '">
+                                <div class="form-group col-sm-2 text-right">
+                                    <label class="text-right">{{$account[$account_id]}}</label>
+                                </div>
+                                <div class="form-group col-sm-8">
+                                    <input type="text" class="form-control single_price"
+                                           name="account_price[{{$account_id}}][]" placeholder="产品价格">
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 @endforeach
 
@@ -438,6 +443,8 @@
                         <!-- <a href="javascript:void(0);" class="btn btn-default btn-sm from_local" lang="detail">从我的电脑选取</a> -->
                         <a href="javascript:void(0);" class="btn btn-success btn-sm image_url"
                            onclick="add_pic_in_detail(this)">图片外链</a>
+                        <a href="javascript:void(0);" class="btn btn-success btn-sm image_url"
+                           onclick="get_sku_pic(this)">获取图片</a>
                         {{-- <a class="btn btn-success btn-sm dir_add" href="javascript: void(0);">图片目录上传</a>
                          <a class="btn btn-success btn-sm dir_add" href="javascript: void(0);">实拍目录上传</a>
                          <a class="btn btn-success btn-sm dir_add" href="javascript: void(0);">WISH目录上传</a>
@@ -508,22 +515,22 @@
 
 @section('pageJs')
 
-   {{-- <script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
-    <script src="{{ asset('plugins/UEditor/umeditor.js') }}"></script>--}}
-   <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
-   <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
-   <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
-   <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
+    {{-- <script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
+     <script src="{{ asset('plugins/UEditor/umeditor.js') }}"></script>--}}
+    <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+    <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
     <script type='text/javascript'>
 
-        var content = UM.getEditor('content',{
-            initialFrameHeight:500
+        var content = UM.getEditor('content', {
+            initialFrameHeight: 500
         });
         content.setWidth("100%");
         $(".edui-body-container").css("width", "98%");
-     /*   var ue = UE.getEditor('container', {
-            initialFrameHeight: 500
-        });*/
+        /*   var ue = UE.getEditor('container', {
+         initialFrameHeight: 500
+         });*/
         /* ue.ready(function() {
          ue.setContent('<p>hello!</p>'); //ture 追加内容
          });*/
@@ -538,57 +545,7 @@
 
 
         $('#addItem').click(function () {
-            var html = '<div><div class="row">' +
-                    '<div class="form-group col-sm-2"></div>' +
-                    '<div class="form-group col-sm-2">' +
-                    '<input type="text" class="form-control prefix" placeholder="sku" name="arr[sku][]">' +
-                    '</div>' +
-                    '<div class="form-group col-sm-2 image">' + '<div class="form-group col-sm-2">' +
-                    '<input type="hidden" value="" name="arr[main_image][]">' +
-                    '</div>' +
-                    '<a class="btn btn-success " title="设置图片"  onclick="add_pic(this)" href="javascript:void(0);">' +
-                    '<span class="glyphicon glyphicon-picture"></span>' +
-                    '</a>' +
-                    '</div>' +
-                    '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  quantity"  placeholder="数量" name="arr[quantity][]" >' +
-                    '</div>' +
-                    '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  price"  placeholder="单价" name="arr[price][]" >' +
-                    '</div>' +
-                    '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  color"  placeholder="颜色" name="arr[color][]" >' +
-                    '</div>' +
-                    '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  size"  placeholder="尺码" name="arr[size][]" >' +
-                    '</div>' +
-                    '<button type="button" class="btn btn-danger bt_right" title="删除该SKU"><i class="glyphicon glyphicon-trash"></i></button>' +
-                    '<button type="button" class="btn " onclick="up_row(this)"  title="上移"><i class="glyphicon glyphicon-arrow-up"></i></button>' +
-                    '<button type="button" class="btn " onclick="down_row(this)"  title="下移"><i class="glyphicon glyphicon-arrow-down"></i></button>' +
-                    '<button type="button" class="btn btn-success zhankai " title="设置多账号价格" onclick="add_account_price(this)"><i class="glyphicon glyphicon-plus"></i></button>' +
-                    '</div>';
-
-
-            var account_info = ' <div class="form-group account_info hidden">';
-            $("input[name='choose_account[]']:checkbox").each(function () {
-                var value = $(this).val();
-                var text_name = $(this).parent().text();
-                var id_name = 'account_tittle_' + value;
-                if ($(this).is(':checked')) {
-                    var single_account_value = 'single_account_value_' + value;
-                    var info = '<div class="row ' + single_account_value + '">' +
-                            '<div class="form-group col-sm-2 text-right">' +
-                            '<label  class="text-right">' + text_name + '：</label>' +
-                            '</div>' +
-                            '<div class="form-group col-sm-8">' +
-                            '<input type="text" class="form-control single_price"   name="account_price[' + value + '][]"  placeholder="产品价格" >' +
-                            '</div></div>';
-                    account_info = account_info + info;
-                }
-            });
-
-            account_info = account_info + '</div></div>';
-            $('#itemDiv').append(html + account_info);
+            addItem('','');
         });
 
 
@@ -702,6 +659,102 @@
             }
         });
 
+        function add_sku_info() {
+            var str = prompt("请输入SKU");
+            if (str) {
+                $.ajax({
+                    url: "{{ route('wish.ajaxGetInfo') }}",
+                    data: {
+                        sku: str
+                    },
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        if (result.status) {
+                            $(".need-del").remove();
+                            $(".pic-detail").empty();
+                            for(var i=0;i<result.data.sku.length;i++){
+                                addItem(result.data.sku[i],result.data.pic[i])
+                            }
+                            for(var i=0;i<result.data.product_sku_pic.length;i++){
+                                var html = '<li>' +
+                                        '<div style="cursor: pointer;"><img width="100" height="100" style="border: 0px;" src="' + result.data.product_sku_pic[i] + '">' +
+                                        '<input type="hidden" value="' + result.data.product_sku_pic[i] + '" name="extra_images[]">' +
+                                        '<a class="pic_del" href="javascript: void(0);">删除</a>' +
+                                        '</div>' +
+                                        '</li>';
+                                $(".pic-detail").append(html);
+                            }
+
+
+                            content.setContent('欢迎使用umeditor')
+
+                        }
+                    }
+                })
+            }
+        }
+
+        function addItem(sku,pic){
+            var html = '<div class="need-del"><div class="row">' +
+                    '<div class="form-group col-sm-2"></div>' +
+                    '<div class="form-group col-sm-2">' +
+                    '<input type="text" class="form-control prefix" placeholder="sku" name="arr[sku][]"  value="'+sku+'">' +
+                    '</div>';
+            if(pic==''){
+                html =html+ '<div class="form-group col-sm-2 image">' + '<div class="form-group col-sm-2">' +
+                '<input type="hidden" value="" name="arr[main_image][]">' +
+                '</div>' +
+                '<a class="btn btn-success " title="设置图片"  onclick="add_pic(this)" href="javascript:void(0);">' +
+                '<span class="glyphicon glyphicon-picture"></span>' +
+                '</a>' +
+                '</div>';
+            }else{
+               html = html+'<div class="form-group col-sm-2 image"> <div class="form-group col-sm-2">' +
+               '<img class="is_del" width="50px" height="50px" src="'+pic+'">' +
+               '<input type="hidden" name="arr[main_image][]" value="'+pic+'">' +
+               '</div>' +
+               '</div>';
+            }
+            html =html+'<div class="form-group col-sm-1">' +
+                    '<input type="text" class="form-control  quantity"  placeholder="数量" name="arr[quantity][]" >' +
+                    '</div>' +
+                    '<div class="form-group col-sm-1">' +
+                    '<input type="text" class="form-control  price"  placeholder="单价" name="arr[price][]" >' +
+                    '</div>' +
+                    '<div class="form-group col-sm-1">' +
+                    '<input type="text" class="form-control  color"  placeholder="颜色" name="arr[color][]" >' +
+                    '</div>' +
+                    '<div class="form-group col-sm-1">' +
+                    '<input type="text" class="form-control  size"  placeholder="尺码" name="arr[size][]" >' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-danger bt_right" title="删除该SKU"><i class="glyphicon glyphicon-trash"></i></button>' +
+                    '<button type="button" class="btn " onclick="up_row(this)"  title="上移"><i class="glyphicon glyphicon-arrow-up"></i></button>' +
+                    '<button type="button" class="btn " onclick="down_row(this)"  title="下移"><i class="glyphicon glyphicon-arrow-down"></i></button>' +
+                    '<button type="button" class="btn btn-success zhankai " title="设置多账号价格" onclick="add_account_price(this)"><i class="glyphicon glyphicon-plus"></i></button>' +
+                    '</div>';
+
+
+            var account_info = ' <div class="form-group account_info hidden">';
+            $("input[name='choose_account[]']:checkbox").each(function () {
+                var value = $(this).val();
+                var text_name = $(this).parent().text();
+                var id_name = 'account_tittle_' + value;
+                if ($(this).is(':checked')) {
+                    var single_account_value = 'single_account_value_' + value;
+                    var info = '<div class="row ' + single_account_value + '">' +
+                            '<div class="form-group col-sm-2 text-right">' +
+                            '<label  class="text-right">' + text_name + '：</label>' +
+                            '</div>' +
+                            '<div class="form-group col-sm-8">' +
+                            '<input type="text" class="form-control single_price"   name="account_price[' + value + '][]"  placeholder="产品价格" >' +
+                            '</div></div>';
+                    account_info = account_info + info;
+                }
+            });
+            account_info = account_info + '</div></div>';
+            $('#itemDiv').append(html + account_info);
+        }
 
         function add_pic(e) {
             var mark = e;
@@ -715,16 +768,41 @@
         }
 
         function add_pic_in_detail(e) {
-            var mark = e;
-            var str = prompt("图片外链地址");
+                var mark = e;
+                var str = prompt("图片外链地址");
+                if (str) {
+                    var html = '<li>' +
+                            '<div style="cursor: pointer;"><img width="100" height="100" style="border: 0px;" src="' + str + '">' +
+                            '<input type="hidden" value="' + str + '" name="extra_images[]">' +
+                            '<a class="pic_del" href="javascript: void(0);">删除</a>' +
+                            '</div>' +
+                            '</li>';
+                    $(mark).parent().next().append(html);
+                }
+        }
+
+        function get_sku_pic(e){
+            var str = prompt("输入SKU");
             if (str) {
-                var html = '<li>' +
-                        '<div style="cursor: pointer;"><img width="100" height="100" style="border: 0px;" src="' + str + '">' +
-                        '<input type="hidden" value="' + str + '" name="extra_images[]">' +
-                        '<a class="pic_del" href="javascript: void(0);">删除</a>' +
-                        '</div>' +
-                        '</li>';
-                $(mark).parent().next().append(html);
+                $.ajax({
+                    url: "{{ route('wish.ajaxGetSkuPicture') }}",
+                    data: {
+                        sku: str
+                    },
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        $.each(result.data, function(index, el){
+                            var html = '<li>' +
+                                    '<div style="cursor: pointer;"><img width="100" height="100" style="border: 0px;" src="' + el + '">' +
+                                    '<input type="hidden" value="' + el + '" name="extra_images[]">' +
+                                    '<a class="pic_del" href="javascript: void(0);">删除</a>' +
+                                    '</div>' +
+                                    '</li>';
+                            $(".pic-detail").append(html);
+                        });
+                    }
+                })
             }
         }
 
@@ -746,16 +824,16 @@
         }
 
 
-        function up_row(e){
+        function up_row(e) {
             var objParentTR = $(e).parent().parent();
             var prevTR = objParentTR.prev();
             var id = prevTR.attr('id');
-            if (prevTR.length > 0&&id !='sku_detail') {
+            if (prevTR.length > 0 && id != 'sku_detail') {
                 prevTR.insertAfter(objParentTR);
             }
         }
 
-        function down_row(e){
+        function down_row(e) {
             var objParentTR = $(e).parent().parent();
             var nextTR = objParentTR.next();
             if (nextTR.length > 0) {
@@ -763,20 +841,20 @@
             }
         }
 
-        function batch_setting(key){
-            var str = prompt("请输入"+key+"(前缀不需要*)");
+        function batch_setting(key) {
+            var str = prompt("请输入" + key + "(前缀不需要*)");
             if (str) {
-                $("."+key).each(function(){
+                $("." + key).each(function () {
                     var old_val = $(this).val();
-                    if(key=='prefix'){
-                        old_val=old_val.split("*");
-                        if(old_val[1]){
-                            $(this).val(str+'*'+old_val[1]);
+                    if (key == 'prefix') {
+                        old_val = old_val.split("*");
+                        if (old_val[1]) {
+                            $(this).val(str + '*' + old_val[1]);
 
-                        }else{
-                            $(this).val(str+'*'+old_val[0]);
+                        } else {
+                            $(this).val(str + '*' + old_val[0]);
                         }
-                    }else{
+                    } else {
                         $(this).val(str);
                     }
 

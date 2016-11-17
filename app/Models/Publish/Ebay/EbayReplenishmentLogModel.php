@@ -10,7 +10,7 @@ namespace App\Models\Publish\Ebay;
 
 use App\Base\BaseModel;
 
-class EbayReplenishmentLog extends BaseModel
+class EbayReplenishmentLogModel extends BaseModel
 {
 
     protected $table = 'ebay_replenishment_log';
@@ -31,7 +31,4 @@ class EbayReplenishmentLog extends BaseModel
 
     protected $rules = [
     ];
-
-
-
 }

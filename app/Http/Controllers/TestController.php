@@ -831,7 +831,7 @@ class TestController extends Controller
                     foreach ($all_ebay_sku as $ebay_sku_item) {
                         if ($ebay_sku_item->status == 1) { //sku 在线
                             echo $ebay_sku_item->erp_sku;
-                            if (in_array($ebay_sku_item->erpProduct->status, $status)) { //其他sku  不满足状态天剑
+                            if (in_array($ebay_sku_item->erpProduct->status, $status)) { //其他sku  不满足状态
                                 if ($ebay_sku_item->erpProduct->AvailableQuantity + $ebay_sku_item->erpProduct->NormalTransitQuantity > 0) { //其他sku 虚库存+在途 > 0
                                     $is_down = false;
                                 }

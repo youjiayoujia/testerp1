@@ -631,15 +631,22 @@ class PackageController extends Controller
         }
         $model = $this->model->with('items')->find($buf[0]);
         $from = json_encode($model);
-        $model->update(['status' => 'NEW']);
-        $model->order->update(['status' => 'REVIEW']);
-        if ($model) {
+        $newPackage = $this->model->create($model->toarray());
+        $weight = 0;
+        if ($newPackage) {
             foreach ($arr as $itemId => $info) {
                 $info['item_id'] = $itemId;
-                $model->items()->create($info);
+                $newPackage->items()->create($info);
+                $weight += ItemModel::find($itemId)->weight * $info['quantity'];
             }
         }
-        $to = json_encode($model);
+        $newPackage->update(['status' => 'NEW', 'weight' => $weight]);
+        $newPackage->order->update(['status' => 'REVIEW']);
+        foreach($model->items as $item) {
+            $item->delete();
+        }
+        $model->delete();
+        $to = json_encode($newPackage);
         $this->eventLog($name, '合并包裹', $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));

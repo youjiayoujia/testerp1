@@ -126,6 +126,27 @@ class PackageController extends Controller
         return $buf;
     }
 
+    //预览包裹
+    public function preview($id)
+    {
+        $model = $this->model->find($id);
+        $logistics = LogisticsModel::where('id', $model->logistics_id)->get();
+        $view = '';
+        foreach ($logistics as $value) {
+            $view = $value->template->view;
+        }
+        $view = explode('.', $view)[0];
+        if ($model->logistics) {
+
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view('logistics.template.tpl.' . $view, $response);
+    }
+
     public function logisticsDelivery()
     {
         $start = request()->input('start');

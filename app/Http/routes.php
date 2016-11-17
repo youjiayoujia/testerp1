@@ -749,6 +749,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'PackageController@placeLogistics', 'as' => 'package.placeLogistics']);
     Route::get('package/flow',
         ['uses' => 'PackageController@flow', 'as' => 'package.flow']);
+    Route::get('preview/{id}',
+        ['uses' => 'PackageController@preview', 'as' => 'preview']);
     Route::resource('package', 'PackageController');
 
     Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);

@@ -83,15 +83,10 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(582);
-        $model = $package->getDeclaredInfo();
-        dd($model);
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $package,
-        ];
+        $package = PackageModel::find(1481);
+        $model = $package->calculateLogisticsFee();
+        var_dump($model);exit;
 
-        return view('logistics.template.tpl.printForPostEubThermal', $response);
     }
 
 //    public function test2()

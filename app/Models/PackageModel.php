@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use App\Models\Logistics\ErpEubModel;
+use App\Models\Logistics\ErpRussiaModel;
 use Excel;
 use DB;
 use App\Jobs\AssignStocks;
@@ -187,6 +188,25 @@ class PackageModel extends BaseModel
         }
 
         return $data;
+    }
+
+    //获取流向代码
+    public function getExpressCodeAttribute()
+    {
+        $logistics = LogisticsModel::where('id', $this->logistics_id)->get();
+        $name = '';
+        foreach ($logistics as $value) {
+            $name = $value->template->name;
+        }
+        $expressCode = '';
+        if ($name == '顺丰俄罗斯挂号面单') {
+            $erpRussia = ErpRussiaModel::where('country_code', $this->shipping_country)->where('type', 'g')->get();
+            foreach ($erpRussia as $value) {
+                $expressCode = $value->express_code;
+            }
+        }
+
+        return $expressCode;
     }
 
     //获取分拣码

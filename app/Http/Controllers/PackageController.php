@@ -136,9 +136,6 @@ class PackageController extends Controller
             $view = $value->template->view;
         }
         $view = explode('.', $view)[0];
-        if ($model->logistics) {
-
-        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,

@@ -1600,7 +1600,7 @@ class SmtProductController extends Controller
         }else{
             $product_arr = smtProductList::where(['token_id' => $token_id,'groupId' => $group_id,'isRemove' => 0 ,'productStatusType' => 'onSelling'])->get();
         }
-        //$product_arr = smtProductList::where('productId','32736001000')->get();
+        //$product_arr = smtProductList::where('productId','32731677074')->get();
         if($product_arr){
             $account = AccountModel::findOrFail($token_id);
             $smtApi = Channel::driver($account->channel->driver, $account->api_config);

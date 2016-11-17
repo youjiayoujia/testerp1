@@ -113,10 +113,7 @@ class OrderModel extends BaseModel
         $items = $this->items;
         $weight = 0;
         foreach($items as $item) {
-            $oldItem = $item->item;
-            if(!$oldItem) {
-                $weight += $oldItem->weight;
-            }
+            $weight += $item->item->weight * $item->quantity;
         }
 
         return $weight;

@@ -271,7 +271,7 @@ $(document).ready(function(){
                             str += "<tr data-id='" + tmp.data('id') + "' class='"+ tmp.data('id') + "'>" + arr[j] + "</tr>";
                         }
                     }
-                    $('.new').append(str);
+                    $('.new').prepend(str);
                     out_js = 1;
                     return false;
                 }
@@ -280,7 +280,7 @@ $(document).ready(function(){
         if(out_js) {
             return false;
         }
-        if(!extern_flag) {
+        if(!extern_flag && val) {
             $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
             $('.searchsku').val('');
             $('.searchsku').focus();

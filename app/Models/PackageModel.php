@@ -953,13 +953,13 @@ class PackageModel extends BaseModel
                     $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                 } else {
                     if($oldWarehouseId != $warehouseId) {
-                        $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                        $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                     } else {
                         if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
                             if($weight == $oldWeight) {
                                 $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
                             } else {
-                                $this->update(['status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                                $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
                             }
                         } else {
                             $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
@@ -1236,7 +1236,6 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
-            
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)

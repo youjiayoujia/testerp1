@@ -65,8 +65,14 @@
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>
                 <!-- 400条sql -->
-                <div>虚：{{$item->available_quantity}}</div>
-                <div>实：{{$item->all_quantity}}</div>
+                @foreach($warehouses as $warehouse)
+                    {{$warehouse->name}}
+                    <br>
+                    <div>虚：{{$item->getStockQuantity($warehouse->id)}}</div>
+                    <div>实：{{$item->getStockQuantity($warehouse->id,1)}}</div>
+                @endforeach
+                所有仓库
+                <br>
                 <div>途：{{$item->normal_transit_quantity}}</div>
                 <div>特：{{$item->special_transit_quantity}}</div>
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>

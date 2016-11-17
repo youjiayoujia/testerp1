@@ -298,6 +298,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
     Route::get('purchaseOrder/sevenPurchaseSku',
         ['uses' => 'Purchase\PurchaseOrderController@sevenPurchaseSku', 'as' => 'purchase.sevenPurchaseSku']);
+
+    Route::get('purchaseOrder/printButNotWarehouseIn',
+        ['uses' => 'Purchase\PurchaseOrderController@printButNotWarehouseIn', 'as' => 'purchase.printButNotWarehouseIn']);
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
     Route::any('PurchaseOrder/trackingNoSearch',
         ['uses' => 'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
@@ -774,6 +777,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Wish\WishPublishController@indexOnlineProduct', 'as' => 'wish.indexOnlineProduct']);
     Route::get('wish/editOnlineProduct',
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
+    Route::get('wish/ajaxGetInfo', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetInfo', 'as' => 'wish.ajaxGetInfo']);
+    Route::get('wish/ajaxGetSkuPicture', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetSkuPicture', 'as' => 'wish.ajaxGetSkuPicture']);
     Route::resource('wish', 'Publish\Wish\WishPublishController');
 
     Route::resource('WishQuantityCheck', 'Publish\Wish\WishQuantityCheckController');
@@ -848,21 +853,6 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('ebayDescription', 'Publish\Ebay\EbayDescriptionTemplateController');
     Route::resource('ebayDataTemplate', 'Publish\Ebay\EbayDataTemplateController');
 
-    Route::post('wish/editOnlineProductStore',
-        ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
-    Route::get('wish/ajaxOperateOnlineProduct', [
-        'uses' => 'Publish\Wish\WishPublishController@ajaxOperateOnlineProduct',
-        'as' => 'wish.ajaxOperateOnlineProduct'
-    ]);
-    Route::get('wish/ajaxEditOnlineProduct',
-        ['uses' => 'Publish\Wish\WishPublishController@ajaxEditOnlineProduct', 'as' => 'wish.ajaxEditOnlineProduct']);
-    Route::get('wish/indexOnlineProduct',
-        ['uses' => 'Publish\Wish\WishPublishController@indexOnlineProduct', 'as' => 'wish.indexOnlineProduct']);
-    Route::get('wish/editOnlineProduct',
-        ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
-    Route::resource('wish', 'Publish\Wish\WishPublishController');
-    Route::resource('wishSellerCode', 'Publish\Wish\WishSellerCodeController');
-    // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
 
     Route::group(['prefix' => 'smt', 'namespace' => 'Publish\Smt'], function () {
         Route::get('onlineProductIndex',

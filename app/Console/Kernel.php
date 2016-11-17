@@ -70,6 +70,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SyncSellmoreApi::class,
         \App\Console\Commands\AutoGetEbayMessage::class,
         \App\Console\Commands\SyncImportApi::class,
+        \App\Console\Commands\AutoEbayAdd::class, //Ebay 自动补货
+
     ];
 
     /**
@@ -100,7 +102,7 @@ class Kernel extends ConsoleKernel
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
                     break;
                 case 'wish':
-                    foreach ($channel->accounts as $account) {
+                    foreach ($channel->accounts->where('is_available','1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;

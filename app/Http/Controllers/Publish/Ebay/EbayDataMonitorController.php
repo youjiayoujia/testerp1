@@ -15,6 +15,7 @@ use App\Models\Publish\Ebay\EbayPublishProductDetailModel;
 use App\Models\PaypalsModel;
 use App\Models\Publish\Ebay\EbaySellerCodeModel;
 use App\Models\Publish\Ebay\EbaySiteModel;
+use App\Models\Publish\Ebay\EbayReplenishmentLogModel;
 
 class EbayDataMonitorController extends Controller
 {
@@ -310,5 +311,47 @@ class EbayDataMonitorController extends Controller
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $string));
     }
+
+
+    public function ajaxGetLog(){
+        $get = request()->input();
+        $where = [];
+        $list = EbayReplenishmentLogModel::where($where);
+        $account =  $this->model->getChannelAccount(4);
+        if(isset($get['update_time_start_log'])&&!empty($get['update_time_start_log'])){
+            $list->where('update_time','>',$get['update_time_start_log']);
+        }
+        if(isset($get['update_time_end_log'])&&!empty($get['update_time_end_log'])){
+            $list->where('update_time','<',$get['update_time_end_log']);
+        }
+        if(isset($get['item_id_log'])&&!empty($get['item_id_log'])){
+            $list->where('item_id',$get['item_id_log']);
+        }
+        if(isset($get['sku_log'])&&!empty($get['sku_log'])){
+            $list->where('sku', 'like', '%' . $get['sku_log'] . '%');
+        }
+        if(isset($get['token_id_log'])&&!empty($get['token_id_log'])){
+            $list->where('token_id',$get['token_id_log']);
+        }
+        if(isset($get['is_api_success_log'])&&!empty($get['is_api_success_log'])){ //is_api_success_log
+            $list->where('is_api_success',$get['is_api_success_log']);
+        }
+        $result = $list->get();
+        if(count($result)>0){
+            foreach($result as $key => $v){
+                $result[$key]['token_id'] = $account[$v['token_id']];
+            }
+            echo json_encode($result);
+            die;
+        }else{
+            echo  json_encode(false);
+            die;
+        }
+
+
+
+
+    }
+
 
 }

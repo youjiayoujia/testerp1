@@ -898,6 +898,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
             ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
         Route::post('batchModify',
             ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);
+        Route::post('batchCreateDraft',
+            ['uses' => 'SmtController@batchCreateDraft', 'as' => 'smt.batchCreateDraft']);
     });
 
     Route::resource('smt', 'Publish\Smt\SmtController');

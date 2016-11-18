@@ -40,6 +40,7 @@
         </select>
     </div>
     <button type="button" id="synchronization" class="btn btn-success submit_btn ">同步</button>
+    <button type="button" id="search" class="btn btn-success submit_btn">筛选</button>
 @stop
 @section('childJs')
     <script type="text/javascript">
@@ -76,6 +77,15 @@
 			}else{
 			}
         });
+
+    	$("#search").on('click',function(){
+    		var token_id = $('#token_id').val();
+    		if(!token_id){
+    			alert('请选择帐号!');
+    		}
+
+    		window.location.href = "{{route('smtProduct.freightManage')}}"+'?token_id='+token_id;
+    	})
     </script>
 @stop
 						

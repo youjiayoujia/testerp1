@@ -345,6 +345,16 @@ class ItemModel extends BaseModel
         ];
     }
 
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
+    }
+
     //获得sku销量 period参数格式为 -7 day
     public function getsales($period)
     {

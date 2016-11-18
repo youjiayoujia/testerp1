@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
 use App\Models\Logistics\TemplateModel;
+use App\Models\LogisticsModel;
 
 class TemplateController extends Controller
 {
@@ -36,6 +37,17 @@ class TemplateController extends Controller
         ];
 
         return view($this->viewPath . 'tpl.' . explode('.', $model->view)[0], $response);
+    }
+
+    //面单确认
+    public function confirm()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '面单确认'),
+            'logistics' => LogisticsModel::all(),
+        ];
+
+        return view($this->viewPath . 'confirm', $response);
     }
 
     /**

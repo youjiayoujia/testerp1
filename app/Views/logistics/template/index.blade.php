@@ -41,3 +41,15 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolButtons')
+    <div class="btn-group">
+        <a href="{{ route('confirm') }}" class="btn btn-info">
+            面单确认
+        </a>
+    </div>
+    <div class="btn-group">
+        <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
+            <i class="glyphicon glyphicon-plus"></i> 新增
+        </a>
+    </div>
+@stop

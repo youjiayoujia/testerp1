@@ -46,11 +46,20 @@
                 <a href="{{ route('logistics.edit', ['id'=>$logistics->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $logistics->id }}"
-                   data-url="{{ route('logistics.destroy', ['id' => $logistics->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
+                {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
+                   {{--data-id="{{ $logistics->id }}"--}}
+                   {{--data-url="{{ route('logistics.destroy', ['id' => $logistics->id]) }}">--}}
+                    {{--<span class="glyphicon glyphicon-trash"></span> 删除--}}
+                {{--</a>--}}
+                @if($logistics->is_enable == '1')
+                    <a href="javascript:" class="btn btn-primary btn-xs enable" data-id="{{ $logistics->id }}">
+                        <span class="glyphicon glyphicon-pencil"></span> 停用
+                    </a>
+                @elseif($logistics->is_enable == '0')
+                    <a href="javascript:" class="btn btn-primary btn-xs enable" data-id="{{ $logistics->id }}">
+                        <span class="glyphicon glyphicon-pencil"></span> 启用
+                    </a>
+                @endif
                 <a href="javascript:" class="btn btn-success btn-xs copy" data-id="{{ $logistics->id }}">
                     <span class="glyphicon glyphicon-pencil"></span> 复制
                 </a>
@@ -79,6 +88,22 @@
                 var logistics_id = $(this).data('id');
                 $.ajax({
                     url: "{{ route('logistics.createData') }}",
+                    data: {logistics_id: logistics_id},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+
+        //启用停用
+        $('.enable').click(function () {
+            if (confirm("是否确认?")) {
+                var logistics_id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('updateEnable') }}",
                     data: {logistics_id: logistics_id},
                     dataType: 'json',
                     type: 'get',

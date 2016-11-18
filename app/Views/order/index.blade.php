@@ -46,7 +46,7 @@
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
                 @if($order->status == 'PACKED' || $order->status == 'SHIPPED' || $order->status == 'COMPLETE')
-                    <div>{{ $order->calculateProfitProcess() }}</div>
+                    <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
                     <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                     <div>运费成本: {{ sprintf("%.3f", $order->packages->sum('cost')) }} RMB</div>
                     <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>

@@ -48,10 +48,10 @@ class BaseModel extends Model
         }
     }
     
-    public function getArray($model, $name)
+    public function getAvailableWarehouse($model, $name)
     {
         $arr = [];
-        $inner_models = $model::all();
+        $inner_models = $model::where('is_available','1')->get();
         foreach ($inner_models as $key => $single) {
             $arr[$single->id] = $single->$name;
         }

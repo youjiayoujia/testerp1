@@ -521,9 +521,9 @@ class OrderController extends Controller
     {
         $order_id = request()->input('order_id');
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($this->model->find($order_id)));
+        $from = json_encode($this->model->find($order_id));
         $this->model->find($order_id)->update(['active' => 'NORMAL']);
-        $to = base64_encode(serialize($this->model->find($order_id)));
+        $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '恢复正常更新,id='.$order_id, $to, $from);
 
         return 1;
@@ -534,9 +534,9 @@ class OrderController extends Controller
     {
         $order_id = request()->input('order_id');
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($this->model->find($order_id)));
+        $from = json_encode($this->model->find($order_id));
         $this->model->find($order_id)->update(['status' => 'REVIEW']);
-        $to = base64_encode(serialize($this->model->find($order_id)));
+        $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '恢复订单更新,id='.$order_id, $to, $from);
 
         return 1;

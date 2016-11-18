@@ -83,9 +83,11 @@ class TestController extends Controller
 
     public function test2()
     {
-        $test = PickListModel::find(155)->pickListItem()->get();
-        var_dump($test->toarray());exit;
-
+        $a = 1.03;
+        $b = '1.030';
+        var_dump($a);
+        var_dump($b);
+        var_dump($a == $b);
     }
 
 //    public function test2()

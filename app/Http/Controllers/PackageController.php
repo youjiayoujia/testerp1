@@ -208,7 +208,7 @@ class PackageController extends Controller
         $name = UserModel::find(request()->user()->id)->name;
         foreach ($arr as $packageId) {
             $model = $this->model->find($packageId);
-            $from = base64_ecode(serialize($model));
+            $from = json_encode($model);
             if (!$model) {
                 continue;
             }
@@ -216,7 +216,7 @@ class PackageController extends Controller
                 continue;
             }
             $model->update(['logistics_id' => $id]);
-            $to = base64_decode(serialize($model));
+            $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
         }
 

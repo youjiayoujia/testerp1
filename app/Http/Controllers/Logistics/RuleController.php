@@ -46,7 +46,7 @@ class RuleController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logisticses' => LogisticsModel::all(),
+            'logisticses' => LogisticsModel::where('is_enable', '1')->get(),
             'catalogs' => CatalogModel::all(),
             'countrySorts' => CountriesSortModel::all(),
             'channels' => ChannelModel::all(), 

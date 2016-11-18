@@ -499,6 +499,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCollectionInfo', 'Logistics\CollectionInfoController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
+    Route::get('updateEnable', ['uses' => 'LogisticsController@updateEnable', 'as' => 'updateEnable']);
     Route::get('logisticsZone/getCountries',
         ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
     Route::get('logisticsZone/sectionAdd',
@@ -522,6 +523,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('logisticsCatalog', 'Logistics\CatalogController');
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
+    Route::get('confirm',
+        ['uses' => 'Logistics\TemplateController@confirm', 'as' => 'confirm']);
     Route::resource('logisticsTransport', 'Logistics\TransportController');
     Route::resource('logisticsPartition', 'Logistics\PartitionController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);

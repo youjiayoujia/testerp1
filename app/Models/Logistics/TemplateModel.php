@@ -22,7 +22,8 @@ class TemplateModel extends BaseModel
         'id',
         'name',
         'view',
-        'size'
+        'size',
+        'is_confirm'
     ];
 
     public $rules = [

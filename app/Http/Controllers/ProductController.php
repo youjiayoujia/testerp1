@@ -80,13 +80,15 @@ class ProductController extends Controller
     public function store()
     {
         $attributesAry  = request()->input('modelSet');
-        /*if (Gate::denies('check','product_admin,product_staff|add')) {
-            echo "没有权限";exit;
-        }*/
+        foreach ($attributesAry as $check_item){
+            if(empty($check_item['variations'])){
+                return redirect(route('product.create',['id' => request()->input('require_id')]))->with('alert', $this->alert('danger', 'set和variation 属性填写不完整.'));
+            }
+        }
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         if(!array_key_exists('modelSet',request()->all())){
-            return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
+            return redirect(route('product.create' ,['id' => request()->input('require_id')]))->with('alert', $this->alert('danger', '请选择model.'));
         }
         //如果包含没有添加的属性就创建新添加的SET 和 Variation属性
         if(!empty($attributesAry)){

@@ -662,11 +662,15 @@ class PackageModel extends BaseModel
                 $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 $newPackage->items()->create($info);
             }
-            $newPackage->update(['status' => 'WAITASSIGN', 'warehouse_id' => $info['warehouse_id'], 'weight' => $weight]);
+            $newPackage->update([
+                'status' => 'WAITASSIGN',
+                'warehouse_id' => $info['warehouse_id'],
+                'weight' => $weight
+            ]);
             //加入订单状态部分发货
         }
         $oldWeight = 0;
-        foreach($this->items as $item) {
+        foreach ($this->items as $item) {
             $oldWeight += $item->item->weight * $item->quantity;
         }
         $this->update(['weight' => $oldWeight]);
@@ -949,14 +953,14 @@ class PackageModel extends BaseModel
                     }
                     DB::commit();
                 }
-                if(empty($oldWarehouseId)) {
+                if (empty($oldWarehouseId)) {
                     $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                 } else {
-                    if($oldWarehouseId != $warehouseId) {
+                    if ($oldWarehouseId != $warehouseId) {
                         $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                     } else {
-                        if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                            if($weight == $oldWeight) {
+                        if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                            if ($weight == $oldWeight) {
                                 $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
                             } else {
                                 $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
@@ -991,15 +995,26 @@ class PackageModel extends BaseModel
                         'status' => 'WAITASSIGN',
                         'weight' => $weight
                     ]);
-                    if(!empty($oldWarehouseId)) {
-                        if($oldWarehouseId != $warehouseId) {
-                            $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                    if (!empty($oldWarehouseId)) {
+                        if ($oldWarehouseId != $warehouseId) {
+                            $newPackage->update([
+                                'warehouse_id' => $warehouseId,
+                                'status' => 'WAITASSIGN',
+                                'weight' => $weight,
+                                'logistics_id' => '0',
+                                'tracking_no' => '0'
+                            ]);
                         } else {
-                            if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                                if($weight == $oldWeight) {
+                            if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                if ($weight == $oldWeight) {
                                     $newPackage->update(['weight' => $weight, 'status' => 'PROCESSING']);
                                 } else {
-                                    $newPackage->update(['status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '0', 'tracking_no' => '0']);
+                                    $newPackage->update([
+                                        'status' => 'WAITASSIGN',
+                                        'weight' => $weight,
+                                        'logistics_id' => '0',
+                                        'tracking_no' => '0'
+                                    ]);
                                 }
                             } else {
                                 $newPackage->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
@@ -1350,16 +1365,16 @@ class PackageModel extends BaseModel
                 $object = $logistics->logisticsChannels->where('channel_id', $this->channel_id)->first();
                 $trackingUrl = $object ? $object->url : '';
                 $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
-                if(Cache::has('package'.$this->id.'logisticsId') && Cache::get('package'.$this->id.'logisticsId') == $rule->logistics->id) {
+                if (Cache::has('package' . $this->id . 'logisticsId') && Cache::get('package' . $this->id . 'logisticsId') == $rule->logistics->id) {
                     $item = $this->items->first();
-                    if(empty($item->warehouse_position_id)) {
+                    if (empty($item->warehouse_position_id)) {
                         return $this->update([
                             'logistics_id' => $rule->logistics->id,
                             'tracking_link' => $trackingUrl,
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
                             'is_auto' => $is_auto,
                             'status' => 'NEED',
-                            'tracking_no' => Cache::get('package'.$this->id.'trackingNo'),
+                            'tracking_no' => Cache::get('package' . $this->id . 'trackingNo'),
                         ]);
                     } else {
                         return $this->update([
@@ -1368,7 +1383,7 @@ class PackageModel extends BaseModel
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
                             'is_auto' => $is_auto,
                             'status' => 'PROCESSING',
-                            'tracking_no' => Cache::get('package'.$this->id.'trackingNo'),
+                            'tracking_no' => Cache::get('package' . $this->id . 'trackingNo'),
                         ]);
                     }
                 } else {
@@ -1423,23 +1438,23 @@ class PackageModel extends BaseModel
                     $this->update([
                         'tracking_no' => $result['tracking_no'],
                         'logistics_order_number' => $result['logistics_order_number'],
-                        'logistics_order_at' => date('Y - m - d H:i:s'),
+                        'logistics_order_at' => date('Y-m-d H:i:s'),
                     ]);
                 } else {
                     $item = $this->items->first();
-                    if(empty($item->warehouse_position_id)) {
+                    if (empty($item->warehouse_position_id)) {
                         $this->update([
                             'status' => 'NEED',
                             'tracking_no' => $result['tracking_no'],
                             'logistics_order_number' => $result['logistics_order_number'],
-                            'logistics_order_at' => date('Y - m - d H:i:s'),
+                            'logistics_order_at' => date('Y-m-d H:i:s'),
                         ]);
                     } else {
                         $this->update([
                             'status' => 'PROCESSING',
                             'tracking_no' => $result['tracking_no'],
                             'logistics_order_number' => $result['logistics_order_number'],
-                            'logistics_order_at' => date('Y - m - d H:i:s'),
+                            'logistics_order_at' => date('Y-m-d H:i:s'),
                         ]);
                     }
                 }
@@ -1448,7 +1463,7 @@ class PackageModel extends BaseModel
                 $this->update([
                     'tracking_no' => $result['tracking_no'],
                     'logistics_order_number' => $result['logistics_order_number'],
-                    'logistics_order_at' => date('Y - m - d H:i:s'),
+                    'logistics_order_at' => date('Y-m-d H:i:s'),
                 ]);
             }
             return $result;
@@ -1464,10 +1479,10 @@ class PackageModel extends BaseModel
      */
     public function excelProcess($file)
     {
-        $path = config('setting . excelPath');
-        !file_exists($path . 'excelProcess . xls') or unlink($path . 'excelProcess . xls');
-        $file->move($path, 'excelProcess . xls');
-        return $this->excelDataProcess($path . 'excelProcess . xls');
+        $path = config('setting.excelPath');
+        !file_exists($path . 'excelProcess.xls') or unlink($path . 'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        return $this->excelDataProcess($path . 'excelProcess.xls');
     }
 
     /**
@@ -1491,9 +1506,9 @@ class PackageModel extends BaseModel
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
         foreach ($arr as $key => $content) {
-            $content['package_id'] = iconv('gb2312', 'utf - 8', trim($content['package_id']));
-            $content['logistics_id'] = iconv('gb2312', 'utf - 8', trim($content['logistics_id']));
-            $content['tracking_no'] = iconv('gb2312', 'utf - 8', trim($content['tracking_no']));
+            $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+            $content['logistics_id'] = iconv('gb2312', 'utf-8', trim($content['logistics_id']));
+            $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
             if (!LogisticsModel::where(['name' => $content['logistics_id']])->count()) {
                 $error[] = $key;
                 continue;
@@ -1526,10 +1541,10 @@ class PackageModel extends BaseModel
      */
     public function excelProcessFee($file, $type)
     {
-        $path = config('setting . excelPath');
-        !file_exists($path . 'excelProcess . xls') or unlink($path . 'excelProcess . xls');
-        $file->move($path, 'excelProcess . xls');
-        return $this->excelDataProcessFee($path . 'excelProcess . xls', $type);
+        $path = config('setting.excelPath');
+        !file_exists($path . 'excelProcess.xls') or unlink($path . 'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        return $this->excelDataProcessFee($path . 'excelProcess.xls', $type);
     }
 
     /**
@@ -1554,8 +1569,8 @@ class PackageModel extends BaseModel
         $error[] = $arr;
         foreach ($arr as $key => $content) {
             if ($type != '3') {
-                $content['package_id'] = iconv('gb2312', 'utf - 8', trim($content['package_id']));
-                $content['cost'] = iconv('gb2312', 'utf - 8', trim($content['cost']));
+                $content['package_id'] = iconv('gb2312', 'uft-8', trim($content['package_id']));
+                $content['cost'] = iconv('gb2312', 'uft-8', trim($content['cost']));
                 $tmp_package = $this->where('id', $content['package_id'])->first();
                 if (!$tmp_package || $tmp_package->status != 'SHIPPED') {
                     $error[] = $key;
@@ -1567,8 +1582,8 @@ class PackageModel extends BaseModel
                     $this->find($content['package_id'])->update(['cost1' => $content['cost']]);
                 }
             } else {
-                $content['package_id'] = iconv('gb2312', 'utf - 8', trim($content['package_id']));
-                $content['tracking_no'] = iconv('gb2312', 'utf - 8', trim($content['tracking_no']));
+                $content['package_id'] = iconv('gb2312', 'uft-8', trim($content['package_id']));
+                $content['tracking_no'] = iconv('gb2312', 'uft-8', trim($content['tracking_no']));
                 $tmp_package = $this->where('id', $content['package_id'])->first();
                 if (!$tmp_package) {
                     $error[] = $key;
@@ -1668,7 +1683,7 @@ class PackageModel extends BaseModel
                         $rows[] = [
                             '供货商' => SupplierModel::find($key1)->name,
                             '物流方式' => LogisticsModel::find($key2)->name,
-                            '发货日期' => iconv('utf - 8', 'gb2312', PackageModel::find($value3)->shipped_at),
+                            '发货日期' => iconv('uft-8', 'gb2312', PackageModel::find($value3)->shipped_at),
                             '运单号' => PackageModel::find($value3)->tracking_no,
                             '重量' => PackageModel::find($value3)->weight,
                         ];
@@ -1706,7 +1721,7 @@ class PackageModel extends BaseModel
 
     public function getStatusTextAttribute()
     {
-        return !empty(config('package' )[$this->status]) ? config('package' )[$this->status] : '';
+        return !empty(config('package')[$this->status]) ? config('package')[$this->status] : '';
     }
 
     public function shipping()

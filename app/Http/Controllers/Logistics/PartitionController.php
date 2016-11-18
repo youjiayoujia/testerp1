@@ -127,7 +127,7 @@ class PartitionController extends Controller
     {
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -144,7 +144,7 @@ class PartitionController extends Controller
             PartitionSortModel::create($data);
         }
         $model = $this->model->with('partitionSorts')->find($id);
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
 
         return redirect($this->mainIndex);

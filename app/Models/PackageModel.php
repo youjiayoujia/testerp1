@@ -959,8 +959,8 @@ class PackageModel extends BaseModel
                     if ($oldWarehouseId != $warehouseId) {
                         $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                     } else {
-                        if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                            if ($weight == $oldWeight) {
+                        if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                            if(floatval($weight)-floatval($oldWeight) < 0.00000000001) {
                                 $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
                             } else {
                                 $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
@@ -1005,8 +1005,8 @@ class PackageModel extends BaseModel
                                 'tracking_no' => '0'
                             ]);
                         } else {
-                            if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                                if ($weight == $oldWeight) {
+                            if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                if(floatval($weight)-floatval($oldWeight) < 0.00000000001) {
                                     $newPackage->update(['weight' => $weight, 'status' => 'PROCESSING']);
                                 } else {
                                     $newPackage->update([

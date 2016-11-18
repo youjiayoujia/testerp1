@@ -597,7 +597,7 @@ class PackageModel extends BaseModel
                             Queue::pushOn('assignStocks', $job);
                         }
                         return true;
-                    } else {
+                    } else {  
                         foreach ($this->items as $item) {
                             $require = [];
                             $require['item_id'] = $item->item_id;
@@ -608,7 +608,7 @@ class PackageModel extends BaseModel
                             $this->requires()->create($require);
                         }
                         //todo v3测试，正式上线删除
-                        $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
+                        $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
                         $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
                         $this->order->update(['status' => 'NEED']);
                         return true;
@@ -624,7 +624,7 @@ class PackageModel extends BaseModel
                         $this->requires()->create($require);
                     }
                     //todo v3测试，正式上线删除
-                    $warehouse_id = $this->items->first()->item->warehouse_id == '1' ? '3' : '4';
+                    $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
                     $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
                     $this->order->update(['status' => 'NEED']);
                     return true;
@@ -791,10 +791,14 @@ class PackageModel extends BaseModel
             if (empty($this->warehouse_id)) {
                 $packageItem = $this->setMultiPackageItem();
             } else {
-                $packageItem = $this->setMultiPackageItemFb();
+                $packageItem = $this->setPackageItemFb();
             }
         } else { //单产品
-            $packageItem = $this->setSinglePackageItem();
+            if (empty($this->warehouse_id)) {
+                $packageItem = $this->setSinglePackageItem();
+            } else {
+                $packageItem = $this->setPackageItemFb();
+            }
         }
         return $packageItem;
     }
@@ -881,43 +885,40 @@ class PackageModel extends BaseModel
     }
 
     //设置多产品订单包裹产品
-    public function setMultiPackageItemFb()
+    public function setPackageItemFb()
     {
-        $warehouses = WarehouseModel::all();
-        foreach ($warehouses as $key => $warehouse) {
-            $buf = [];
-            $i = 0;
-            foreach ($this->items as $packageItem) {
-                $pquantity = $packageItem->quantity;
-                $stocks = StockModel::where([
-                    'warehouse_id' => $warehouse->id,
-                    'item_id' => $packageItem->item_id
-                ])->get()->sortByDesc('available_quantity');
-                if ($stocks->sum('available_quantity') < $packageItem->quantity) {
-                    unset($buf);
+        $buf = [];
+        $i = 0;
+        foreach ($this->items as $packageItem) {
+            $pquantity = $packageItem->quantity;
+            $stocks = StockModel::where([
+                'warehouse_id' => $this->warehouse_id,
+                'item_id' => $packageItem->item_id
+            ])->get()->sortByDesc('available_quantity');
+            if ($stocks->sum('available_quantity') < $packageItem->quantity) {
+                unset($buf);
+                return false;
+            }
+            foreach ($stocks as $key => $stock) {
+                if ($stock->available_quantity < $pquantity) {
+                    $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
+                    $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                    $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
+                    $buf[$this->warehouse_id][$i]['quantity'] = $stock->available_quantity;
+                    $pquantity -= $stock->available_quantity;
+                    $i++;
+                } else { 
+                    $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
+                    $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                    $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
+                    $buf[$this->warehouse_id][$i]['quantity'] = $pquantity;
+                    $i++;
                     continue 2;
                 }
-                foreach ($stocks as $key => $stock) {
-                    if ($stock->available_quantity < $pquantity) {
-                        $buf[$warehouse->id][$i]['item_id'] = $packageItem->item_id;
-                        $buf[$warehouse->id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
-                        $buf[$warehouse->id][$i]['order_item_id'] = $packageItem->order_item_id;
-                        $buf[$warehouse->id][$i]['quantity'] = $stock->available_quantity;
-                        $pquantity -= $stock->available_quantity;
-                        $i++;
-                    } else {
-                        $buf[$warehouse->id][$i]['item_id'] = $packageItem->item_id;
-                        $buf[$warehouse->id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
-                        $buf[$warehouse->id][$i]['order_item_id'] = $packageItem->order_item_id;
-                        $buf[$warehouse->id][$i]['quantity'] = $pquantity;
-                        $i++;
-                        continue 2;
-                    }
-                }
             }
-            if (!empty($buf)) {
-                return $buf;
-            }
+        }
+        if (!empty($buf)) {
+            return $buf;
         }
 
         return false;
@@ -1282,8 +1283,6 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
-
-
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {
                     $channels = $rule->rule_channels_through;
@@ -1711,7 +1710,6 @@ class PackageModel extends BaseModel
                 $sheet->fromArray($rows);
             });
         })->download('csv');
-
     }
 
     public function scopeOfTrackingNo($query, $trackingNo)

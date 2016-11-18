@@ -186,8 +186,8 @@
     <hr style="height:5px;border:none;border-top:5px solid #000;margin-top:5px;" />
     <div style="width:100%;height:55px;">
         <p style="width:190px;height:55px;float:left;text-align:center;font-weight:bold;">
-            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
-            <br/>{{$model->tracking_no}}
+            <img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}">
+            <br/>{{$model->logistics_order_number}}
         </p>
         <p style="width:40px;height:55px;float:left;font-weight:bold;line-height:60px;font-size:20px;text-align:center;">
             {{ $model->country ? $model->country->code : '' }}

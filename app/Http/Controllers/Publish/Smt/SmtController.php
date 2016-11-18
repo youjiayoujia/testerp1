@@ -58,6 +58,7 @@ class SmtController extends Controller{
            'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
            'type' => 'newData',
+           'token'=> $this->model->account_info,
        ];
        return view($this->viewPath . 'index', $response);
    }

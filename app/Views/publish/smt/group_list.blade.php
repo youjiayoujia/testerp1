@@ -40,6 +40,7 @@
         </select>
     </div>
     <button type="button" id="synchronization" class="btn btn-success submit_btn ">同步</button>
+    <button type="button" id="search" class="btn btn-success ">筛选</button>
 @stop
 @section('childJs')
     <script type="text/javascript">
@@ -76,6 +77,16 @@
 			}else{
 			}
         });
+
+		$("#search").on('click',function(){
+			var val = $('#token_id').val();
+        	var text = '';
+        	if(val == ''){
+        		alert('请选择帐号!');
+        		return false;
+            }
+            window.location.href = "{{route('smtProduct.groupManage')}}"+'?token_id='+val;
+		});
     </script>
 @stop
 						

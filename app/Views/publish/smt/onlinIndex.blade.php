@@ -297,6 +297,43 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="myModalSelect"    tabindex="-1" role="dialog"   aria-labelledby="myModalLabel" aria-hidden="true">
+    	<div class="modal-dialog modal-lg">
+    		<div class="modal-content">
+    			<div class="modal-header">
+    				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    				<h4 class="text-left modal-title" >速卖通刊登--产品复制</h4>
+    			</div>
+    			<div class="modal-body">
+    				<form class="form-horizontal" onsubmit="return false;">   				    
+    					<div class="form-group">    						
+    						<div class="col-sm-2">
+    						全选:	<input type="checkbox" id="checkAll"/>
+    						</div>
+    							<div class="col-sm-12">
+    							<?php  							
+    						  
+    							
+    							foreach($accountList as $account){ 
+    							    echo '<div class ="col-sm-3">';
+    							    echo $account->account.':'.'<input type="checkbox"  name="account"  value="'.$account->id.'" >';
+    							    echo '</div>';
+    							}
+    							?>
+                                <input type="hidden" id="productIds"/>
+    						</div>
+    					</div>   
+    
+    					<div class="modal-footer">
+    						<a href="#"   class="btn btn-primary " id="productCopy">确定</a>
+    						<a href="#" class="btn btn-default" data-dismiss="modal">关闭</a>
+    				    </div>
+    				</form>
+    			</div>
+    		</div>
+    	</div>
+    </div>
 @stop
 @section('childJs')
 <link href="{{ asset('plugins/layer/skin/layer.css')}}" type="text/css" rel="stylesheet">
@@ -440,6 +477,7 @@ $(document).on('click','#editOnline',function(){
 	
 })
 
+
 $(document).on('click', '#batch_copy', function(event) {
 		event.preventDefault();
 		/* Act on the event */
@@ -450,7 +488,63 @@ $(document).on('click', '#batch_copy', function(event) {
 			alert('请先选择数据');
 			return false;
 		}
+		if (confirm('确定要将选中的广告另存为草稿吗？')) {
+			$('#productIds').val(productIds);
+			$('#myModalSelect').modal({backdrop: 'static', keyboard: false,toggle:true});
+		}
+})
 
+$("#productCopy").click(function(){	
+	var productIds = $('#productIds').val();
+	var accounttext = $("input[name='account']:checked").map(function(){return $(this).val()}).get().join(',');
+	/*$('input[name="account"]:checked').each(function() {
+		accounttext += ","+$(this).val();
+	});*/
+
+	if(!accounttext){
+		showtips('请先选择账号!', 'alert-warning');
+	}
+
+	$.ajax({
+		url: '{{route('smtProduct.copyToDraft')}}',
+		data: 'productIds='+productIds+'&tokenIds='+accounttext,
+		type: 'POST',
+		dataType: 'json',
+		beforeSend: function(){
+			$('#batch_copy').addClass('productCopy');
+		},
+		success: function(data){
+			var str='';
+			if (data.data){
+				$.each(data.data, function(index, el){
+					str += el+';';
+				});
+			}
+			if (data.status) { //成功
+				showxbtips(data.info+str);
+				$("#myModalSelect").modal('hide');
+			}else {
+				showxbtips(data.info+str, 'alert-warning');
+			}
+		},
+		complete: function(){
+			$('#productCopy').removeClass('disabled');
+		}
+	})
+	
+});
+
+$(document).on('click', '#batch_copy1', function(event) {
+		event.preventDefault();
+		/* Act on the event */
+		var productIds = $('input[name="single[]"]:checked').map(function() {
+			return $(this).val();
+		}).get().join(',');
+		if (productIds == ''){
+			alert('请先选择数据');
+			return false;
+		}
+		
 		if (confirm('确定要将选中的广告另存为草稿吗？')) {
 			//弹出层选择账号
 			$.layer({
@@ -735,6 +829,23 @@ $(document).on('change', '#select2-mixedSearchFieldsfilterSelectstoken_id-rs-con
 			}
 		}
 	});	
+})
+
+ $('#checkAll').click(function(){
+            this.checked ? $("[name='account']").prop('checked', true) : $("[name='account']").prop('checked', false);
+        });
+$('#quanxuanzaccount').click(function(){
+	$("[name='account']").each(function(){
+
+		if($(this).is(':checked')) {
+			$(this).removeProp('checked');
+			$(this).prop('checked',false);
+		}
+		else
+		{
+			$(this).prop("checked",true);//全选
+		}
+	})
 })
 
 </script>

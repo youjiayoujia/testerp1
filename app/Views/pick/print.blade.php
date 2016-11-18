@@ -58,16 +58,16 @@
         </thead>
         <tbody>
             @foreach($picklistitems as $key => $picklistitem)
-            @if($picklistitem->quantity - $picklistitem->packed_quantity > 0)
-            <tr>
-                <td>{{ $picklistitem->items ? $picklistitem->items->sku : '' }}</td>
-                <td>{{ $picklistitem->position ? $picklistitem->position->name : '' }}</td>
-                <td>{{ $picklistitem->quantity - $picklistitem->packed_quantity }}</td>
-                <td>{{ $picklistitem->items ? $picklistitem->items->remark : '' }}</td>
-                <td>{{ $picklistitem->items ? $picklistitem->items->c_name : '' }}</td>
-                <td>{{ $model->picknum }}</td>
-            </tr>
-            @endif
+                @if($picklistitem->quantity - $picklistitem->packed_quantity > 0)
+                <tr>
+                    <td>{{ $picklistitem->items ? $picklistitem->items->sku : '' }}</td>
+                    <td>{{ $picklistitem->position ? $picklistitem->position->name : '' }}</td>
+                    <td>{{ $picklistitem->quantity - $picklistitem->packed_quantity }}</td>
+                    <td>{{ $picklistitem->items ? $picklistitem->items->remark : '' }}</td>
+                    <td>{{ $picklistitem->items ? $picklistitem->items->c_name : '' }}</td>
+                    <td>{{ $model->picknum }}</td>
+                </tr>
+                @endif
             @endforeach
         </tbody>
     </table>

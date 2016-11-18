@@ -14,7 +14,7 @@
     <th>物流方式</th>
     <th>物流单号</th>
     <th>发货类型</th>
-    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -43,7 +43,7 @@
             <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
-            <td>{{ $package->created_at }}</td>
+            <td>{{ $package->updated_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
@@ -81,8 +81,9 @@
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='2'>运输方式: {{ $package->order->shipping }}</td>
+            <td colspan='2'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
             <td colspan='6'>
+
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
@@ -215,11 +216,11 @@
             出库复检
         </a>
     </div>
-    <div class="btn-group">
-        <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}">
-            发货统计
-        </a>
-    </div>
+    <!-- <div class="btn-group"> -->
+        <!-- <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}"> -->
+            <!-- 发货统计 -->
+        <!-- </a> -->
+    <!-- </div> -->
 @stop
 @section('childJs')
     <script type='text/javascript'>

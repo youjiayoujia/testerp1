@@ -195,8 +195,8 @@ class ExportModel extends BaseModel
                     case 'tracking_link':
                         $rows[$k][$buf['tracking_link']] = $package->tracking_link;
                         break;
-                    case 'is_remark':
-                        $rows[$k][$buf['is_remark']] = $package->is_remark == 1 ? '是' : '否';
+                    case 'is_mark':
+                        $rows[$k][$buf['is_mark']] = $package->is_mark == 1 ? '是' : '否';
                         break;
                     case 'is_upload':
                         $rows[$k][$buf['is_upload']] = $package->is_upload == 1 ? '是' : '否';

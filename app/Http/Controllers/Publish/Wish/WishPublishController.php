@@ -626,7 +626,7 @@ class WishPublishController extends Controller
         $erpSku = ItemModel:: where('sku', 'like', $sku . '%')->get();
         foreach ($erpSku as $key=> $e_sku) {
             if($key==0){
-                $description =  $e_sku->product->spu->spuMultiOption->first()->en_description;;
+                $description =  $e_sku->product->spu->spuMultiOption->first()->en_description;
             }
             $skuArr[] = $e_sku->sku;
             //$pic[] = asset($e_sku->product->Dimage);

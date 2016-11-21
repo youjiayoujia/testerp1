@@ -23,7 +23,7 @@
         <div class="form-group col-lg-12">
             <label for="name" class='control-label'>对应人员</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="user_id" id="user_id" class="form-control">
+            <select name="user_id" id="user_id" class="form-control select_select0">
                 <option value="">==请选择==</option>
                 @foreach($users as $user)
                     <option value="{{$user->id}}"   {{ Tool::isSelected('user_id', $user->id,$model) }} >{{$user->name}}</option>
@@ -33,4 +33,11 @@
 
         </div>
     </div>
+@stop
+@section('pageJs')
+    <script type="text/javascript">
+        $('.select_select0').select2();
+
+    </script>
+
 @stop

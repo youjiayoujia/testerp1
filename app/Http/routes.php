@@ -403,6 +403,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('purchaseAccount', 'Purchase\AccountController');
 
     //品类路由
+    Route::any('catalog/ajaxCatalog', ['uses' => 'CatalogController@ajaxCatalog', 'as' => 'ajaxCatalog']);
     Route::resource('catalog', 'CatalogController');
     Route::get('catalog/exportCatalogRates/{str}',
         ['uses' => 'CatalogController@exportCatalogRates', 'as' => 'catalog.exportCatalogRates']);

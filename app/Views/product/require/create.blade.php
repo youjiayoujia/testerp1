@@ -32,13 +32,9 @@
             <label for="name" class='control-label'>产品名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="name" placeholder="产品名" name='name' value="{{ old('name') }}">
         </div>
-        <div class="form-group col-lg-3">
-            <label for="name" class='control-label'>品类</label>
-            <select name='catalog_id' class='form-control'>
-                @foreach($catalogs as $catalog)
-                    <option value="{{ $catalog->id }}" {{ old('catalog_id') ? (old('catalog_id') == $catalog->id ? 'selected' : '') : '' }}>{{ $catalog->name }}</option>
-                @endforeach
-            </select>
+       <div class="form-group col-lg-3">
+            <label for="catalog_id">分类</label>
+            <select class='form-control catalog_id' name="catalog_id"></select>
         </div>
         <div class="form-group col-lg-3">
             <label for='province'>货源地(省)</label> 
@@ -163,6 +159,22 @@
             data: function (params) {
               return {
                 user:params.term,
+              };
+            },
+            results: function(data, page) {
+                
+            }
+        },
+    });
+
+    $('.catalog_id').select2({
+        ajax: {
+            url: "{{ route('ajaxCatalog') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                catalog:params.term,
               };
             },
             results: function(data, page) {

@@ -494,6 +494,11 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::get('logistics/ajaxSupplier',
         ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
+    Route::get('logistics/ajaxLogistics',
+        ['uses' => 'Logistics\TemplateController@ajaxLogistics', 'as' => 'logistics.ajaxLogistics']);
+    Route::get('template/preview',
+        ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
+    Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
@@ -895,6 +900,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
             ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
         Route::post('batchModify',
             ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);
+        Route::post('batchCreateDraft',
+            ['uses' => 'SmtController@batchCreateDraft', 'as' => 'smt.batchCreateDraft']);
     });
 
     Route::resource('smt', 'Publish\Smt\SmtController');

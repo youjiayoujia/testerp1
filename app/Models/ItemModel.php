@@ -214,7 +214,9 @@ class ItemModel extends BaseModel
         foreach ($this->purchase as $purchaseItem) {
             if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
-                    $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                    if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                        $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                    }  
                 }
             }
         }
@@ -229,7 +231,9 @@ class ItemModel extends BaseModel
         foreach ($this->purchase as $purchaseItem) {
             if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
-                    $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                    if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                        $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                    }
                 }
             }
         }
@@ -681,7 +685,9 @@ class ItemModel extends BaseModel
                 if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
                     if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
-                            $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
+                            if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                                $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
+                            } 
                         }
                     }
                 }

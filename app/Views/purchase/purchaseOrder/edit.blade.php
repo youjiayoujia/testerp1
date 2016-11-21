@@ -194,7 +194,7 @@
                 </td>    --> 
 
                  <td>
-                    <a target='_blank' href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
+                    <a target='_blank' href="{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
                 </td>  
                 <!-- <td>
                 @if($purchaseItem->active ==1 )

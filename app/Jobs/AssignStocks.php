@@ -43,7 +43,6 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
                 $this->dispatch($job);
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success to assign stock.';
-                $this->package->eventLog('队列', '已匹配到库存',json_encode($this->package));
             } elseif ($this->package->status == 'PROCESSING') {
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success to assign stock.';

@@ -31,7 +31,8 @@ class WishPublishProductModel extends BaseModel
         'upc',
         'extra_images',
         'number_saves',
-        'number_sold'
+        'number_sold',
+        'sku_perfix'
     ];
 
     public $searchFields = [];

@@ -790,6 +790,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
     Route::get('wish/ajaxGetInfo', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetInfo', 'as' => 'wish.ajaxGetInfo']);
     Route::get('wish/ajaxGetSkuPicture', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetSkuPicture', 'as' => 'wish.ajaxGetSkuPicture']);
+    Route::get('wish/ajaxGenerateSku', ['uses' => 'Publish\Wish\WishPublishController@ajaxGenerateSku', 'as' => 'wish.ajaxGenerateSku']);
     Route::resource('wish', 'Publish\Wish\WishPublishController');
 
     Route::resource('WishQuantityCheck', 'Publish\Wish\WishQuantityCheckController');

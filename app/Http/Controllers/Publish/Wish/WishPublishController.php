@@ -7,6 +7,7 @@
  */
 
 namespace App\Http\Controllers\Publish\Wish;
+
 use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
@@ -20,7 +21,7 @@ use App\Models\ItemModel;
 
 class WishPublishController extends Controller
 {
-    public function __construct(WishPublishProductModel $wishProduct, WishPublishProductDetailModel $wishProductDetail,WishSellerCodeModel $sellerCode)
+    public function __construct(WishPublishProductModel $wishProduct, WishPublishProductDetailModel $wishProductDetail, WishSellerCodeModel $sellerCode)
     {
         $this->model = $wishProduct;
         $this->mainIndex = route('wish.index');
@@ -35,6 +36,7 @@ class WishPublishController extends Controller
     public function index()
     {
         request()->flash();
+        $this->mainTitle = 'wish草稿数据';
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('product_type_status', '!=', 2)),
@@ -52,15 +54,14 @@ class WishPublishController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('product_type_status', 2)),
             'mixedSearchFields' => $this->model->mixed_search,
-
         ];
         $response['mixedSearchFields']
         ['filterSelects'] = [
             'account_id' => $this->wishProduct->getChannelAccount(3),
-            'sellerID' =>$this->sellerCode->getWishCodeWithName(),
+            'sellerID' => $this->sellerCode->getWishCodeWithName(),
 
         ];
-        return view($this->viewPath . 'index', $response);
+        return view($this->viewPath . 'indexOnline', $response);
     }
 
 
@@ -139,6 +140,7 @@ class WishPublishController extends Controller
             $wish_product['account_id'] = intval($account);
             $wish_product['publishedTime'] = date('Y-m-d H:i:s');
             $wish_product['sellerID'] = '';
+            $wish_product['sku_perfix'] = trim($post['sku_perfix']);
             $description = $post['content'];
             $description = str_replace('<p>', ' ', $description);
             $description = str_replace('</p>', '\n ', $description);
@@ -147,7 +149,7 @@ class WishPublishController extends Controller
 
 
             $wish_product['product_name'] = $post['account_tittle'][$account]['tittle'];
-            $wish_product['parent_sku'] = $this->autoFillSuffix(trim($post['parent_sku']), $channel_accounts->domain, $channel_accounts->wish_sku_resolve);
+            $wish_product['parent_sku'] = $this->autoFillSuffix(trim($post['parent_sku']), $channel_accounts->domain, $channel_accounts->wish_sku_resolve,$wish_product['sku_perfix']);
             $wish_product['tags'] = $post['account_tags'][$account]['tags'];
 
             $wish_product['brand'] = $post['brand'];
@@ -163,32 +165,34 @@ class WishPublishController extends Controller
             } else {//replaceDomainPictures
                 if (!empty($post["extra_images"])) {
                     foreach ($post["extra_images"] as $key => $image) {
-                        $post["extra_images"][$key] = $this->replaceDomainPictures($image, $channel_accounts->image_domain);
+                        //$post["extra_images"][$key] = $this->replaceDomainPictures($image, $channel_accounts->image_domain);
+                        $post["extra_images"][$key] = $this->getPictureUrl($image,$channel_accounts->image_domain);
+
                     }
                     $wish_product['extra_images'] = implode('|', $post["extra_images"]);
                 }
             }
 
             //var_dump($post['arr']['sku']);exit; autoRemovePerfix
-            if(isset($post['check_repeat'])){
-                $check_sku  = [];
-                foreach($post['arr']['sku'] as $key=> $sku){
-                    $erp_sku =$this->autoRemovePerfix($sku,$channel_accounts->wish_sku_resolve);
+            if (isset($post['check_repeat'])) {
+                $check_sku = [];
+                foreach ($post['arr']['sku'] as $key => $sku) {
+                    $erp_sku = $this->autoRemovePerfix($sku, $channel_accounts->wish_sku_resolve);
                     $check_sku[] = $erp_sku;
                 }
 
-                $is_repeat =  $this->wishProductDetail->where(['account_id'=>$channel_accounts->id,'enabled'=>1])->whereIn('erp_sku',$check_sku)->first();
-                if(!empty($is_repeat)){
+                $is_repeat = $this->wishProductDetail->where(['account_id' => $channel_accounts->id, 'enabled' => 1])->whereIn('erp_sku', $check_sku)->first();
+                if (!empty($is_repeat)) {
                     $result[$k]['id'] = '';
                     $result[$k]['account'] = $accountInfo[intval($account)];
-                    $result[$k]['info'] = '检查测到该账号该SKU已经存在上架广告'.$is_repeat->productID;
+                    $result[$k]['info'] = '检查测到该账号该SKU已经存在上架广告' . $is_repeat->productID;
                     continue;
                 }
             }
             foreach ($post['arr']['sku'] as $key => $variant) {
 
                 //autoFillSuffix
-                $wish_product_detail[$key]['sku'] = $this->autoFillSuffix(trim($variant), $channel_accounts->wish_publish_code, $channel_accounts->wish_sku_resolve);
+                $wish_product_detail[$key]['sku'] = $this->autoFillSuffix(trim($variant), $channel_accounts->wish_publish_code, $channel_accounts->wish_sku_resolve,$wish_product['sku_perfix']);
 
                 $wish_product_detail[$key]['account_id'] = intval($account);
                 $wish_product_detail[$key]['price'] = !empty($post['account_price'][$account][$key]) ? $post['account_price'][$account][$key] : $post['arr']['price'][$key];
@@ -200,7 +204,8 @@ class WishPublishController extends Controller
                 $wish_product_detail[$key]['shipping_time'] = $post['shipping_time'];
                 $wish_product_detail[$key]['main_image'] = isset($post['arr']['main_image'][$key]) ? $post['arr']['main_image'][$key] : '';
                 if (!empty($wish_product_detail[$key]['main_image'])) {
-                    $wish_product_detail[$key]['main_image'] = $this->replaceDomainPictures($wish_product_detail[$key]['main_image'], $channel_accounts->image_domain);
+                    //$wish_product_detail[$key]['main_image'] = $this->replaceDomainPictures($wish_product_detail[$key]['main_image'], $channel_accounts->image_domain);
+                    $wish_product_detail[$key]['main_image'] = $this->getPictureUrl($wish_product_detail[$key]['main_image'], $channel_accounts->image_domain);
                 }
             }
 
@@ -547,13 +552,13 @@ class WishPublishController extends Controller
 
     }
 
-    /** 自动填充后缀
+    /** 自动填充前后缀
      * @param $sku
      * @param $suffix
      * @param $type
      * @return string
      */
-    function autoFillSuffix($sku, $suffix, $type)
+    public function autoFillSuffix($sku, $suffix, $type,$sku_perfix)
     {
         $retrunSku = [];
         if (stripos($sku, '[') !== false) { //先去除【】
@@ -562,12 +567,13 @@ class WishPublishController extends Controller
         $sku = explode('+', $sku);
         foreach ($sku as $v) {
             if ($type == 2) { //特殊处理
-                $retrunSku[] = $v;
+                $prePart = substr($v, 0, 1);
+                $suffPart = substr($v, 1);
+                $retrunSku[] = $prePart.$sku_perfix.$suffPart;
             } else {
-                $retrunSku[] = $v . $suffix;
+                $retrunSku[] = $sku_perfix.'*'.$v.$suffix;
             }
         }
-
         return implode('+', $retrunSku);
     }
 
@@ -577,7 +583,8 @@ class WishPublishController extends Controller
      * @param $type
      * @return string
      */
-    function autoRemovePerfix($sku, $type){
+    public function autoRemovePerfix($sku, $type)
+    {
         $retrunSku = [];
         if (stripos($sku, '[') !== false) { //先去除【】
             $sku = preg_replace('/\[.*\]/', '', $sku);
@@ -601,62 +608,111 @@ class WishPublishController extends Controller
         return implode('+', $retrunSku);
     }
 
-    function replaceDomainPictures($picture, $domain)
+    public function replaceDomainPictures($picture, $domain)
     {
         $picture = str_replace('imgurl.moonarstore.com', $domain, $picture);
         $picture = str_replace('getSkuImageInfo-resize', 'getSkuImageInfo', $picture);
         return $picture;
     }
 
-    function ajaxGetInfo(){
+    /**
+     * 模糊查找sku 图片 英文描述
+     */
+    public function ajaxGetInfo()
+    {
         $skuArr = [];
         $pic = [];
         $sku = trim(request()->input('sku'));
-        $erpSku =ItemModel:: where('sku', 'like', $sku.'%')->get();
-        foreach($erpSku as $e_sku){
+        $erpSku = ItemModel:: where('sku', 'like', $sku . '%')->get();
+        foreach ($erpSku as $key=> $e_sku) {
+            if($key==0){
+                $description =  $e_sku->product->spu->spuMultiOption->first()->en_description;;
+            }
             $skuArr[] = $e_sku->sku;
-            $pic[] = asset($e_sku->product->Dimage);
+            //$pic[] = asset($e_sku->product->Dimage);
         }
-        $product_sku_pic =[
-            'http://www.v3.slme.com//default.jpg',
-            'http://www.v3.slme.com//default.jpg',
-            'http://www.v3.slme.com//default.jpg',
-            'http://www.v3.slme.com//default.jpg',
-            'http://www.v3.slme.com//default.jpg',
-            'http://www.v3.slme.com//default.jpg',
-        ];
+        $skuArr[]=$sku;
+        $product_sku_pic = [];
         $return['sku'] = $skuArr;
         $return['pic'] = $pic;
         $return['product_sku_pic'] = $product_sku_pic;
-        unset($skuArr);unset($pic);
-        $this->ajax_return('',true,$return);
+        $return['description'] = isset($description)?$description:'';
+        unset($skuArr);
+        unset($pic);
+        $this->ajax_return('', true, $return);
 
     }
 
-
-    function ajaxGetSkuPicture(){
+    /**
+     * 获取SLME sku图片信息
+     */
+    public function ajaxGetSkuPicture()
+    {
         $picture = [];
         $sku = strtoupper(trim(request()->input('sku')));
-        $url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+        $url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=' . $sku;
         $get_data = Tool::curl($url);
-        $result = json_decode($get_data,true);
-        if(!empty($result)){
-            foreach($result as $ke => $v){
+        $result = json_decode($get_data, true);
+        if (!empty($result)) {
+            foreach ($result as $ke => $v) {
                 $photo_name = $v['filename'];
-                $s_url = '/getSkuImageInfo/sku/'.$photo_name;
-                $picture[] = 'http://imgurl.moonarstore.com'.$s_url;
+                $s_url = '/getSkuImageInfo/sku/' . $photo_name;
+                $picture[] = 'http://imgurl.moonarstore.com' . $s_url;
             }
-        }else{
-            $url ='http://imgurl.moonarstore.com/get_image.php?dirName='.$sku;
+        } else {
+            $url = 'http://imgurl.moonarstore.com/get_image.php?dirName=' . $sku;
             $get_data = Tool::curl($url);
-            $result = json_decode($get_data,true);
-            if(is_array($result)){
-                foreach($result as $re){
+            $result = json_decode($get_data, true);
+            if (is_array($result)) {
+                foreach ($result as $re) {
                     $picture[] = $re;
                 }
             }
         }
-        $this->ajax_return('',true,$picture);
+        $this->ajax_return('', true, $picture);
+
+    }
+
+    /**
+     * 生成随机SKU
+     */
+    function ajaxGenerateSku()
+    {
+        $last_result = array();
+        $generate_sku_parent = trim(request()->input('generate_sku_parent'));
+        $generate_sku_color = trim(request()->input('generate_sku_color'));
+        $generate_sku_size = trim(request()->input('generate_sku_size'));
+        $generate_sku_color_array = explode(',', $generate_sku_color);
+        $generate_sku_size_array = explode(',', $generate_sku_size);
+        $i = 0;
+        foreach ($generate_sku_color_array as $color) {
+            foreach ($generate_sku_size_array as $size) {
+                $last_result[$i]['sku'] = $generate_sku_parent . '_' . $color . '_' . $size;
+                $last_result[$i]['color'] = $color;
+                $last_result[$i]['size'] = $size;
+                $i++;
+            }
+        }
+        $last_result[$i]['sku'] = $generate_sku_parent;
+        $last_result[$i]['color'] = '';
+        $last_result[$i]['size'] = '';
+        $this->ajax_return('', 1, $last_result);
+    }
+
+    /**
+     * @param $url 图片链接
+     * @param $host 账号域名
+     * @return string 新图片链接
+     */
+    function getPictureUrl($url, $host)
+    {
+        $n = 0;
+        for ($i = 1; $i <= 3; $i++) {
+            $n = strpos($url, '/', $n);
+            $i != 3 && $n++;
+        }
+        $url = substr($url, $n);
+        return 'http://' . $host . $url;
 
     }
 

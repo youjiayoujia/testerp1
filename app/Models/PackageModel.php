@@ -94,7 +94,7 @@ class PackageModel extends BaseModel
             'filterFields' => ['tracking_no'],
             'filterSelects' => [
                 'status' => config('package'),
-                'warehouse_id' => $this->getArray('App\Models\WarehouseModel', 'name'),
+                'warehouse_id' => $this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
                 'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')
             ],
             'selectRelatedSearchs' => [

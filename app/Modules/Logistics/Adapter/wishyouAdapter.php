@@ -168,7 +168,7 @@ Class WishyouAdapter extends BasicAdapter
 		$this->API_key = $this->tokenArr[$orderInfo->warehouse_id];  //根据仓库选择对应
 
 		$order_xml=$this->createRequestXmlFile($orderInfo,$shipInfo);  //xml
-		
+		print_r($order_xml);
 		 if(!$order_xml){
 			 return $result = [
 				 'code' => 'error',

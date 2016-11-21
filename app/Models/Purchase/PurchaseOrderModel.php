@@ -75,6 +75,7 @@ class PurchaseOrderModel extends BaseModel
                                 ],
             'selectRelatedSearchs' => [],
             'sectionSelect' => ['time' => ['created_at']],
+            'doubleRelatedSearchFields' => ['purchaseItem' => ['productItem' => ['sku']]],
         ];
     }
 

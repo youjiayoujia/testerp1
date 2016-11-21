@@ -124,7 +124,7 @@
                                                     </div>
                                                 </td>
                                                 <td colspan="2">
-                                                    目标价格：
+                                                    反推价格：
                                                     <div class="input-group">
                                                         <input type="text" class="form-control " style="width:125px" id="target-price-{{$item->id}}" value="">
                                                         <span class="input-group-addon">$</span>
@@ -200,7 +200,7 @@
                                                 <th>渠道名</th>
                                                 <th>大PP价格（单位：美元）</th>
                                                 <th>小PP价格（单位：美元）</th>
-                                                <th>价格推算利润</th>
+                                                <th>反推利润率</th>
                                             </tr>
                                             </thead>
                                             <tbody id="result-price-{{$item->id}}">

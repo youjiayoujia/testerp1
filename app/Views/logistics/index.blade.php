@@ -15,6 +15,7 @@
     <th>物流编码</th>
     <th>平邮or快递</th>
     <th>是否启用</th>
+    <th class="sort" data-field="is_confirm">面单是否确认</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -37,6 +38,7 @@
             <td>{{ $logistics->logistics_code }}</td>
             <td>{{ $logistics->is_express == '1' ? '快递' : '平邮' }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
+            <td>{{ $logistics->is_confirm == '1' ? '是' : '否' }}</td>
             <td>{{ $logistics->created_at }}</td>
             <td>{{ $logistics->updated_at }}</td>
             <td>

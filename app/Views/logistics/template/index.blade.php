@@ -4,7 +4,6 @@
     <th>面单名称</th>
     <th>视图</th>
     <th>尺寸</th>
-    <th class="sort" data-field="is_confirm">是否确认</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -16,7 +15,6 @@
             <td>{{ $template->name }}</td>
             <td>{{ $template->view }}</td>
             <td>{{ $template->size }}</td>
-            <td>{{ $template->is_confirm == '1' ? '是' : '否' }}</td>
             <td>{{ $template->updated_at }}</td>
             <td>{{ $template->created_at }}</td>
             <td>

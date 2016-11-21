@@ -116,6 +116,22 @@
                                                 <td colspan="3">产品名称：{{ $item->c_name }}</td>
                                             </tr>
                                             <tr>
+                                                <td>
+                                                    利润率：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:125px" id="profit-{{$item->id}}" value="20">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2">
+                                                    目标价格：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:125px" id="target-price-{{$item->id}}" value="">
+                                                        <span class="input-group-addon">$</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <td>产品重量：
                                                     <div class="input-group">
                                                         <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 110px;"  disabled>
@@ -123,25 +139,14 @@
                                                     </div>
 
                                                 </td>
-                                                <td>
+                                                <td colspan="2">
                                                     渠道名称：
-                                                    <select class="form-control" id="channel-{{$item->id}}">
+                                                    <select class="form-control" id="channel-{{$item->id}}" style="width: 160px;">
                                                         <option value="none">请选择</option>
                                                         @foreach($Compute_channels as $channel)
                                                             <option value="{{$channel->name}}">{{$channel->name}}</option>
                                                         @endforeach
-                                                    </select></td>
-                                                <td>
-
-                                                    利润率：
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$item->id}}" value="20">
-                                                        <span class="input-group-addon">%</span>
-                                                    </div>
-                                                    {{--   <div class="input-group">
-                                                           <input type="text" class="form-control" style="width: 60px;">
-                                                           <span class="input-group-addon">个</span>
-                                                       </div>--}}
+                                                    </select>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -195,6 +200,7 @@
                                                 <th>渠道名</th>
                                                 <th>大PP价格（单位：美元）</th>
                                                 <th>小PP价格（单位：美元）</th>
+                                                <th>价格推算利润</th>
                                             </tr>
                                             </thead>
                                             <tbody id="result-price-{{$item->id}}">
@@ -540,10 +546,11 @@
          */
         function doComputePrice(productId){
 
-            var zone_id = $('#zones-'+productId).val();
-            var channel_id = $('#channel-'+productId).val();
-            var profit_id = $('#profit-'+productId).val();
+            var zone_id        = $('#zones-'+productId).val();
+            var channel_id     = $('#channel-'+productId).val();
+            var profit_id      = $('#profit-'+productId).val();
             var product_weight = $('#weight-'+productId).val();
+            var target_price   = $('#target-price-'+productId).val();
 
             if(zone_id == 'none'){
                 alert('物流分区不能为空');
@@ -563,13 +570,22 @@
                 url: "{{  route('product.ajaxReturnPrice') }}",
                 dataType: 'json',
                 'type': 'get',
-                data: {product_id:productId,zone_id:zone_id,channel_id:channel_id,profit_id:profit_id,product_weight:product_weight},
+                data: {product_id:productId,zone_id:zone_id,channel_id:channel_id,profit_id:profit_id,product_weight:product_weight,target_price:target_price},
                 success:function (returnInfo){
 
                     if(returnInfo['status'] == 1){
                         $.each(returnInfo['data'],function (i ,item) {
+
+                            if(item.channel_price_big !=false){
+
+                            }
+                            var channel_rate_price_big   = (item.channel_price_big != false) ? '<font color="red">('+item.channel_price_big+')</font>' : '';
+                            var channel_rate_price_small = (item.channel_price_small != false) ? '<font color="red">('+item.channel_price_small+')</font>' : '';
+
                             html += '<tr>';
-                            html += '<td>'+(i+1)+'</td><td>'+item.channel_name+'</td><td>'+item.sale_price_big+'</td><td>'+item.sale_price_small+'</td>';
+                            html += '<td>'+(i+1)+'</td><td>'+item.channel_name+'</td><td>'+item.sale_price_big+channel_rate_price_big+'</td><td>'+item.sale_price_small+channel_rate_price_small+'</td>';
+                            /*html += '<td>'+item.profit_id+'->'+item.sale_price_small+'</td>';*/
+                            html += '<td>'+item.profitability.profit+'</td>';
                             html += '</tr>';
 
                             $('#result-price-'+productId).html(html);
@@ -580,7 +596,7 @@
                     }
                 },
                 error:function () {
-                    alert('计算失败，品类渠道的税率是否编辑？');
+                    alert('参数不完整，计算失败；品类渠道的税率是否编辑？');
 
                 }
             });

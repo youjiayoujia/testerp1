@@ -117,8 +117,7 @@ return [
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',
         'by_id' => '买家ID',
-        'shipping_firstname' => '名',
-        'shipping_lastname' => '姓',
+        'shipping_firstname' => '姓名',
         'profit_rate' => '利润率',
         'items.item_status' => 'SKU状态',
         'outer_type' => '出库/入库', 
@@ -169,6 +168,7 @@ return [
         'catalog.id' => '品类',
         'spu_id' => 'SPU',
         'logistics.catalog.name' => '物流分类',
-        'order.channel_ordernum' => '渠道运单号'
+        'order.channel_ordernum' => '渠道运单号',
+        'purchaseItem.productItem.sku' => 'sku',
     ],
 ];

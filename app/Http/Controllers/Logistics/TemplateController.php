@@ -98,8 +98,7 @@ class TemplateController extends Controller
     {
         $logistics_id = request()->input('logistics_id');
         $logistics = LogisticsModel::find($logistics_id);
-        $template = TemplateModel::find($logistics->logistics_template_id);
-        $template->update(['is_confirm' => '1']);
+        $logistics->update(['is_confirm' => '1']);
 
         return 1;
     }

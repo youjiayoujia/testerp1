@@ -153,6 +153,55 @@
 
 
     ?>
+
+
+
+    <div class="modal fade " id="withdraw" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-left" id="myModalLabel">生成SKU</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-sm-12">
+                            <span class="text-center" >颜色和尺寸用英文逗号分隔 例如 颜色:red,yellow,black</span></div>
+                        </div>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            <label  class="label-right"> 母SKU:</label>
+                        </div>
+                        <div class="form-group col-sm-10">
+                            <input class="form-control" id="generate_sku_parent">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            <label  class="right"> 颜色:</label>
+                        </div>
+                        <div class="form-group col-sm-10">
+                            <input class="form-control" id="generate_sku_color">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            <label for="subject" class="right"> 尺寸:</label>
+                        </div>
+                        <div class="form-group col-sm-10">
+                            <input class="form-control" id="generate_sku_size" >
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-info creatsku" >确定</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="panel panel-default">
         <div class="panel-heading">账号选择</div>
         <div class="panel-body">
@@ -283,18 +332,38 @@
     <div class="panel panel-default">
         <div class="panel-heading">SKU信息</div>
 
-        <div class="panel-body" id="itemDiv">
-            <div class='row' id="sku_detail">
-                <div class="form-group col-sm-2">(点击相应文字可批量设置)
-                    <a class="btn btn-info" onclick="add_sku_info()">设置SKU</a>
+        <div class="panel-body" >
+            <div class='row'>
+                <div class="form-group col-sm-2">
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="sku" class='control-label' onclick="batch_setting('prefix')">sku</label>
+                    <input type="text" class="form-control" placeholder="ERPSKU" id="erp_sku">
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type="text" class="form-control" placeholder="前缀"  datatype="*" nullmsg="请输入前缀"  name="sku_perfix"  value="@if(isset($model->sku_perfix)){{$model->sku_perfix}}@endif">
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type="text" class="form-control" placeholder="数量" id="sku_num">
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type="text" class="form-control" placeholder="价格" id="sku_price">
+                </div>
+                <div class="form-group col-sm-2">
+                    <a class="btn btn-info" onclick="add_sku_info()">ERPSKU</a>
+                    <a class="btn btn-primary withdraw" data-toggle="modal"  data-target="#withdraw">随机SKU</a>
+                </div>
+            </div>
+
+            <div  id="itemDiv">
+            <div class='row' id="sku_detail">
+                <div class="form-group col-sm-2">
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="sku" class='control-label' >sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="image" class='control-label'>图片</label>
-
                 </div>
                 <div class="form-group col-sm-1">
                     <label for="quantity" class='control-label' onclick="batch_setting('quantity')">数量</label>
@@ -321,7 +390,7 @@
                             <div class="form-group col-sm-2"></div>
                             <div class="form-group col-sm-2">
                                 <input type="text" class="form-control prefix" placeholder="sku" name="arr[sku][]"
-                                       value="{{$detail->sku}}">
+                                       value="{{Tool::getErpSkuBySku($detail->sku,$model->channelAccount->wish_sku_resolve) }}">
                             </div>
                             <div class="form-group col-sm-2 image">
                                 <div class="form-group col-sm-2">
@@ -382,7 +451,7 @@
                 @endforeach
 
             @endif
-
+            </div>
         </div>
         <div class="panel-footer">
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增产品</strong></div>
@@ -422,7 +491,7 @@
                     <label for="subject" class="right">零售价(msrp)：</label>
                 </div>
                 <div class="form-group col-sm-8">
-                    <input type="text" class="form-control" name="msrp" id="msrp" placeholder="建议零售价"
+                    <input type="text" class="form-control" name="msrp" id="msrp" placeholder="建议零售价" onblur="changeMsrp(this)"
                            value="<?php if (isset($msrp)) echo $msrp; ?>">
                 </div>
             </div>
@@ -545,7 +614,7 @@
 
 
         $('#addItem').click(function () {
-            addItem('','');
+            addItem('','','','','','');
         });
 
 
@@ -555,13 +624,25 @@
             var id_name = 'account_tittle_' + value;
             var id_tags = 'account_tags_' + value;
             var id_shipping = 'account_shipping_' + value;
+            var tittle_text = $("#account_tittle").children().first().children().eq(1).children().eq(0).val();
+            if (typeof(tittle_text) == 'undefined') {
+                tittle_text = '';
+            }
+            var tags_text = $("#account_tags").children().first().children().eq(1).children().eq(0).val();
+            if (typeof(tags_text) == 'undefined') {
+                tags_text = '';
+            }
+            var shipping_text = $("#account_shipping").children().first().children().eq(1).children().eq(0).val();
+            if (typeof(shipping_text) == 'undefined') {
+                shipping_text = '';
+            }
             if ($(this).is(':checked')) { // 选中
                 var add_tittle = '<div  class="row" id="' + id_name + '">' +
                         '<div class="form-group col-sm-2">' +
                         '<label for="subject" class="right">' + text_name + ' 标题：</label>' +
                         '</div>' +
                         '<div class="form-group col-sm-8">' +
-                        '<textarea  datatype="*" nullmsg="标题不能为空"  name="account_tittle[' + value + '][tittle]"  class="form-control" placeholder="名称">' +
+                        '<textarea  datatype="*" nullmsg="标题不能为空"  name="account_tittle[' + value + '][tittle]"  class="form-control" placeholder="名称" >' + tittle_text +
                         '</textarea>' +
                         '</div>' +
                         '</div>';
@@ -572,7 +653,7 @@
                         '<label for="subject" class="right">' + text_name + ' Tags：</label>' +
                         '</div>' +
                         '<div class="form-group col-sm-8">' +
-                        '<textarea  datatype="*" nullmsg="Tags不能为空" name="account_tags[' + value + '][tags]"  class="form-control" placeholder="Tags不超过10个">' +
+                        '<textarea  datatype="*" nullmsg="Tags不能为空" name="account_tags[' + value + '][tags]"  class="form-control" placeholder="Tags不超过10个">' + tags_text +
                         '</textarea>' +
                         '</div>' +
                         '</div>';
@@ -583,14 +664,11 @@
                         '<label for="subject" class="right">' + text_name + '运费(shipping)：</label>' +
                         '</div>' +
                         '<div class="form-group col-sm-8">' +
-                        '<input type="text"  datatype="*" nullmsg="运费不能为空" class="form-control" name="account_shpping[' + value + '][shipping]"  placeholder="运费价格" >' +
+                        '<input type="text"  datatype="*" nullmsg="运费不能为空" class="form-control" name="account_shpping[' + value + '][shipping]"  placeholder="运费价格"  value=' + shipping_text + '>' +
                         '</div>' +
                         '</div>';
                 $('#account_shipping').append(add_shipping_html);
-
-
                 var account_info_html = '';
-
                 var single_account_value = 'single_account_value_' + value;
                 var info = '<div class="row ' + single_account_value + '">' +
                         '<div class="form-group col-sm-2 text-right">' +
@@ -603,8 +681,6 @@
                     $(this).append(info);
                 });
                 //account_info
-
-
             } else { //取消
                 $("#account_tittle_" + value).remove();
                 $("#account_tags_" + value).remove();
@@ -639,6 +715,33 @@
 
             }
         });
+        $(".creatsku").click(function(){
+            var generate_sku_parent = $("#generate_sku_parent").val();
+            var generate_sku_color = $("#generate_sku_color").val();
+            var generate_sku_size = $("#generate_sku_size").val();
+            var sku_price = $("#sku_price").val();
+            var sku_num = $("#sku_num").val();
+            $.ajax({
+                url: "{{ route('wish.ajaxGenerateSku') }}",
+                data: {
+                    generate_sku_parent: generate_sku_parent,
+                    generate_sku_color:generate_sku_color,
+                    generate_sku_size:generate_sku_size
+                },
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    $("#withdraw").modal('toggle');
+                    $(".need-del").remove();
+                    $("#generate_sku_parent").empty();
+                    $("#generate_sku_color").empty();
+                    $("#generate_sku_size").empty();
+                    for(var i=0;i<result.data.length;i++){
+                        addItem(result.data[i].sku,'',sku_num,sku_price,result.data[i].color,result.data[i].size);
+                    }
+                    }
+                })
+        });
 
         $('.submit_btn').click(function () {
             var name = $(this).attr('name');
@@ -660,42 +763,48 @@
         });
 
         function add_sku_info() {
-            var str = prompt("请输入SKU");
-            if (str) {
-                $.ajax({
-                    url: "{{ route('wish.ajaxGetInfo') }}",
-                    data: {
-                        sku: str
-                    },
-                    dataType: 'json',
-                    type: 'get',
-                    success: function (result) {
-                        if (result.status) {
-                            $(".need-del").remove();
-                            $(".pic-detail").empty();
-                            for(var i=0;i<result.data.sku.length;i++){
-                                addItem(result.data.sku[i],result.data.pic[i])
-                            }
-                            for(var i=0;i<result.data.product_sku_pic.length;i++){
-                                var html = '<li>' +
-                                        '<div style="cursor: pointer;"><img width="100" height="100" style="border: 0px;" src="' + result.data.product_sku_pic[i] + '">' +
-                                        '<input type="hidden" value="' + result.data.product_sku_pic[i] + '" name="extra_images[]">' +
-                                        '<a class="pic_del" href="javascript: void(0);">删除</a>' +
-                                        '</div>' +
-                                        '</li>';
-                                $(".pic-detail").append(html);
-                            }
-
-
-                            content.setContent('欢迎使用umeditor')
-
-                        }
-                    }
-                })
+            var str = $("#erp_sku").val();
+            if (str == '') {
+                return false;
             }
+            var sku_price = $("#sku_price").val();
+            var sku_num = $("#sku_num").val();
+            $.ajax({
+                url: "{{ route('wish.ajaxGetInfo') }}",
+                data: {
+                    sku: str
+                },
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    if (result.status) {
+                        $(".need-del").remove();
+                        $(".pic-detail").empty();
+                        for (var i = 0; i < result.data.sku.length; i++) {
+                            if (typeof(result.data.pic[i]) == 'undefined') {
+                                addItem(result.data.sku[i], '', sku_price, sku_num, '', '')
+                            } else {
+                                addItem(result.data.sku[i], result.data.pic[i], sku_price, sku_num, '', '')
+                            }
+                        }
+                        for (var i = 0; i < result.data.product_sku_pic.length; i++) {
+                            var html = '<li>' +
+                                    '<div style="cursor: pointer;"><img width="100" height="100" style="border: 0px;" src="' + result.data.product_sku_pic[i] + '">' +
+                                    '<input type="hidden" value="' + result.data.product_sku_pic[i] + '" name="extra_images[]">' +
+                                    '<a class="pic_del" href="javascript: void(0);">删除</a>' +
+                                    '</div>' +
+                                    '</li>';
+                            $(".pic-detail").append(html);
+                        }
+                        content.setContent( result.data.description);
+
+                    }
+                }
+            })
+
         }
 
-        function addItem(sku,pic){
+        function addItem(sku,pic,num,pirce,color,size){
             var html = '<div class="need-del"><div class="row">' +
                     '<div class="form-group col-sm-2"></div>' +
                     '<div class="form-group col-sm-2">' +
@@ -717,16 +826,16 @@
                '</div>';
             }
             html =html+'<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  quantity"  placeholder="数量" name="arr[quantity][]" >' +
+                    '<input type="text" class="form-control  quantity"  placeholder="数量" name="arr[quantity][]" value="'+num+'" >' +
                     '</div>' +
                     '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  price"  placeholder="单价" name="arr[price][]" >' +
+                    '<input type="text" class="form-control  price"  placeholder="单价" name="arr[price][]" value="'+pirce+'" >' +
                     '</div>' +
                     '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  color"  placeholder="颜色" name="arr[color][]" >' +
+                    '<input type="text" class="form-control  color"  placeholder="颜色" name="arr[color][]" value="'+color+'" >' +
                     '</div>' +
                     '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control  size"  placeholder="尺码" name="arr[size][]" >' +
+                    '<input type="text" class="form-control  size"  placeholder="尺码" name="arr[size][]"  value="'+size+'">' +
                     '</div>' +
                     '<button type="button" class="btn btn-danger bt_right" title="删除该SKU"><i class="glyphicon glyphicon-trash"></i></button>' +
                     '<button type="button" class="btn " onclick="up_row(this)"  title="上移"><i class="glyphicon glyphicon-arrow-up"></i></button>' +
@@ -860,6 +969,11 @@
 
                 })
             }
+        }
+
+        function changeMsrp(e){
+            var value = $(e).val();
+            $("#itemDiv").children().last().children().find("input[name='arr[price][]']").val(value);
         }
     </script>
 @stop

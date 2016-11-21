@@ -128,6 +128,20 @@ class LogisticsController extends Controller
         return 1;
     }
 
+    //启用停用
+    public function updateEnable()
+    {
+        $logistics_id = request()->input('logistics_id');
+        $model = $this->model->find($logistics_id);
+        if ($model->is_enable == '1') {
+            $model->update(['is_enable' => '0']);
+        } else {
+            $model->update(['is_enable' => '1']);
+        }
+
+        return 1;
+    }
+
     /**
      * 存储
      *

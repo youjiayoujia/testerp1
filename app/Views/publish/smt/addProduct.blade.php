@@ -717,7 +717,7 @@ text-align: left;
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="productStock" name="productStock"
                                datatype="numrange" min="1" max="999999" nullmsg="库存值为1-999999之间" errormsg="库存错误"
-                               value="<?php $first_sku = array_shift($draft_skus); echo $draft_skus && $smtApi->filterData('ipmSkuStock', $first_sku) ? $first_sku['ipmSkuStock'] : 0; ?>"/>
+                               value="<?php $first_sku = array_shift($draft_skus); echo $smtApi->filterData('ipmSkuStock', $first_sku) ? $first_sku['ipmSkuStock'] : 0; ?>"/>
                     </div>
                     </div>
                 </div>
@@ -728,7 +728,7 @@ text-align: left;
                     <div class="col-sm-3">	
                         <?php
                         $skuCode = ''; //SKU代码信息              
-                        if (!empty($draft_skus) && !empty($first_sku['smtSkuCode'])){
+                        if (!empty($first_sku['smtSkuCode'])){                            
                             $skuCode = $smtApi->rebuildSmtSku($first_sku['smtSkuCode']);
                         }
                         ?>	
@@ -1192,7 +1192,7 @@ $template['name'].'</option>';
                                 var input_txt = parseSkuList(data.data, selected);
 
                                 target_td.find('.sku_select, .sku_reinput').remove();
-                                input_txt += '<a class="btn btn-primary btn-xs sku_reinput" title="手动输入"><i class="btn-cx"></i></a>';
+                                input_txt += '<a class="btn btn-primary btn-xs sku_reinput" title="手动输入"><i class="glyphicon glyphicon-pencil"></i></a>';
                                 target_input.after(input_txt);
 
                                 target_input.attr('type', 'hidden');

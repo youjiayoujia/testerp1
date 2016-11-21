@@ -38,6 +38,7 @@ class LogisticsModel extends BaseModel
         'logistics_code',
         'priority',
         'is_express',
+        'is_confirm',
     ];
 
     public $rules = [

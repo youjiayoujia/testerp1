@@ -65,7 +65,7 @@ class PurchaseOrderModel extends BaseModel
         return [
             'relatedSearchFields' => ['supplier' => ['name'], 'purchaseUser' => ['name']],
             'filterFields' => [],
-            'filterSelects' => ['warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+            'filterSelects' => ['warehouse' =>$this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
                                 'status' => config('purchase.purchaseOrder.status'),
                                 'examineStatus' => config('purchase.purchaseOrder.examineStatus'),
                                 'write_off' => config('purchase.purchaseOrder.write_off'),
@@ -75,6 +75,7 @@ class PurchaseOrderModel extends BaseModel
                                 ],
             'selectRelatedSearchs' => [],
             'sectionSelect' => ['time' => ['created_at']],
+            'doubleRelatedSearchFields' => ['purchaseItem' => ['productItem' => ['sku']]],
         ];
     }
 

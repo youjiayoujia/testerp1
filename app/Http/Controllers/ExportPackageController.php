@@ -182,7 +182,7 @@ class ExportPackageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'fields' => $this->model->all(),
             'channels' => ChannelModel::all(),
-            'warehouses' => WarehouseModel::all(),
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
             'statuses' => config('package'),
             'logisticses' => LogisticsModel::all(),
         ];
@@ -242,7 +242,6 @@ class ExportPackageController extends Controller
             } else {
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', '条件给的有问题信息有误'));
             }
-            
         } else {
             $file = request()->file('accordingTracking');
             $arr = $this->model->processGoods($file);
@@ -252,9 +251,12 @@ class ExportPackageController extends Controller
             foreach($arr as $key => $tracking_no) {
                 $model = PackageModel::where('tracking_no', $tracking_no)->first();
                 if(!$model) {
-                    $errors[$key]['id'] = $tracking_no;
-                    $errors[$key]['remark'] = '对应包裹不存在';
-                    continue;
+                    $model = PackageModel::where('logistics_order_number', $tracking_no)->first();
+                    if(!$model) {
+                       $errors[$key]['id'] = $tracking_no;
+                        $errors[$key]['remark'] = '对应包裹不存在';
+                        continue; 
+                    }
                 }
                 $rows[$key] = [
                     '包裹Id' => $model->id,

@@ -4,6 +4,7 @@ namespace App\Models\Publish\Smt;
 
 use App\Base\BaseModel;
 use App\Models\ChannelModel;
+use App\Models\Channel\AccountModel;
 
 class smtProductList extends BaseModel
 {
@@ -83,4 +84,17 @@ class smtProductList extends BaseModel
         }
         return $arr;
     }
+    
+    public function getAccountInfoAttribute()
+    {
+        $channel =  ChannelModel::where('driver','aliexpress')->first();
+        $arr = [];
+        $inner_models = AccountModel::where('channel_id',$channel->id)->get();
+        foreach ($inner_models as $single) {
+            $arr[$single->account] = $single->id;
+        }
+        return $arr;
+    }
+    
+    
 }

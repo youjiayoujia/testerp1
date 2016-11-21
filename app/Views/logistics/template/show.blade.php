@@ -15,6 +15,9 @@
             <div class="col-lg-3">
                 <strong>尺寸</strong>: {{ $model->size }}
             </div>
+            <div class="col-lg-3">
+                <strong>是否确认</strong>: {{ $model->is_confirm == '1' ? '是' : '否' }}
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

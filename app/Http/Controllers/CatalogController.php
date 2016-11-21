@@ -330,4 +330,29 @@ class CatalogController extends Controller
         return $result;
 
     }
+
+    /**
+     * ajax获取产品分类
+     * @param $AttributeAry
+     * @param $type
+     * return bool
+     */
+    public function ajaxCatalog(){
+        if(request()->ajax()) {
+            $catalog = trim(request()->input('catalog'));
+            $buf = CatalogModel::where('c_name', 'like', '%'.$catalog.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->c_name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }   
 }

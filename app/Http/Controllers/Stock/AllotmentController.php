@@ -238,7 +238,7 @@ class AllotmentController extends Controller
         $name = UserModel::find(request()->user()->id)->name;   
         if($arr['result'] == 0) {
             $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]);
-            $to = base64_encode(serialize($model));
+            $to = json_encode($model);
             $this->eventLog($name, '审核未通过', $to, $to);
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核已拒绝...'));
         }

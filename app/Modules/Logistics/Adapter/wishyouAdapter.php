@@ -99,10 +99,10 @@ Class WishyouAdapter extends BasicAdapter
 
 	private $channel_info = array('370'=>'wish邮,yw,sh,0','469'=>'wish邮,yw,yw,0','481'=>'wish邮,sz,sz,0','487'=>'wish邮,sz,sz,11-0','512'=>'wish邮,sz,gz,0','549'=>'wish邮,yw,nj,0');
 	private $tokenArr = array(
-		1 => '2c65dc39df8a49e0aaaac552076f138f',
-		2 => 'ea474a4efc1645bead26b16bc7c98535',
-		3 => '2c65dc39df8a49e0aaaac552076f138f',
-		4 => 'ea474a4efc1645bead26b16bc7c98535'
+		1 => '3bc42b75cc634613816582fef3268063',
+		2 => '46ade8fea61d449897f07e9dc50bfb35',
+		3 => '3bc42b75cc634613816582fef3268063',
+		4 => '46ade8fea61d449897f07e9dc50bfb35'
 	);
 
 	public function __construct($config)

@@ -29,9 +29,18 @@
             </select>
         </div>
         <div class="form-group col-md-3">
+            <label for="color">采购链接</label>
+            <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="size">采购价（RMB）</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="purchase_price" placeholder="采购价" name='purchase_price' value="{{ old('purchase_price') ?  old('purchase_price') : $model->purchase_price }}">
+        </div>
+        <!-- <div class="form-group col-md-3">
             <label for="color">主供应商sku</label>
             <input class="form-control" id="supplier_sku" placeholder="主供应商sku" name='supplier_sku' value="{{ old('supplier_sku') ?  old('supplier_sku') : $model->supplier_sku }}">
-        </div>
+        </div> -->
         <!-- <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select id="second_supplier_id" class="form-control supplier" name="second_supplier_id">
                <option value="{{$model->secondSupplier?$model->secondSupplier->id:0}}">{{$model->secondSupplier?$model->secondSupplier->name:''}}</option>
@@ -43,15 +52,7 @@
         </div> -->
     </div>
     <div class="row">
-        <div class="form-group col-md-4">
-            <label for="color">采购链接</label>
-            <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
-        </div>
-        <div class="form-group col-md-2">
-            <label for="size">采购价（RMB）</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="purchase_price" placeholder="采购价" name='purchase_price' value="{{ old('purchase_price') ?  old('purchase_price') : $model->purchase_price }}">
-        </div>
+        
         <div class="form-group col-md-2">
             <label for="color">采购物流费（RMB）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -62,6 +63,24 @@
 
     <div class="row">
         <div class="form-group col-md-3">
+            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select  class="form-control warehouse_id" name="warehouse_id" >
+                <option value="0"></option>
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" {{ $model->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">库位</label>
+            <select id="warehouse_position" class="form-control" name="warehouse_position">
+                <option value="{{$model->warehousePosition?$model->warehousePosition->id:0}}">{{$model->warehousePosition?$model->warehousePosition->name:''}}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- <div class="form-group col-md-3">
             <label for="size">尺寸类型</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select id="product_size" class="form-control" name="product_size">     
@@ -69,19 +88,24 @@
                 <option value="中" {{ $model->product_size == '中' ? 'selected' : '' }}>中</option>
                 <option value="小" {{ $model->product_size == '小' ? 'selected' : '' }}>小</option>
             </select>
-        </div>
-        <div class="form-group col-md-3">
+        </div> -->
+        <!-- <div class="form-group col-md-3">
             <label for="color">item包装尺寸（cm）(长*宽*高)</label>
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $model->package_size }}">
-        </div>
+        </div> -->
         <div class="form-group col-md-3">
-            <label for="size">item重量（kg）</label>
+            <label for="size">包装前重量（kg）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
-        </div>        
+            <input class="form-control" id="weight" placeholder="包装前重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
+        </div>   
+        <div class="form-group col-md-3">
+            <label for="size">包装后重量（kg）</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="package_weight" placeholder="包装后重量" name='package_weight' value="{{ old('package_weight') ?  old('package_weight') : $model->package_weight }}">
+        </div>      
     </div>
 
-    <!-- <div class="row">
+    <div class="row">
         <div class="form-group col-md-3">
             <label for="length">长</label>
             <input class="form-control" id="length" placeholder="length" name='length' value="{{ old('length') ?  old('length') : $model->length }}">
@@ -94,7 +118,7 @@
             <label for="height">高</label>
             <input class="form-control" id="height" placeholder="height" name='height' value="{{ old('height') ?  old('height') : $model->height }}">
         </div>
-    </div> -->
+    </div>
 
     <div class="row">
         <div class="form-group col-md-3">
@@ -145,21 +169,7 @@
                 <br>
             @endforeach
         </div>
-        <div class="form-group col-md-3">
-            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select  class="form-control warehouse_id" name="warehouse_id" >
-                <option value="0"></option>
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" {{ $model->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-md-3">
-            <label for="color">库位</label>
-            <select id="warehouse_position" class="form-control" name="warehouse_position">
-                <option value="{{$model->warehousePosition?$model->warehousePosition->id:0}}">{{$model->warehousePosition?$model->warehousePosition->name:''}}</option>
-            </select>
-        </div>
+        
         <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">

@@ -210,7 +210,7 @@ Class WishyouAdapter extends BasicAdapter
 		 $xmlStr = '<?xml version="1.0" encoding="UTF-8"?>';
 		 $xmlStr .='
 		 			<orders>
-		 			  <api_key>'.$this->API_key.'</api_key>
+		 			   <access_token>'.$this->API_key.'</access_token>
 		 			  <mark></mark>
 		 			  <bid>'.rand(0,99999).'</bid>
 		 		   ';

@@ -12,7 +12,7 @@
 		'actual_weight' => '实际重量', 
 		'tracking_no' => '追踪号', 
 		'tracking_link' => '追踪链接', 
-		'is_remark' => '是否备注', 
+		'is_mark' => '是否备注', 
 		'is_upload' => '是否上传', 
 		'email' => 'email', 
 		'shipping_name' => '发货人姓名', 
@@ -25,5 +25,5 @@
 		'remark' => '备注', 
 		'printed_at' => '打印时间', 
 		'delieved_at' => '妥投时间', 
-		'status' => '状态'
+		'status' => '状态',
 	];

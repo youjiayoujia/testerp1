@@ -26,8 +26,8 @@ class CreatePackagesTable extends Migration
 			$table->enum('type', array('SINGLE','SINGLEMULTI','MULTI'))->default('SINGLE');
 			$table->decimal('cost', 10);
 			$table->decimal('cost1', 10);
-			$table->decimal('weight', 10);
-			$table->decimal('actual_weight', 10);
+			$table->decimal('weight', 10,3);
+			$table->decimal('actual_weight', 10,3);
 			$table->decimal('length', 10);
 			$table->decimal('width', 10);
 			$table->decimal('height', 10);

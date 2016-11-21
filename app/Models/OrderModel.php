@@ -253,7 +253,6 @@ class OrderModel extends BaseModel
                 'email',
                 'by_id',
                 'shipping_firstname',
-                'shipping_lastname',
                 'currency',
                 'profit_rate'
             ],

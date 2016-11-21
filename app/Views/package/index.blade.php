@@ -10,10 +10,11 @@
     <th>状态</th>
     <th>类型</th>
     <th>重量(kg)</th>
+    <th>运费</th>
     <th>物流方式</th>
     <th>物流单号</th>
     <th>发货类型</th>
-    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -38,10 +39,11 @@
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
+            <td class='logisticsFee'></td>
             <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
-            <td>{{ $package->created_at }}</td>
+            <td>{{ $package->updated_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
@@ -73,14 +75,15 @@
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
-                <td colspan='3'>{{ $packageItem->quantity }}</td>
+                <td colspan='4'>{{ $packageItem->quantity }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='2'>运输方式: {{ $package->order->shipping }}</td>
-            <td colspan='5'>
+            <td colspan='2'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
+            <td colspan='6'>
+
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
@@ -107,6 +110,11 @@
                         data-target="#split" data-id="{{ $package->id }}" title='拆分包裹'>
                     <span class="glyphicon glyphicon-tasks"></span>
                 </button>
+                @if($package->logistics_id != 0)
+                    <a href="{{ route('preview', ['id'=>$package->id]) }}" target="_blank" class="btn btn-info btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> 面单预览
+                    </a>
+                @endif
             </td>
         </tr>
     @endforeach
@@ -208,11 +216,11 @@
             出库复检
         </a>
     </div>
-    <div class="btn-group">
-        <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}">
-            发货统计
-        </a>
-    </div>
+    <!-- <div class="btn-group"> -->
+        <!-- <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}"> -->
+            <!-- 发货统计 -->
+        <!-- </a> -->
+    <!-- </div> -->
 @stop
 @section('childJs')
     <script type='text/javascript'>
@@ -247,7 +255,6 @@
         });
 
         $(document).ready(function () {
-
             arr = new Array();
             i = 0;
             $.each($('.packageId'), function () {
@@ -261,8 +268,8 @@
                         j = 0;
                         $.each($('.packageId'), function () {
                             block = $(this).parent();
-                            logisticsReal = block.children('.logisticsReal');
-                            logisticsReal.html(logisticsReal.text() + "   <font color='gray'>" + result[j] + "</font>");
+                            block.children('.logisticsReal').html(block.children('.logisticsReal').text() + "   <font color='gray'>" + result[j][0] + "</font>");
+                            block.children('.logisticsFee').text(result[j][1]);
                             j++;
                         })
                     }

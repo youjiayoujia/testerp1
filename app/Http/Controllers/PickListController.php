@@ -150,7 +150,11 @@ class PickListController extends Controller
             $from = json_encode($model);
             $name = UserModel::find(request()->user()->id)->name;
             if (!$model) {
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+                continue;
+            }
+            foreach($model->package as $package) {
+                $to = json_encode($package);
+                $package->eventLog($name, '包裹打印', $to);
             }
             $model->printRecords()->create(['user_id' => request()->user()->id]);
             if($model->status == 'NONE') {
@@ -457,7 +461,7 @@ class PickListController extends Controller
             $package->status = 'PICKED';
             $package->save();
         }
-        $this->eventLog($name, '分拣完成,id='.$obj->id, $from, $from);
+        $this->eventLog($name, '分拣完成,id='.$obj->id, $from);
 
         return redirect(route('package.flow'));
     }
@@ -531,6 +535,7 @@ class PickListController extends Controller
             return json_encode(false);
         }
         if($package) {
+            $package->eventLog(UserModel::find(request()->user()->id)->name, '已包装', json_encode($package));
             $item = $package->items->first();
             $item->update(['picked_quantity' => $item->quantity]);
             $order = $package->order;
@@ -538,7 +543,7 @@ class PickListController extends Controller
             $package->save();
             $picklistItems = $package->picklistItems;
             foreach($picklistItems as $picklistItem) {
-                $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
+                $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;
                 $picklistItem->save();
             }
             $buf = 1;

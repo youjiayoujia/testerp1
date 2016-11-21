@@ -345,6 +345,16 @@ class ItemModel extends BaseModel
         ];
     }
 
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
+    }
+
     //获得sku销量 period参数格式为 -7 day
     public function getsales($period)
     {
@@ -1072,7 +1082,7 @@ class ItemModel extends BaseModel
                 $old_data['declared_cn'] = $data->products_declared_cn;
                 $old_data['declared_value'] = $data->products_declared_value;
                 $old_data['purchase_price'] = $data->products_value;
-                $old_data['weight'] = 0.6;
+                $old_data['weight'] = $data->products_weight;
                 $old_data['package_weight'] = $data->weightWithPacket;
                 $old_data['supplier_id'] = $data->products_suppliers_id;
                 $old_data['quality_standard'] = $data->products_check_standard;

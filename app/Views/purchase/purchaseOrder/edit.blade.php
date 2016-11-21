@@ -129,9 +129,9 @@
             <td>状态</td>
             <td>已入库数量</td>
             <td>采购价格</td>
-            <td>采购价格审核</td>
+            <!-- <td>采购价格审核</td> -->
             <td>购买链接</td> 
-            <td>操作</td>
+            <!-- <td>操作</td> -->
             <td>删除</td>         
         </tr>
     </thead>
@@ -179,7 +179,7 @@
                         <input type="hidden" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
                     @endif
                     </td>
-                <td>
+                <!-- <td>
                 @if($purchaseItem->costExamineStatus ==2)
                     价格审核通过
                 @elseif($purchaseItem->costExamineStatus ==1)
@@ -191,12 +191,12 @@
                     
                   @endif
                 @endif
-                </td>    
+                </td>    --> 
 
                  <td>
-                    <a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
+                    <a target='_blank' href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
                 </td>  
-                <td>
+                <!-- <td>
                 @if($purchaseItem->active ==1 )
                     @if($purchaseItem->active_status ==1 )
                     报缺
@@ -224,7 +224,7 @@
                  @endforeach
                 </select>
                  @endif
-                </td>
+                </td> -->
                 <td>
                     <a href="javascript:" class="btn btn-danger btn-xs p_item_delete"
                    data-id="{{ $purchaseItem->id }}"

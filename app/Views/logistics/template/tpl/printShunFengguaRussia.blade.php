@@ -68,7 +68,7 @@
             <br/>{{$model->logistics_order_number}}
         </p>
         <p style="width:130px;height:100%;line-height:68px;float:right;text-align:center;font-weight:bold;font-size:14px;">
-            {{$model->tracking_no}}
+            {{$model->express_code}}
         </p>
     </div>
 </div>
@@ -142,8 +142,7 @@
                     </tr>
                     <tr style="line-height: 12px; height: 39px;">
                         <td colspan="4" class="border_r_b_l" valign="top" width="60%">
-                            namefiles
-
+                            {{ $model->getDeclaredInfo()['declared_en'] }} X {{ $model->items->first()->quantity }}
                         </td>
                         <td class="border_r_b" valign="top">
                             {{ $model->total_weight }}
@@ -166,10 +165,10 @@
                     <tr style="line-height: 14px;">
                         <td colspan="4" class="border_r_b_l">CN</td>
                         <td class="border_r_b">
-                            {{ $model->signal_weight }}
+                            {{ $model->total_weight }}
                         </td>
                         <td class="border_r_b">
-                            {{ $model->signal_price }}
+                            {{ $model->total_price }}
                         </td>
                     </tr>
                     <tr style="line-height: 12px;height:60px;">
@@ -187,8 +186,8 @@
     <hr style="height:5px;border:none;border-top:5px solid #000;margin-top:5px;" />
     <div style="width:100%;height:55px;">
         <p style="width:190px;height:55px;float:left;text-align:center;font-weight:bold;">
-            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
-            <br/>{{$model->tracking_no}}
+            <img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}">
+            <br/>{{$model->logistics_order_number}}
         </p>
         <p style="width:40px;height:55px;float:left;font-weight:bold;line-height:60px;font-size:20px;text-align:center;">
             {{ $model->country ? $model->country->code : '' }}
@@ -198,7 +197,7 @@
         </p>
         <p style="width:96px;height:55px;float:left;border:2px solid #000;font-size:20px;text-align:center;">
             Electric<br/>
-            {{ $model->battery ? '含电池' : '否' }}
+            {{ $model->battery ? 'Y' : 'N' }}
         </p>
     </div>
 </div>

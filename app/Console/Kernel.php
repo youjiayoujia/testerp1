@@ -23,6 +23,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\TransferChannelAccount::class,
         \App\Console\Commands\TransferSupplier::class,
         \App\Console\Commands\TransferStock::class,
+        \App\Console\Commands\UpdatedWeight::class,
         \App\Console\Commands\ImportPosition::class,
         \App\Console\Commands\ImportStock::class,
         \App\Console\Commands\TransferLogistics::class,
@@ -102,9 +103,9 @@ class Kernel extends ConsoleKernel
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
                     break;
                 case 'wish':
-                    foreach ($channel->accounts->where('is_available','1') as $account) {
+                    /*foreach ($channel->accounts->where('is_available','1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
+                    }*/
                     break;
                 case 'ebay':
                     foreach ($channel->accounts as $account) {

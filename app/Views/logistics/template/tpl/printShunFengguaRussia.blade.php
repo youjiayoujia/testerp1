@@ -55,7 +55,6 @@
     </div>
     <div style="width:100%;height:55px;">
         <p style="width:240px;height:100%;float:center;font-weight:bold;text-align:center;">
-            <br/>
             <b style="font-size:20px;">R</b>&nbsp;
             <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             <br/>{{$model->tracking_no}}

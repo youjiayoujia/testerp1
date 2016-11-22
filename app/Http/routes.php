@@ -626,6 +626,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('withdrawAll', ['uses' => 'OrderController@withdrawAll', 'as' => 'withdrawAll']);
+    Route::any('partReview', ['uses' => 'OrderController@partReview', 'as' => 'partReview']);
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
     Route::get('updateStatus', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
     Route::get('updatePrepared', ['uses' => 'OrderController@updatePrepared', 'as' => 'updatePrepared']);

@@ -943,13 +943,13 @@ class PackageController extends Controller
         $packageIds = [];
         while ($packages->count()) {
             foreach ($packages as $package) {
-                $orderRate = $package->order->calculateProfitProcess();
-                if ($orderRate > 0) {
+                // $orderRate = $package->order->calculateProfitProcess();
+                // if ($orderRate > 0) {
                     $job = new PlaceLogistics($package);
                     $job = $job->onQueue('placeLogistics');
                     $this->dispatch($job);
                     $packageIds[] = $package->id;
-                }
+                // }
             }
             $start += $len;
             unset($packages);

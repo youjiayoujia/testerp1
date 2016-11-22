@@ -11,11 +11,16 @@
     <th class="sort" data-field="id">ID</th>
     <th>主图</th>
     <th>账号</th>
+{{--
     <th>产品ID</th>
+--}}
     <th>SKU</th>
     <th>标题</th>
+    <th>Tags</th>
+{{--
     <th class="sort" data-field="number_sold">售出量</th>
-    <th>刊登人员</th>
+--}}
+    <th>创建人员</th>
     <th>刊登时间</th>
     <th>操作</th>
 @stop
@@ -41,14 +46,19 @@
                 {{  $wishProduct->channelAccount->account }}
                 @endif
             </td>
+{{--
             <td>{{  $wishProduct->productID }}</td>
+--}}
             <td><?php
                 foreach ($wishProduct->details as $detail) {
                     echo $detail->sku . '<br/>';
                 }
                 ?></td>
             <td>{{  $wishProduct->product_name }}</td>
+            <td>{{$wishProduct->tags}}</td>
+{{--
             <td >{{  $wishProduct->number_sold }}</td>
+--}}
             <td>
                 @if(isset( $wishProduct->operator->name))
                     {{ $wishProduct->operator->name }}

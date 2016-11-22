@@ -68,9 +68,11 @@ class RequireModel extends BaseModel
             $purchaseItems = PurchaseItemModel::where("sku",$item['sku'])->whereIn("status",['1', '2','3'])->get();
             $zaitu_num = 0;
             foreach ($item->purchase as $purchaseItem) {
-                if($purchaseItem->status>0||$purchaseItem->status<4){
+                if($purchaseItem->status>0&&$purchaseItem->status<4){
                     if(!$purchaseItem->purchaseOrder->write_off){
-                        $zaitu_num += $purchaseItem->purchase_num-$purchaseItem->storage_qty-$purchaseItem->unqualified_qty;
+                        if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                            $zaitu_num += $purchaseItem->purchase_num-$purchaseItem->storage_qty-$purchaseItem->unqualified_qty;
+                        }
                     }
                 }
             }

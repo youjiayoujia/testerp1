@@ -65,9 +65,7 @@ class WinitAdapter extends BasicAdapter
     }
     
     public function getTracking($package)
-    {
-        //$this->config = $package->logistics->api_config;
-        
+    {              
         $creatOrder = array();
         $creatOrder['buyerAddress1'] = $package->shipping_address;
         $creatOrder['buyerAddress2'] = $package->shipping_address1;
@@ -125,11 +123,11 @@ class WinitAdapter extends BasicAdapter
         $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
         if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))
         {   
-            $data = ['tracking_no' => $result['data']['orderNo'] ];
-            PackageModel::where('id',$package->id)->update($data);           
-        
+            //$data = ['tracking_no' => $result['data']['orderNo'] ];
+            //PackageModel::where('id',$package->id)->update($data);            
+            return array('code' => 'success', 'result' => $result['data']['orderNo'] );        
         }else{        
-          
+            return array('code' => 'error', 'result' => 'error description.');
         }
     }
     

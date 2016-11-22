@@ -39,21 +39,21 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
         $this->package->assignLogistics();
         if ($this->package->status == 'ASSIGNED') {
             //计算订单利润率
-            $orderRate = $this->package->order->calculateProfitProcess();
-            if ($orderRate > 0 && $orderRate < 0.4) {
-                $job = new PlaceLogistics($this->package);
-                $job = $job->onQueue('placeLogistics');
-                $this->dispatch($job);
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success.';
-                $this->package->eventLog('队列', '已匹配物流，加入下单队列',json_encode($this->package));
-            } else {
-                $order = $this->package->order;
-                $order->OrderCancle();
-                $this->result['status'] = 'fail';
-                $this->result['remark'] = "Order's profit isn't more than 0.";
-            }
-            $this->package->order->update(['profit_rate' => $orderRate]);
+            //$orderRate = $this->package->order->calculateProfitProcess();
+            //if ($orderRate > 0 && $orderRate < 0.4) {
+            $job = new PlaceLogistics($this->package);
+            $job = $job->onQueue('placeLogistics');
+            $this->dispatch($job);
+            $this->result['status'] = 'success';
+            $this->result['remark'] = 'Success.';
+            $this->package->eventLog('队列', '已匹配物流，加入下单队列',json_encode($this->package));
+            // } else {
+            //     $order = $this->package->order;
+            //     $order->OrderCancle();
+            //     $this->result['status'] = 'fail';
+            //     $this->result['remark'] = "Order's profit isn't more than 0.";
+            // }
+            //$this->package->order->update(['profit_rate' => $orderRate]);
         } else {
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'Fail to assign logistics.';

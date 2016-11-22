@@ -228,14 +228,16 @@ Class WishyouAdapter extends BasicAdapter
 		      $buyer_phone=$orderInfo->shipping_phone;
 		    }
 		    foreach($orderInfo->items as $k=>$v){
-				$wishIDArr = explode('+',$v->orderItem->channel_order_id);
+				$order_item = $v->orderItem;
+				$wishIDArr = explode('+',$order_item->channel_order_id);
 				$wishID = $wishIDArr[0];              //wish_id
-				continue;
+			}
+			if(!$wishID){
+				$wishID = $orderInfo->id;
 			}
 
 		    $buyer_state = $orderInfo->shipping_city ? $orderInfo->shipping_city : ',';//上传的省，默认是用城市名代替
 		    
-			$wishID = $orderInfo->transaction_number;   //交易编号
 		    //上传的省为空用逗号代替
 		    $buyer_state = $orderInfo->shipping_state ? $orderInfo->shipping_state :',';
 		     foreach($orderInfo->items  as $key => $item){

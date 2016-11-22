@@ -1036,7 +1036,7 @@ class PackageModel extends BaseModel
             $all = $packageItem->item->product->logisticsLimit;
             foreach ($all as $key => $packageLimit) {
                 if ($packageLimit) {
-                    $packageLimits = $packageLimits->merge(explode(",", $packageLimit->logistics_limits_id));
+                    $packageLimits = $packageLimits->merge(explode(",", $packageLimit->pivot->logistics_limits_id));
                 }
             }
         }

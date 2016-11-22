@@ -75,7 +75,8 @@
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
-                <td colspan='4'>{{ $packageItem->quantity }}</td>
+                <td colspan='2'>{{ $packageItem->quantity }}</td>
+                <td colspan='2'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">

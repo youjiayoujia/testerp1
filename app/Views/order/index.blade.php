@@ -45,17 +45,14 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                @if($order->status == 'PACKED' || $order->status == 'SHIPPED' || $order->status == 'COMPLETE')
-                    <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
-                    <div>产品成本: {{ $order->all_item_cost }} RMB</div>
-                    <div>运费成本: {{ sprintf("%.3f", $order->packages->sum('cost')) }} RMB</div>
-                    <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
-                    <div>
-                        毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee()) }}
-                        USD
-                    </div>
-                @else
-                @endif
+                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
+                <div>产品成本: {{ $order->all_item_cost }} RMB</div>
+                <div>运费成本: {{ sprintf("%.3f", $order->packages->sum('cost')) }} RMB</div>
+                <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
+                <div>
+                    毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee()) }}
+                    USD
+                </div>
             </td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
@@ -127,15 +124,15 @@
                                 @endif
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
-                            @if($orderItem->item)
-                                <div class="col-lg-2">
-                                    <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
-                                </div>
-                            @else
-                                <div class="col-lg-2">
-                                    <img src="{{ asset('default.jpg') }}" width="50px">
-                                </div>
-                            @endif
+                            {{--@if($orderItem->item)--}}
+                                {{--<div class="col-lg-2">--}}
+                                    {{--<img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">--}}
+                                {{--</div>--}}
+                            {{--@else--}}
+                                {{--<div class="col-lg-2">--}}
+                                    {{--<img src="{{ asset('default.jpg') }}" width="50px">--}}
+                                {{--</div>--}}
+                            {{--@endif--}}
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>
@@ -837,11 +834,15 @@
         </ul>
     </div>
     <div class="btn-group">
+        <a class="btn btn-success partReview" href="javascript:">
+            批量审核
+        </a>
+    </div>
+    <div class="btn-group">
         <button class="btn btn-info"
                 data-toggle="modal"
                 data-target="#withdraw"
-                title="SMT批量撤单">
-            <span class="glyphicon glyphicon-link"></span> SMT批量撤单
+                title="批量撤单">批量撤单
         </button>
     </div>
     <div class="modal fade" id="withdraw" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -852,7 +853,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title text-left" id="myModalLabel">SMT批量撤单</h4>
+                    <h4 class="modal-title text-left" id="myModalLabel">批量撤单</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -1057,6 +1058,29 @@
             } else {
                 document.getElementById('price' + id).readOnly = false;
                 document.getElementById('refund_amount' + id).readOnly = false;
+            }
+        });
+
+        //批量审核
+        $('.partReview').click(function () {
+            if (confirm("确认审核")) {
+                var checkbox = document.getElementsByName("tribute_id");
+                var ids = "";
+
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)continue;
+                    ids += checkbox[i].value+",";
+                }
+                ids = ids.substr(0,(ids.length)-1);
+                $.ajax({
+                    url : "{{ route('partReview') }}",
+                    data : {ids:ids},
+                    dataType : 'json',
+                    type : 'get',
+                    success:function(result){
+                        window.location.reload();
+                    }
+                })
             }
         });
 

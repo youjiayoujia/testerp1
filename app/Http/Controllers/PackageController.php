@@ -215,7 +215,7 @@ class PackageController extends Controller
             if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            $model->update(['logistics_id' => $id]);
+            $model->update(['logistics_id' => $id, 'tracking_no' => '0']);
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
         }
@@ -682,7 +682,7 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['tracking_no' => request('tracking_no'), 'shipping_address' => request('shipping_address')]);
+        $model->update(request()->all());
         $to = json_encode($model);
         $this->eventLog($name, '修改追踪号', $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;

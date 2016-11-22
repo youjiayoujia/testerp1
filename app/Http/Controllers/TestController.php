@@ -83,11 +83,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $a = 1.03;
-        $b = '1.030';
-        var_dump($a);
-        var_dump($b);
-        var_dump($a == $b);
+        $package = PackageModel::find(1);
+        var_dump($package->realTimeLogistics());
     }
 
 //    public function test2()

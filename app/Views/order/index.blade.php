@@ -127,15 +127,15 @@
                                 @endif
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
-                            @if($orderItem->item)
-                                <div class="col-lg-2">
-                                    <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
-                                </div>
-                            @else
-                                <div class="col-lg-2">
-                                    <img src="{{ asset('default.jpg') }}" width="50px">
-                                </div>
-                            @endif
+                            {{--@if($orderItem->item)--}}
+                                {{--<div class="col-lg-2">--}}
+                                    {{--<img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">--}}
+                                {{--</div>--}}
+                            {{--@else--}}
+                                {{--<div class="col-lg-2">--}}
+                                    {{--<img src="{{ asset('default.jpg') }}" width="50px">--}}
+                                {{--</div>--}}
+                            {{--@endif--}}
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>

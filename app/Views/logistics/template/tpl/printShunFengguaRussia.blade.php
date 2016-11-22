@@ -72,9 +72,6 @@
         </p>
     </div>
 </div>
-<br>
-<br>
-
 <div id="main_frame_box" style="height:370px;">
 
     <table cellpadding="5" cellspacing="0" class="fixed">

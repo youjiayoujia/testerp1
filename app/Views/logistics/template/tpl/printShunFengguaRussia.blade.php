@@ -62,7 +62,6 @@
     </div><br>
     <div style="width:100%;height:50px;">
         <p style="width:240px;height:100%;float:left;font-weight:bold;text-align:center;">
-            <br/>
             <img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}">
             <br/>{{$model->logistics_order_number}}
         </p>

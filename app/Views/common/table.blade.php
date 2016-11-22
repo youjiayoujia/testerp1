@@ -188,6 +188,7 @@
                     'filters' => request()->input('filters'),
                     'filterClear' => request()->input('filterClear'),
                     'mixedSearchFields' => request()->input('mixedSearchFields'),
+                    'special' => request()->input('special'),
                     ])
                     ->render()
                     !!}

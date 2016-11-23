@@ -25,6 +25,9 @@
         <tr class="dark-{{ $order->status_color }}">
             <td>
                 <input type="checkbox" name="tribute_id" value="{{$order->id}}">
+                @if(($order->packages ? $order->packages->count() : 0) > 1)
+                    <span class='glyphicon glyphicon-adjust'></span>
+                @endif
             </td>
             <td>{{ $order->id }}</td>
             <td>{{ $order->ordernum }}</td>

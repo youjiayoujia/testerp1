@@ -713,7 +713,7 @@ class OrderModel extends BaseModel
         $orderAmount = $this->amount * $currency;
         $orderCosting = $this->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee();
-        $orderRate = ($this->amount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $this->amount;
+        $orderRate = ($orderAmount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $orderAmount;
 //        if ($this->status != 'CANCEL' && $orderRate <= 0) {
 //            //利润率为负撤销0
 //            $this->OrderCancle();

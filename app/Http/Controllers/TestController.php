@@ -636,20 +636,22 @@ class TestController extends Controller
         /*
          * 写入队列
          */
-        $replys = ReplyModel::where('status','FAIL')->get();
+       $replys = ReplyModel::where('status','FAIL')->get();
         foreach($replys as $reply){
-            $reply->status = 'NEW';
-            $reply->save();
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
         }
-        dd('已执行！ss');
+        dd('已执行！fight！！！');
 
         foreach (AccountModel::all() as $account) {
-            if ($account->account == 'darli04@126.com') { //测试diver
-                //dd($account);
+            if ($account->account == 'Coolcoola04@126.com') { //测试diver
+
+                $reply = ReplyModel::find(13);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $channel->sendMessages($reply);
+                exit;
                 $messageList = $channel->getMessages();
                 print_r($messageList);
                 exit;
@@ -792,6 +794,24 @@ class TestController extends Controller
                     return $ids_ary;
                 }
                 exit;*/
+    }
+
+    public function testReply($id){
+
+
+        foreach (AccountModel::all() as $account) {
+            if ($account->account == 'Coolcoola04@126.com') { //测试diver
+                $reply = ReplyModel::find($id);
+
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $channel->sendMessages($reply);
+                exit;
+
+            }
+        }
+
+        dd($reply);
     }
     /**
      * Curl Post JSON 数据

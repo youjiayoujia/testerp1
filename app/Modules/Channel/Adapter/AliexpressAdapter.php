@@ -251,6 +251,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['shipping_phone'] = $mobileNo != "" ? $mobileNo : $phoneNumber;
         $orderInfo['payment_date'] = $this->getPayTime($list['gmtPayTime']);
         $orderInfo['aliexpress_loginId'] = $orderDetail['buyerInfo']['loginId'];
+        $orderInfo['by_id'] = isset($orderDetail ["buyerSignerFullname"])?$orderDetail ["buyerSignerFullname"]:'';
 
 
 

@@ -330,6 +330,7 @@ class EbayAdapter implements AdapterInterface
         $reurnOrder['transaction_number'] = (string)$order->ExternalTransaction->ExternalTransactionID;
         $reurnOrder['payment_date'] = $paidTime;//支付时间
         $reurnOrder['aliexpress_loginId'] = (string)$order->BuyerUserID;
+        $reurnOrder['by_id'] = (string)$order->BuyerUserID;
         $reurnOrder['customer_remark'] = isset($order->BuyerCheckoutMessage) ? (string)$order->BuyerCheckoutMessage : '';
         if (isset($order->TransactionArray->Transaction[0])) {
             foreach ($order->TransactionArray->Transaction as $sku) {

@@ -1,4 +1,7 @@
 @extends('common.table')
+@section('tableToolButtons')
+    
+@stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th>待入库sku</th>
     <th>待入库数量</th>

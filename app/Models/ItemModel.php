@@ -666,7 +666,7 @@ class ItemModel extends BaseModel
     public function createPurchaseNeedData($item_id_array=null)
     {
         ini_set('memory_limit', '2048M');
-        $item_id_array=['39547'];
+        //$item_id_array=['39547'];
         if(!$item_id_array){
             $items = $this->all();
         }else{

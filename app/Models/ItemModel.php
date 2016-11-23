@@ -214,7 +214,7 @@ class ItemModel extends BaseModel
         foreach ($this->purchase as $purchaseItem) {
             if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
-                    if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
                         $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }  
                 }
@@ -231,7 +231,7 @@ class ItemModel extends BaseModel
         foreach ($this->purchase as $purchaseItem) {
             if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
-                    if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
                         $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }
                 }
@@ -666,14 +666,12 @@ class ItemModel extends BaseModel
     public function createPurchaseNeedData($item_id_array=null)
     {
         ini_set('memory_limit', '2048M');
+        //$item_id_array=['39547'];
         if(!$item_id_array){
             $items = $this->all();
         }else{
             $items = $this->find($item_id_array);
         }
-        
-        //$crr = array('21372','21373','29644','30974','32076','42437','47534','54980','57370','57616','59186');
-        //$items = $this->find($crr);
         
         $requireModel = new RequireModel();
         foreach ($items as $item) {
@@ -682,16 +680,17 @@ class ItemModel extends BaseModel
             $data['c_name'] = $item->c_name;
             $zaitu_num = 0;
             foreach ($item->purchase as $purchaseItem) {
-                if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
+                if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
                     if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
-                            if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                            if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
                                 $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
                             } 
                         }
                     }
                 }
             }
+            
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
                 orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
@@ -821,6 +820,8 @@ class ItemModel extends BaseModel
             } else {
                 PurchasesModel::create($data);
             }
+            
+            return $data;
         }
     }
 

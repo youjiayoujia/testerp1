@@ -78,7 +78,7 @@
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>
                 <div>14天销量：{{$item->getsales('-14 day')}}</div>
                 <div>28天销量：{{$item->getsales('-28 day')}}</div>
-                <div>建议采购值：{{$item->getNeedPurchase()}}</div>
+                <div>建议采购值：{{$item->createPurchaseNeedData([$item->id])['need_purchase_num']}}</div>
                 <div>库存周数：{{$item->getsales('-7 day')==0?0:($item->available_quantity+$item->normal_transit_quantity)/$item->getsales('-7 day')}}</div>
             </td>
             <td>{{ config('item.status')[$item->status]}}</td>

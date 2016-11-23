@@ -48,23 +48,21 @@
                 @endif
                 @if($allotment->allotment_status == 'new' && $allotment->check_status == '0')
                     <a href="{{ route('allotment.check', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs" title='审核调拨单'>
-                        <span class="glyphicon glyphicon-pencil"></span>
+                        <span class="glyphicon glyphicon-comment"></span>
                         
                     </a>
                 @endif
                 @if($allotment->check_status == '2')
                     <a href="javascript:" class="btn btn-success btn-xs print" title='生成拣货单'>
-                        <span class="glyphicon glyphicon-pencil"></span>
+                        <span class="glyphicon glyphicon-print"></span>
                     </a>
                 @endif
                 @if($allotment->allotment_status == 'pick')
                     <a href="javascript:" class="btn btn-success btn-xs new" data-id="{{ $allotment->id }}" title='重置'>
-                        <span class="glyphicon glyphicon-pencil"></span>
-                        
+                        <span class="glyphicon glyphicon-retweet"></span> 
                     </a>
                     <a href="{{ route('allotment.checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}" title='确认出库'>
-                        <span class="glyphicon glyphicon-pencil"></span>
-                        
+                        <span class="glyphicon glyphicon-hand-right"></span>
                     </a>
                 @endif
                 @if($allotment->check_status == '2' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
@@ -125,18 +123,20 @@
             });
 
             $(document).on('click', '.new', function () {
-                id = $(this).data('id');
-                obj = $(this);
-                td = obj.parent();
-                $.ajax({
-                    url: "{{ route('allotment.new') }}",
-                    data: {id: id},
-                    dataType: 'json',
-                    type: 'get',
-                    success: function (result) {
-                        location.reload();
-                    }
-                });
+                if(confirm('确定重置?')) {
+                    id = $(this).data('id');
+                    obj = $(this);
+                    td = obj.parent();
+                    $.ajax({
+                        url: "{{ route('allotment.new') }}",
+                        data: {id: id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            location.reload();
+                        }
+                    });
+                }
             });
 
             $(document).on('click', '.print', function () {

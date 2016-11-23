@@ -14,7 +14,7 @@
     <th>物流限制</th>
     <th>物流编码</th>
     <th>平邮or快递</th>
-    <th class="sort" data-field="is_enable">是否启用</th>
+    <th>是否启用</th>
     <th class="sort" data-field="is_confirm">面单是否确认</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -22,7 +22,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $logistics)
-        <tr class="dark-{{ $logistics->enable_color }}">
+        <tr>
             <td>{{ $logistics->id }}</td>
             <td>{{ $logistics->priority != 0 ? $logistics->priority : '' }}</td>
             <td>{{ $logistics->code }}</td>

@@ -14,10 +14,6 @@
 <script type='text/javascript'>
 $(document).ready(function(){
     $('.download').click(function(){
-        if($('.type').data('type') == '4') {
-            location.href="{{ route('package.downloadLogisticsTno')}}";
-            return false;
-        }
         if($('.type').data('type') == '3') {
             location.href="{{ route('package.downloadTrackingNo')}}";
             return false;

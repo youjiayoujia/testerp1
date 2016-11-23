@@ -199,7 +199,6 @@ class ExportPackageController extends Controller
      */
     public function exportPackageDetail()
     {
-        ini_set('memory_limit', '2G');
         if(!request()->hasFile('accordingTracking')) {
             $field = $this->model->find(request('field_id'));
             $fieldItems = $field->items;

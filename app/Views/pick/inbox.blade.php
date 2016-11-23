@@ -141,7 +141,6 @@
                                 }
                                 return false;
                             }
-                            return false;
                         }
                     }
                 });

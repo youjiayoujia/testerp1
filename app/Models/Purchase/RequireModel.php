@@ -1,7 +1,7 @@
 <?php
 namespace App\Models\Purchase;
 use App\Base\BaseModel;
-use App\Models\Purchase\RequireModel;
+//use App\Models\Purchase\RequireModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseRequireModel;

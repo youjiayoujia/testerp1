@@ -219,7 +219,6 @@ $(document).ready(function(){
                         $('#barcode')[0].contentWindow.focus();
                         $('#barcode')[0].contentWindow.print();
                     });
-                    return false;
                 }
             }
         });

@@ -533,8 +533,6 @@ class OrderModel extends BaseModel
         if ($driver == 'wish') {
             $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
             $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
-        } elseif($driver == 'aliexpress') {
-            $blacklist = BlacklistModel::where('by_id', $this->by_id);
         } else {
             $blacklist = BlacklistModel::where('email', $this->email);
         }
@@ -714,10 +712,10 @@ class OrderModel extends BaseModel
         $orderCosting = $this->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee();
         $orderRate = ($this->amount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $this->amount;
-//        if ($this->status != 'CANCEL' && $orderRate <= 0) {
-//            //利润率为负撤销0
-//            $this->OrderCancle();
-//        }
+        if ($this->status != 'CANCEL' && $orderRate <= 0) {
+            //利润率为负撤销0
+            $this->OrderCancle();
+        }
 
         return $orderRate;
     }

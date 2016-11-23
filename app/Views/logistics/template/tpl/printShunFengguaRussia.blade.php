@@ -55,6 +55,7 @@
     </div>
     <div style="width:100%;height:55px;">
         <p style="width:240px;height:100%;float:center;font-weight:bold;text-align:center;">
+            <br/>
             <b style="font-size:20px;">R</b>&nbsp;
             <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             <br/>{{$model->tracking_no}}
@@ -62,6 +63,7 @@
     </div><br>
     <div style="width:100%;height:50px;">
         <p style="width:240px;height:100%;float:left;font-weight:bold;text-align:center;">
+            <br/>
             <img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}">
             <br/>{{$model->logistics_order_number}}
         </p>
@@ -70,6 +72,9 @@
         </p>
     </div>
 </div>
+<br>
+<br>
+
 <div id="main_frame_box" style="height:370px;">
 
     <table cellpadding="5" cellspacing="0" class="fixed">

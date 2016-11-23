@@ -75,8 +75,7 @@
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
-                <td colspan='2'>{{ $packageItem->quantity }}</td>
-                <td colspan='2'>单件重量:{{ $packageItem->item->weight }}</td>
+                <td colspan='4'>{{ $packageItem->quantity }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
@@ -203,7 +202,6 @@
                    data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
-            <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
             <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
             <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
         </ul>
@@ -292,11 +290,6 @@
             })
 
             $('.multiEditTracking').click(function () {
-                type = $(this).data('type');
-                location.href = "{{ route('package.returnFee')}}?type=" + type;
-            })
-
-            $('.changeLogisticsTn').click(function () {
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
             })

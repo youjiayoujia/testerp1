@@ -15,6 +15,30 @@
                     <input type='text' class='form-control' value="{{ $model->channel ? $model->channel->name : '无渠道' }}" readonly>
                 </div>
                 <div class="col-lg-2">
+                    <label>收货人</label>
+                    <input type='text' class='form-control' value="{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}" readonly>
+                </div>
+                <div class="col-lg-2">
+                    <label>电话</label>
+                    <input type='text' class='form-control' value="{{ $model->shipping_phone }}" readonly>
+                </div>
+                <div class="col-lg-2">
+                    <label>发货邮编</label>
+                    <input type='text' class='form-control' value="{{ $model->shipping_zipcode }}" readonly>
+                </div>
+                <div class="col-lg-2">
+                    <label>城市</label>
+                    <input type='text' class='form-control' value="{{ $model->shipping_city }}" readonly>
+                </div>
+                <div class="col-lg-2">
+                    <label>区</label>
+                    <input type='text' class='form-control' value="{{ $model->shipping_state }}" readonly>
+                </div>
+                <div class="col-lg-2">
+                    <label>国家</label>
+                    <input type='text' class='form-control' value="{{ $model->shipping_country }}" readonly>
+                </div>
+                <div class="col-lg-2">
                     <label>物流</label>
                     <input type='text' class='form-control' value="{{ $model->logistics ? $model->logistics->name : '暂无物流方式' }}" readonly>
                 </div>
@@ -58,30 +82,6 @@
             <div class="col-lg-2">
                 <label>发货地址</label>
                 <input type='text' class='form-control' name='shipping_address' value="{{ $model->shipping_address }}">
-            </div>
-            <div class="col-lg-2">
-                <label>收货人</label>
-                <input type='text' class='form-control' name='shipping_firstname' value="{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}">
-            </div>
-            <div class="col-lg-2">
-                <label>电话</label>
-                <input type='text' class='form-control' name='shipping_phone' value="{{ $model->shipping_phone }}">
-            </div>
-            <div class="col-lg-2">
-                <label>发货邮编</label>
-                <input type='text' class='form-control' name='shipping_zipcode' value="{{ $model->shipping_zipcode }}">
-            </div>
-            <div class="col-lg-2">
-                <label>城市</label>
-                <input type='text' class='form-control' name='shipping_city' value="{{ $model->shipping_city }}">
-            </div>
-            <div class="col-lg-2">
-                <label>区</label>
-                <input type='text' class='form-control' name='shipping_state' value="{{ $model->shipping_state }}">
-            </div>
-            <div class="col-lg-2">
-                <label>国家</label>
-                <input type='text' class='form-control' name='shipping_country' value="{{ $model->shipping_country }}">
             </div>
         </div>
     </div>

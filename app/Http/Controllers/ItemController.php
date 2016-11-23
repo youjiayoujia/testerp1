@@ -480,6 +480,7 @@ class ItemController extends Controller
             'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit'),$field = ['*'],$pageSize='10'),
             'mixedSearchFields' => $this->model->mixed_search,
             'warehouses' => $this->warehouse->all(),
+            'warehouse_info' => $this->warehouse->where('is_available',1)->get(),
             'Compute_channels' => CatalogRatesModel::all(),
 
         ];

@@ -98,7 +98,6 @@ class PurchaseItemController extends Controller
 	public function purchaseItemIndex()
 	{
 		request()->flash();
-		$this->mainTitle = '新品待入库';
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model,$this->model->where('status','6')),

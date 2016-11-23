@@ -13,21 +13,21 @@
 <div class="main">
     <div style="border-bottom:3px solid black;height:20mm;margin-top:5px;">
         <div style="float:left;width:80px;height:70px;border:2px solid black;font-size:60px;line-height:70px;text-align:center;font-weight:bold;">
-
+            F
         </div>
         <div style="float:left;height:60px;width:185px;text-align:center;">
-            {{ substr(substr($model->tracking_no, 0, -2), 2) }}
+            <img src="{{ asset('image/korea.png') }}" style="height:70px;" /></td>
         </div>
         <div style="float:right;width:90px;height:70px;border:2px solid black;text-align:center;">
-            <p></p>
-            <p></p>
-            <p></p>
+            <p>Air Mail</p>
+            <p>Postage Paid</p>
+            <p>korea Post</p>
         </div>
     </div>
     <div style="border-bottom:3px solid black;height:26.5mm;text-align:center;line-height:14px;">
         <p>USPS Tracking #</p>
         <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
-        <p style="font-weight:bold;margin-top:2px;">{{$model->id}}</p>
+        <p style="font-weight:bold;margin-top:2px;">{{$model->tracking_no}}</p>
         <p style="font-size:11px;">USPS personnel scan barcode above for delivery event information</p>
     </div>
     <div style="border-bottom:3px solid black;height:23mm;">

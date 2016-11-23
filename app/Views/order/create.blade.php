@@ -42,8 +42,8 @@
                 <input class="form-control" id="email" placeholder="邮箱" name='email' value="{{ old('email') }}">
             </div>
             <div class="form-group col-lg-2">
-                <label for="aliexpress_loginId" class='control-label'>买家ID</label>
-                <input class="form-control" id="aliexpress_loginId" placeholder="买家ID" name='aliexpress_loginId' value="{{ old('aliexpress_loginId') }}">
+                <label for="by_id" class='control-label'>买家ID</label>
+                <input class="form-control" id="by_id" placeholder="买家ID" name='by_id' value="{{ old('by_id') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="status" class='control-label'>订单状态</label>

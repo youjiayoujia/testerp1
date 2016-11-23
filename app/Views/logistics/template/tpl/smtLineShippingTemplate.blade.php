@@ -131,9 +131,11 @@
             </td>
         </tr>
     </table>
-    <div style="width:382px;height:30px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
+    <div style="width:382px;height:40px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
         <span style="font-size:12px;font-weight:bold;">
-            【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】
+            【
+            {{ $model->logistics ? $model->logistics->logistics_code : '' }}
+            】
         </span>
         {{ $model->sku_info }}
     </div>

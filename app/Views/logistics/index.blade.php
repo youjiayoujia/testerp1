@@ -73,6 +73,9 @@
                 <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-usd"></span> 分区报价
                 </a>
+                <a href="{{ route('logisticsRule.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
+                    <span class="glyphicon glyphicon-usd"></span> 分配规则
+                </a>
                 <a class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
                         data-target="#dialog" data-table="{{ $logistics->table }}" data-id="{{$logistics->id}}">

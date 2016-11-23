@@ -337,6 +337,7 @@ class StockController extends Controller
      */
     public function ajaxSku()
     {
+        ini_set('memory_limit', '1G');
         $sku = trim(request()->input('sku'));
         $items = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
         $total = $items->count();
@@ -362,6 +363,7 @@ class StockController extends Controller
      */
     public function ajaxGetByPosition()
     {
+        ini_set('memory_limit', '1G');
         $warehouse_id = trim(request()->input('warehouse_id'));
         $item_id = trim(request()->input('sku'));
         $position = trim(request()->input('position'));

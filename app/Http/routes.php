@@ -668,6 +668,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/downloadLogisticsTno',
+        ['uses' => 'PackageController@downloadLogisticsTno', 'as' => 'package.downloadLogisticsTno']);
     Route::get('package/errorToShipped',
         ['uses' => 'PackageController@errorToShipped', 'as' => 'package.errorToShipped']);
     Route::get('package/exportInfo',

@@ -203,6 +203,7 @@
                    data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
+            <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
             <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
             <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
         </ul>
@@ -291,6 +292,11 @@
             })
 
             $('.multiEditTracking').click(function () {
+                type = $(this).data('type');
+                location.href = "{{ route('package.returnFee')}}?type=" + type;
+            })
+
+            $('.changeLogisticsTn').click(function () {
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
             })

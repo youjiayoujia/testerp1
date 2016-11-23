@@ -795,6 +795,24 @@ class TestController extends Controller
                 }
                 exit;*/
     }
+
+    public function testReply($id){
+
+
+        foreach (AccountModel::all() as $account) {
+            if ($account->account == 'Coolcoola04@126.com') { //测试diver
+                $reply = ReplyModel::find($id);
+
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $channel->sendMessages($reply);
+                exit;
+
+            }
+        }
+
+        dd($reply);
+    }
     /**
      * Curl Post JSON 数据
      */

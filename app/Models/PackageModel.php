@@ -523,6 +523,27 @@ class PackageModel extends BaseModel
         return $arr;
     }
 
+    public function canclePackage()
+    {
+        if(in_array($this->status, ['PACKED', 'SHIPPED'])) {
+            return false;
+        }
+        $item = $this->items()->first();
+        if($item->warehouse_position_id) {
+            foreach($this->items as $packageItem) {
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity);
+                $packageItem->delete();
+            }
+        } else {
+            foreach($this->items as $packageItem) {
+                $packageItem->delete();
+            }
+        }
+        $this->delete();
+
+        return true;
+    }
+
     public function reCreatePackage()
     {
         $arr = [];

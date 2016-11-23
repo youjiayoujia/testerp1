@@ -71,11 +71,10 @@ class TestController extends Controller
     public function test2()
     {
         $package = PackageModel::find(1);
-        var_dump($package->realTimeLogistics());
+        var_dump($package->items->toarray());
     }
 //    public function test2()
 //    {
-//
 //        foreach (\App\Models\Order\ItemModel::all() as $item) {
 //            $status = ItemModel::where('sku', $item->sku)->first()->status;
 //            $item->update(['item_status' => $status]);
@@ -645,6 +644,9 @@ class TestController extends Controller
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
+
+            $reply->status = 'NEW';
+            $reply->save();
         }
         dd('已执行！');
 

@@ -1570,8 +1570,8 @@ class PackageModel extends BaseModel
             switch ($type) {
                 case '1':
                 case '2':
-                    $content['package_id'] = iconv('gb2312', 'uft-8', trim($content['package_id']));
-                    $content['cost'] = iconv('gb2312', 'uft-8', trim($content['cost']));
+                    $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                    $content['cost'] = iconv('gb2312', 'utf-8', trim($content['cost']));
                     $tmp_package = $this->where('id', $content['package_id'])->first();
                     if (!$tmp_package || $tmp_package->status != 'SHIPPED') {
                         $error[] = $key;
@@ -1584,8 +1584,8 @@ class PackageModel extends BaseModel
                     }
                     break;
                 case '3':
-                    $content['package_id'] = iconv('gb2312', 'uft-8', trim($content['package_id']));
-                    $content['tracking_no'] = iconv('gb2312', 'uft-8', trim($content['tracking_no']));
+                    $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                    $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
                     $tmp_package = $this->where('id', $content['package_id'])->first();
                     if (!$tmp_package) {
                         $error[] = $key;
@@ -1594,15 +1594,15 @@ class PackageModel extends BaseModel
                     $this->find($content['package_id'])->update(['tracking_no' => $content['tracking_no']]);
                     break;
                 case '4':
-                    $content['package_id'] = iconv('gb2312', 'uft-8', trim($content['package_id']));
-                    $content['tracking_no'] = iconv('gb2312', 'uft-8', trim($content['tracking_no']));
-                    $content['logistics_id'] = iconv('gb2312', 'uft-8', trim($content['logistics_id']));
+                    $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                    $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
+                    $content['logistics_id'] = iconv('gb2312', 'utf-8', trim($content['logistics_id']));
                     $tmp_package = $this->where('id', $content['package_id'])->first();
                     if (!$tmp_package) {
                         $error[] = $key;
                         continue;
                     }
-                    if (!in_array($tmp_package->status, ['PACKAGED', 'SHIPPED'])) {
+                    if (!in_array($tmp_package->status, ['PACKED', 'SHIPPED'])) {
                         $error[] = $key;
                         continue;
                     }
@@ -1702,7 +1702,7 @@ class PackageModel extends BaseModel
                         $rows[] = [
                             '供货商' => SupplierModel::find($key1)->name,
                             '物流方式' => LogisticsModel::find($key2)->name,
-                            '发货日期' => iconv('uft-8', 'gb2312', PackageModel::find($value3)->shipped_at),
+                            '发货日期' => iconv('utf-8', 'gb2312', PackageModel::find($value3)->shipped_at),
                             '运单号' => PackageModel::find($value3)->tracking_no,
                             '重量' => PackageModel::find($value3)->weight,
                         ];

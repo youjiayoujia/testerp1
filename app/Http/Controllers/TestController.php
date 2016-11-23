@@ -690,13 +690,15 @@ class TestController extends Controller
          * 写入队列
          */
 
-/*        $replys = ReplyModel::where('status','FAIL')->get();
+       $replys = ReplyModel::where('status','FAIL')->get();
         foreach($replys as $reply){
+            $reply->status = 'NEW';
+            $reply->save();
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
         }
-        dd('已执行！');*/
+        dd('已执行！ss');
 
 
 

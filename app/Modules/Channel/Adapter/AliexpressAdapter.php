@@ -338,7 +338,6 @@ Class AliexpressAdapter implements AdapterInterface
     public function getCurlData($remote_server)
     {
         $ch = curl_init();
-        dd($remote_server);
         curl_setopt($ch, CURLOPT_URL, $remote_server);
         //curl_setopt ( $ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded; charset=utf-8'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
@@ -1081,7 +1080,11 @@ Class AliexpressAdapter implements AdapterInterface
             $channelId = rawurlencode($message_obj->message_id);
             $buyerId = rawurlencode($message_obj->from);
             //$msgSources = rawurlencode($ChannelMessageFields['message_type']);
-            ($message_obj->label == '订单留言') ? $msgSources = rawurlencode('order_msg') : ($msgSources = 'message_center');
+            if($message_obj->label == '订单留言'){
+                $msgSources = rawurlencode('order_msg');
+            }else{
+                $msgSources = rawurlencode('message_center');
+            }
             $content = rawurlencode($replyMessage->content);
             $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
             $api_return =  $this->getJsonData('api.addMsg', $send_param);

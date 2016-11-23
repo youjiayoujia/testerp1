@@ -5,18 +5,13 @@
  * Date: 2016-05-24
  * Time: 13:17
  */
-
 namespace App\Modules\Channel\Adapter;
-
 use App\Models\OrderModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Channel\AccountModel;
 use App\models\Publish\Smt\smtCategoryAttribute;
 use App\Models\Message\MessageModel;
-
-
 set_time_limit(1800);
-
 Class AliexpressAdapter implements AdapterInterface
 {
     const GWURL = 'gw.api.alibaba.com';
@@ -30,7 +25,6 @@ Class AliexpressAdapter implements AdapterInterface
     private $_aliexpress_member_id;
     public  $_operator_id;
     public  $_customer_service_id;
-
     public function __construct($config)
     {
         $this->_appkey = $config["appkey"];
@@ -44,7 +38,6 @@ Class AliexpressAdapter implements AdapterInterface
         $this->_operator_id = $config['operator_id'];
         $this->_customer_service_id = $config['customer_service_id'];
     }
-
     /** 获取订单
      * @param $startDate 开始时间
      * @param $endDate 结束时间
@@ -65,7 +58,6 @@ Class AliexpressAdapter implements AdapterInterface
         $startDate = $startDate>'2016-10-27 17:00:00'?$startDate:'2016-10-27 17:00:00';
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
-
         $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
 
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
@@ -102,11 +94,8 @@ Class AliexpressAdapter implements AdapterInterface
             }
             $nextToken ='';
         }
-
         return ['orders' => $orders, 'nextToken' => $nextToken];
-
     }
-
     /**获取订单(暂时没有用)
      * @param $startDate
      * @param $endDate
@@ -117,18 +106,15 @@ Class AliexpressAdapter implements AdapterInterface
      */
     public function listOrdersOther($startDate, $endDate, $status, $page = 1, $perPage = 10)
     {
-
         $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
             strtotime($startDate));
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
         $param = "page=" . $page . "&pageSize=" . $perPage . "&orderStatus=" . $status . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
-
         //echo $param.'<br/>';
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
         return json_decode($orderjson, true);
     }
-
     /** 获取订单详情
      * @param $orderID 订单号
      * @return mixed
@@ -139,7 +125,6 @@ Class AliexpressAdapter implements AdapterInterface
         $orderjson = $this->getJsonData('api.findOrderById', $param);
         return json_decode($orderjson, true);
     }
-
     /** 回传追踪号
      * @param $tracking_info 需要上传的信息
      * @return array
@@ -150,23 +135,19 @@ Class AliexpressAdapter implements AdapterInterface
         $action = 'api.sellerShipment';
         $app_url = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
-
         $tracking_info['access_token'] = $this->_access_token;
         $tracking_info['_aop_signature'] = $this->getApiSignature($api_info, $tracking_info);
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $tracking_info);
         $result = json_decode($result,true);
-
         if (isset($result['success']) && ($result['success'] == 'true')) {
             $return['status'] = true;
             $return['info'] = 'Success';
-
         } else {
             $return['status'] = false;
             $return['info'] = isset($result['error_message']) ? $result['error_message'] : "error";
         }
         return $return;
     }
-
     /** 获取需要评价的订单
      * @param int $currentPage 页码
      * @param int $pageSize 页数
@@ -182,7 +163,6 @@ Class AliexpressAdapter implements AdapterInterface
             return false;
         }
     }
-
     /** 评价订单
      * @param $orderID 订单号
      * @param string $text 内容
@@ -194,8 +174,6 @@ Class AliexpressAdapter implements AdapterInterface
         $result = $this->getJsonData("api.evaluation.saveSellerFeedback", $param);
         var_dump($result);
     }
-
-
     /** 订单信息的组装
      * @param $list
      * @param $orderDetail
@@ -205,7 +183,6 @@ Class AliexpressAdapter implements AdapterInterface
     {
         $orderInfo = array();
         $productInfo = array();
-
         $ship_price = 0;
         $orderProductArr = $list ["productList"][0];
         $order_remark = array();
@@ -218,8 +195,6 @@ Class AliexpressAdapter implements AdapterInterface
             }
             $ship_price = $p["logisticsAmount"] ["amount"]; //多个sku的运费 不进行叠加了 因为这个时候就是总运费了
         }
-
-
         $orderInfo['channel_ordernum'] = $list['orderId'];
         $orderInfo["email"] = isset($list["buyerInfo"]["email"]) ? $list["buyerInfo"]["email"] : '';
         $orderInfo['amount'] = $list ["payAmount"] ["amount"];
@@ -240,9 +215,7 @@ Class AliexpressAdapter implements AdapterInterface
         $leftSendGoodDay = isset($list["leftSendGoodDay"])?(int)$list["leftSendGoodDay"]:0;
         $leftSendGoodHour = isset($list["leftSendGoodHour"])?(int)$list["leftSendGoodHour"]:0;
         $leftSendGoodMin = isset($list["leftSendGoodMin"])?(int)$list["leftSendGoodMin"]:0;
-
         $orderInfo['orders_expired_time'] =date('Y-m-d H:i:s',time()+$leftSendGoodDay*24*60*60+$leftSendGoodHour*60*60+$leftSendGoodMin*60);
-
         $mobileNo = isset($orderDetail ["receiptAddress"] ["mobileNo"]) ? $orderDetail ["receiptAddress"] ["mobileNo"] : '';
         $phoneCountry = isset($orderDetail ["receiptAddress"] ["phoneCountry"]) ? $orderDetail ["receiptAddress"] ["phoneCountry"] : '';
         $phoneArea = isset($orderDetail ["receiptAddress"] ["phoneArea"]) ? $orderDetail ["receiptAddress"] ["phoneArea"] : '';
@@ -251,9 +224,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['shipping_phone'] = $mobileNo != "" ? $mobileNo : $phoneNumber;
         $orderInfo['payment_date'] = $this->getPayTime($list['gmtPayTime']);
         $orderInfo['aliexpress_loginId'] = $orderDetail['buyerInfo']['loginId'];
-
-
-
+        $orderInfo['by_id'] = isset($orderDetail ["buyerSignerFullname"])?$orderDetail ["buyerSignerFullname"]:'';
         $childProductArr = $orderDetail['childOrderList'];
         foreach ($childProductArr as $childProArr) {
             $skuCode = trim($childProArr ["skuCode"]);
@@ -273,12 +244,10 @@ Class AliexpressAdapter implements AdapterInterface
             $productInfo[$sku_new]['channel_sku'] = trim($childProArr ["skuCode"]);
             $productInfo[$sku_new]["sku"] = $sku_new;
             $productInfo[$sku_new]["price"] = $qty ? $childProArr["productPrice"]["amount"] / $qty : $childProArr["productPrice"]["amount"];
-
             $productInfo[$sku_new]["quantity"] = isset($productInfo[$sku_new]["quantity"]) ? $productInfo[$sku_new]["quantity"] : 0;
             $productInfo[$sku_new]["quantity"] += $qty ? $childProArr["productCount"] * $qty : $childProArr["productCount"];
             $productInfo[$sku_new]['currency'] = $childProArr['initOrderAmt']['currency']['currencyCode'];
             $productInfo[$sku_new]['orders_item_number'] = $childProArr['productId'];
-
             if (!empty($order_remark) && !empty($order_remark[$childProArr['id']])) { // --各SKU相应的备注信息
                 $productInfo[$sku_new]["remark"] = isset($productInfo[$sku_new]["remark"]) ? $productInfo[$sku_new]["remark"] . ' ' . $order_remark[$childProArr['id']] : $order_remark[$childProArr['id']]; //备注信息
             }
@@ -286,11 +255,8 @@ Class AliexpressAdapter implements AdapterInterface
         foreach ($productInfo as $pro) {
             $orderInfo['items'][] = $pro;
         }
-
         return $orderInfo;
-
     }
-
     /** 支付时间 转换
      * @param $paytime
      * @return bool|string
@@ -300,8 +266,6 @@ Class AliexpressAdapter implements AdapterInterface
         $str = mb_substr($paytime, 0, 14);
         return date('Y-m-d H:i:s', strtotime($str));
     }
-
-
     /**
      * 使用access_token 令牌获取数据
      * @param string $action api动作
@@ -314,7 +278,6 @@ Class AliexpressAdapter implements AdapterInterface
         $app_url = "http://" . self::GWURL . "/openapi/";
         //apiinfo	aliexpress.open
         $apiInfo = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey;
-
         //参数
         $app_parameter_url = ($parameter ? "$parameter&" : '') . "access_token=" . $this->_access_token;
         $sign_url = '';
@@ -329,8 +292,6 @@ Class AliexpressAdapter implements AdapterInterface
         $result = $this->getCurlData($get_url);
         return $result;
     }
-
-
     /**
      * Curl http Get 数据
      * 使用方法：
@@ -338,7 +299,6 @@ Class AliexpressAdapter implements AdapterInterface
     public function getCurlData($remote_server)
     {
         $ch = curl_init();
-        dd($remote_server);
         curl_setopt($ch, CURLOPT_URL, $remote_server);
         //curl_setopt ( $ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded; charset=utf-8'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
@@ -353,7 +313,6 @@ Class AliexpressAdapter implements AdapterInterface
         $this->checkToken($output);
         return $output;
     }
-
     /**
      * Curl http Post 数据
      * 使用方法：
@@ -377,8 +336,6 @@ Class AliexpressAdapter implements AdapterInterface
         $this->checkToken($data);
         return $data;
     }
-
-
     /**
      *
      * API签名算法主要是使用urlPath和请求参数作为签名因子进行签名，主要针对api 调用
@@ -389,7 +346,6 @@ Class AliexpressAdapter implements AdapterInterface
     {
         $code_arr = explode("&", $strcode);//去掉&
         $newcode_arr = array();
-
         foreach ($code_arr as $key => $val) {
             $code_narr = explode("=", $val);//分割=
             $newcode_arr [$code_narr [0]] = $code_narr [1];//重组数组
@@ -405,7 +361,6 @@ Class AliexpressAdapter implements AdapterInterface
         $code_sign = strtoupper(bin2hex(hash_hmac("sha1", $sign_str, $this->_appsecret, true)));
         return $code_sign;
     }
-
     /**
      * 计算签名
      * @param $apiInfo
@@ -446,7 +401,6 @@ Class AliexpressAdapter implements AdapterInterface
         $code_sign = strtoupper(bin2hex(hash_hmac("sha1", $sign_str, $this->_appsecret, true)));
         return $code_sign;
     }
-
     /**
      * 获取acees_token
      * 判断access_token是否过期(10小时)
@@ -477,7 +431,6 @@ Class AliexpressAdapter implements AdapterInterface
                 return false;
             }
         }
-
     }
     public function sendToSlme($access_token,$member_id){
         $url = 'http://v2.erp.moonarstore.com/admin/auto/auto_smt_refresh_access_token/get_v3_access_token?key=SLME5201314&access_token='.$access_token.'&member_id='.$member_id;
@@ -514,7 +467,6 @@ Class AliexpressAdapter implements AdapterInterface
         $postdata = "grant_type=authorization_code&need_refresh_token=true&client_id=" . $this->_appkey . "&client_secret=" . $this->_appsecret . "&redirect_uri=" . $this->_returnurl . "&code=" . $code . "";
         return $this->postCurlHttpsData ( $getAppCodeUrl, $postdata );
     }
-
     /**
      * Curl https Post 数据
      * 使用方法：
@@ -543,8 +495,6 @@ Class AliexpressAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-
-
 
     /**
      * API交互，POST方式
@@ -595,7 +545,6 @@ Class AliexpressAdapter implements AdapterInterface
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
-
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
@@ -611,20 +560,15 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['channelId'] = $item['channelId'];
                         $message_list[$j]['unreadCount'] = $item['unreadCount'];
                         $message_list[$j]['readStat'] = $item['readStat'];
-
                         $message_fields_ary = false; //aliexress 平台特殊参数
                         if($Sources == 'order_msg'){
                             $message_list[$j]['label'] = '订单留言';
                             $message_list[$j]['channel_order_number'] =$item['channelId'];
-                            $message_fields_ary['message_type'] =$Sources;
                         }else{
                             $message_list[$j]['label'] = '站内信';
                             $message_list[$j]['channel_order_number'] ='';
-                            $message_fields_ary['message_type'] =$Sources;
                         }
-
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
-
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
                         $j++;
                     }
@@ -635,7 +579,6 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return (!empty($message_list)) ? array_reverse($message_list) : false;
     }
-
 
 
     /**
@@ -1069,7 +1012,6 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $detail;
     }
-
     public function sendMessages($replyMessage)
     {
         // TODO: Implement sendMessages() method.
@@ -1080,16 +1022,13 @@ Class AliexpressAdapter implements AdapterInterface
             $send_param = [];
             $channelId = rawurlencode($message_obj->message_id);
             $buyerId = rawurlencode($message_obj->from);
-            $msgSources = rawurlencode($ChannelMessageFields['message_type']);
-            if($msgSources == false){
-                $message_obj->label == '订单留言' ? $msgSources = 'order_msg' : $msgSources = 'message_center';
-            }
+            //$msgSources = rawurlencode($ChannelMessageFields['message_type']);
+            $message_obj->label == '订单留言' ? $msgSources = 'order_msg' : $msgSources = 'message_center';
 
             $content = rawurlencode($replyMessage->content);
             $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
             $api_return =  $this->getJsonData('api.addMsg', $send_param);
             $api_return_array = json_decode($api_return,true);
-
             if(isset($api_return_array['result']["isSuccess"])){
                 if($api_return_array['result']["isSuccess"]){
                     //step2: 更新消息为已读
@@ -1097,7 +1036,6 @@ Class AliexpressAdapter implements AdapterInterface
                     $update_param['channelId'] = $message_obj->message_id;
                     $update_param['msgSources'] = $ChannelMessageFields['message_type'];
                     $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
-
                     $replyMessage->status = 'SENT';
                 }else{
                     $replyMessage->status = 'FAIL';
@@ -1107,7 +1045,6 @@ Class AliexpressAdapter implements AdapterInterface
             $replyMessage->status = 'FAIL';
         }
         $replyMessage->save();
-
         return $replyMessage->status== 'SENT' ? true : false;
     }
 
@@ -1461,7 +1398,6 @@ Class AliexpressAdapter implements AdapterInterface
     }
 
 
-
     /**
      * 纠纷
      */
@@ -1478,11 +1414,8 @@ Class AliexpressAdapter implements AdapterInterface
         );
         $page = 1;
         $page_size = 10;
-
-
         foreach ($issue_ary as $issue){
             for($i = 1 ; $i>0; $i++){
-
                 $method = 'api.queryIssueList';
                 $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
                 $issue_list = json_decode($this->getJsonData($method, $para));
@@ -1490,13 +1423,11 @@ Class AliexpressAdapter implements AdapterInterface
                     foreach ($issue_list->dataList as $key => $item) {
                         $detail_param = "issueId=".$item->id;
                         $return_detail = json_decode($this->getJsonData('alibaba.ae.issue.findIssueDetailByIssueId',$detail_param));
-
                         if(isset($return_detail->success)){
                             $issue_detail = $return_detail;
                         }else{
                             $issue_detail = '';
                         }
-
                         $issueAry[] = [
                             'issue_id'      => $item->id,
                             'gmtModified'   => $item->gmtModified,
@@ -1513,18 +1444,13 @@ Class AliexpressAdapter implements AdapterInterface
                     break;
                 }
             }
-
-
         }
-
         return $issueAry;
-
     }
     public function changetime($time){
         $time = date('Y-m-d H:i:s', substr($time, 0, 10));
         return $time;
     }
-
     /**
      * 过滤速卖通产品信息模块
      * @param $str 产品详情信息
@@ -1548,15 +1474,10 @@ Class AliexpressAdapter implements AdapterInterface
         // $order_detail_ary = json_decode($this->getJsonData('api.findOrderById',"orderId=".$paramAry['orderId']),true);
         $query =rawurlencode("channelId={$paramAry['orderId']}&buyerId={$paramAry['buyId']}&msgSources=order_msg&content={$paramAry['comments']}");
         $respon_ary = json_decode($this->getJsonData('api.addMsg',$query));
-
         return $respon_ary['result']['isSuccess'] ? true : false;
-
     }
-
     public function issuesRedfuse(){
-
         // $respon_ary = json_decode($this->getJsonData('api.addMsg','api.sellerRefuseIssue'));
-
     }
 
     //根据交易订单获取线上发货物流服务列表
@@ -1566,5 +1487,4 @@ Class AliexpressAdapter implements AdapterInterface
         $result = json_decode($this->getJsonData($api,$query),true);
         return $result;
     }
-
 }

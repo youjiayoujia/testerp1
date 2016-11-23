@@ -633,22 +633,18 @@ class TestController extends Controller
     }
     public function jdtestCrm()
     {
-
-
         /*
          * 写入队列
          */
-
         $replys = ReplyModel::where('status','FAIL')->get();
         foreach($replys as $reply){
+            $reply->status = 'NEW';
+            $reply->save();
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
-
-            $reply->status = 'NEW';
-            $reply->save();
         }
-        dd('已执行！');
+        dd('已执行！ss');
 
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'darli04@126.com') { //测试diver

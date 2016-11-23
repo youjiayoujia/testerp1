@@ -337,22 +337,19 @@ class StockController extends Controller
      */
     public function ajaxSku()
     {
-        if(request()->ajax()) {
-            $sku = trim(request()->input('sku'));
-            $items = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
-            $total = $items->count();
-            $arr = [];
-            foreach($items as $key => $item) {
-                $arr[$key]['id'] = $item->id;
-                $arr[$key]['text'] = $item->sku;
-            }
-            if($total)
-                return json_encode(['results' => $arr, 'total' => $total]);
-            else 
-                return json_encode('false');
+        $sku = trim(request()->input('sku'));
+        $items = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+        $total = $items->count();
+        $arr = [];
+        foreach($items as $key => $item) {
+            $arr[$key]['id'] = $item->id;
+            $arr[$key]['text'] = $item->sku;
         }
+        if($total)
+            return json_encode(['results' => $arr, 'total' => $total]);
+        else 
+            return json_encode('false');
 
-        return json_encode('false');
     }
 
     /**

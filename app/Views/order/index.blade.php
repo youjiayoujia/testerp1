@@ -230,8 +230,35 @@
                                 <strong>追踪号</strong> :
                                 <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-2">
                                 <strong>包裹状态</strong> : {{ $package->status_name }}
+                            </div>
+                            <div class="col-lg-1">
+                                <button class="btn btn-primary btn-xs split"
+                                        data-toggle="modal"
+                                        data-target="#split{{ $package->id }}" title='拆分包裹'>
+                                    <span class="glyphicon glyphicon-tasks"></span>
+                                </button>
+                            </div>
+                            <div class="modal fade" id="split{{ $package->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">拆分包裹</div>
+                                            <div class="panel-body">
+                                                <div class='row'>
+                                                    <div class='col-lg-5'>
+                                                        <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
+                                                    </div>
+                                                    <div class='col-lg-1'>
+                                                        <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
+                                                    </div>
+                                                </div>
+                                                <div class='split_package'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         @endforeach
                     @endif
@@ -1040,6 +1067,50 @@
                 }
 
             });
+
+            $(document).on('click', '.split_button', function () {
+                if (confirm('确认拆分')) {
+                    id = $(this).parent().prev().find('.confirm_quantity').attr('name');
+                    arr = new Array();
+                    i = 0;
+                    j = 0;
+                    $.each($(this).parent().find('table'), function (k, v) {
+                        $.each($(v).find('tr'), function (k1, v1) {
+                            if ($(v1).find(':radio').prop('checked')) {
+                                arr[i] = j + '.' + $(v1).find('.item_id').data('itemid');
+                                i += 1;
+                            }
+                        })
+                        j += 1;
+                    })
+                    location.href = "{{ route('package.actSplitPackage', ['arr' => '']) }}/" + arr + "/" + id;
+                }
+            });
+
+            $(document).on('click', '.confirm_quantity', function () {
+                quantity = $(this).parent().prev().find(':input').val();
+                id = $(this).attr('name');
+                if (quantity > 1) {
+                    $.get(
+                            "{{ route('package.returnSplitPackage')}}",
+                            {quantity: quantity, id: id},
+                            function (result) {
+                                $('.split_package').html('');
+                                $('.split_package').html(result);
+                            }, 'html'
+                    );
+                } else {
+                    alert('数量不能小于1');
+                }
+
+            });
+
+            $(document).on('click', '.split', function () {
+                id = $(this).data('id');
+                $('.confirm_quantity').attr('name', id);
+                $('.package_num').val('');
+                $('.split_package').html('');
+            })
         });
 
         $('.statistics').click(function () {

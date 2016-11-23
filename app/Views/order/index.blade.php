@@ -206,11 +206,35 @@
                         <div class="divider"></div>
                     @endforeach
                 </div>
+                <div class="col-lg-12 text-center">
+                    <div class="row">
+                        <div class="col-lg-3">物品数量: {{ $order->items->sum('quantity') }}</div>
+                        <div class="col-lg-3">包裹个数: {{ $order->packages->count() }}</div>
+                        <div class="col-lg-3">包裹总重: {{ $order->packages->sum('weight') }} Kg</div>
+                        <div class="col-lg-3">运费合计: {{ $order->packages->sum('cost') }} RMB</div>
+                    </div>
+                    <div class="divider"></div>
+                </div>
                 <div class="row col-lg-12 text-center">
-                    <div class="col-lg-3">物品数量: {{ $order->items->sum('quantity') }}</div>
-                    <div class="col-lg-3">包裹个数: {{ $order->packages->count() }}</div>
-                    <div class="col-lg-3">包裹总重: {{ $order->packages->sum('weight') }} Kg</div>
-                    <div class="col-lg-3">运费合计: {{ $order->packages->sum('cost') }} RMB</div>
+                    @if($order->packages->count() > 0)
+                        @foreach($order->packages as $package)
+                            <div class="col-lg-3">
+                                <strong>包裹ID</strong> :
+                                <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                            </div>
+                            <div class="col-lg-3">
+                                <strong>物流方式</strong>
+                                : {{ $package->logistics ? $package->logistics->name : '' }}
+                            </div>
+                            <div class="col-lg-3">
+                                <strong>追踪号</strong> :
+                                <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                            </div>
+                            <div class="col-lg-3">
+                                <strong>包裹状态</strong> : {{ $package->status_name }}
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
             </td>
         </tr>

@@ -37,7 +37,7 @@
             {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
-            <td>{{ $order->aliexpress_loginId }}</td>
+            <td>{{ $order->by_id }}</td>
             <td>{{ $order->logistics }}<br>{{ $order->shipping }}</td>
             <td>{{ $order->code }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>

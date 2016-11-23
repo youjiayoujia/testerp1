@@ -644,6 +644,9 @@ class TestController extends Controller
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
+
+            $reply->status = 'NEW';
+            $reply->save();
         }
         dd('已执行！');
 

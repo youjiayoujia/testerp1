@@ -226,8 +226,10 @@ class PackageModel extends BaseModel
     public function getSkuInfoAttribute()
     {
         $skuString = '';
-        foreach ($this->items as $packageItem) {
-            $skuString .= ',' . ($packageItem->item ? $packageItem->item->sku : '') . '*' . $packageItem->quantity . '【' . ($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '') . '】';
+        foreach ($this->items as $key => $packageItem) {
+            if ($key <= 2) {
+                $skuString .= ',' . ($packageItem->item ? $packageItem->item->sku : '') . '*' . $packageItem->quantity . '【' . ($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '') . '】';
+            }
         }
         $skuString = substr($skuString, 1);
 

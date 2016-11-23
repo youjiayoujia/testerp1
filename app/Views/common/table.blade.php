@@ -189,6 +189,8 @@
                     'filterClear' => request()->input('filterClear'),
                     'mixedSearchFields' => request()->input('mixedSearchFields'),
                     'special' => request()->input('special'),
+                    'sx' => request()->input('sx'),
+                    'lr' => request()->input('lr'),
                     ])
                     ->render()
                     !!}

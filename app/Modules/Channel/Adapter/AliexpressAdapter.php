@@ -28,7 +28,7 @@ Class AliexpressAdapter implements AdapterInterface
     private $_returnurl;            //回传地址
     private $_version = 1;
     private $_aliexpress_member_id;
-    public  $_operator_id;  
+    public  $_operator_id;
     public  $_customer_service_id;
 
     public function __construct($config)
@@ -67,7 +67,7 @@ Class AliexpressAdapter implements AdapterInterface
             strtotime($endDate));
 
         $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
-        
+
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
         $orderList = json_decode($orderjson, true,512,JSON_BIGINT_AS_STRING);
         unset($orderjson);
@@ -251,7 +251,6 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['shipping_phone'] = $mobileNo != "" ? $mobileNo : $phoneNumber;
         $orderInfo['payment_date'] = $this->getPayTime($list['gmtPayTime']);
         $orderInfo['aliexpress_loginId'] = $orderDetail['buyerInfo']['loginId'];
-        $orderInfo['by_id'] = isset($orderDetail ["buyerSignerFullname"])?$orderDetail ["buyerSignerFullname"]:'';
 
 
 
@@ -324,7 +323,7 @@ Class AliexpressAdapter implements AdapterInterface
             $sign = $this->getApiSign($apiInfo, $app_parameter_url);
             $sign_url = "&_aop_signature=$sign"; //签名参数
         }
-        //组装URL  
+        //组装URL
         $get_url = $app_url . $apiInfo . '?' . $app_parameter_url . $sign_url;
         //if ( $this->debug ) echo $get_url. "\n";
         $result = $this->getCurlData($get_url);
@@ -339,6 +338,7 @@ Class AliexpressAdapter implements AdapterInterface
     public function getCurlData($remote_server)
     {
         $ch = curl_init();
+        dd($remote_server);
         curl_setopt($ch, CURLOPT_URL, $remote_server);
         //curl_setopt ( $ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded; charset=utf-8'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
@@ -503,7 +503,7 @@ Class AliexpressAdapter implements AdapterInterface
         $postdata = "grant_type=refresh_token&client_id=" . $this->_appkey . "&client_secret=" . $this->_appsecret . "&refresh_token=" . $refresh_token . "";
         return $this->postCurlHttpsData($serverurl, $postdata);
     }
-    
+
     /**
      *
      * 使用code获取令牌
@@ -527,7 +527,7 @@ Class AliexpressAdapter implements AdapterInterface
         curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
-       // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+        // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
         curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
@@ -543,7 +543,7 @@ Class AliexpressAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-       
+
 
 
     /**
@@ -558,13 +558,13 @@ Class AliexpressAdapter implements AdapterInterface
         //apiinfo	aliexpress.open
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
         $parameter['access_token'] = $this->_access_token;
-    
+
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
         //参数
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         return $result;
     }
-    
+
     public function getMessages()
     {
         $msgSourcesArr =array('message_center','order_msg');
@@ -616,9 +616,11 @@ Class AliexpressAdapter implements AdapterInterface
                         if($Sources == 'order_msg'){
                             $message_list[$j]['label'] = '订单留言';
                             $message_list[$j]['channel_order_number'] =$item['channelId'];
+                            $message_fields_ary['message_type'] =$Sources;
                         }else{
                             $message_list[$j]['label'] = '站内信';
                             $message_list[$j]['channel_order_number'] ='';
+                            $message_fields_ary['message_type'] =$Sources;
                         }
 
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
@@ -633,9 +635,9 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return (!empty($message_list)) ? array_reverse($message_list) : false;
     }
-    
 
-    
+
+
     /**
      * 同步分类在线产品属性2:新API，
      * 缺点：目前只获取了主要属性，不知道属性是否有子属性，需要再判断
@@ -644,14 +646,14 @@ Class AliexpressAdapter implements AdapterInterface
      * @param string $parentAttrValueList
      * @return bool
      */
-    public function getChildAttributesResultByPostCateIdAndPath($token_id, $category_id, $parentAttrValueList=''){        
+    public function getChildAttributesResultByPostCateIdAndPath($token_id, $category_id, $parentAttrValueList=''){
         if ($token_id && $category_id){
             //获取账号的信息
             $tokenInfo = AccountModel::where('id',$token_id)->get();
             if ($tokenInfo) {
                 $api    = 'getChildAttributesResultByPostCateIdAndPath';
-                $result = $this->getJsonData($api, 'cateId=' . $category_id.(!empty($parentAttrValueList) ? '&parentAttrValueList='.$parentAttrValueList : ''));                
-                $rs = json_decode($result, true);           
+                $result = $this->getJsonData($api, 'cateId=' . $category_id.(!empty($parentAttrValueList) ? '&parentAttrValueList='.$parentAttrValueList : ''));
+                $rs = json_decode($result, true);
                 if (array_key_exists('success', $rs) && $rs['success']) { //返回成功了
                     //判断分类ID是否存在，不存在就插入，存在就UPdate
                     $options = array(
@@ -659,13 +661,13 @@ Class AliexpressAdapter implements AdapterInterface
                         'attribute'        => serialize($rs['attributes']),
                         'last_update_time' => date('Y-m-d H:i:s')
                     );
-                    
+
                     $category_attribute = smtCategoryAttribute::where('category_id',$category_id)->first();
                     $smtCategoryAttribute = new smtCategoryAttribute;
-                    if ($category_attribute) {                      
+                    if ($category_attribute) {
                         smtCategoryAttribute::where('category_id',$category_id)->update($options);
                     } else {
-                        $smtCategoryAttribute->create($options);                      
+                        $smtCategoryAttribute->create($options);
                     }
                     return $rs['attributes'];
                 }else {
@@ -678,7 +680,7 @@ Class AliexpressAdapter implements AdapterInterface
             return false;
         }
     }
-    
+
     /**
      * 过滤输出速卖通刊登的数据,排除Notice错误
      * @param $key
@@ -689,7 +691,7 @@ Class AliexpressAdapter implements AdapterInterface
     public function filterData($key, $data, $returnArray=false){
         return $data && array_key_exists($key, $data) ? $data[$key] : ($returnArray ? array() : '');
     }
-    
+
     /**
      * 解析属性并返回 --这礼现在不解析SKU属性
      * $array:属性数组
@@ -710,28 +712,28 @@ Class AliexpressAdapter implements AdapterInterface
         $attribute_string  = ''; //属性显示方式
         $customized_flag   = ($att['customizedName'] || $att['customizedPic']) ? true : false; //自定义
         $other_string      = '';//其他属性
-         
+
         $inputType         = $att['inputType']; //属性值的类型
         $units             = array_key_exists('units', $att) ? $att['units'] : array(); //单位
-         
+
         switch ($att['attributeShowTypeValue']){
             case 'check_box': //复选框
                 $attribute_string = '<div class="row"><div class="col-sm-6">';
                 $attribute_string .= '<ul class="list-inline">';
                 foreach ($att['values'] as $item):
-                $checked = false;
-                if (!empty($array)){
-                    foreach ($array as $row){ //判断是否存在这个属性ID和值ID
-                        if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
-                        if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                    $checked = false;
+                    if (!empty($array)){
+                        foreach ($array as $row){ //判断是否存在这个属性ID和值ID
+                            if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
+                            if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                        }
                     }
-                }
-                 
-                $attribute_string .= '<li>';
-                $attribute_string .= '<label class="checkbox-inline">';
-                $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].'][]').'" '.($checked ? 'checked' : '').'/>'.$item['names']['zh'];
-                $attribute_string .= '</label>';
-                $attribute_string .= '</li>';
+
+                    $attribute_string .= '<li>';
+                    $attribute_string .= '<label class="checkbox-inline">';
+                    $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].'][]').'" '.($checked ? 'checked' : '').'/>'.$item['names']['zh'];
+                    $attribute_string .= '</label>';
+                    $attribute_string .= '</li>';
                 endforeach;
                 $attribute_string .= '</ul>';
                 $attribute_string .= '</div></div>';
@@ -741,22 +743,22 @@ Class AliexpressAdapter implements AdapterInterface
                 $attribute_string .= '<select name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id']).']" class="form-control" '.($required ? 'datatype="*"' : '').' attr_id="'.$att['id'].'">';
                 $attribute_string .= '<option value="">---请选择---</option>';
                 foreach ($att['values'] as $item):
-                $checked = false;
-                if (!empty($array)){
-                    foreach ($array as $row){
-                        if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
-                        if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                    $checked = false;
+                    if (!empty($array)){
+                        foreach ($array as $row){
+                            if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
+                            if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                        }
                     }
-                }
-                 
-                //lang=0,说明没有子属性了
-                $attribute_string .= '<option value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" lang="'.(!empty($item['attributes']) ? 0 : 1).'" attr_value_id="'.$item['id'].'" '.($checked ? 'selected="selected"' : '').'>'.$item['names']['zh'].'('.$item['names']['en'].')'.'</option>';
-                if (!empty($item['attributes'])){ //值还有子属性
-                    foreach ($item['attributes'] as $i){
-                        $child_string .= $this->parseAttribute($i, $item['id'], $isSku, $array);
+
+                    //lang=0,说明没有子属性了
+                    $attribute_string .= '<option value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" lang="'.(!empty($item['attributes']) ? 0 : 1).'" attr_value_id="'.$item['id'].'" '.($checked ? 'selected="selected"' : '').'>'.$item['names']['zh'].'('.$item['names']['en'].')'.'</option>';
+                    if (!empty($item['attributes'])){ //值还有子属性
+                        foreach ($item['attributes'] as $i){
+                            $child_string .= $this->parseAttribute($i, $item['id'], $isSku, $array);
+                        }
                     }
-                }
-                $customized_string .= '<tr class="hide tr-p-'.$att['id'].'-'.$item['id'].'"><td>'.$item['names']['zh'].'</td>'.($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" /></td>' : '').($att['customizedPic'] ? '<td><a href="javascript: void(0);" class="btn btn-defaut btn-xs">选择图片</a><a href="" class="view-custom-image"></a><a href="" class="del-custom-image">删除</a><input type="hidden" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="" /></td>' : '').'</tr>';
+                    $customized_string .= '<tr class="hide tr-p-'.$att['id'].'-'.$item['id'].'"><td>'.$item['names']['zh'].'</td>'.($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" /></td>' : '').($att['customizedPic'] ? '<td><a href="javascript: void(0);" class="btn btn-defaut btn-xs">选择图片</a><a href="" class="view-custom-image"></a><a href="" class="del-custom-image">删除</a><input type="hidden" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="" /></td>' : '').'</tr>';
                 endforeach;
                 $attribute_string .= '</select>';
                 $attribute_string .= '</div></div>';
@@ -772,11 +774,11 @@ Class AliexpressAdapter implements AdapterInterface
                 $attribute_string = '<div class="row"><div class="col-sm-6">';
                 $attribute_string .= '<ul class="list-inline">';
                 foreach ($att['values'] as $item):
-                $attribute_string .= '<li class="col-sm-4 no-padding-left groupTab">';
-                $attribute_string .= '<label class="checkbox-inline">';
-                $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].']').'"/>'.$item['names']['zh'];
-                $attribute_string .= '</label>';
-                $attribute_string .= '</li>';
+                    $attribute_string .= '<li class="col-sm-4 no-padding-left groupTab">';
+                    $attribute_string .= '<label class="checkbox-inline">';
+                    $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].']').'"/>'.$item['names']['zh'];
+                    $attribute_string .= '</label>';
+                    $attribute_string .= '</li>';
                 endforeach;
                 $attribute_string .= '</ul>';
                 $attribute_string .= '</div></div>';
@@ -797,11 +799,11 @@ Class AliexpressAdapter implements AdapterInterface
                     if ($inputValue){
                         list($input, $u) = explode(' ', $inputValue);
                     }
-                     
+
                     $attribute_string = '<div class="row"><div class="col-sm-6">';
                     $attribute_string .= '<input type="text" class="form-control" name="sysAttrIdAndValueName[' . $att['id'] . ']" ' . ($dataType ? 'datatype="' . $dataType . '" ' : ' ') . ($required ? '' : 'ignore="ignore" ') . ($dataType == 'n' ? 'errormsg="请输入数字" ' : '') . ' value="'.$input.'" />';
                     $attribute_string .= '</div>';
-                     
+
                     //单位处理
                     $attribute_string .= '<div class="col-sm-2">';
                     $attribute_string .= '<select name="sysAttrIdAndUnit['.$att['id'].']" class="form-control">';
@@ -821,7 +823,7 @@ Class AliexpressAdapter implements AdapterInterface
         $product_attribute .= '<label class="col-sm-2 control-label">'.$required_string.$key_string.$att['names']['zh'].'：</label>';
         $product_attribute .= $attribute_string;
         $product_attribute .= '</div>';
-         
+
         //还要添加些内容，比如自定义属性的设置
         if($customized_flag){ //自定义名称或者图片
             $product_attribute .= '<div class="form-group hide">';
@@ -833,10 +835,10 @@ Class AliexpressAdapter implements AdapterInterface
             $product_attribute .= '</div>';
             $product_attribute .= '</div>';
         }
-         
+
         return $product_attribute.$other_string.$child_string;
     }
-    
+
     /**
      * 解析SKU属性 --应该都是check_box这个类型的
      * @param $att   属性数组
@@ -852,34 +854,34 @@ Class AliexpressAdapter implements AdapterInterface
         $required_string   = $att['required'] ? '<span class="red">*</span>' : '';         //必要属性
         $key_string        = $att['keyAttribute'] ? '<span class="green">！</span>' : '';  //关键属性
         $customized_flag   = ($att['customizedName'] || $att['customizedPic']) ? true : false; //自定义
-    
+
         $attribute_string = '<div class="row"><div class="col-sm-8">';
         $attribute_string .= '<ul class="list-inline">';
         foreach ($att['values'] as $k => $item):
-        $attribute_string .= '<li>';
-        $attribute_string .= '<label class="checkbox-inline">';
-        $attribute_string .= '<input type="checkbox" name="'.$att['id'].'" value="'.$item['id'].'" '.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ?  'checked' : '').(($required && $k == 0) ? ' datatype="*" nullmsg="'.$att['names']['zh'].'不能为空"' : '').' />'.$item['names']['zh'];
-        $attribute_string .= '</label>';
-        $attribute_string .= '</li>';
-        //自定义名称或图片
-        $customized_string .= '<tr class="'.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ? '' : 'hide').' tr-p-'.$att['id'].'-'.$item['id'].'">'
-            .'<td>'.$item['names']['zh'].'</td>'
+            $attribute_string .= '<li>';
+            $attribute_string .= '<label class="checkbox-inline">';
+            $attribute_string .= '<input type="checkbox" name="'.$att['id'].'" value="'.$item['id'].'" '.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ?  'checked' : '').(($required && $k == 0) ? ' datatype="*" nullmsg="'.$att['names']['zh'].'不能为空"' : '').' />'.$item['names']['zh'];
+            $attribute_string .= '</label>';
+            $attribute_string .= '</li>';
+            //自定义名称或图片
+            $customized_string .= '<tr class="'.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ? '' : 'hide').' tr-p-'.$att['id'].'-'.$item['id'].'">'
+                .'<td>'.$item['names']['zh'].'</td>'
                 .($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" value="'.($this->filterData($att['id'], $array, true) && $this->filterData($item['id'], $array[$att['id']]) ? $array[$att['id']][$item['id']]['propertyValueDefinitionName'] : '').'" /></td>' : '')
                 .'<td><span class="customize-pic pull-right">'
-                    .(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? '<img src="'.$array[$att['id']][$item['id']]['skuImage'].'" width="30" height="30" /><a href="javascript: void(0);" class="del-custom-image">删除</a>' : '').'</span>'
-                        .'<a href="javascript: void(0);" class="btn btn-default btn-xs add-custom-image pull-left" lang="'.$att['id'].'_'.$item['id'].'">选择图片</a>'
-                            .'<a href="javascript: void(0);" class="btn btn-default btn-xs copyToCust" onclick="copyToHere(this, \'pic-detail\');" >详情图片</a>'
-                                .'<input type="hidden" class="customized-pic-input customizedPic-'.$att['id'].'_'.$item['id'].'" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="'.(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? $array[$att['id']][$item['id']]['skuImage'] : '').'" /></td>'
-                                    .'</tr>';
+                .(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? '<img src="'.$array[$att['id']][$item['id']]['skuImage'].'" width="30" height="30" /><a href="javascript: void(0);" class="del-custom-image">删除</a>' : '').'</span>'
+                .'<a href="javascript: void(0);" class="btn btn-default btn-xs add-custom-image pull-left" lang="'.$att['id'].'_'.$item['id'].'">选择图片</a>'
+                .'<a href="javascript: void(0);" class="btn btn-default btn-xs copyToCust" onclick="copyToHere(this, \'pic-detail\');" >详情图片</a>'
+                .'<input type="hidden" class="customized-pic-input customizedPic-'.$att['id'].'_'.$item['id'].'" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="'.(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? $array[$att['id']][$item['id']]['skuImage'] : '').'" /></td>'
+                .'</tr>';
         endforeach;
         $attribute_string .= '</ul>';
         $attribute_string .= '</div></div>';
-    
+
         $product_attribute .= '<div class="form-group  s_attr" attr_id="'.$att['id'].'" custome="'.(($att['customizedName'] || $att['customizedPic']) ? '1' : '0').'">';
         $product_attribute .= '<label class="col-sm-2 control-label">'.$required_string.$key_string.$att['names']['zh'].'：</label>';
         $product_attribute .= $attribute_string;
         $product_attribute .= '</div>';
-    
+
         //还要添加些内容，比如自定义属性的设置
         if($customized_flag){ //自定义名称或者图片
             $product_attribute .= '<div class="form-group '.($this->filterData($att['id'], $array) ? '' : 'hide').'">';
@@ -891,10 +893,10 @@ Class AliexpressAdapter implements AdapterInterface
             $product_attribute .= '</div>';
             $product_attribute .= '</div>';
         }
-    
+
         return $product_attribute.$child_string;
     }
-    
+
     function accounterFormat($string) {
         $string = trim($string);
         $newString = $string;
@@ -908,11 +910,11 @@ Class AliexpressAdapter implements AdapterInterface
             if($string=='happywill2013')$newString='happ**will**3';
             if($string=='pandamotos2012')$newString='pand**tos**2';
             if($string=='pandacars2012')$newString='pand**car**2';
-    
+
         }
         return $newString;
     }
-    
+
     /**
      * SKU列表显示排序
      * @param $skus
@@ -933,7 +935,7 @@ Class AliexpressAdapter implements AdapterInterface
                     foreach ($aeopSKUProperty as $Property){
                         if ($sa == $Property['skuPropertyId']){ //分类信息
                             $saVal = $Property['propertyValueId'];
-                    
+
                             foreach ($attVal[$sa] as $k2 => $av){
                                 if ($av == $saVal){
                                     $sKarr[$k1][$k2] = $saVal;
@@ -943,26 +945,26 @@ Class AliexpressAdapter implements AdapterInterface
                             $matchFlag = true;
                             break;
                         }
-                    }    
+                    }
                     $trClassArr[] = $saVal;
-                    
+
                     if (!$matchFlag) $sKarr[$k1] = array();
                     ksort($sKarr[$k1]);
-                }                              
+                }
             }
             $skus[implode('_', $trClassArr)] = $sku;
         }
-        
+
         $newTrSortArr = $this->combineDika($sKarr); //行显示的排序数组
-  
+
         foreach ($newTrSortArr as $ns){
-            if (array_key_exists($ns, $skus)){                
+            if (array_key_exists($ns, $skus)){
                 $newSkus[] = $skus[$ns];
             }
         }
         return $newSkus; //返回排序后的新的SKU列表
     }
-    
+
     /**
      * 对SMTSKU进行去前后缀处理
      * @param $smtSkuCode
@@ -973,7 +975,7 @@ Class AliexpressAdapter implements AdapterInterface
         // 去掉SKU的销售代码
         $n = strpos($smtSkuCode, '*');
         $sku_new = $n !== false ? substr($smtSkuCode, $n+1) : $smtSkuCode;
-    
+
         // 去除sku的帐户代码
         $m = strpos($sku_new, '#');
         $sku_new = $m !== false ? substr($sku_new, 0, $m) : $sku_new;
@@ -982,7 +984,7 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return trim($sku_new);
     }
-    
+
     /**
      * 多个数组的笛卡儿积
      * @param $data
@@ -999,7 +1001,7 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $result;
     }
-    
+
     /**
      * 两个数组的笛卡尔积
      * @param $arr1
@@ -1027,15 +1029,15 @@ Class AliexpressAdapter implements AdapterInterface
                 $result[] = '_';
             }
         }
-    
+
         return $result;
     }
-    
+
     /**
-    * 把SMT的module替换成图片，这样才能显示成图片的占位符
-    * @param $detail
-    * @return mixed
-    */
+     * 把SMT的module替换成图片，这样才能显示成图片的占位符
+     * @param $detail
+     * @return mixed
+     */
     public function replaceSmtModuleToImg($detail){
         preg_match_all('/<kse:widget.*><\/kse:widget>/i', $detail, $matches);
         if (!empty($matches[0])) {
@@ -1079,8 +1081,11 @@ Class AliexpressAdapter implements AdapterInterface
             $channelId = rawurlencode($message_obj->message_id);
             $buyerId = rawurlencode($message_obj->from);
             $msgSources = rawurlencode($ChannelMessageFields['message_type']);
-            $content = rawurlencode($replyMessage->content);
+            if($msgSources == false){
+                $message_obj->label == '订单留言' ? $msgSources = 'order_msg' : $msgSources = 'message_center';
+            }
 
+            $content = rawurlencode($replyMessage->content);
             $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
             $api_return =  $this->getJsonData('api.addMsg', $send_param);
             $api_return_array = json_decode($api_return,true);
@@ -1105,7 +1110,7 @@ Class AliexpressAdapter implements AdapterInterface
 
         return $replyMessage->status== 'SENT' ? true : false;
     }
-    
+
     /**
      * 速卖通上传图片到图片银行或临时目录专用
      * @param  [type] $action     api名称
@@ -1113,51 +1118,51 @@ Class AliexpressAdapter implements AdapterInterface
      * @param  [type] $fileStream 图片流,二进制文件
      * @return [type]             [description]
      */
-   /*  public function uploadBankImage($action, $file, $fileName=''){
-        //接口URL
-        $app_url  = 'http://'.self::GWURL.'/fileapi/param2/'.$this->_version.'/aliexpress.open/'.$action.'/'.$this->_appkey.'?access_token='.$this->_access_token;
-        $param    = '';
-        
-        $parameter_arr['_access_token'] = $this->_access_token;
-        $_aop_signature = $this->getApiSignature($app_url,$parameter_arr);
-        $fileName = ($fileName ? $fileName : time()).'.jpg';
-        if ($action == 'api.uploadImage') {
-            $param = '&fileName='.$fileName.'&_aop_signature='.$_aop_signature;
-        }elseif ($action == 'api.uploadTempImage') {
-            $param = '&srcFileName='.$fileName;
-        }
-        $data = file_get_contents($file);
-        $ch   = curl_init ();
-        curl_setopt($ch, CURLOPT_URL, $app_url.$param);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-from-urlencoded'));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
-        $result = curl_exec($ch);
-        if (curl_error($ch)) {
-            //$this->setCurlErrorLog(curl_error ( $ch ));
-            die(curl_error ( $ch )); //异常错误
-        }
-        curl_close($ch);
-        //$this->setCurlErrorLog($result);
-        return json_decode($result, true);
-    } */
-    
+    /*  public function uploadBankImage($action, $file, $fileName=''){
+         //接口URL
+         $app_url  = 'http://'.self::GWURL.'/fileapi/param2/'.$this->_version.'/aliexpress.open/'.$action.'/'.$this->_appkey.'?access_token='.$this->_access_token;
+         $param    = '';
+
+         $parameter_arr['_access_token'] = $this->_access_token;
+         $_aop_signature = $this->getApiSignature($app_url,$parameter_arr);
+         $fileName = ($fileName ? $fileName : time()).'.jpg';
+         if ($action == 'api.uploadImage') {
+             $param = '&fileName='.$fileName.'&_aop_signature='.$_aop_signature;
+         }elseif ($action == 'api.uploadTempImage') {
+             $param = '&srcFileName='.$fileName;
+         }
+         $data = file_get_contents($file);
+         $ch   = curl_init ();
+         curl_setopt($ch, CURLOPT_URL, $app_url.$param);
+         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-from-urlencoded'));
+         curl_setopt($ch, CURLOPT_POST, 1);
+         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+         curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+         $result = curl_exec($ch);
+         if (curl_error($ch)) {
+             //$this->setCurlErrorLog(curl_error ( $ch ));
+             die(curl_error ( $ch )); //异常错误
+         }
+         curl_close($ch);
+         //$this->setCurlErrorLog($result);
+         return json_decode($result, true);
+     } */
+
     public function updateProductPublishState($action,$productId){
-        $app_url  = "http://" . self::GWURL . "/openapi/";       
+        $app_url  = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey;
-        $parameter['access_token'] = $this->_access_token;  
+        $parameter['access_token'] = $this->_access_token;
         $parameter['productIds'] = $productId;
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
-       
-     
+
+
         //参数
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
- 
+
         return json_decode($result,true);
     }
-    
+
     public function uploadBankImage($action, $file, $fileName=''){
         //接口URL
         $app_url = "http://" . self::GWURL . "/fileapi/";
@@ -1172,16 +1177,16 @@ Class AliexpressAdapter implements AdapterInterface
         }
         //参数
         $app_parameter_url = $param."&access_token=" . $this->_access_token;
-    
+
         $sign_url = '';
-    
+
         //获取对应URL的签名
         $sign     = $this->getApiSign ( $apiInfo, $app_parameter_url );
         $sign_url = "&_aop_signature=$sign"; //签名参数
-    
+
         //组装URL
         $get_url = $app_url . $apiInfo . '?' . $app_parameter_url . $sign_url;
-    
+
         $data = file_get_contents($file);
         $ch   = curl_init ();
         curl_setopt($ch, CURLOPT_URL, $get_url);
@@ -1198,8 +1203,8 @@ Class AliexpressAdapter implements AdapterInterface
         curl_close($ch);
         return json_decode($result, true);
     }
-    
-        /**
+
+    /**
      * 获取定义的平台信息
      * @param string $platType
      * @return array
@@ -1213,7 +1218,7 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return array();
     }
-    
+
     public function defineProductPublishPlatArray( )
     {
         $array = array(
@@ -1316,7 +1321,7 @@ Class AliexpressAdapter implements AdapterInterface
         );
         return $array;
     }
-    
+
     /**
      * 对速卖通的SKU属性进行排序处理 --基本属性不进行处理
      * @param $attribute
@@ -1338,8 +1343,8 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $attribute;
     }
-    
-    
+
+
     /**
      * 解析SKU成ERP内的SKU
      * @param $skuCode
@@ -1349,7 +1354,7 @@ Class AliexpressAdapter implements AdapterInterface
     public function buildSysSku($skuCode, $erpFlag=false){
         // 处理带销售代码的SKU：B702B#Y6 及海外仓标识
         $skus = $this->rebuildSmtSku($skuCode, $erpFlag);
-    
+
         $sku_list = explode('+', $skus); // 处理组合的SKU：DA0090+DA0170+DA0137
         $sku_arr  = array();
         foreach ($sku_list as $value) {
@@ -1359,7 +1364,7 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return !empty($sku_arr) ? $sku_arr : array();
     }
-    
+
     /**
      * 获取SKU属性中的海外仓发货属性ID,没有就返回0
      * @param $aeopSKUProperty
@@ -1368,7 +1373,7 @@ Class AliexpressAdapter implements AdapterInterface
     public function checkProductSkuAttrIsOverSea($aeopSKUProperty){
         $valId = 0;
         if (!empty($aeopSKUProperty)){
-             
+
             foreach ($aeopSKUProperty as $property){
                 if ($property['skuPropertyId'] == 200007763){ //发货地的属性ID
                     $valId = $property['propertyValueId'];
@@ -1378,7 +1383,7 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $valId;
     }
-    
+
     /**
      * 标点过滤函数 --主要是针对关键字
      * @param unknown $str
@@ -1389,7 +1394,7 @@ Class AliexpressAdapter implements AdapterInterface
         $str = str_replace(',', ' ', $str);
         return trim($str);
     }
-    
+
     /**
      * 获取在线数据
      * @param $currentPage 每页查询商品数量
@@ -1405,13 +1410,13 @@ Class AliexpressAdapter implements AdapterInterface
         if($grounpId){
             $parameter['groupId'] = $grounpId;
         }
-        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);         
-        
-        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);        
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         return json_decode($result,true);
     }
-    
-    
+
+
     /**
      * 根据商品id查询单个商品的详细信息
      * @param $productId
@@ -1425,7 +1430,7 @@ Class AliexpressAdapter implements AdapterInterface
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         return json_decode($result,true);
     }
-    
+
     /**
      * 编辑商品单个SKU库存
      * @param  $productId  商品ID
@@ -1442,7 +1447,7 @@ Class AliexpressAdapter implements AdapterInterface
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         return json_decode($result,true);
     }
-    
+
     public function editSingleSkuPrice($data){
         $app_url  = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/api.editSingleSkuPrice/" . $this->_appkey;
@@ -1454,8 +1459,8 @@ Class AliexpressAdapter implements AdapterInterface
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         return json_decode($result,true);
     }
-    
-   
+
+
 
     /**
      * 纠纷
@@ -1464,8 +1469,8 @@ Class AliexpressAdapter implements AdapterInterface
         $issueAry = [];
         $issue_ary = array(
             'WAIT_SELLER_CONFIRM_REFUND',  //买家提起纠纷
-           // 'SELLER_REFUSE_REFUND', //卖家拒绝纠
-           // 'ARBITRATING', // 仲裁中
+            // 'SELLER_REFUSE_REFUND', //卖家拒绝纠
+            // 'ARBITRATING', // 仲裁中
             // 'ACCEPTISSUE', //卖家接受纠纷     相当于完成了的纠纷
             // 'WAIT_BUYER_SEND_GOODS', //等待买家发货
             //  'WAIT_SELLER_RECEIVE_GOODS', // 买家发货，等待卖家收货
@@ -1515,10 +1520,10 @@ Class AliexpressAdapter implements AdapterInterface
         return $issueAry;
 
     }
-   public function changetime($time){
-       $time = date('Y-m-d H:i:s', substr($time, 0, 10));
-       return $time;
-   }
+    public function changetime($time){
+        $time = date('Y-m-d H:i:s', substr($time, 0, 10));
+        return $time;
+    }
 
     /**
      * 过滤速卖通产品信息模块
@@ -1534,13 +1539,13 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $str;
     }
-    
+
     /**
      * @param $paramAry
      * compact('orderId','buyId','comments')
      */
     public function addMessageNew($paramAry){
-         // $order_detail_ary = json_decode($this->getJsonData('api.findOrderById',"orderId=".$paramAry['orderId']),true);
+        // $order_detail_ary = json_decode($this->getJsonData('api.findOrderById',"orderId=".$paramAry['orderId']),true);
         $query =rawurlencode("channelId={$paramAry['orderId']}&buyerId={$paramAry['buyId']}&msgSources=order_msg&content={$paramAry['comments']}");
         $respon_ary = json_decode($this->getJsonData('api.addMsg',$query));
 
@@ -1550,10 +1555,10 @@ Class AliexpressAdapter implements AdapterInterface
 
     public function issuesRedfuse(){
 
-       // $respon_ary = json_decode($this->getJsonData('api.addMsg','api.sellerRefuseIssue'));
+        // $respon_ary = json_decode($this->getJsonData('api.addMsg','api.sellerRefuseIssue'));
 
     }
-    
+
     //根据交易订单获取线上发货物流服务列表
     public function getOnlineLogisticsServiceListByOrderId($orderId){
         $query = 'orderId='.$orderId;

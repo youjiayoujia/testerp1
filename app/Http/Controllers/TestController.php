@@ -83,8 +83,11 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(1);
-        var_dump($package->realTimeLogistics());
+        $a = 1.03;
+        $b = '1.030';
+        var_dump($a);
+        var_dump($b);
+        var_dump($a == $b);
     }
 
 //    public function test2()
@@ -681,12 +684,34 @@ class TestController extends Controller
     public function jdtestCrm()
     {
 
+
+
+        /*
+         * 写入队列
+         */
+
+        $replys = ReplyModel::where('status','FAIL')->get();
+        foreach($replys as $reply){
+            $job = new SendMessages($reply);
+            $job = $job->onQueue('SendMessages');
+            $this->dispatch($job);
+        }
+        dd('已执行！');
+
+
+
+
         foreach (AccountModel::all() as $account) {
-            if ($account->account == 'darli04@126.com') { //测试diver
+            if ($account->account == 'Coolcoola04@126.com') { //测试diver
 
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $messageList = $channel->getMessages();
+                $reply = ReplyModel::find(13);
+
+
+                //dd($reply);
+
+                $messageList = $channel->sendMessages($reply);
                 print_r($messageList);
                 exit;
 

@@ -6,9 +6,7 @@
  * Time: 上午9:19
  */
 namespace App\Http\Controllers;
-
 header('Content-type: text/html; charset=UTF-8');
-
 use Session;
 use App\Models\ChannelModel;
 use App\Models\Message\MessageModel;
@@ -21,11 +19,8 @@ use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 use App\Modules\Paypal\PaypalApi;
 use App\Models\Order\OrderPaypalDetailModel;
-
 use App\Models\Publish\Ebay\EbayFeedBackModel;
 use App\Models\Publish\Ebay\EbaySpecificsModel;
-
-
 use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
@@ -41,7 +36,6 @@ use App\Modules\Channel\ChannelModule;
 use App\Jobs\Job;
 use App\Jobs\DoPackage;
 use App\Jobs\SendMessages;
-
 use App\Models\PickListModel;
 use App\Models\WarehouseModel;
 use DNS1D;
@@ -60,33 +54,25 @@ use App\Models\Message\Issues\AliexpressIssueListModel;
 use App\Models\Message\Issues\AliexpressIssuesDetailModel;
 use App\Models\Order\RefundModel;
 use App\Models\Product\SupplierModel;
-
 use Illuminate\Support\Facades\Storage;
-
 use BarcodeGen;
-
 use App\Models\ProductModel;
 use Cache;
 use Crypt;
-
-
 class TestController extends Controller
 {
     private $itemModel;
     private $orderModel;
-
     public function __construct(OrderModel $orderModel, ItemModel $itemModel)
     {
         $this->itemModel = $itemModel;
         $this->orderModel = $orderModel;
     }
-
     public function test2()
     {
         $package = PackageModel::find(1);
         var_dump($package->realTimeLogistics());
     }
-
 //    public function test2()
 //    {
 //
@@ -95,13 +81,11 @@ class TestController extends Controller
 //            $item->update(['item_status' => $status]);
 //        }
 //    }
-
 //    public function test2()
 //    {
 //        $item = ItemModel::find(23767);
 //        var_dump($item->getStockQuantity(4,1));
 //    }
-
     // public function test2()
     // {
     //     $a = ['a' => 'b', 'c' => 'e', 'f' => ['f','g','i']];
@@ -110,7 +94,6 @@ class TestController extends Controller
     //     var_dump($a);
     //     var_dump($b);
     // }
-
     public function calcTwoArr(&$a, &$b)
     {
         foreach ($a as $key => $value) {
@@ -126,7 +109,6 @@ class TestController extends Controller
             }
         }
     }
-
     public function valueEqual($c, $d)
     {
         if (getType($c) == getType($d)) {
@@ -152,23 +134,19 @@ class TestController extends Controller
             return false;
         }
     }
-
     public function test3()
     {
         var_dump('123');
         // $response = [
         //     'metas' => $this->metas(__FUNCTION__),
         // ];
-
         // return view('test', $response);
         $model = PackageModel::where('id', '<', 5);
         return redirect(route('package.index', ['outer_model' => $model]));
     }
-
     // public function test2()
     // {
     //     $package = PackageModel::find('17');
-
     //     $package->realTimeLogistics();
     // }
     // public function test2()
@@ -185,7 +163,6 @@ class TestController extends Controller
     //     $job->onQueue('Inorders');
     //     $this->dispatch($job);
     // }
-
     // public function test2()
     // {
     //     $account = AccountModel::find(1);
@@ -231,13 +208,11 @@ class TestController extends Controller
     //         // fbaStock::create($vals);
     //     // }exit;
     // }
-
     public function test1()
     {
         var_dump('123');
         exit;
     }
-
     public function index()
     {
         echo "<pre>";
@@ -286,7 +261,6 @@ class TestController extends Controller
             echo 'Account is not exist.';
         }
     }
-
     public function testChinaPost()
     {
         $package = PackageModel::findOrFail(2);
@@ -294,7 +268,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function testWinit()
     {
         $package = PackageModel::findOrFail(2);
@@ -302,7 +275,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function test4px()
     {
         $package = PackageModel::findOrFail(2);
@@ -310,7 +282,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function testSmt()
     {
         $package = PackageModel::findOrFail(2);
@@ -318,7 +289,6 @@ class TestController extends Controller
             ->createWarehouseOrder($package);
         exit;
     }
-
     public function testYw()
     {
         $id = request()->get('id');
@@ -327,7 +297,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function aliexpressOrdersList()
     {
         $begin = microtime(true);
@@ -376,7 +345,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function lazadaOrdersList()
     {
         $begin = microtime(true);
@@ -399,7 +367,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function cdiscountOrdersList()
     {
         $begin = microtime(true);
@@ -422,7 +389,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function test()
     {
         $datas = DB::table('test')->get();
@@ -466,7 +432,6 @@ class TestController extends Controller
             );
         }
     }
-
     public function getWishProduct()
     {
         $accountID = request()->get('id');
@@ -528,7 +493,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function getEbayInfo()
     {
         $accountID = request()->get('id');
@@ -537,11 +501,8 @@ class TestController extends Controller
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbaySite();
     }
-
     public function testLazada()
     {
-
-
         $accountId = 201;
         $account = AccountModel::findOrFail($accountId);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
@@ -556,14 +517,11 @@ class TestController extends Controller
                     if ($re['Order']['state'] == 'REFUNDED') { //退款状态
                         var_dump($re);
                     }
-
                 }
             } else {
                 $is_do = false;
             }
         } while ($is_do);
-
-
         /*  $result = $channel->GetFeedback();
           foreach($result as $re){
               $re['channel_account_id'] = $accountId;
@@ -573,7 +531,6 @@ class TestController extends Controller
                   EbayFeedBackModel::create($re);
               }
           }*/
-
         $packages = PackageModel::where('order_id', 12914)->get();
         foreach ($packages as $package) {
             $OrderItemIds = [];
@@ -606,10 +563,8 @@ class TestController extends Controller
             var_dump($OrderItemIds);
             var_dump($result);
         }
-
         exit;
     }
-
     public function testPaypal()
     {
         $orders = OrderModel::where('id', 12851)->get();
@@ -677,34 +632,38 @@ class TestController extends Controller
             }
         }
     }
-
     public function jdtestCrm()
     {
 
+
+        /*
+         * 写入队列
+         */
+
+        $replys = ReplyModel::where('status','FAIL')->get();
+        foreach($replys as $reply){
+            $job = new SendMessages($reply);
+            $job = $job->onQueue('SendMessages');
+            $this->dispatch($job);
+        }
+        dd('已执行！');
+
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'darli04@126.com') { //测试diver
-
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
                 print_r($messageList);
                 exit;
-
             }
         }
-
         dd('end');
-
         $ali = new Alibaba(); //初始化阿里账号
         $ali_accounts = AlibabaSupliersAccountModel::all();
-
         $purchase_orders =  PurchaseOrderModel::whereIn('status',[1,2,3])->whereNotNull('post_coding')->get();
         foreach ($purchase_orders as $purchase_order){
-
             if(!empty($purchase_order->post_coding)){
-
                 foreach ($ali_accounts as $account){
-
                     if(empty($account->access_token)){
                         continue;
                     }
@@ -715,34 +674,24 @@ class TestController extends Controller
                     $curl_params['access_token']  =$account->access_token;
                     //$curl_params['buyerMemberId'] =$account->memberId;
                     $curl_params['id']    = $purchase_order->post_coding;
-
                     //$param['buyerMemberId'] = $curl_params['buyerMemberId'];
                     $param['access_token']  = $curl_params['access_token'];
                     $param['id']    = $curl_params['id'];
-
                     $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
                     $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
-
                     $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
-
                     if(!empty($order_detail['orderModel']['logisticsOrderList'])){
                         foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
                             if(!empty($item_logistics['logisticsBillNo'])) {
-
                             }
-
                         }
-
                     }
                 }
             }
-
         }
-
         $orderids = '';
         $orderids_ary = [];
         $count = 0;
-
         /**
          * 获取所有缺失物流单号的采购单中的单号
          *
@@ -755,9 +704,7 @@ class TestController extends Controller
                 }
             }
         }
-
         //dd($orderids_ary);
-
         $ali_accounts = AlibabaSupliersAccountModel::all();
         foreach($orderids_ary as $ali_order_id){
             foreach ($ali_accounts as $account){
@@ -771,47 +718,26 @@ class TestController extends Controller
                 $curl_params['access_token']  =$account->access_token;
                 //$curl_params['buyerMemberId'] =$account->memberId;
                 $curl_params['id']    = $ali_order_id;
-
                 //$param['buyerMemberId'] = $curl_params['buyerMemberId'];
                 $param['access_token']  = $curl_params['access_token'];
                 $param['id']    = $curl_params['id'];
-
                 $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
                 $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
-
                 $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
-
                 if(!empty($order_detail['orderModel']['logisticsOrderList'])){
                     foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
                         if(!empty($item_logistics['logisticsBillNo'])) {
-
                         }
-
                     }
-
                 }
-
-
-
-
                 //dd($orderList);
-
-
-
-
-
-
-
                 if(isset($orderList['orderListResult']['modelList'])){
                     if(count($orderList['orderListResult']['modelList']) != 0){
                         foreach ($orderList['orderListResult']['modelList'] as $modellist){
                             if(!empty($modellist['logisticsOrderList']) && is_array($modellist['logisticsOrderList'])){ //如果存在物流列表
                                 foreach ($modellist['logisticsOrderList'] as $logistic){
                                     if(!empty($logistic['logisticsBillNo'])){
-
                                         dd($logistic['logisticsOrderNo']);
-
-
                                         /*                                    $postage = PurchasePostageModel::where('post_coding','=',$logistic['logisticsOrderNo'])->first();
                                                                             if(empty($postage)){
                                                                                 $new_postage = new PurchasePostageModel;
@@ -821,49 +747,29 @@ class TestController extends Controller
                                                                                 $new_postage->save();
                                                                                 $this->info('#Order:'.$modellist['id'].' add logisticsOrderNo :'. $logistic['logisticsOrderNo'].' insert success');
                                                                             }*/
-
-
-
                                     }
                                 }
                             }
                         }
                     }
-
-
-
-
-
-
-
                 }
             }
         }
-
-
         /*        $message_obj = MessageModel::find(36336);
                 //$tt = $message_obj->ChannelMessageFields();
-
                 dd($message_obj->MessageFields);exit;
                 exit;*/
-
-
         //渠道测试块
-
         /*        $message_obj = MessageModel::find(36259);
                 $fields = unserialize(base64_decode($message_obj->channel_message_fields));
                 dd($fields);exit;*/
-
         /*
                  $reply_obj = ReplyModel::find(28569);
-
                   foreach (AccountModel::all() as $account) {
                     if( $account->account == 'wintrade9'){ //测试diver
-
                         $channel = Channel::driver($account->channel->driver, $account->api_config);
                         $messageList = $channel->sendMessages($reply_obj);
                         print_r($messageList);exit;
-
                     }
                 }*/
         /*
@@ -872,32 +778,23 @@ class TestController extends Controller
          */
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'darli04@126.com') { //测试diver
-
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
                 print_r($messageList);
                 exit;
-
             }
         }
-
-
         /*        $userId =  request()->user()->id;
                 $accounts = AccountModel::where('customer_service_id','=',$userId)->get();
                 if(count($accounts) <> 0){
-
                     foreach ($accounts as $key => $account){
                         $ids_ary[] = $account->id;
                     }
-
                     return $ids_ary;
-
                 }
                 exit;*/
     }
-
-
     /**
      * Curl Post JSON 数据
      */
@@ -927,11 +824,8 @@ class TestController extends Controller
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-
     public function testEbayCases()
     {
-
-
         $url = 'jiangdi.zserp.com/api/SyncSellmoreData';
         $data = [
             'secretKey' => 'VSxtAts2fQlTLc1KCLaM',
@@ -953,11 +847,8 @@ class TestController extends Controller
             'attachment_url' => 'http://erp.moonarstore.com/upload/suppliers/2014/0410/13971223945484.jpg',
         ];
         $result = $this->postCurlHttpsData($url, $data);
-
         echo($result);
         exit;
-
-
         /*        'sellmore' => [
                     'pay_type' => [
                         1 => 'ONLINE',
@@ -967,20 +858,15 @@ class TestController extends Controller
                     ],
                     'api_url' => 'http://120.24.100.157:60/api/api_suppliers.php',
                 ],*/
-
-
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'ebay@licn2011') { //测试diver
-
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getCases();
                 print_r($messageList);
                 exit;
-
             }
         }
     }
-
     /*
      * 同步ebay信息
      * 测试自动补货功能
@@ -1002,7 +888,6 @@ class TestController extends Controller
         $status = ['saleOutStopping', 'stopping', 'cleaning'];
         $product_data = ItemModel::where(['is_available' => 1,])->whereIn('status',
             $status)->Offset($pageSize * $page)->limit($pageSize)->get();
-
         foreach ($product_data as $product) {
             if ($product->AvailableQuantity + $product->NormalTransitQuantity > 0) {
                 continue;
@@ -1034,15 +919,11 @@ class TestController extends Controller
                         echo 'mul  down';
                     } else { //将这个sku的在线数量调成0
                         echo 'set zero';
-
                     }
                 }
             }
         }
-
-
         //货源待定SKU 在线数量设置为0
-
         $page = 2;
         $pageSize = 2000;
         $status = ['unSellTemp'];
@@ -1060,8 +941,6 @@ class TestController extends Controller
                 echo 'set zero';
             }
         }
-
-
         /* $account = AccountModel::find(378);
          if ($account) {
              $channel = Channel::driver($account->channel->driver, $account->api_config);
@@ -1082,11 +961,8 @@ class TestController extends Controller
 //                    $is_do=false;
 //                }
 //            }
-
-
         //}
     }
-
     public function getCurlData($remote_server)
     {
         $ch = curl_init();
@@ -1103,17 +979,11 @@ class TestController extends Controller
         curl_close($ch);
         return $output;
     }
-
     public function getSmtIssue()
     {
-
-
         //  $refund = RefundModel::find(2);
-
         /*        dd($refund->PakcageWeight);
-
                 dd($refund);*/
-
         for ($i = 1; $i > 0; $i++) {
             $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page=' . $i;
             $data = json_decode($this->getCurlData($url));
@@ -1121,17 +991,13 @@ class TestController extends Controller
                 break;
             } else {
                 foreach ($data as $key => $value) {
-
                     $img_src = 'http://erp.moonarstore.com' . substr($value->attachment_url, 1);
                     $content = file_get_contents($img_src);
                     $suffix = strstr(substr($value->attachment_url, 1), '.');
                     $uploads_file = '/product/supplier/' . Tool::randString(16, false) . $suffix;
-
                     //dd($uploads_file);
                     $bytes = Storage::put($uploads_file, $content);
-
                     $pay_type = $value->pay_method;
-
                     $insert = [
                         'company' => $value->suppliers_company,
                         'address' => $value->suppliers_address,
@@ -1148,22 +1014,16 @@ class TestController extends Controller
                         'created_by' => $value->user_id,
                         'pay_type' => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
                         'qualifications' => Tool::randString(16, false) . $suffix,
-
                     ];
-
                     if (!empty($insert)) {
                         SupplierModel::create($insert);
                     }
                 }
             }
         }
-
-
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'smtjiahongming@126.com') { //测试diver
-
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
-
                 $getIssueLists = $channel->getIssues();
                 if (!empty($getIssueLists)) {
                     foreach ($getIssueLists as $issue) {
@@ -1178,7 +1038,6 @@ class TestController extends Controller
                             $issue_list->reasonEnglish = $issue['reasonEnglish'];
                             $issue_list->issueType = $issue['issueType'];
                             $issue_list->save();
-
                             if (!empty($issue['issue_detail'])) {
                                 $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
                                 if (empty($issue_detail->id)) {
@@ -1191,7 +1050,6 @@ class TestController extends Controller
                                     $issue_detail->issueStatus = $issue['issue_detail']->resultObject->issueStatus;
                                     $issue_detail->issueReason = $issue['issue_detail']->resultObject->issueReason;
                                     $issue_detail->productName = $issue['issue_detail']->resultObject->productName;
-
                                     //序列化对象
                                     $issue_detail->productPrice = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
                                     $issue_detail->buyerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
@@ -1199,12 +1057,8 @@ class TestController extends Controller
                                     $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
                                     $issue_detail->refundMoneyMax = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
                                     $issue_detail->refundMoneyMaxLocal = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
-
                                     $issue_detail->save();
-
                                 }
-
-
                             }
                         }
                     }
@@ -1212,7 +1066,6 @@ class TestController extends Controller
             }
         }
     }
-
     public function oneSku()
     {
         ini_set('memory_limit', '2048M');
@@ -1235,7 +1088,6 @@ class TestController extends Controller
             }
         }
     }
-
     /*Synchronize joom platform data
      *@model:joom
      *@param $account_ids
@@ -1264,7 +1116,6 @@ class TestController extends Controller
                         }
                         $productInfo['account_id'] = $account_id;  //request account id
                         $thisProduct = JoomPublishProductModel::where('productID', $productInfo['productID'])->first();
-
                         if ($thisProduct) {
                             $is_add = false;
                             $mark_id = $thisProduct->id;
@@ -1307,7 +1158,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     /*Time:2016-10-7
      *get joom order
      *@param $account_ids
@@ -1342,7 +1192,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     /*Time:2016-10-14
          *joom_OrdersToShipping 标记发货
          *@param $order_id $id
@@ -1376,14 +1225,11 @@ class TestController extends Controller
                 $orderList = $channel->joomApiOrdersToShipping($item, $provider, $track->tracking_no, $orders->status);
                 if ($orderList['code'] == 0 || isset($orderList['data']['success'])) {
                     if ($orders->status == 'SHIPPED') {
-
                     }
                 } else {
                     if (strpos($orderList['message'], "has been shipped already")) {
-
                         echo "" . $orderList->id . "在joom平台上已经标记发货成功！不需重新发货！api返回信息为" . $orderList['message'] . "<br>";
                     } else {
-
                         echo "发生错误，错误信息为" . $orderList["message"] . "<br>";
                     }
                 }
@@ -1392,7 +1238,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     /*
      * Time:2016-10-17
      * joomordersshelves  refure token

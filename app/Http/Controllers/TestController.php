@@ -71,11 +71,10 @@ class TestController extends Controller
     public function test2()
     {
         $package = PackageModel::find(1);
-        var_dump($package->realTimeLogistics());
+        var_dump($package->items->toarray());
     }
 //    public function test2()
 //    {
-//
 //        foreach (\App\Models\Order\ItemModel::all() as $item) {
 //            $status = ItemModel::where('sku', $item->sku)->first()->status;
 //            $item->update(['item_status' => $status]);

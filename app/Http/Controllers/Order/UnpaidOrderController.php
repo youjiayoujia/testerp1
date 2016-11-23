@@ -25,13 +25,25 @@ class UnpaidOrderController extends Controller
 
     public function create()
     {
+        $user = request()->user();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
-            'users' => UserModel::all(),
+            'users' => $user,
         ];
 
         return view($this->viewPath . 'create', $response);
+    }
+
+    public function index()
+    {
+        request()->flash();
+        $model = $this->model->where('customer_id', request()->user()->id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($model),
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 
     public function edit($id)

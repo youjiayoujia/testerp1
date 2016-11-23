@@ -1023,8 +1023,11 @@ Class AliexpressAdapter implements AdapterInterface
             $channelId = rawurlencode($message_obj->message_id);
             $buyerId = rawurlencode($message_obj->from);
             //$msgSources = rawurlencode($ChannelMessageFields['message_type']);
-            ($message_obj->label == '订单留言') ? $msgSources = 'order_msg' : $msgSources = 'message_center';
-
+            if($message_obj->label == '订单留言'){
+                $msgSources = rawurlencode('order_msg');
+            }else{
+                $msgSources = rawurlencode('message_center');
+            }
             $content = rawurlencode($replyMessage->content);
             $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
             $api_return =  $this->getJsonData('api.addMsg', $send_param);

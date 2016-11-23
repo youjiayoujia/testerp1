@@ -1017,12 +1017,10 @@ Class AliexpressAdapter implements AdapterInterface
         // TODO: Implement sendMessages() method.
         $message_obj = $replyMessage->message;
         if(!empty($message_obj)){
-            //$ChannelMessageFields = unserialize(base64_decode($message_obj->channel_message_fields));
             // step1:发信息
             $send_param = [];
             $channelId = rawurlencode($message_obj->message_id);
             $buyerId = rawurlencode($message_obj->from);
-            //$msgSources = rawurlencode($ChannelMessageFields['message_type']);
             if($message_obj->label == '订单留言'){
                 $msgSources = rawurlencode('order_msg');
             }else{
@@ -1030,34 +1028,27 @@ Class AliexpressAdapter implements AdapterInterface
             }
             $content = rawurlencode($replyMessage->content);
             $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
+
             $api_return =  $this->getJsonData('api.addMsg', $send_param);
             $api_return_array = json_decode($api_return,true);
             if(isset($api_return_array['result']["isSuccess"])){
-                echo 1 . '<br/>';
                 if($api_return_array['result']["isSuccess"]){
-                    echo 2 . '<br/>';
-
                     //step2: 更新消息为已读
                     $update_param = [];
                     $update_param['channelId']  = $message_obj->message_id;
                     $update_param['msgSources'] = $msgSources;
+
                     $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
                     $replyMessage->status = 'SENT';
                 }else{
-                    echo 3 . '<br/>';
-
                     $replyMessage->status = 'FAIL';
                 }
             }
         }else{
-
-            echo 4 . '<br/>';
-
             $replyMessage->status = 'FAIL';
         }
-        dd($replyMessage);
         $replyMessage->save();
-        return $replyMessage->status== 'SENT' ? true : false;
+        return $replyMessage->status == 'SENT' ? true : false;
     }
 
     /**

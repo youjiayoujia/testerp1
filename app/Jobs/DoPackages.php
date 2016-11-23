@@ -39,8 +39,8 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
         if ($this->order) {
             if ($this->order->status == 'PREPARED') {
                 $oldPackages = $this->order->packages;
-                foreach($oldPackages as $oldPackage) {
-                    foreach($oldPackage->items as $packageItem) {
+                foreach ($oldPackages as $oldPackage) {
+                    foreach ($oldPackage->items as $packageItem) {
                         $packageItem->delete();
                     }
                     $oldPackage->delete();
@@ -53,7 +53,7 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'Success.';
-                    $package->eventLog('队列', '已生成空包裹，加入匹配库存队列',json_encode($package));
+                    $package->eventLog('队列', '已生成空包裹，加入匹配库存队列', json_encode($package));
                 } else {
                     $this->relation_id = 0;
                     $this->result['status'] = 'fail';
@@ -63,7 +63,8 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                 $this->relation_id = 0;
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Order status is not PREPARED. Can not create package';
-                $this->order->eventLog('队列', 'Order status is not PREPARED. Can not create package',json_encode($package));
+                $this->order->eventLog('队列', 'Order status is not PREPARED. Can not create package',
+                    json_encode($this->order));
             }
         }
         $this->lasting = round(microtime(true) - $start, 3);

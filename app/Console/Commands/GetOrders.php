@@ -54,62 +54,63 @@ class GetOrders extends Command
                 $endDate = date("Y-m-d H:i:s", time() - 300);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $nextToken = '';
-
-                do {
-                    $start = microtime(true);
-                    $total = 0;
-                    $commandLog = CommandLog::create([
-                        'relation_id' => $account->id,
-                        'signature' => __CLASS__,
-                        'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '] - ' . $i . '.',
-                        'lasting' => 0,
-                        'total' => 0,
-                        'result' => 'init',
-                        'remark' => 'init',
-                    ]);
-                    $response = $channel->listOrders(
-                        $startDate, //开始日期
-                        $endDate, //截止日期
-                        $account->api_status, //订单状态
-                        $account->sync_pages, //每页数量
-                        $nextToken //下一页TOKEN
-                    );
-                    if (isset($response['error'])) {
-                        $result['status'] = 'fail';
-                        $result['remark'] = '[' . $response['error']['code'] . '] ' . $response['error']['message'] . '.';
-                        $result['data'] = serialize($response['error']);
-                        $this->error($account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页失败');
-                        $this->error($result['remark']);
-                    } else {
-                        foreach ($response['orders'] as $order) {
-                            $order['channel_id'] = $account->channel->id;
-                            $order['channel_account_id'] = $account->id;
-                            $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
-                            $order['operator'] = $account->operator ? $account->operator->id : 0;
-                            $order['active'] = 'NORMAL';
-                            $job = new InOrders($order);
-                            $job = $job->onQueue('inOrders');
-                            $this->dispatch($job);
-                            $total++;
+                foreach ($account->api_status as $api_statu) {
+                    do {
+                        $start = microtime(true);
+                        $total = 0;
+                        $commandLog = CommandLog::create([
+                            'relation_id' => $account->id,
+                            'signature' => __CLASS__,
+                            'description' => 'get [' . $api_statu . '] orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '] - ' . $i . '.',
+                            'lasting' => 0,
+                            'total' => 0,
+                            'result' => 'init',
+                            'remark' => 'init',
+                        ]);
+                        $response = $channel->listOrders(
+                            $startDate, //开始日期
+                            $endDate, //截止日期
+                            $api_statu, //订单状态
+                            $account->sync_pages, //每页数量
+                            $nextToken //下一页TOKEN
+                        );
+                        if (isset($response['error'])) {
+                            $result['status'] = 'fail';
+                            $result['remark'] = '[' . $response['error']['code'] . '] ' . $response['error']['message'] . '.';
+                            $result['data'] = serialize($response['error']);
+                            $this->error($account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页失败');
+                            $this->error($result['remark']);
+                        } else {
+                            foreach ($response['orders'] as $order) {
+                                $order['channel_id'] = $account->channel->id;
+                                $order['channel_account_id'] = $account->id;
+                                $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
+                                $order['operator'] = $account->operator ? $account->operator->id : 0;
+                                $order['active'] = 'NORMAL';
+                                $job = new InOrders($order);
+                                $job = $job->onQueue('inOrders');
+                                $this->dispatch($job);
+                                $total++;
+                            }
+                            $nextToken = $response['nextToken'];
+                            $result['status'] = 'success';
+                            $result['remark'] = 'Success.';
+                            $result['data'] = serialize($response['orders']);
+                            $this->info($account->alias . ':' . $account->id . ' 抓取第 ' . $i . ' 页成功');
+                            $i++;
                         }
-                        $nextToken = $response['nextToken'];
-                        $result['status'] = 'success';
-                        $result['remark'] = 'Success.';
-                        $result['data'] = serialize($response['orders']);
-                        $this->info($account->alias . ':' . $account->id . ' 抓取第 ' . $i . ' 页成功');
-                        $i++;
-                    }
-                    $end = microtime(true);
-                    $lasting = round($end - $start, 3);
-                    $this->info('Lasting ' . $lasting . 's.');
-                    $commandLog->update([
-                        'data' => $result['data'],
-                        'lasting' => $lasting,
-                        'total' => $total,
-                        'result' => $result['status'],
-                        'remark' => $result['remark'],
-                    ]);
-                } while ($nextToken);
+                        $end = microtime(true);
+                        $lasting = round($end - $start, 3);
+                        $this->info('Lasting ' . $lasting . 's.');
+                        $commandLog->update([
+                            'data' => $result['data'],
+                            'lasting' => $lasting,
+                            'total' => $total,
+                            'result' => $result['status'],
+                            'remark' => $result['remark'],
+                        ]);
+                    } while ($nextToken);
+                }
             } else {
                 $this->error('Account is not exist.');
             }

@@ -113,7 +113,7 @@ class OrderModel extends BaseModel
     {
         $items = $this->items;
         $weight = 0;
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $weight += $item->item->weight * $item->quantity;
         }
 
@@ -343,8 +343,9 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\RequireModel', 'order_id');
     }
 
-    public function ebayMessageList(){
-        return $this->hasMany('App\Models\Message\SendEbayMessageListModel','order_id','id');
+    public function ebayMessageList()
+    {
+        return $this->hasMany('App\Models\Message\SendEbayMessageListModel', 'order_id', 'id');
     }
 
     public function getStatusNameAttribute()
@@ -420,7 +421,7 @@ class OrderModel extends BaseModel
     public function getLogisticsAttribute()
     {
         $logistics = '';
-        foreach($this->packages as $package) {
+        foreach ($this->packages as $package) {
             $logisticsName = $package->logistics ? $package->logistics->code : '';
             $logistics .= $logisticsName . ' ';
         }
@@ -431,7 +432,7 @@ class OrderModel extends BaseModel
     public function getCodeAttribute()
     {
         $code = '';
-        foreach($this->packages as $package) {
+        foreach ($this->packages as $package) {
             $trackingNo = $package->tracking_no;
             $code .= $trackingNo . ' ';
         }
@@ -506,13 +507,13 @@ class OrderModel extends BaseModel
             }
             $data['customer_id'] = request()->user()->id;
             $refund = new RefundModel;
-            $refund_new=$refund->create($data);
+            $refund_new = $refund->create($data);
             if ($data['type'] == 'FULL') {
                 foreach ($data['arr']['id'] as $fullid) {
                     $orderItem = $this->items->find($fullid);
                     $orderItem->update(['refund_id' => $refund_new->id]);
                 }
-            }else{
+            } else {
                 foreach ($data['tribute_id'] as $partid) {
                     $orderItem = $this->items->find($partid);
                     $orderItem->update(['refund_id' => $refund_new->id]);
@@ -533,7 +534,7 @@ class OrderModel extends BaseModel
         if ($driver == 'wish') {
             $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
             $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
-        } elseif($driver == 'aliexpress') {
+        } elseif ($driver == 'aliexpress') {
             $blacklist = BlacklistModel::where('by_id', $this->by_id);
         } else {
             $blacklist = BlacklistModel::where('email', $this->email);
@@ -552,11 +553,9 @@ class OrderModel extends BaseModel
     public function createOrder($data)
     {
         $data['ordernum'] = str_replace('.', '', microtime(true));
-        $currency = CurrencyModel::where('code', $data['currency']);
-        if($currency->count() > 0) {
-            foreach($currency->get() as $value) {
-                $data['rate'] = $value['rate'];
-            }
+        $currency = CurrencyModel::where('code', $data['currency'])->first();
+        if ($currency) {
+            $data['rate'] = $currency->rate;
         }
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
@@ -569,35 +568,10 @@ class OrderModel extends BaseModel
             }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
-                $order->update(['status' => 'REVIEW']);
+                $order->update(['is_reviewed' => 0, 'review_type' => 'ITEM']);
                 $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
             }
             $order->items()->create($orderItem);
-        }
-        if($order->status == 'COMPLETE' && $order->fulfill_by == 'AFN') {
-            foreach($order->items as $orderItem) {
-                ChannelSaleModel::create(['item_id' => $orderItem->item_id,
-                                          'channel_sku' => $orderItem->channel_sku,
-                                          'quantity' => $orderItem->quantity,
-                                          'account_id' => $order->channel_account_id,
-                                          'create_time' => $order->create_time]);
-            }
-        }
-
-        //客户留言需审核
-        if ($order->customer_remark != null && $order->customer_remark != '') {
-            $order->update(['status' => 'REVIEW']);
-        }
-
-        //客户备注需审核
-        if (isset($data['remark']) and !empty($data['remark'])) {
-            $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
-        }
-
-        //黑名单需审核
-        if ($order->status != 'UNPAID' && $order->checkBlack()) {
-            $order->update(['status' => 'REVIEW']);
-            $order->remark('黑名单订单.');
         }
 
         if ($order->status == 'PAID') {
@@ -607,7 +581,6 @@ class OrderModel extends BaseModel
         return $order;
     }
 
-    //todo: Update order
     public function updateOrder($data, $order)
     {
         $order = $order->update($data);
@@ -736,12 +709,13 @@ class OrderModel extends BaseModel
         $channel = $this->channel;
         $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($orderItems as $orderItem) {
-            $buf = $orderItem->item->catalog->channels->where('id', $this->channelAccount->catalog_rates_channel_id)->first();
-            if($buf) {
+            $buf = $orderItem->item->catalog->channels->where('id',
+                $this->channelAccount->catalog_rates_channel_id)->first();
+            if ($buf) {
                 $buf = $buf->pivot;
                 $flat_rate_value = $buf->flat_rate;
                 $rate_value = $buf->rate;
-                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value/100 + $flat_rate_value * $currency;
+                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value / 100 + $flat_rate_value * $currency;
             } else {
                 return 0;
             }
@@ -751,32 +725,29 @@ class OrderModel extends BaseModel
     }
 
     /**
-     * 订单取消
+     * 订单撤销
      *
-     * @param $order 订单 $orderItems 订单条目
-     * @return none
-     *
+     * @return boolean
      */
-    public function OrderCancle()
+    public function cancelOrder($type, $reason = '')
     {
-        $orderItems = $this->items;
-        $this->update(['status' => 'REVIEW']);
-        $this->remarks()->create(['remark' => 'profit is less than 0', 'user_id' => request()->user()->id]);
-        foreach ($orderItems as $orderItem) {
-            $orderItem->update(['is_active' => '0']);
-        }
-        $packages = $this->packages;
-        foreach ($packages as $package) {
-            foreach ($package->items as $packageItem) {
-                $item = $packageItem->item;
-                if(!in_array($package->status, ['NEW', 'WAITASSIGN', 'NEED', 'SHIPPED', 'PACKED'])) {
-                    $item->unhold($packageItem->warehouse_position_id, $packageItem->quantity,
-                         'CANCEL');
+        if ($this->status != 'CANCEL') {
+            if (!in_array($this->status, ['SHIPPED', 'COMPLETE'])) {
+                //取消包裹
+                foreach ($this->packages as $package) {
+                    $package->cancelPackage();
                 }
-                $packageItem->delete();
+                //撤销订单
+                $this->update([
+                    'status' => 'CANCEL',
+                    'withdraw' => $type,
+                    'withdraw_reason' => $reason
+                ]);
+            } else {
+                return false;
             }
-            $package->delete();
         }
+        return true;
     }
 
     public function getStatusTextAttribute()
@@ -789,19 +760,21 @@ class OrderModel extends BaseModel
         return config('order.active.' . $this->active);
     }
 
-    public function getSendEbayMessageHistoryAttribute(){
-        if(!$this->ebayMessageList->isEmpty()){
+    public function getSendEbayMessageHistoryAttribute()
+    {
+        if (!$this->ebayMessageList->isEmpty()) {
             return $this->ebayMessageList;
-        }else{
+        } else {
             return false;
         }
     }
 
-    public function getOrderReamrksAttribute(){
+    public function getOrderReamrksAttribute()
+    {
         $remarks = '';
-        if(!$this->remarks->isEmpty()){
-            foreach ($this->remarks as $remark){
-                $remarks .= empty($remarks) ? $remark->remark : $remark->remark.';';
+        if (!$this->remarks->isEmpty()) {
+            foreach ($this->remarks as $remark) {
+                $remarks .= empty($remarks) ? $remark->remark : $remark->remark . ';';
 
             }
         }

@@ -339,7 +339,15 @@ class LogisticsController extends Controller
         $logistics_id = request('logistics');
         $logistics = $this->model->find($logistics_id);
         if(!$logistics) {
-            return json_encode(false);
+            $logistics = $this->model->where('code', $logistics_id)->get();
+            if(!$logistics->count()) {
+                return json_encode(false);
+            }
+            $str = '';
+            foreach($logistics as $single) {
+                $str .= "<option class='logis' value='".$single->id."'>".$single->code."</option>";
+            }
+            return $str;
         }
         $str = "<option class='logis' value='".$logistics->id."'>".$logistics->code."</option>";
         return $str;

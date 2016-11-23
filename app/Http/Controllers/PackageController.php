@@ -793,6 +793,21 @@ class PackageController extends Controller
         })->download('csv');
     }
 
+    public function downloadLogisticsTno()
+    {
+        $rows[] = [
+            'package_id' => '',
+            'logistics_id' => '',
+            'tracking_no' => '',
+        ];
+        $name = '批量修改物流挂号码';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     public function forceOutPackage()
     {
         $package_id = trim(request('package_id'));

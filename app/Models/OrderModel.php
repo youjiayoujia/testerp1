@@ -533,6 +533,8 @@ class OrderModel extends BaseModel
         if ($driver == 'wish') {
             $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
             $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
+        } elseif($driver == 'aliexpress') {
+            $blacklist = BlacklistModel::where('by_id', $this->by_id);
         } else {
             $blacklist = BlacklistModel::where('email', $this->email);
         }

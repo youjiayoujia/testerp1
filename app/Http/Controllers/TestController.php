@@ -642,7 +642,7 @@ class TestController extends Controller
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
         }
-        dd('已执行！fight！！！');
+        dd('已执行！ fight 2！！！');
 
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver

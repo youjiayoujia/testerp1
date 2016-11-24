@@ -48,9 +48,6 @@
             <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
-            <div class="col-lg-4">
-                <strong>物流限制</strong>: {{ $model->limit($model->limit) }}
-            </div>
             @foreach($channelNames as $channelName)
             <div class="col-lg-4">
                 <strong>{{$channelName->channel ? $channelName->channel->name : ''}}渠道回传编码</strong>: {{ $channelName->name }}
@@ -66,6 +63,19 @@
                     <div class="col-lg-2">
                         <strong>{{ $logisticsChannel->channel ? $logisticsChannel->channel->name : '' }}平台</strong>:
                         {{ $logisticsChannel->is_up == '1' ? '上传' : '不上传' }}
+                    </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">缺货是否标记发货</div>
+        <div class="panel-body">
+            @if($logisticsChannels->count() > 0)
+                @foreach($logisticsChannels as $logisticsChannel)
+                    <div class="col-lg-2">
+                        <strong>{{ $logisticsChannel->channel ? $logisticsChannel->channel->name : '' }}平台</strong>:
+                        {{ $logisticsChannel->delivery == '1' ? '是' : '否' }}
                     </div>
                 @endforeach
             @endif

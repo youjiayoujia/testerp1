@@ -121,13 +121,11 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['winitProductCode'] = $channel;
 
         $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
-        echo "<pre>";
-        print_r($result);
+//         echo "<pre>";
+//         print_r($result);
         $result = json_decode($result,true);
-        if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))
-        {   
-            //$data = ['tracking_no' => $result['data']['orderNo'] ];
-            //PackageModel::where('id',$package->id)->update($data);            
+        if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))        {   
+              
             return array('code' => 'success', 'result' => $result['data']['orderNo'] );        
         }else{        
             return array('code' => 'error', 'result' => 'error description.');

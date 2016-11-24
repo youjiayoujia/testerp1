@@ -13,7 +13,7 @@ class WinitAdapter extends BasicAdapter
     protected $shipperAddrCode =array(
         999 =>'A00004',
         1000=>'SLME003',
-        5 => 'SLME003',
+        3 => 'SLME003',
     );
     
     protected $winitProductCode=array(
@@ -61,12 +61,14 @@ class WinitAdapter extends BasicAdapter
         $this->userName = $config['userId'];
         $this->passWord = $config['userPassword'];
         $this->token = $config['key'];
-        $this->server_url = $config['url'];
+        $this->server_url = $config['url']; 
     }
     
     public function getTracking($package)
     {              
         $creatOrder = array();
+        
+        list($name, $channel) = explode(',', $package->logistics->type);
         $creatOrder['buyerAddress1'] = $package->shipping_address;
         $creatOrder['buyerAddress2'] = $package->shipping_address1;
         $creatOrder['buyerCity'] = $package->shipping_city;
@@ -78,53 +80,52 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['buyerState'] = $package->shipping_state;
         $creatOrder['buyerZipCode'] = $package->shipping_zipcode;
         $creatOrder['dispatchType'] = 'P';
-        $creatOrder['ebaySellerId'] = '';
+        $creatOrder['ebaySellerId'] = $package->channelAccount ?  lcfirst($package->channelAccount->account) : '';
         
         $product_last = array();
         $product_detail = array();
-        //$product_last['packageDesc'] = 
-        $product_last['height'] = $package->height;
-        $product_last['length'] = $package->length;
-        $product_last['width'] = $package->width;        
-        $product_last['weight'] = $package->weight;
         
+        $product_last['weight'] = $package->signal_weight;
         foreach ($package->items as $key => $item) {                   
             if ($key == 0) {
-                $product_detail['declareNameCn'] = $item->item->product->declared_cn;
-                $product_detail['declareNameEn'] = $item->item->product->declared_en;
-                $product_detail['declareValue'] = $item->item->product->declared_value;
-                $product_detail['itemID'] = $item->orderItem->item_id;    //条目ID（eBay订单必填）  字段不确定，待确认
-                $product_detail['transactionID'] = $item->orderItem->transaction_id; //交易ID（eBay订单必填） 不确定字段数据相关联的表
+                $product_last['height'] = (isset($item->item->height) && $item->item->height != 0)? $item->item->height : 5;
+                $product_last['length'] = (isset($item->item->length) && $item->item->length !=0)? $item->item->length : 5;
+                $product_last['width'] =  (isset($item->item->width) &&  $item->item->width !=0) ? $item->item->width  : 5;
+                $product_detail['declaredNameCn'] = $item->item->product->declared_cn;
+                $product_detail['declaredNameEn'] = $item->item->product->declared_en;
+                $product_detail['declaredValue'] = $item->item->product->declared_value;
+                $product_detail['itemID'] = $item->orderItem->orders_item_number;    //条目ID（eBay订单必填）  字段不确定，待确认
+                $product_detail['transactionID'] = isset($item->orderItem->transaction_id) ? $item->orderItem->transaction_id : '0'; //交易ID（eBay订单必填） 不确定字段数据相关联的表
             }
             $product_last['merchandiseList'][] = $product_detail;
         }
         
         ksort($product_last);
         $creatOrder['packageList'][] = $product_last;               //包裹列表
-        $creatOrder['pickUpCode'] = $package->picklist->picknum;    //捡货条码
+        $creatOrder['pickUpCode'] = $package->order->ordernum;    //捡货条码
         $creatOrder['refNo'] = $package->order->ordernum;          //卖家订单号    字段不确定，待确认
-    
-        if($package->logistics_id == 524){
+        $logistics_code = $package->logistics->logistics_code;
+        if($logistics_code == 524){
             $new_warehouseCode='YW10000012';//此渠道发金华仓
             $new_shipperAddrCode = 'YWSLME';
         }else{
-            $new_warehouseCode=$this->warehouseCode[$this->winitProductCode];
+            $new_warehouseCode=$this->warehouseCode[$channel];
             $new_shipperAddrCode=$this->shipperAddrCode[$package->warehouse_id];
         }
         /*$creatOrder['shipperAddrCode'] = $this->shipperAddrCode[$package->warehouse_id];        
         $creatOrder['warehouseCode'] = $this->warehouseCode['WP-HKP101']
         $creatOrder['winitProductCode'] = 'WP-HKP101';*/
-        
+       
         $creatOrder['shipperAddrCode'] = $new_shipperAddrCode;        
         $creatOrder['warehouseCode'] = $new_warehouseCode;
-        $creatOrder['winitProductCode'] = $this->winitProductCode;
-        
-        //$this->setApi($package->warehouse_id);
+        $creatOrder['winitProductCode'] = $channel;
+
         $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
-        if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))
-        {   
-            //$data = ['tracking_no' => $result['data']['orderNo'] ];
-            //PackageModel::where('id',$package->id)->update($data);            
+//         echo "<pre>";
+//         print_r($result);
+        $result = json_decode($result,true);
+        if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))        {   
+              
             return array('code' => 'success', 'result' => $result['data']['orderNo'] );        
         }else{        
             return array('code' => 'error', 'result' => 'error description.');
@@ -143,7 +144,7 @@ class WinitAdapter extends BasicAdapter
     
     public function getSign($token,$action,$data=''){
         $time =date('Y-m-d H:i:s');
-        $string =$token.'action'.$action.'app_key'.$this->config['userId'].'data'.(string)json_encode($data,JSON_UNESCAPED_UNICODE).'formatjsonplatformsign_methodmd5timestamp'.$time.'version1.0'.$token;   
+        $string =$token.'action'.$action.'app_key'.$this->userName.'data'.(string)json_encode($data,JSON_UNESCAPED_UNICODE).'formatjsonplatformsign_methodmd5timestamp'.$time.'version1.0'.$token;   
         $sign =strtoupper(md5($string));
         $this->sign = $sign;
     
@@ -187,9 +188,34 @@ class WinitAdapter extends BasicAdapter
         $post_array['timestamp'] =date('Y-m-d H:i:s');
         $post_array['version'] ="1.0";    
         $headers = array("application/x-www-form-urlencoded; charset=gb2312");
-        $result =  $this->curlPost($this->server_url,json_encode($post_array,JSON_UNESCAPED_UNICODE),$headers);
+        //$result =  $this->curlPost($this->server_url,json_encode($post_array,JSON_UNESCAPED_UNICODE),$headers);
+        $result = $this->postCurlData($this->server_url, json_encode($post_array,JSON_UNESCAPED_UNICODE));
         return $result;
     }
+    
+    /**
+     * Curl http Post 数
+     * 使用方法：
+     * $post_string = "app=request&version=beta";
+     * postCurlData('http://www.test.cn/restServer.php',$post_string);
+     */
+    public function postCurlData($remote_server, $post_string) {
+        //   var_dump($post_string);exit;
+        $ch = curl_init();
+        $header[] = "Content-type: text/json";
+        curl_setopt($ch, CURLOPT_URL, $remote_server); //定义表单提交地址
+        curl_setopt($ch, CURLOPT_POST, 1);   //定义提交类型 1：POST ；0：GET
+        curl_setopt($ch, CURLOPT_HEADER, 0); //定义是否显示状态头 1：显示 ； 0：不显示
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);//定义请求类型
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);//定义是否直接输出返回流
+        curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string); //定义提交的数据，这里是XML文件
+        $tmpInfo = curl_exec ( $ch ); // 执行操作
+    
+        curl_close($ch);//关闭
+        return $tmpInfo;
+    }
+    
     
 }
 

@@ -173,8 +173,6 @@ class SmtAdapter extends BasicAdapter
             $api = 'api.createWarehouseOrder';
             $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
             $result = json_decode($rs,true);
-            echo "<pre>";
-            print_r($result);
             if(array_key_exists('success', $result) && $result['result']['success']){
                 if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
                     $data['channel_listnum'] = $result['result']['intlTracking'];
@@ -219,124 +217,23 @@ class SmtAdapter extends BasicAdapter
         $result = $smtApi->getJsonData($action, $parameter);
         return json_decode($result, true);
     }
-
+    
     /**
-     * 创建线上发货物流订单
-     * @param unknown $package
-     */
-    /*
-    public function createWarehouseOrder($package){
-        $orderId     = $package->order->channel_ordernum; //内单号
-        $warehouseId = $package->warehouse_id; //仓库
-        $shipId = $package->logistics_id; //物流
-        $channel_account_id = $package->channel_account_id;
-        
-        list($name, $channel) = explode(',',$package->logistics->type);
-        //$warehouseCarrierService = $this->getWarehouseCarrierService($channel,$warehouseId);
-        $warehouseCarrierService = $channel;  //物流方式
-        $totalWeight = 0;
-        $productData = array();
-        foreach($package->items as $key => $item){
-            $totalWeight += $item->item->weight;
-            $products_declared_cn = $item->item->product->declared_cn;
-            $products_declared_en = $item->item->product->declared_en;
-            $products_declared_value = $item->item->product->declared_value;
-            $productId = $item->item->product->id;
-            $productNum =  $item->quantity;
-        }
-        
-        $productData = array(
-            'categoryCnDesc'       => $package->decleared_cname,
-            'categoryEnDesc'       => $package->decleared_ename,
-            'productDeclareAmount' => $package->decleared_value,
-            'productId'            => $productId,
-            'productNum'           => $productNum,
-            'productWeight'        => $totalWeight,
-            'isContainsBattery'    => 0
-        );
-        
-        $addressArray = array(
-            'receiver' => array( //收件人地址
-                'country'       => $package->shipping_country, //国家简称, 速卖通下单下来应该就是吧
-                'province'      => $package->shipping_state, //省/州,（必填，长度限制1-48字节）
-                'city'          => $package->shipping_city, //城市
-                'streetAddress' => $package->shipping_address . ' ' . $package->shipping_address1, //街道 ,（必填，长度限制1-90字节）
-                'phone'         => $package->shipping_phone, //phone（长度限制1- 54字节）,phone,mobile两者二选一
-                'name'          => $package->shipping_firstname . " " . $package->shipping_lastname, //姓名,（必填，长度限制1-90字节）
-                'postcode'      => $package->shipping_zipcode  //邮编
-            ),
-        );        
-        
-        $data = array();
-        $data['tradeOrderId'] = $orderId;
-        $data['tradeOrderFrom'] = 'SOURCING';
-        $data['warehouseCarrierService'] = $warehouseCarrierService;
-        $data['domesticLogisticsCompanyId'] = '-1'; //国内快递ID;(物流公司是other时,ID为-1)
-        $data['domesticLogisticsCompany']   = '上门揽收'; //国内快递公司名称;(物流公司Id为-1时,必填)
-        $data['domesticTrackingNo']         = 'None'; //国内快递运单号,长度1-32
-        
-        //获取SMT平台线上发货地址
-        $address_api = "alibaba.ae.api.getLogisticsSellerAddresses";
-        $address_smt = array(
-            'request'=>'["sender","pickup"]'
-        );
-        $address_result = parent::getJsonDataUsePostMethod($address_api, $address_smt);
-        $address_result = json_decode($address_result, true);
-        
-        $addressArray = array_merge($addressArray, $this->_senderAddress['5']);
-        $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
-        $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
-        $data['declareProductDTOs']         = json_encode($productData);
-        $data['addressDTOs']                = json_encode($addressArray);
-        
-       $api = 'api.createWarehouseOrder';
-       //获取渠道帐号资料
-       $account = AccountModel::findOrFail($channel_account_id);
-       $smtApi = Channel::driver($account->channel->driver, $account->api_config);
-       $result = json_decode($smtApi->getJsonDataUsePostMethod($api,$data));
-
-       if(array_key_exists('success', $result)){
-           if ($result['result']['success']){
-               if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
-                   $data['channel_listnum'] = $result['result']['intlTracking'];
-                   $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
-                   //OrderModel::where('id',$package->order->id)->update($data);
-                   return array('code' => 'success', 'result' => $result['result']['intlTracking'] );                                     
-               }               
-           }
-       }else{
-           return array('code' => 'error','result' => 'error description.');                  
-       }
-        
-    }*/
-
-    /**
-     * 根据渠道代码、货仓id获取线上发货物流方案
-     * @param string $channelName
-     * @param int $warehouse_id
+     * 截取全角和半角（汉字和英文）混合的字符串以避免乱码
+     * @param unknown $str_cut  需要截断的字符串
+     * @param unknown $length   允许字符串显示的最大长度
      * @return string
      */
-    public function getWarehouseCarrierService($channelName, $warehouse_id)
+    public function substr_cut($str_cut,$length)
     {
-        $defineLogisticsService = array('中国邮政挂号小包' => 'CPAM', '中国邮政平常小包+' => 'YANWEN_JYT');   //渠道代码
-        $defineDetailShipService = array(
-            'YANWEN_JYT' => array(                  //中国邮政平常小包+ 对应的物流ID
-                '5' => 'YANWENJYT_WLB_CPAMSZ',   //深圳
-                '2' => 'YANWENJYT_WLB_CPAMJH'    //先设置成义乌的，后期开通了再设置成金华的//'YANWENJYT_WLB_CPAMJH' //金华，目前未开通
-            ),
-            'CPAM' => array(                        //中国邮政挂号小包
-                '5' => 'CPAM_WLB_CPAMSZ',        //深圳
-                '2' => 'CPAM_WLB_CPAMJH'         //金华
-            )
-        );
-
-        $logisticsCode = $defineLogisticsService[$channelName];
-
-        $warehouseCarrierService = $defineDetailShipService[$logisticsCode][$warehouse_id]; //实际发货物流服务key
-        return $warehouseCarrierService;
-
+        if (strlen($str_cut) > $length)
+        {
+            for($i=0; $i < $length; $i++)
+            if (ord($str_cut[$i]) > 128)    $i++;
+            $str_cut = substr($str_cut,0,$i)."..";
+        }
+        return $str_cut;
     }
-
-}
+}   
 
 ?>

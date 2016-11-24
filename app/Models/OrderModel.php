@@ -617,8 +617,8 @@ class OrderModel extends BaseModel
             }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
-                $order->update(['is_reviewed' => 0, 'review_type' => 'ITEM']);
-                $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
+                $order->update(['status' => 'CANCEl',]);
+                $order->remark($orderItem['channel_sku'] . '找不到对应产品.', 'ITEM');
             }
             $order->items()->create($orderItem);
         }

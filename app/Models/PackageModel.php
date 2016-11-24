@@ -607,9 +607,6 @@ class PackageModel extends BaseModel
         if (!in_array($this->status, ['NEW', 'NEED'])) {
             return false;
         }
-        if (!$this->order->is_reviewed) {
-            return false;
-        }
         return true;
     }
 

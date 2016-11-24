@@ -283,6 +283,15 @@ class PurchaseOrderController extends Controller
         $data['examineStatus']=$examineStatus;
         $data['status'] = 1;
         $model->update($data);
+        //更新采购需求数据
+        $temp_arr = [];
+        foreach($model->purchaseItem as $purchaseitemModel){
+            $purchaseitemModel->update(['status'=>1]);
+            $temp_arr[] = $purchaseitemModel->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
+
         $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单审核,id='.$model->id, $to, $from);
         return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'审核通过.'));

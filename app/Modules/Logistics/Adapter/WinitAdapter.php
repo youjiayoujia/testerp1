@@ -102,7 +102,7 @@ class WinitAdapter extends BasicAdapter
         
         ksort($product_last);
         $creatOrder['packageList'][] = $product_last;               //包裹列表
-        $creatOrder['pickUpCode'] = $package->picklist->picknum;    //捡货条码
+        $creatOrder['pickUpCode'] = $package->order->ordernum;    //捡货条码
         $creatOrder['refNo'] = $package->order->ordernum;          //卖家订单号    字段不确定，待确认
         $logistics_code = $package->logistics->logistics_code;
         if($logistics_code == 524){

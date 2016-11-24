@@ -380,7 +380,7 @@ $(function () {
         var row_hidden = '<div id="hidden-row-'+row+'"></div>';
         $('#hidden-inputs').append(row_hidden);
         row += 1;
-        console.log(row);
+        //console.log(row);
     });
 
     $('#set').change(function() {
@@ -394,7 +394,7 @@ $(function () {
                 $('.variation-hide-'+current).attr('name','modelSet['+$(this).val()+'][variations]['+$("#variation-name").val()+'][]');
             }else{
                 var hidden = '<input type="hidden" class="set-hidden-'+current+'" name="modelSet['+$(this).val()+'][model]" value="'+$(this).val()+'">';
-                console.log(hidden);
+                //console.log(hidden);
                 $('#hidden-row-'+current).append(hidden);
             }
             $(this).val('');
@@ -404,13 +404,19 @@ $(function () {
     $('#variation').change(function() {
         var current = row - 1;
         if($(this).val() != ''){
+            var set = $('.set-row-'+current).first().text();
+            if(!set){
+                alert('请先选则颜色，ok?');
+                return;
+            }
             var variation = '<code>'+$(this).val()+'</code>';
             $(".variation-row-"+current).append(variation);
             //把属性增加到隐藏表单
-            var set = $('.set-row-'+current).first().text();
             if(set){
                 var variation_name = $("#variation-name").val();
                 var hidden = '<input type="hidden" class="variation-hide-'+current+'" name="modelSet['+set+'][variations]['+variation_name+'][]" value="'+$(this).val()+'">';
+
+                //console.log(hidden);
                 $('#hidden-row-'+current).append(hidden);
             }
             $(this).val('');

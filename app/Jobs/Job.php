@@ -48,7 +48,7 @@ abstract class Job
             if(!$category) {
                 $category = CategoryModel::create(['model_name' => $modelName]);
             }
-            $category->child()->create(['type_id' => ($to ? unserialize(base64_decode($to))->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user]);
+            $category->child()->create(['type_id' => ($to ? json_decode($to)->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user]);
         }
     }
 }

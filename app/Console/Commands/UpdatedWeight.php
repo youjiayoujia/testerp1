@@ -46,7 +46,6 @@ class UpdatedWeight extends Command
         $num = 0;
         while ($packages->count()) {
             foreach($packages as $package) {
-                $weight = floatval($package->weight);
                 $newWeight = 0;
                 foreach($package->items as $packageItem) {
                     $newWeight += $packageItem->item->weight * $packageItem->quantity;

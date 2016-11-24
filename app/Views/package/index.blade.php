@@ -14,7 +14,7 @@
     <th>物流方式</th>
     <th>物流单号</th>
     <th>发货类型</th>
-    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -43,7 +43,7 @@
             <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
-            <td>{{ $package->created_at }}</td>
+            <td>{{ $package->updated_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
@@ -75,14 +75,16 @@
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
-                <td colspan='4'>{{ $packageItem->quantity }}</td>
+                <td colspan='2'>{{ $packageItem->quantity }}</td>
+                <td colspan='2'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='2'>运输方式: {{ $package->order->shipping }}</td>
+            <td colspan='2'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
             <td colspan='6'>
+
                 <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
@@ -201,6 +203,7 @@
                    data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
+            <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
             <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
             <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
         </ul>
@@ -289,6 +292,11 @@
             })
 
             $('.multiEditTracking').click(function () {
+                type = $(this).data('type');
+                location.href = "{{ route('package.returnFee')}}?type=" + type;
+            })
+
+            $('.changeLogisticsTn').click(function () {
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
             })

@@ -362,7 +362,7 @@ class ItemModel extends BaseModel
             'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
             'filterSelects' => ['status' => config('item.status'),
-                                'warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+                                'warehouse_id' =>$this->getArray('App\Models\WarehouseModel', 'name'),
                                ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'sectionSelect' => [],

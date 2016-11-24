@@ -13,7 +13,7 @@
                 </div>
                 <div class='form-group col-lg-6'>
                     <label>物流ID</label>
-                    <input type='text' class='form-control search' placeholder='物流id'>
+                    <input type='text' class='form-control search' placeholder='物流id,简码'>
                 </div>
             </div>
             <div class='row'>

@@ -292,7 +292,7 @@ class PurchaseOrderController extends Controller
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);
 
-        $to = base64_encode(serialize($model));
+        $to = json_encode(serialize($model));
         $this->eventLog($userName->name, '采购单审核,id='.$model->id, $to, $from);
         return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'审核通过.'));
     }

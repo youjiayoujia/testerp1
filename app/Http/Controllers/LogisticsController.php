@@ -128,6 +128,20 @@ class LogisticsController extends Controller
         return 1;
     }
 
+    //启用停用
+    public function updateEnable()
+    {
+        $logistics_id = request()->input('logistics_id');
+        $model = $this->model->find($logistics_id);
+        if ($model->is_enable == '1') {
+            $model->update(['is_enable' => '0']);
+        } else {
+            $model->update(['is_enable' => '1']);
+        }
+
+        return 1;
+    }
+
     /**
      * 存储
      *
@@ -325,7 +339,15 @@ class LogisticsController extends Controller
         $logistics_id = request('logistics');
         $logistics = $this->model->find($logistics_id);
         if(!$logistics) {
-            return json_encode(false);
+            $logistics = $this->model->where('code', $logistics_id)->get();
+            if(!$logistics->count()) {
+                return json_encode(false);
+            }
+            $str = '';
+            foreach($logistics as $single) {
+                $str .= "<option class='logis' value='".$single->id."'>".$single->code."</option>";
+            }
+            return $str;
         }
         $str = "<option class='logis' value='".$logistics->id."'>".$logistics->code."</option>";
         return $str;

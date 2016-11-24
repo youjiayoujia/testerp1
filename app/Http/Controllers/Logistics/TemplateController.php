@@ -12,6 +12,8 @@ namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
 use App\Models\Logistics\TemplateModel;
+use App\Models\LogisticsModel;
+use App\Models\PackageModel;
 
 class TemplateController extends Controller
 {
@@ -36,6 +38,69 @@ class TemplateController extends Controller
         ];
 
         return view($this->viewPath . 'tpl.' . explode('.', $model->view)[0], $response);
+    }
+
+    //面单确认
+    public function confirm()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '面单确认'),
+            'logistics' => LogisticsModel::all(),
+        ];
+
+        return view($this->viewPath . 'confirm', $response);
+    }
+
+    /**
+     * 获取物流方式信息
+     */
+    public function ajaxLogistics()
+    {
+        if (request()->ajax()) {
+            $logistics = trim(request()->input('logistics_id'));
+            $buf = LogisticsModel::where('name', 'like', '%' . $logistics . '%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach ($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if ($total) {
+                return json_encode(['results' => $arr, 'total' => $total]);
+            } else {
+                return json_encode(false);
+            }
+        }
+
+        return json_encode(false);
+    }
+
+    //确认
+    public function preview()
+    {
+        $packageId = request()->input('package_id');
+        $logisticsId = request()->input('logistics_id');
+        $model = PackageModel::find($packageId);
+        $logistics = LogisticsModel::find($logisticsId);
+        $model->logistics = $logistics;
+        $view = $logistics->template->view;
+        $view = explode('.', $view)[0];
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view('logistics.template.tpl.' . $view, $response);
+    }
+
+    //面单确认
+    public function queren()
+    {
+        $logistics_id = request()->input('logistics_id');
+        $logistics = LogisticsModel::find($logistics_id);
+        $logistics->update(['is_confirm' => '1']);
+
+        return 1;
     }
 
     /**

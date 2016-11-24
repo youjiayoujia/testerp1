@@ -491,15 +491,23 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logisticsZone/one/{id}',
         ['uses' => 'Logistics\ZoneController@one', 'as' => 'logisticsZone.one']);
+    Route::get('logisticsRule/one/{id}',
+        ['uses' => 'Logistics\RuleController@one', 'as' => 'logisticsRule.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::get('logistics/ajaxSupplier',
         ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
+    Route::get('logistics/ajaxLogistics',
+        ['uses' => 'Logistics\TemplateController@ajaxLogistics', 'as' => 'logistics.ajaxLogistics']);
+    Route::get('template/preview',
+        ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
+    Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCollectionInfo', 'Logistics\CollectionInfoController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
+    Route::get('updateEnable', ['uses' => 'LogisticsController@updateEnable', 'as' => 'updateEnable']);
     Route::get('logisticsZone/getCountries',
         ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
     Route::get('logisticsZone/sectionAdd',
@@ -523,6 +531,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('logisticsCatalog', 'Logistics\CatalogController');
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
+    Route::get('confirm',
+        ['uses' => 'Logistics\TemplateController@confirm', 'as' => 'confirm']);
     Route::resource('logisticsTransport', 'Logistics\TransportController');
     Route::resource('logisticsPartition', 'Logistics\PartitionController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
@@ -619,6 +629,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('withdrawAll', ['uses' => 'OrderController@withdrawAll', 'as' => 'withdrawAll']);
+    Route::any('partReview', ['uses' => 'OrderController@partReview', 'as' => 'partReview']);
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
     Route::get('updateStatus', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
     Route::get('updatePrepared', ['uses' => 'OrderController@updatePrepared', 'as' => 'updatePrepared']);
@@ -659,6 +670,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/downloadLogisticsTno',
+        ['uses' => 'PackageController@downloadLogisticsTno', 'as' => 'package.downloadLogisticsTno']);
     Route::get('package/errorToShipped',
         ['uses' => 'PackageController@errorToShipped', 'as' => 'package.errorToShipped']);
     Route::get('package/exportInfo',
@@ -782,6 +795,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
     Route::get('wish/ajaxGetInfo', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetInfo', 'as' => 'wish.ajaxGetInfo']);
     Route::get('wish/ajaxGetSkuPicture', ['uses' => 'Publish\Wish\WishPublishController@ajaxGetSkuPicture', 'as' => 'wish.ajaxGetSkuPicture']);
+    Route::get('wish/ajaxGenerateSku', ['uses' => 'Publish\Wish\WishPublishController@ajaxGenerateSku', 'as' => 'wish.ajaxGenerateSku']);
     Route::resource('wish', 'Publish\Wish\WishPublishController');
 
     Route::resource('WishQuantityCheck', 'Publish\Wish\WishQuantityCheckController');
@@ -893,6 +907,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
             ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
         Route::post('batchModify',
             ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);
+        Route::post('batchCreateDraft',
+            ['uses' => 'SmtController@batchCreateDraft', 'as' => 'smt.batchCreateDraft']);
     });
 
     Route::resource('smt', 'Publish\Smt\SmtController');
@@ -1218,5 +1234,8 @@ Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);
 Route::any('joomOrdersList', ['uses' => 'TestController@joomOrdersList']);
 Route::any('joomToShipping', ['uses' => 'TestController@joomToShipping']);
 Route::any('joomrefreshtoken', ['uses' => 'TestController@joomrefreshtoken']);
+
+Route::any('testReply/{id}',
+    ['as' => 'test.testReply', 'uses' => 'TestController@testReply']);
 
 

@@ -88,15 +88,15 @@ class EventChildController extends Controller
                             $html .= '</div></div>';
                         } else {
                             foreach($value as $k => $v) {
-                                $html .="<div class='col-lg-12'><div class='row'>";
                                 if(is_array($v)) {
+                                    $html .="<div class='col-lg-12'><div class='row'>";
                                     foreach($v as $k1 => $v1) {
                                         if(!is_array($v1)) {
                                             $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;";
                                         }
                                     }
+                                    $html .="</div></div>";
                                 }
-                                $html .="</div></div>";
                             }
                         }
                     } else {
@@ -126,13 +126,15 @@ class EventChildController extends Controller
                         $html .="</div></div>";
                     } else {
                         foreach($value as $k => $v) {
-                            $html .="<div class='col-lg-12'><div class='row'>";
-                            foreach($v as $k1 => $v1) {
-                                if(!is_array($v1)) {
-                                   $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;"; 
-                               }
+                            if(is_array($v)) {
+                                $html .="<div class='col-lg-12'><div class='row'>";
+                                foreach($v as $k1 => $v1) {
+                                    if(!is_array($v1)) {
+                                       $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;"; 
+                                   }
+                                }
+                                $html .="</div></div>";
                             }
-                            $html .="</div></div>";
                         }
                     }
                 } else {
@@ -154,13 +156,15 @@ class EventChildController extends Controller
                         $html .="</div></div>";
                     } else {
                         foreach($value as $k => $v) {
-                            $html .="<div class='col-lg-12'><div class='row'>";
-                            foreach($v as $k1 => $v1) {
-                                if(!is_array($v1)) {
-                                   $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;"; 
-                               }
+                            if(is_array($v)) {
+                                $html .="<div class='col-lg-12'><div class='row'>";
+                                foreach($v as $k1 => $v1) {
+                                    if(!is_array($v1)) {
+                                       $html .= "to['".$key."']['".$k."']['".$k1."']<span class='glyphicon glyphicon-arrow-right'></span>".$v1."&nbsp;&nbsp;&nbsp;&nbsp;"; 
+                                    }
+                                }
+                                $html .="</div></div>";
                             }
-                            $html .="</div></div>";
                         }
                     }
                 } else {

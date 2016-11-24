@@ -17,7 +17,7 @@
                 @section('formBody')@show{{-- 表单内容 --}}
                 @section('formButton')
                     <button type="submit" class="btn btn-success">提交</button>
-                    <button type="reset" class="btn btn-default">取消</button>
+                    <button type="button" class="btn btn-default" onclick="return history.go(-1);">取消</button>
                 @show{{-- 表单按钮 --}}
             </form>
         </div>

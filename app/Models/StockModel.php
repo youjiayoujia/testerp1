@@ -52,7 +52,7 @@ class StockModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
-        $warehosues = WarehouseModel::all();
+        $warehosues = WarehouseModel::where('is_available', '1')->get();
         $arr = [];
         foreach($warehosues as $warehouse) {
             $arr[$warehouse->name] = $warehouse->name;

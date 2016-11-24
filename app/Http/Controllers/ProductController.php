@@ -80,13 +80,15 @@ class ProductController extends Controller
     public function store()
     {
         $attributesAry  = request()->input('modelSet');
-        /*if (Gate::denies('check','product_admin,product_staff|add')) {
-            echo "没有权限";exit;
-        }*/
+        foreach ($attributesAry as $check_item){
+            if(empty($check_item['variations'])){
+                return redirect(route('product.create',['id' => request()->input('require_id')]))->with('alert', $this->alert('danger', 'set和variation 属性填写不完整.'));
+            }
+        }
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         if(!array_key_exists('modelSet',request()->all())){
-            return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
+            return redirect(route('product.create' ,['id' => request()->input('require_id')]))->with('alert', $this->alert('danger', '请选择model.'));
         }
         //如果包含没有添加的属性就创建新添加的SET 和 Variation属性
         if(!empty($attributesAry)){
@@ -491,10 +493,11 @@ class ProductController extends Controller
      * @param ZoneModel $zone
      * @param ItemModel $items_obj
      */
-    public function ajaxReturnPrice(ZoneModel $zone,ItemModel  $items_obj,PaypalRatesModel $rates_obj){
+    public function ajaxReturnPrice(ZoneModel $zone,ItemModel  $items_obj,PaypalRatesModel $rates_obj ,CurrencyModel $currency){
         $return_price_array = [];
         $shipment_fee = false;
         $form_ary =  request()->input();
+        $target_price = !empty($form_ary['target_price']) ? floatval($form_ary['target_price']) : false;
         //dd($form_ary);exit;
         //获取运费
         if(isset($form_ary['zone_id'])){
@@ -507,6 +510,9 @@ class ProductController extends Controller
             $rates = $rates_obj->find(1); //paypal固定税率
             $USD_obj = CurrencyModel::where('code','=','RMB')->first(); //美元->人民币 汇率
             foreach ($channels_rate as $item_channel){
+
+                $channel_price_big   = false; //渠道对应的价格   例如： 亚马逊英国就是对应的 英镑
+                $channel_price_small = false; //渠道对应的价格   例如： 亚马逊英国就是对应的 英镑
 
                 if($form_ary['channel_id'] != 'none'){ //如果指定渠道
                     if($item_channel->name != $form_ary['channel_id']) {
@@ -529,13 +535,38 @@ class ProductController extends Controller
                             if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 2;
                             }
-                            //售价=（采购成本+平台费用+物流成本）（1-利润率）
+                            //售价=（采购成本+平台费用+物流成本）/（1-利润率）
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) /(1 / $USD_obj->rate);
                             $sale_price_small = 0;
+
+                            //推算利润率 取值范围 （0,+oo)
+                            if(!empty($target_price)){
+                               // dd(($product_obj->purchase_price + $shipment_fee + $channel_fee));
+                                $profitability = 1- ($product_obj->purchase_price + $shipment_fee + $channel_fee)
+                                    /
+                                    ($target_price * (1 / $USD_obj->rate));
+                            }else{
+                                $profitability = '';
+                            }
+
                         }else{
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /(1 / $USD_obj->rate);
                             $sale_price_small = 0;
+
+                            //推算利润率 取值范围 （0,+oo)
+                            if(!empty($target_price)){
+                                $profitability = 1- ($product_obj->purchase_price + $shipment_fee)
+                                    /
+                                    ($target_price * (1 / $USD_obj->rate)) - $item_channel->pivot->rate /100 ;
+                            }else{
+                                $profitability = '';
+                            }
                         }
+
+                        $channel_price_big   = 'USD:' . number_format($sale_price_big ,2,'.','');
+                        $channel_price_small = 'USD:' . number_format($sale_price_small ,2,'.','');
+
+
                         break;
                     case '亚马逊英国':
                         //AMZ英国站平台费小于0.5英镑，按0.5英镑计算(珠宝及手表分类下，该条件用1.25英镑计算)
@@ -552,11 +583,33 @@ class ProductController extends Controller
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
+                            //推算利润率 取值范围 （0,+oo)
+                            if(!empty($target_price)){
+                                $profitability = 1- ($product_obj->purchase_price + $shipment_fee + $channel_fee)
+                                    /
+                                    ($target_price * (1 / $USD_obj->rate));
+                            }else{
+                                $profitability = '';
+                            }
+
                         }else{
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
+                            //推算利润率 取值范围 （0,+oo)
+                            if(!empty($target_price)){
+                                $profitability = 1- ($product_obj->purchase_price + $shipment_fee)
+                                    /
+                                    ($target_price * (1 / $USD_obj->rate)) - $item_channel->pivot->rate /100 ;
+
+                            }else{
+                                $profitability = '';
+                            }
+
                         }
+
+                        $channel_price_big   = 'GBP:' . number_format($sale_price_big * (1 / $GBP_obj->rate),2,'.','');
+                        $channel_price_small = 'GBP:' . number_format($sale_price_small * (1 / $GBP_obj->rate),2,'.','');
 
                         break;
                     case '亚马逊欧洲':
@@ -574,10 +627,34 @@ class ProductController extends Controller
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
+                            //推算利润率 取值范围 （0,+oo)
+                            if(!empty($target_price)){
+                                $profitability = 1- ($product_obj->purchase_price + $shipment_fee + $channel_fee)
+                                    /
+                                    ($target_price * (1 / $USD_obj->rate));
+                            }else{
+                                $profitability = '';
+                            }
+
                         }else{
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
+
+                            //推算利润率 取值范围 （0,+oo)
+                            if(!empty($target_price)){
+                                $profitability = 1- ($product_obj->purchase_price + $shipment_fee)
+                                    /
+                                    ($target_price * (1 / $USD_obj->rate)) - $item_channel->pivot->rate /100 ;
+
+                            }else{
+                                $profitability = '';
+                            }
+
                         }
+
+                        $channel_price_big   = 'EUR:' . number_format($sale_price_big * (1 / $EUR_obj->rate),2,'.','');
+                        $channel_price_small = 'EUR:' . number_format($sale_price_small * (1 / $EUR_obj->rate),2,'.','');
+
                         break;
                     case '亚马逊日本':
                         //AMZ日本站平台费小于30日元，按30日元计算(珠宝及手表分类下，该条件用50日元计算)
@@ -594,10 +671,27 @@ class ProductController extends Controller
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / (1 / $USD_obj->rate);
                             $sale_price_small = 0;
 
+
+
                         }else{
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /(1 / $USD_obj->rate);
                             $sale_price_small = 0;
+
+                            //推算利润率 取值范围 （0,+oo)
+                            if(!empty($target_price)){
+                                $profitability = 1- ($product_obj->purchase_price + $shipment_fee)
+                                    /
+                                    ($target_price * (1 / $USD_obj->rate)) - $item_channel->pivot->rate /100 ;
+
+                            }else{
+                                $profitability = '';
+                            }
+
                         }
+
+                        $channel_price_big   = 'JPY:' . number_format($sale_price_big * (1 / $JPY_obj->rate),2,'.','');
+                        $channel_price_small = 'JPY:' . number_format($sale_price_small * (1 / $JPY_obj->rate),2,'.','');
+
                         break;
                     case 'eBay欧洲':
                     case 'eBay澳洲':
@@ -609,21 +703,63 @@ class ProductController extends Controller
                      * 如果是大PP计算，则小PP成交费率为0
                      */
                         $sale_price_big   = ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / (1 /$USD_obj->rate);
-                        $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100) / (1 / $USD_obj->rate);
-                        break;
+                        $sale_price_small = ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100) / (1 / $USD_obj->rate);
+
+                    //推算利润率 取值范围 （0,+oo)
+                    if(!empty($target_price)){
+                        $profitability =1 - ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big)
+                                        /
+                                        ($target_price * (1 /$USD_obj->rate)) - $item_channel->pivot->rate /100;
+                    }else{
+                        $profitability = '';
+                    }
+
+
+                    if($item_channel->name == 'eBay欧洲'){
+                        $rate_obj = $currency->where('code','EUR')->first();
+                    }elseif($item_channel->name == 'eBay澳洲'){
+                        $rate_obj = $currency->where('code','AUD')->first();
+
+                    }elseif($item_channel->name == 'eBay美国'){
+                        $rate_obj = $currency->where('code','USD')->first();
+
+                    }elseif ($item_channel->name == 'eBay英国'){
+                        $rate_obj = $currency->where('code','GBP')->first();
+                    }
+
+                    $channel_price_big   = $rate_obj->code . ':' . number_format($sale_price_big  / $rate_obj->rate,2 , '.','' );
+                    $channel_price_small = $rate_obj->code . ':' . number_format($sale_price_small  / $rate_obj->rate,2 , '.','' );
+
+                    break;
                     default:
                         //其他渠道统一计算
                         //售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
                         $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /(1 / $USD_obj->rate);
                         $sale_price_small = 0;
+
+                        if(!empty($target_price)){
+                            $profitability = 1 - ($product_obj->purchase_price + $shipment_fee)
+                                                      /
+                                ($target_price*(1 / $USD_obj->rate)) - $item_channel->pivot->rate /100;
+                        }else{
+                            $profitability = '';
+                        }
+
                         break;
 
                 }
 
                 $return_price_array[] = [
-                    'channel_name' => $item_channel->name,
-                    'sale_price_big' => number_format($sale_price_big,2,'.',''),
+                    'profit_id'        => $form_ary['profit_id'],
+                    'channel_name'     => $item_channel->name,
+                    'sale_price_big'   => number_format($sale_price_big,2,'.',''),
                     'sale_price_small' => number_format($sale_price_small,2,'.',''),
+                    'profitability'    => [
+                        'target_price' => $target_price,
+                        'profit'       => (!empty($profitability)) ? number_format($profitability,2,'.','')*100 . '%' : '',
+                    ],
+                    'channel_price_big'  => $channel_price_big,
+                    'channel_price_small'=> $channel_price_small,
                 ];
             }
         }else{

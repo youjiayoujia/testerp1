@@ -15,14 +15,6 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-sm-4">
-            <label for="adjust_by">调整人</label>
-            <select name='adjust_by' class='form-control'>
-            @foreach($users as $user)
-            <option value="{{ $user->id }}">{{ $user->name }}</option>
-            @endforeach
-            </select>
-        </div>
         <div class='form-group col-sm-12'>
             <label for='label'>备注(原因)</label>
             <textarea class='form-control remark' name='remark' id='remark'>{{ old('remark') }}</textarea>

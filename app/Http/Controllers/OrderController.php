@@ -521,9 +521,9 @@ class OrderController extends Controller
     {
         $order_id = request()->input('order_id');
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($this->model->find($order_id)));
+        $from = json_encode($this->model->find($order_id));
         $this->model->find($order_id)->update(['active' => 'NORMAL']);
-        $to = base64_encode(serialize($this->model->find($order_id)));
+        $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '恢复正常更新,id='.$order_id, $to, $from);
 
         return 1;
@@ -534,11 +534,38 @@ class OrderController extends Controller
     {
         $order_id = request()->input('order_id');
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($this->model->find($order_id)));
+        $from = json_encode($this->model->find($order_id));
         $this->model->find($order_id)->update(['status' => 'REVIEW']);
-        $to = base64_encode(serialize($this->model->find($order_id)));
+        $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '恢复订单更新,id='.$order_id, $to, $from);
 
+        return 1;
+    }
+
+    /**
+     * 批量审核
+     *
+     * @return int
+     */
+    public function partReview()
+    {
+        $userName = UserModel::find(request()->user()->id);
+        $ids = request()->input('ids');
+        $ids_arr = explode(',', $ids);
+        foreach($ids_arr as $id) {
+            $model = $this->model->find($id);
+            if($model) {
+                $from = json_encode($model);
+                if ($model->status = 'REVIEW') {
+                    $model->update(['status' => 'PREPARED']);
+                    $job = new DoPackages($model);
+                    $job->onQueue('doPackages');
+                    $this->dispatch($job);
+                }
+                $to = json_encode($model);
+                $this->eventLog($userName->name, '批量审核,id='.$id, $to, $from);
+            }
+        }
         return 1;
     }
 

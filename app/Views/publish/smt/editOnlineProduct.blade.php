@@ -659,17 +659,17 @@ text-align: left;
                 ?>
                 
                 <div class="row">
-                  <div class="form-group <?php echo $sku_property ? 'hide' : ''; ?>">
-                    <label for="productPrice" class="control-label col-sm-2"><span class="red">*</span>零售价：</label>
-
-                    <div class="col-sm-3 input-group">
+                  <div class="form-group col-sm-2 <?php echo $sku_property ? 'hide' : ''; ?>">
+                    <label for="productPrice" class="control-label "><span class="red">*</span>零售价：</label>
+                  </div>
+                    <div class="col-sm-2 input-group">
                         <input type="text" class="form-control" name="productPrice" id="productPrice"
                                datatype="*,numrange" nullmsg="零售价范围为0-100000" min="0" max="100000"
                                value="<?php echo $draft_info ? $draft_info['productPrice'] : ''; ?>">
 
                         <div class="input-group-addon">USD</div>
                     </div>
-                </div>
+          
                 </div>
               
                 <div class="row">  
@@ -717,7 +717,7 @@ text-align: left;
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="productStock" name="productStock"
                                datatype="numrange" min="1" max="999999" nullmsg="库存值为1-999999之间" errormsg="库存错误"
-                               value="<?php $first_sku = array_shift($draft_skus); echo $draft_skus && $smtApi->filterData('ipmSkuStock', $first_sku) ? $first_sku['ipmSkuStock'] : 0; ?>"/>
+                               value="<?php $first_sku = array_shift($draft_skus); echo $smtApi->filterData('ipmSkuStock', $first_sku) ? $first_sku['ipmSkuStock'] : 0; ?>"/>
                     </div>
                     </div>
                 </div>
@@ -727,10 +727,11 @@ text-align: left;
                    
                     <div class="col-sm-3">	
                         <?php
-                        $skuCode = ''; //SKU代码信息              
-                        if (!empty($draft_skus) && !empty($first_sku['smtSkuCode'])){
+                        $skuCode = ''; //SKU代码信息       
+                        if (!empty($first_sku['smtSkuCode'])){                            
                             $skuCode = $smtApi->rebuildSmtSku($first_sku['smtSkuCode']);
                         }
+                        
                         ?>	
                          <input type="text" class="form-control" id="productCode" name="productCode" placeholder="商品编码" value="<?php echo $skuCode;?>">    
         			</div>

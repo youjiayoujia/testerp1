@@ -99,10 +99,10 @@ Class WishyouAdapter extends BasicAdapter
 
 	private $channel_info = array('370'=>'wish邮,yw,sh,0','469'=>'wish邮,yw,yw,0','481'=>'wish邮,sz,sz,0','487'=>'wish邮,sz,sz,11-0','512'=>'wish邮,sz,gz,0','549'=>'wish邮,yw,nj,0');
 	private $tokenArr = array(
-		1 => '2c65dc39df8a49e0aaaac552076f138f',
-		2 => 'ea474a4efc1645bead26b16bc7c98535',
-		3 => '2c65dc39df8a49e0aaaac552076f138f',
-		4 => 'ea474a4efc1645bead26b16bc7c98535'
+		1 => '3bc42b75cc634613816582fef3268063',
+		2 => '46ade8fea61d449897f07e9dc50bfb35',
+		3 => '3bc42b75cc634613816582fef3268063',
+		4 => '46ade8fea61d449897f07e9dc50bfb35'
 	);
 
 	public function __construct($config)
@@ -168,7 +168,7 @@ Class WishyouAdapter extends BasicAdapter
 		$this->API_key = $this->tokenArr[$orderInfo->warehouse_id];  //根据仓库选择对应
 
 		$order_xml=$this->createRequestXmlFile($orderInfo,$shipInfo);  //xml
-		
+		print_r($order_xml);
 		 if(!$order_xml){
 			 return $result = [
 				 'code' => 'error',
@@ -210,7 +210,7 @@ Class WishyouAdapter extends BasicAdapter
 		 $xmlStr = '<?xml version="1.0" encoding="UTF-8"?>';
 		 $xmlStr .='
 		 			<orders>
-		 			  <api_key>'.$this->API_key.'</api_key>
+		 			   <access_token>'.$this->API_key.'</access_token>
 		 			  <mark></mark>
 		 			  <bid>'.rand(0,99999).'</bid>
 		 		   ';
@@ -227,15 +227,17 @@ Class WishyouAdapter extends BasicAdapter
 		    if(!empty($orderInfo->shipping_phone)){
 		      $buyer_phone=$orderInfo->shipping_phone;
 		    }
-		    foreach($orderInfo->items as $k=>$v){
-				$wishIDArr = explode('+',$v->orderItem->channel_order_id);
+			foreach($orderInfo->items as $k=>$v){
+				$order_item = $v->orderItem;
+				$wishIDArr = explode('+',$order_item->channel_order_id);
 				$wishID = $wishIDArr[0];              //wish_id
-				continue;
+			}
+			if(!$wishID){
+				$wishID = $orderInfo->id;
 			}
 
 		    $buyer_state = $orderInfo->shipping_city ? $orderInfo->shipping_city : ',';//上传的省，默认是用城市名代替
 		    
-			$wishID = $orderInfo->transaction_number;   //交易编号
 		    //上传的省为空用逗号代替
 		    $buyer_state = $orderInfo->shipping_state ? $orderInfo->shipping_state :',';
 		     foreach($orderInfo->items  as $key => $item){

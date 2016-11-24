@@ -123,7 +123,7 @@
             <td>model</td>
             <td>SKU*采购数量</td> 
             <td>采购类型</td>
-            <td>供货商sku</td>
+            <!-- <td>供货商sku</td> -->
               
             <td>样图</td>
             <td>状态</td>
@@ -143,7 +143,7 @@
                 <td>{{$purchaseItem->item->product->model}}</td>
                 <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
                 <td>{{config('product.product_supplier.type')[$purchaseItem->supplier->type]}}</td>
-                <td>{{$purchaseItem->item->supplier_sku}}</td>   
+                <!-- <td>{{$purchaseItem->item->supplier_sku}}</td> -->   
                 
                 <td>
                 @if($purchaseItem->item->product->default_image>0) 

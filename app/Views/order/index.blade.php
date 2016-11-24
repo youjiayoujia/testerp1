@@ -215,46 +215,51 @@
                     </div>
                     <div class="divider"></div>
                 </div>
-                <div class="row col-lg-12 text-center">
+                <div class="col-lg-12">
                     @if($order->packages->count() > 0)
                         @foreach($order->packages as $package)
-                            <div class="col-lg-3">
-                                <strong>包裹ID</strong> :
-                                <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
-                            </div>
-                            <div class="col-lg-3">
-                                <strong>物流方式</strong>
-                                : {{ $package->logistics ? $package->logistics->name : '' }}
-                            </div>
-                            <div class="col-lg-3">
-                                <strong>追踪号</strong> :
-                                <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
-                            </div>
-                            <div class="col-lg-2">
-                                <strong>包裹状态</strong> : {{ $package->status_name }}
-                            </div>
-                            <div class="col-lg-1">
-                                <button class="btn btn-primary btn-xs split"
-                                        data-toggle="modal"
-                                        data-target="#split{{ $package->id }}" title='拆分包裹'>
-                                    <span class="glyphicon glyphicon-tasks"></span>
-                                </button>
-                            </div>
-                            <div class="modal fade" id="split{{ $package->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">拆分包裹</div>
-                                            <div class="panel-body">
-                                                <div class='row'>
-                                                    <div class='col-lg-5'>
-                                                        <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <strong>包裹ID</strong> :
+                                    <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                                </div>
+                                <div class="col-lg-3">
+                                    <strong>物流方式</strong>
+                                    : {{ $package->logistics ? $package->logistics->name : '' }}
+                                </div>
+                                <div class="col-lg-2">
+                                    <strong>追踪号</strong> :
+                                    <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                                </div>
+                                <div class="col-lg-2">
+                                    <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
+                                </div>
+                                <div class="col-lg-2">
+                                    <strong>包裹状态</strong> : {{ $package->status_name }}
+                                </div>
+                                <div class="col-lg-1">
+                                    <button class="btn btn-primary btn-xs split"
+                                            data-toggle="modal"
+                                            data-target="#split{{ $package->id }}" title='拆分包裹'>
+                                        <span class="glyphicon glyphicon-tasks"></span>
+                                    </button>
+                                </div>
+                                <div class="modal fade" id="split{{ $package->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">拆分包裹</div>
+                                                <div class="panel-body">
+                                                    <div class='row'>
+                                                        <div class='col-lg-5'>
+                                                            <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
+                                                        </div>
+                                                        <div class='col-lg-1'>
+                                                            <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
+                                                        </div>
                                                     </div>
-                                                    <div class='col-lg-1'>
-                                                        <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
-                                                    </div>
+                                                    <div class='split_package'></div>
                                                 </div>
-                                                <div class='split_package'></div>
                                             </div>
                                         </div>
                                     </div>

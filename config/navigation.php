@@ -309,11 +309,11 @@ return [
                     'url' => 'logistics.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '物流分配规则',
-                    'url' => 'logisticsRule.index',
-                    'icon' => '',
-                ],
+//                [
+//                    'name' => '物流分配规则',
+//                    'url' => 'logisticsRule.index',
+//                    'icon' => '',
+//                ],
                 [
                     'name' => '渠道展示编码',
                     'url' => 'logisticsTransport.index',

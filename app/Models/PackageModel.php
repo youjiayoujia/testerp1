@@ -599,7 +599,7 @@ class PackageModel extends BaseModel
                             Queue::pushOn('assignStocks', $job);
                         }
                         return true;
-                    } else {  
+                    } else {
                         foreach ($this->items as $item) {
                             $require = [];
                             $require['item_id'] = $item->item_id;
@@ -909,7 +909,7 @@ class PackageModel extends BaseModel
                     $buf[$this->warehouse_id][$i]['quantity'] = $stock->available_quantity;
                     $pquantity -= $stock->available_quantity;
                     $i++;
-                } else { 
+                } else {
                     $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
                     $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
                     $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
@@ -962,8 +962,8 @@ class PackageModel extends BaseModel
                     if ($oldWarehouseId != $warehouseId) {
                         $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                     } else {
-                        if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                            if(floatval($weight)-floatval($oldWeight) < 0.00000000001) {
+                        if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                            if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                 $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
                             } else {
                                 $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
@@ -1008,8 +1008,8 @@ class PackageModel extends BaseModel
                                 'tracking_no' => '0'
                             ]);
                         } else {
-                            if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                                if(floatval($weight)-floatval($oldWeight) < 0.00000000001) {
+                            if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                     $newPackage->update(['weight' => $weight, 'status' => 'PROCESSING']);
                                 } else {
                                     $newPackage->update([
@@ -1413,7 +1413,7 @@ class PackageModel extends BaseModel
     {
         if ($type == 'UPDATE') {
             //判断订单状态
-            if (!in_array($this->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            if (!in_array($this->status, ['NEED', 'PROCESSING', 'PICKING', 'PACKED'])) {
                 return false;
             }
         } else {
@@ -1608,10 +1608,12 @@ class PackageModel extends BaseModel
                         $error[] = $key;
                         continue;
                     }
-                    $this->find($content['package_id'])->update(['tracking_no' => $content['tracking_no'],
-                                                                 'logistics_id' => $content['logistics_id']]);
+                    $this->find($content['package_id'])->update([
+                        'tracking_no' => $content['tracking_no'],
+                        'logistics_id' => $content['logistics_id']
+                    ]);
                     break;
-                }
+            }
         }
 
         return $error;

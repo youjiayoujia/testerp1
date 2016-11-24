@@ -227,7 +227,7 @@ Class WishyouAdapter extends BasicAdapter
 		    if(!empty($orderInfo->shipping_phone)){
 		      $buyer_phone=$orderInfo->shipping_phone;
 		    }
-		    foreach($orderInfo->items as $k=>$v){
+			foreach($orderInfo->items as $k=>$v){
 				$order_item = $v->orderItem;
 				$wishIDArr = explode('+',$order_item->channel_order_id);
 				$wishID = $wishIDArr[0];              //wish_id

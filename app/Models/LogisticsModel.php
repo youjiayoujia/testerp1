@@ -38,6 +38,7 @@ class LogisticsModel extends BaseModel
         'logistics_code',
         'priority',
         'is_express',
+        'is_confirm',
     ];
 
     public $rules = [
@@ -141,6 +142,23 @@ class LogisticsModel extends BaseModel
         $config['returnProvince'] = $this->emailTemplate->province;
         $config['returnCity'] = $this->emailTemplate->city;
         return $config;
+    }
+
+    //物流方式停用启用颜色
+    public function getEnableColorAttribute()
+    {
+        switch ($this->is_enable) {
+            case '0':
+                $color = 'danger';
+                break;
+            case '1':
+                $color = '';
+                break;
+            default:
+                $color = '';
+                break;
+        }
+        return $color;
     }
 
     public function getDockingNameAttribute()

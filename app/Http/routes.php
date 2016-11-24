@@ -491,6 +491,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logisticsZone/one/{id}',
         ['uses' => 'Logistics\ZoneController@one', 'as' => 'logisticsZone.one']);
+    Route::get('logisticsRule/one/{id}',
+        ['uses' => 'Logistics\RuleController@one', 'as' => 'logisticsRule.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::get('logistics/ajaxSupplier',
@@ -627,6 +629,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('withdrawAll', ['uses' => 'OrderController@withdrawAll', 'as' => 'withdrawAll']);
+    Route::any('partReview', ['uses' => 'OrderController@partReview', 'as' => 'partReview']);
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
     Route::get('updateStatus', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
     Route::get('updatePrepared', ['uses' => 'OrderController@updatePrepared', 'as' => 'updatePrepared']);
@@ -667,6 +670,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/downloadLogisticsTno',
+        ['uses' => 'PackageController@downloadLogisticsTno', 'as' => 'package.downloadLogisticsTno']);
     Route::get('package/errorToShipped',
         ['uses' => 'PackageController@errorToShipped', 'as' => 'package.errorToShipped']);
     Route::get('package/exportInfo',
@@ -1222,12 +1227,15 @@ Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersLi
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
-Route::any('jdtestcrm', ['uses' => 'TestController@jdtestCrm']);
+//Route::any('jdtestcrm', ['uses' => 'TestController@jdtestCrm']);
 Route::any('testEbayCases', ['uses' => 'TestController@testEbayCases']);
 Route::any('getSmtIssue', ['uses' => 'TestController@getSmtIssue']);
 Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);
 Route::any('joomOrdersList', ['uses' => 'TestController@joomOrdersList']);
 Route::any('joomToShipping', ['uses' => 'TestController@joomToShipping']);
 Route::any('joomrefreshtoken', ['uses' => 'TestController@joomrefreshtoken']);
+
+Route::any('testReply/{id}',
+    ['as' => 'test.testReply', 'uses' => 'TestController@testReply']);
 
 

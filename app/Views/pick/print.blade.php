@@ -1,7 +1,7 @@
 @extends('layouts.default')
 @section('body')
 @foreach($picklistitemsArray as $picklistitems)
-<div class='col-lg-10'>
+<div class='container'>
     <div class='row'>
         <div class='form-group col-lg-offset-5'>
             <h3>仓库发货拣货单(面单尺寸:{{$size}})</h3>

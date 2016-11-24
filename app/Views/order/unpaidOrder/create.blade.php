@@ -23,17 +23,15 @@
             <label for="customer_id">客服</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="customer_id" class="form-control" id="customer_id">
-                @foreach($users as $user)
-                    <option value="{{$user->id}}" {{ Tool::isSelected('customer_id', $user->id) }}>
-                        {{$user->name}}
-                    </option>
-                @endforeach
+                <option value="{{$users->id}}" {{ Tool::isSelected('customer_id', $users->id) }}>
+                    {{$users->name}}
+                </option>
             </select>
         </div>
         <div class="form-group col-lg-3">
             <label for="date" class="control-label">日期</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="date" placeholder="日期" name='date' value="{{ old('date') }}">
+            <input class="form-control" id="date" placeholder="日期" name='date' value="{{ date('Y-m-d') }}">
         </div>
         <div class="form-group col-lg-3">
             <label for="remark" class="control-label">要求</label>

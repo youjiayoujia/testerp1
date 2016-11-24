@@ -25,6 +25,9 @@
         <tr class="dark-{{ $order->status_color }}">
             <td>
                 <input type="checkbox" name="tribute_id" value="{{$order->id}}">
+                @if(($order->packages ? $order->packages->count() : 0) > 1)
+                    <span class='glyphicon glyphicon-adjust'></span>
+                @endif
             </td>
             <td>{{ $order->id }}</td>
             <td>{{ $order->ordernum }}</td>
@@ -37,7 +40,7 @@
             {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
-            <td>{{ $order->aliexpress_loginId }}</td>
+            <td>{{ $order->by_id }}</td>
             <td>{{ $order->logistics }}<br>{{ $order->shipping }}</td>
             <td>{{ $order->code }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
@@ -45,17 +48,14 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                @if($order->status == 'PACKED' || $order->status == 'SHIPPED' || $order->status == 'COMPLETE')
-                    <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
-                    <div>产品成本: {{ $order->all_item_cost }} RMB</div>
-                    <div>运费成本: {{ sprintf("%.3f", $order->packages->sum('cost')) }} RMB</div>
-                    <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
-                    <div>
-                        毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee()) }}
-                        USD
-                    </div>
-                @else
-                @endif
+                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
+                <div>产品成本: {{ $order->all_item_cost }} RMB</div>
+                <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
+                <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
+                <div>
+                    毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->logistics_fee) * $rmbRate - $order->calculateOrderChannelFee()) }}
+                    USD
+                </div>
             </td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
@@ -127,15 +127,15 @@
                                 @endif
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
-                            @if($orderItem->item)
-                                <div class="col-lg-2">
-                                    <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
-                                </div>
-                            @else
-                                <div class="col-lg-2">
-                                    <img src="{{ asset('default.jpg') }}" width="50px">
-                                </div>
-                            @endif
+                            {{--@if($orderItem->item)--}}
+                                {{--<div class="col-lg-2">--}}
+                                    {{--<img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">--}}
+                                {{--</div>--}}
+                            {{--@else--}}
+                                {{--<div class="col-lg-2">--}}
+                                    {{--<img src="{{ asset('default.jpg') }}" width="50px">--}}
+                                {{--</div>--}}
+                            {{--@endif--}}
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>
@@ -206,11 +206,67 @@
                         <div class="divider"></div>
                     @endforeach
                 </div>
-                <div class="row col-lg-12 text-center">
-                    <div class="col-lg-3">物品数量: {{ $order->items->sum('quantity') }}</div>
-                    <div class="col-lg-3">包裹个数: {{ $order->packages->count() }}</div>
-                    <div class="col-lg-3">包裹总重: {{ $order->packages->sum('weight') }} Kg</div>
-                    <div class="col-lg-3">运费合计: {{ $order->packages->sum('cost') }} RMB</div>
+                <div class="col-lg-12 text-center">
+                    <div class="row">
+                        <div class="col-lg-3">物品数量: {{ $order->items->sum('quantity') }}</div>
+                        <div class="col-lg-3">包裹个数: {{ $order->packages->count() }}</div>
+                        <div class="col-lg-3">包裹总重: {{ $order->packages->sum('weight') }} Kg</div>
+                        <div class="col-lg-3">运费合计: {{ $order->packages->sum('cost') }} RMB</div>
+                    </div>
+                    <div class="divider"></div>
+                </div>
+                <div class="col-lg-12">
+                    @if($order->packages->count() > 0)
+                        @foreach($order->packages as $package)
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <strong>包裹ID</strong> :
+                                    <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                                </div>
+                                <div class="col-lg-3">
+                                    <strong>物流方式</strong>
+                                    : {{ $package->logistics ? $package->logistics->name : '' }}
+                                </div>
+                                <div class="col-lg-2">
+                                    <strong>追踪号</strong> :
+                                    <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                                </div>
+                                <div class="col-lg-2">
+                                    <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
+                                </div>
+                                <div class="col-lg-2">
+                                    <strong>包裹状态</strong> : {{ $package->status_name }}
+                                </div>
+                                <div class="col-lg-1">
+                                    <button class="btn btn-primary btn-xs split"
+                                            data-toggle="modal"
+                                            data-target="#split{{ $package->id }}" title='拆分包裹'>
+                                        <span class="glyphicon glyphicon-tasks"></span>
+                                    </button>
+                                </div>
+                                <div class="modal fade" id="split{{ $package->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">拆分包裹</div>
+                                                <div class="panel-body">
+                                                    <div class='row'>
+                                                        <div class='col-lg-5'>
+                                                            <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
+                                                        </div>
+                                                        <div class='col-lg-1'>
+                                                            <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class='split_package'></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
             </td>
         </tr>
@@ -837,11 +893,15 @@
         </ul>
     </div>
     <div class="btn-group">
+        <a class="btn btn-success partReview" href="javascript:">
+            批量审核
+        </a>
+    </div>
+    <div class="btn-group">
         <button class="btn btn-info"
                 data-toggle="modal"
                 data-target="#withdraw"
-                title="SMT批量撤单">
-            <span class="glyphicon glyphicon-link"></span> SMT批量撤单
+                title="批量撤单">批量撤单
         </button>
     </div>
     <div class="modal fade" id="withdraw" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -852,7 +912,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title text-left" id="myModalLabel">SMT批量撤单</h4>
+                    <h4 class="modal-title text-left" id="myModalLabel">批量撤单</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -1012,6 +1072,50 @@
                 }
 
             });
+
+            $(document).on('click', '.split_button', function () {
+                if (confirm('确认拆分')) {
+                    id = $(this).parent().prev().find('.confirm_quantity').attr('name');
+                    arr = new Array();
+                    i = 0;
+                    j = 0;
+                    $.each($(this).parent().find('table'), function (k, v) {
+                        $.each($(v).find('tr'), function (k1, v1) {
+                            if ($(v1).find(':radio').prop('checked')) {
+                                arr[i] = j + '.' + $(v1).find('.item_id').data('itemid');
+                                i += 1;
+                            }
+                        })
+                        j += 1;
+                    })
+                    location.href = "{{ route('package.actSplitPackage', ['arr' => '']) }}/" + arr + "/" + id;
+                }
+            });
+
+            $(document).on('click', '.confirm_quantity', function () {
+                quantity = $(this).parent().prev().find(':input').val();
+                id = $(this).attr('name');
+                if (quantity > 1) {
+                    $.get(
+                            "{{ route('package.returnSplitPackage')}}",
+                            {quantity: quantity, id: id},
+                            function (result) {
+                                $('.split_package').html('');
+                                $('.split_package').html(result);
+                            }, 'html'
+                    );
+                } else {
+                    alert('数量不能小于1');
+                }
+
+            });
+
+            $(document).on('click', '.split', function () {
+                id = $(this).data('id');
+                $('.confirm_quantity').attr('name', id);
+                $('.package_num').val('');
+                $('.split_package').html('');
+            })
         });
 
         $('.statistics').click(function () {
@@ -1057,6 +1161,29 @@
             } else {
                 document.getElementById('price' + id).readOnly = false;
                 document.getElementById('refund_amount' + id).readOnly = false;
+            }
+        });
+
+        //批量审核
+        $('.partReview').click(function () {
+            if (confirm("确认审核")) {
+                var checkbox = document.getElementsByName("tribute_id");
+                var ids = "";
+
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)continue;
+                    ids += checkbox[i].value+",";
+                }
+                ids = ids.substr(0,(ids.length)-1);
+                $.ajax({
+                    url : "{{ route('partReview') }}",
+                    data : {ids:ids},
+                    dataType : 'json',
+                    type : 'get',
+                    success:function(result){
+                        window.location.reload();
+                    }
+                })
             }
         });
 

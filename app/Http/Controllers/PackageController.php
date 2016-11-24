@@ -215,7 +215,7 @@ class PackageController extends Controller
             if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            $model->update(['logistics_id' => $id]);
+            $model->update(['logistics_id' => $id, 'tracking_no' => '0']);
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
         }
@@ -682,7 +682,7 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['tracking_no' => request('tracking_no'), 'shipping_address' => request('shipping_address')]);
+        $model->update(request()->all());
         $to = json_encode($model);
         $this->eventLog($name, '修改追踪号', $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
@@ -786,6 +786,21 @@ class PackageController extends Controller
             'tracking_no' => '',
         ];
         $name = 'editTrackingNo';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    public function downloadLogisticsTno()
+    {
+        $rows[] = [
+            'package_id' => '',
+            'logistics_id' => '',
+            'tracking_no' => '',
+        ];
+        $name = '批量修改物流挂号码';
         Excel::create($name, function ($excel) use ($rows) {
             $excel->sheet('', function ($sheet) use ($rows) {
                 $sheet->fromArray($rows);
@@ -943,13 +958,13 @@ class PackageController extends Controller
         $packageIds = [];
         while ($packages->count()) {
             foreach ($packages as $package) {
-                $orderRate = $package->order->calculateProfitProcess();
-                if ($orderRate > 0) {
+                // $orderRate = $package->order->calculateProfitProcess();
+                // if ($orderRate > 0) {
                     $job = new PlaceLogistics($package);
                     $job = $job->onQueue('placeLogistics');
                     $this->dispatch($job);
                     $packageIds[] = $package->id;
-                }
+                // }
             }
             $start += $len;
             unset($packages);

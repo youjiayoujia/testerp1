@@ -70,15 +70,16 @@
                     <br>
                     <div>虚：{{$item->getStockQuantity($warehouse->id)}}</div>
                     <div>实：{{$item->getStockQuantity($warehouse->id,1)}}</div>
+                    <div>途：{{$item->transit_quantity[$warehouse->id]['normal']}}</div>
+                    <div>特：{{$item->transit_quantity[$warehouse->id]['special']}}</div>
+                    <div>缺：{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</div>
                 @endforeach
                 所有仓库
                 <br>
-                <div>途：{{$item->normal_transit_quantity}}</div>
-                <div>特：{{$item->special_transit_quantity}}</div>
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>
                 <div>14天销量：{{$item->getsales('-14 day')}}</div>
                 <div>28天销量：{{$item->getsales('-28 day')}}</div>
-                <div>建议采购值：{{$item->getNeedPurchase()}}</div>
+                <div>建议采购值：{{$item->createPurchaseNeedData([$item->id])['need_purchase_num']}}</div>
                 <div>库存周数：{{$item->getsales('-7 day')==0?0:($item->available_quantity+$item->normal_transit_quantity)/$item->getsales('-7 day')}}</div>
             </td>
             <td>{{ config('item.status')[$item->status]}}</td>
@@ -116,6 +117,22 @@
                                                 <td colspan="3">产品名称：{{ $item->c_name }}</td>
                                             </tr>
                                             <tr>
+                                                <td>
+                                                    利润率：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:125px" id="profit-{{$item->id}}" value="20">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2">
+                                                    反推价格：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:125px" id="target-price-{{$item->id}}" value="">
+                                                        <span class="input-group-addon">$</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <td>产品重量：
                                                     <div class="input-group">
                                                         <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 110px;"  disabled>
@@ -123,25 +140,14 @@
                                                     </div>
 
                                                 </td>
-                                                <td>
+                                                <td colspan="2">
                                                     渠道名称：
-                                                    <select class="form-control" id="channel-{{$item->id}}">
+                                                    <select class="form-control" id="channel-{{$item->id}}" style="width: 160px;">
                                                         <option value="none">请选择</option>
                                                         @foreach($Compute_channels as $channel)
                                                             <option value="{{$channel->name}}">{{$channel->name}}</option>
                                                         @endforeach
-                                                    </select></td>
-                                                <td>
-
-                                                    利润率：
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$item->id}}" value="20">
-                                                        <span class="input-group-addon">%</span>
-                                                    </div>
-                                                    {{--   <div class="input-group">
-                                                           <input type="text" class="form-control" style="width: 60px;">
-                                                           <span class="input-group-addon">个</span>
-                                                       </div>--}}
+                                                    </select>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -195,6 +201,7 @@
                                                 <th>渠道名</th>
                                                 <th>大PP价格（单位：美元）</th>
                                                 <th>小PP价格（单位：美元）</th>
+                                                <th>反推利润率</th>
                                             </tr>
                                             </thead>
                                             <tbody id="result-price-{{$item->id}}">
@@ -540,10 +547,11 @@
          */
         function doComputePrice(productId){
 
-            var zone_id = $('#zones-'+productId).val();
-            var channel_id = $('#channel-'+productId).val();
-            var profit_id = $('#profit-'+productId).val();
+            var zone_id        = $('#zones-'+productId).val();
+            var channel_id     = $('#channel-'+productId).val();
+            var profit_id      = $('#profit-'+productId).val();
             var product_weight = $('#weight-'+productId).val();
+            var target_price   = $('#target-price-'+productId).val();
 
             if(zone_id == 'none'){
                 alert('物流分区不能为空');
@@ -563,13 +571,22 @@
                 url: "{{  route('product.ajaxReturnPrice') }}",
                 dataType: 'json',
                 'type': 'get',
-                data: {product_id:productId,zone_id:zone_id,channel_id:channel_id,profit_id:profit_id,product_weight:product_weight},
+                data: {product_id:productId,zone_id:zone_id,channel_id:channel_id,profit_id:profit_id,product_weight:product_weight,target_price:target_price},
                 success:function (returnInfo){
 
                     if(returnInfo['status'] == 1){
                         $.each(returnInfo['data'],function (i ,item) {
+
+                            if(item.channel_price_big !=false){
+
+                            }
+                            var channel_rate_price_big   = (item.channel_price_big != false) ? '<font color="red">('+item.channel_price_big+')</font>' : '';
+                            var channel_rate_price_small = (item.channel_price_small != false) ? '<font color="red">('+item.channel_price_small+')</font>' : '';
+
                             html += '<tr>';
-                            html += '<td>'+(i+1)+'</td><td>'+item.channel_name+'</td><td>'+item.sale_price_big+'</td><td>'+item.sale_price_small+'</td>';
+                            html += '<td>'+(i+1)+'</td><td>'+item.channel_name+'</td><td>'+item.sale_price_big+channel_rate_price_big+'</td><td>'+item.sale_price_small+channel_rate_price_small+'</td>';
+                            /*html += '<td>'+item.profit_id+'->'+item.sale_price_small+'</td>';*/
+                            html += '<td>'+item.profitability.profit+'</td>';
                             html += '</tr>';
 
                             $('#result-price-'+productId).html(html);
@@ -580,7 +597,7 @@
                     }
                 },
                 error:function () {
-                    alert('计算失败，品类渠道的税率是否编辑？');
+                    alert('参数不完整，计算失败；品类渠道的税率是否编辑？');
 
                 }
             });

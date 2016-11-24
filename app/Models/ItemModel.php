@@ -212,9 +212,9 @@ class ItemModel extends BaseModel
     {
         $zaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+            if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
-                    if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                         $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }  
                 }
@@ -229,9 +229,9 @@ class ItemModel extends BaseModel
     {
         $szaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+            if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
-                    if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                         $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }
                 }
@@ -700,16 +700,17 @@ class ItemModel extends BaseModel
             $data['c_name'] = $item->c_name;
             $zaitu_num = 0;
             foreach ($item->purchase as $purchaseItem) {
-                if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+                if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                     if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
-                            if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                            if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                                 $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
                             } 
                         }
                     }
                 }
             }
+            //print_r($zaitu_num);exit;
             
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 

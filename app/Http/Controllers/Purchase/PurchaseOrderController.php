@@ -281,12 +281,28 @@ class PurchaseOrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = base64_encode(serialize($model));
         $data['examineStatus']=$examineStatus;
-        $data['status'] = 1;
+        if($examineStatus==1){
+            $data['status'] = 1;
+        }
+        if($examineStatus==3){
+            $data['status'] = 5;
+        }
+        if($examineStatus==0){
+            $data['status'] = 0;
+        }
         $model->update($data);
         //更新采购需求数据
         $temp_arr = [];
         foreach($model->purchaseItem as $purchaseitemModel){
-            $purchaseitemModel->update(['status'=>1]);
+            if($examineStatus==1){
+                $purchaseitemModel->update(['status'=>1]);
+            }
+            if($examineStatus==3){
+                $purchaseitemModel->update(['status'=>5]);
+            }
+            if($examineStatus==0){
+                $purchaseitemModel->update(['status'=>0]);
+            }
             $temp_arr[] = $purchaseitemModel->item_id;
         }
         $itemModel = new ItemModel();
@@ -560,6 +576,9 @@ class PurchaseOrderController extends Controller
         //更新采购需求
         $temp_arr = [];
         foreach($this->model->find($id)->purchaseItem as $p_item){
+            if($off==1){
+                $p_item->update(['status'=>'5']);
+            }
             $temp_arr[] = $p_item->item_id;
         }
         $itemModel = new ItemModel();

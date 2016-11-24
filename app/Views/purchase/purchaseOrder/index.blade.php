@@ -134,11 +134,16 @@
                 @endif</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
-                	<a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/1" title="审核" class="btn btn-info btn-xs">
+                	<a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/1" title="审核通过" class="btn btn-info btn-xs">
                          <span class="glyphicon glyphicon-ok-sign">审核通过</span>
                     </a>
                     <a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/3" title="审核不通过" class="btn btn-info btn-xs">
                          <span class="glyphicon glyphicon-ok-sign">审核不通过</span>
+                    </a>
+                @endif
+                @if($purchaseOrder->examineStatus==3)
+                    <a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/0" title="撤销审核" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">撤销审核</span>
                     </a>
                 @endif
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">

@@ -76,6 +76,7 @@ class RequireController extends Controller
 		}else{
 			$needPurchases=$this->productItem->get();
 		}
+		$temp_arr = [];
 		foreach($needPurchases as $key=>$v){
 			$sumtrend=PurchasesModel::where('item_id',$v->id)->where('require_create','1')->get()->first();
 			if(!$sumtrend){
@@ -120,9 +121,8 @@ class RequireController extends Controller
 				    
 				}
 			}
-			$temp_arr = [];
 			$temp_arr[] = $v->id;
-			$this->productItem->createPurchaseNeedData($temp_arr);
+			
 			$sumtrend->update(['require_create'=>'0']);
 		}
 		$warehouse_supplier=PurchaseItemModel::select('id','warehouse_id','supplier_id','user_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->groupBy('user_id')->get()->toArray();
@@ -150,6 +150,8 @@ class RequireController extends Controller
 				}				 
 			}		
 		}
+
+		$this->productItem->createPurchaseNeedData($temp_arr);
 		return 1;
 	}
 

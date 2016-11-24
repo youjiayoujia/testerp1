@@ -220,9 +220,9 @@ class PurchaseOrderController extends Controller
                     foreach($v as $key=>$vo){
                         $item[$key]=$vo;    
                     }
-                    if($v['active']>0){
+                    /*if($v['active']>0){
                         $item['active_status']=1;
-                    }
+                    }*/
                     if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
                         $item['costExamineStatus']=2;
                         ItemModel::where('sku',$purchaseItem->sku)->update(['purchase_price'=>$item['purchase_cost']]); 

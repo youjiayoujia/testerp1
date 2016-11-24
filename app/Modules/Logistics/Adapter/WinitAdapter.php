@@ -13,7 +13,7 @@ class WinitAdapter extends BasicAdapter
     protected $shipperAddrCode =array(
         999 =>'A00004',
         1000=>'SLME003',
-        1 => 'SLME003',
+        3 => 'SLME003',
     );
     
     protected $winitProductCode=array(

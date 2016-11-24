@@ -803,21 +803,22 @@ class TestController extends Controller
         /*
  * 写入队列
  */
-        $reply = ReplyModel::find($id);
+/*        $reply = ReplyModel::find($id);
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
-        dd($reply);
+        dd($reply);*/
 
 
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
-                $reply = ReplyModel::find($id);
+                $replys = ReplyModel::where('status','FAIL')->get();
+                foreach ($replys as $reply){
+                    $channel = Channel::driver($account->channel->driver, $account->api_config);
+                    $channel->sendMessages($reply);
+                }
 
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-
-                $channel->sendMessages($reply);
-                dd('已经操作');
+                dd('已经操作233');
 
             }
         }

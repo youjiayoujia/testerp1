@@ -37,24 +37,7 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-
-
-            $account = $this->reply->message->account;
-
-            // if($account->channel->driver == 'aliexpress') //亚马逊渠道邮件
-
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-
-            $return_msg = $channel->sendMessages($this->reply);
-
-                $this->result['status'] = 'fail';
-                $this->result['remark'] = $return_msg;
-
-
-
-
-
-/*        if ($this->reply) {
+        if ($this->reply) {
             $account = $this->reply->message->account;
 
             // if($account->channel->driver == 'aliexpress') //亚马逊渠道邮件
@@ -72,9 +55,7 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
         } else {
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'not find message';
-        }*/
-
-
+        }
         $start = microtime(true);
 
         $this->lasting = round(microtime(true) - $start, 3);

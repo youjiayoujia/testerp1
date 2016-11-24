@@ -1030,14 +1030,7 @@ Class AliexpressAdapter implements AdapterInterface
             $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
 
             $api_return =  $this->getJsonData('api.addMsg', $send_param);
-
-            return $api_return;
-
             $api_return_array = json_decode($api_return,true);
-
-
-
-
             if(isset($api_return_array['result']["isSuccess"])){
                 if($api_return_array['result']["isSuccess"]){
                     //step2: 更新消息为已读

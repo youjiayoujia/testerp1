@@ -190,7 +190,7 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已取消.'));
         }
         $userName = UserModel::find(request()->user()->id);
-        $from = json_encode($model);
+        $from = base64_encode(serialize($model));
         $data=request()->all();
         if(isset($data['arr'])){
             if(isset($data['post'])){
@@ -258,7 +258,7 @@ class PurchaseOrderController extends Controller
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);  
 
-        $to = json_encode($model);
+        $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'编辑成功.'));
@@ -279,11 +279,20 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $userName = UserModel::find(request()->user()->id);
-        $from = json_encode($model);
+        $from = base64_encode(serialize($model));
         $data['examineStatus']=$examineStatus;
         $data['status'] = 1;
         $model->update($data);
-        $to = json_encode($model);
+        //更新采购需求数据
+        $temp_arr = [];
+        foreach($model->purchaseItem as $purchaseitemModel){
+            $purchaseitemModel->update(['status'=>1]);
+            $temp_arr[] = $purchaseitemModel->item_id;
+        }
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData($temp_arr);
+
+        $to = json_encode(serialize($model));
         $this->eventLog($userName->name, '采购单审核,id='.$model->id, $to, $from);
         return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'审核通过.'));
     }
@@ -372,7 +381,7 @@ class PurchaseOrderController extends Controller
         }
         $model=$this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = json_encode($model);
+        $from = base64_encode(serialize($model));
         $num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
         $Inum=ItemModel::where('sku',$data['sku'])->where('is_available','<>',1)->where('status',"selling")->count();
         if($num > 0 || $Inum > 0){
@@ -398,7 +407,7 @@ class PurchaseOrderController extends Controller
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);
 
-        $to = json_encode($model);
+        $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '创建采购条目,id='.$model->id, $to, $from);
         return redirect( route('purchaseOrder.edit', $id)); 
         }
@@ -479,9 +488,9 @@ class PurchaseOrderController extends Controller
         $id = request()->input('id');
         $model = $this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
-        $from = json_encode($model);
+        $from = base64_encode(serialize($model));
         $model->update(['print_status'=>1]);
-        $to = json_encode($model);
+        $to = base64_encode(serialize($model));
         $this->eventLog($userName->name, '修改打印状态,id='.$model->id, $to, $from);
     }
 

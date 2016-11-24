@@ -248,7 +248,7 @@ class ItemModel extends BaseModel
         $stockCollection = $this->stocks->groupBy('warehouse_id');
         foreach($stockCollection as $colleciton){
             $data[$colleciton[0]->warehouse_id]['all_quantity'] = $colleciton->sum('all_quantity');
-            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity');
+            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity')-$this->warehouse_ouf_of_stock[$colleciton[0]->warehouse_id]['need'];
         }
         $warehouses = WarehouseModel::all();
         foreach($warehouses as $warehouse){
@@ -300,6 +300,26 @@ class ItemModel extends BaseModel
         return $num;
     }
 
+    //分仓欠货数量
+    public function getWarehouseOutOfStockAttribute()
+    {
+        $item_id = $this->id;
+        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
+                packages.id = package_items.package_id group by packages.warehouse_id');
+        $data = [];
+
+        $warehouses = WarehouseModel::all();
+        foreach($warehouses as $warehouse){
+            $data[$warehouse->id]['need'] = 0; 
+        }
+
+        foreach ($num as $key => $value) {
+            $data[$value->warehouse_id]['need'] += $value->num;
+        }    
+
+        return $data;
+    }
+
     //最近一次采购时间
     public function getRecentlyPurchaseTimeAttribute()
     {
@@ -342,7 +362,7 @@ class ItemModel extends BaseModel
             'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
             'filterSelects' => ['status' => config('item.status'),
-                                'warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+                                'warehouse_id' =>$this->getArray('App\Models\WarehouseModel', 'name'),
                                ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'sectionSelect' => [],
@@ -820,7 +840,7 @@ class ItemModel extends BaseModel
             } else {
                 PurchasesModel::create($data);
             }
-            
+
             return $data;
         }
     }

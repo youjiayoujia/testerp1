@@ -70,11 +70,12 @@
                     <br>
                     <div>虚：{{$item->getStockQuantity($warehouse->id)}}</div>
                     <div>实：{{$item->getStockQuantity($warehouse->id,1)}}</div>
+                    <div>途：{{$item->transit_quantity[$warehouse->id]['normal']}}</div>
+                    <div>特：{{$item->transit_quantity[$warehouse->id]['special']}}</div>
+                    <div>缺：{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</div>
                 @endforeach
                 所有仓库
                 <br>
-                <div>途：{{$item->normal_transit_quantity}}</div>
-                <div>特：{{$item->special_transit_quantity}}</div>
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>
                 <div>14天销量：{{$item->getsales('-14 day')}}</div>
                 <div>28天销量：{{$item->getsales('-28 day')}}</div>

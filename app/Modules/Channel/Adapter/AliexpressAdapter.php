@@ -1031,6 +1031,13 @@ Class AliexpressAdapter implements AdapterInterface
 
             $api_return =  $this->getJsonData('api.addMsg', $send_param);
             $api_return_array = json_decode($api_return,true);
+
+
+            //断点测试
+            return $api_return_array;
+
+
+
             if(isset($api_return_array['result']["isSuccess"])){
                 if($api_return_array['result']["isSuccess"]){
                     //step2: 更新消息为已读

@@ -68,6 +68,21 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
         $this->orderModel = $orderModel;
     }
+    //测试包裹站台是否满足 物流下单状态；
+    //进行物流下单
+
+
+    public function tryGetLogtisticsNo($id){
+
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
+    }
+
     public function test2()
     {
         $package = PackageModel::find(1);

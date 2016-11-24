@@ -642,7 +642,7 @@ class TestController extends Controller
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
         }
-        dd('已执行！ fight 2！！！');
+        dd('已执行！ fight 3333！！！');
 
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
@@ -799,6 +799,17 @@ class TestController extends Controller
     public function testReply($id){
 
 
+        //测试单个塞入队列
+        /*
+ * 写入队列
+ */
+        $reply = ReplyModel::find($id);
+            $job = new SendMessages($reply);
+            $job = $job->onQueue('SendMessages');
+            $this->dispatch($job);
+        dd($reply);
+
+
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
                 $reply = ReplyModel::find($id);
@@ -806,12 +817,11 @@ class TestController extends Controller
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
 
                 $channel->sendMessages($reply);
-                exit;
+                dd('已经操作');
 
             }
         }
 
-        dd($reply);
     }
     /**
      * Curl Post JSON 数据

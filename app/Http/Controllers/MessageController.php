@@ -337,7 +337,7 @@ class MessageController extends Controller
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);*/
             $account = $message->account;
-
+            $reply = ReplyModel::where('message_id',$id)->get()->first();
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $channel->sendMessages($reply);
 

@@ -1206,7 +1206,7 @@
                     dataType: 'json',
                     type: 'get',
                     success: function (result) {
-                        window.location.reload();
+//                        window.location.reload();
                     }
                 });
             }

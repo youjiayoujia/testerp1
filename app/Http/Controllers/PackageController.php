@@ -960,10 +960,10 @@ class PackageController extends Controller
             foreach ($packages as $package) {
                 // $orderRate = $package->order->calculateProfitProcess();
                 // if ($orderRate > 0) {
-                    $job = new PlaceLogistics($package);
-                    $job = $job->onQueue('placeLogistics');
-                    $this->dispatch($job);
-                    $packageIds[] = $package->id;
+                $job = new PlaceLogistics($package);
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+                $packageIds[] = $package->id;
                 // }
             }
             $start += $len;
@@ -1137,7 +1137,7 @@ class PackageController extends Controller
                 $this->dispatch($job);
             }
         } else {
-            $this->model->order->OrderCancle();
+            $this->model->order->reviewOrder(); //todo：
         }
 
         return json_encode(true);

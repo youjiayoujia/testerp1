@@ -619,9 +619,6 @@ class PackageModel extends BaseModel
         if (!in_array($this->status, ['NEW', 'NEED'])) {
             return false;
         }
-        if (!$this->order->is_reviewed) {
-            return false;
-        }
         return true;
     }
 
@@ -1181,6 +1178,7 @@ class PackageModel extends BaseModel
 
     public function calculateLogisticsFee()
     {
+        //todo:包裹没有分配到物流方式，虚拟匹配一个物流方式计算运费
         $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
         $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($zones as $zone) {

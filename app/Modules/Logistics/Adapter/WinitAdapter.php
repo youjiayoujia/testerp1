@@ -190,9 +190,34 @@ class WinitAdapter extends BasicAdapter
         $post_array['timestamp'] =date('Y-m-d H:i:s');
         $post_array['version'] ="1.0";    
         $headers = array("application/x-www-form-urlencoded; charset=gb2312");
-        $result =  $this->curlPost($this->server_url,json_encode($post_array,JSON_UNESCAPED_UNICODE),$headers);
+        //$result =  $this->curlPost($this->server_url,json_encode($post_array,JSON_UNESCAPED_UNICODE),$headers);
+        $result = $this->postCurlData($this->server_url, json_encode($post_array,JSON_UNESCAPED_UNICODE));
         return $result;
     }
+    
+    /**
+     * Curl http Post 数
+     * 使用方法：
+     * $post_string = "app=request&version=beta";
+     * postCurlData('http://www.test.cn/restServer.php',$post_string);
+     */
+    public function postCurlData($remote_server, $post_string) {
+        //   var_dump($post_string);exit;
+        $ch = curl_init();
+        $header[] = "Content-type: text/json";
+        curl_setopt($ch, CURLOPT_URL, $remote_server); //定义表单提交地址
+        curl_setopt($ch, CURLOPT_POST, 1);   //定义提交类型 1：POST ；0：GET
+        curl_setopt($ch, CURLOPT_HEADER, 0); //定义是否显示状态头 1：显示 ； 0：不显示
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);//定义请求类型
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);//定义是否直接输出返回流
+        curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string); //定义提交的数据，这里是XML文件
+        $tmpInfo = curl_exec ( $ch ); // 执行操作
+    
+        curl_close($ch);//关闭
+        return $tmpInfo;
+    }
+    
     
 }
 

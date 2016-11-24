@@ -1030,11 +1030,11 @@ Class AliexpressAdapter implements AdapterInterface
             $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
 
             $api_return =  $this->getJsonData('api.addMsg', $send_param);
+
+            return $api_return;
+
             $api_return_array = json_decode($api_return,true);
 
-
-            //断点测试
-            return $api_return_array;
 
 
 

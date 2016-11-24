@@ -71,7 +71,7 @@ class TestController extends Controller
     public function test2()
     {
         $package = PackageModel::find(1);
-        var_dump($package->items->toarray());
+        var_dump($package->canclePackage());
     }
 //    public function test2()
 //    {

@@ -523,6 +523,25 @@ class PackageModel extends BaseModel
         return $arr;
     }
 
+    public function cancelPackage()
+    {
+        if (in_array($this->status, ['PACKED', 'SHIPPED'])) {
+            return false;
+        }
+        $item = $this->items()->first();
+        if ($item->warehouse_position_id) {
+            foreach ($this->items as $packageItem) {
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity);
+                $packageItem->delete();
+            }
+        } else {
+            foreach ($this->items as $packageItem) {
+                $packageItem->delete();
+            }
+        }
+        return $this->delete();
+    }
+
     public function reCreatePackage()
     {
         $arr = [];
@@ -583,23 +602,51 @@ class PackageModel extends BaseModel
         return false;
     }
 
+    public function canAssignStocks()
+    {
+        if (!in_array($this->status, ['NEW', 'NEED'])) {
+            return false;
+        }
+        if (!$this->order->is_reviewed) {
+            return false;
+        }
+        return true;
+    }
+
     public function createPackageItems()
     {
-        $items = $this->setPackageItems();
-        if ($items) {
-            return $this->createPackageDetail($items);
-        } else {
-            if ($this->status == 'NEW') {
-                if ($this->type == 'MULTI') {
-                    $orderId = $this->reCreatePackage();
-                    if ($orderId) {
-                        $order = OrderModel::find($orderId);
-                        foreach ($order->packages as $package) {
-                            $job = new AssignStocks($package);
-                            Queue::pushOn('assignStocks', $job);
+        if ($this->canAssignStocks()) {
+            $items = $this->setPackageItems();
+            if ($items) {
+                return $this->createPackageDetail($items);
+            } else {
+                if ($this->status == 'NEW') {
+                    if ($this->type == 'MULTI') {
+                        $orderId = $this->reCreatePackage();
+                        if ($orderId) {
+                            $order = OrderModel::find($orderId);
+                            foreach ($order->packages as $package) {
+                                $job = new AssignStocks($package);
+                                Queue::pushOn('assignStocks', $job);
+                            }
+                            return true;
+                        } else {
+                            foreach ($this->items as $item) {
+                                $require = [];
+                                $require['item_id'] = $item->item_id;
+                                $require['warehouse_id'] = $item->item->warehouse_id;
+                                $require['order_item_id'] = $item->order_item_id;
+                                $require['sku'] = $item->item->sku;
+                                $require['quantity'] = $item->quantity;
+                                $this->requires()->create($require);
+                            }
+                            //todo v3测试，正式上线删除
+                            $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                            $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
+                            $this->order->update(['status' => 'NEED']);
+                            return true;
                         }
-                        return true;
-                    } else {  
+                    } else {
                         foreach ($this->items as $item) {
                             $require = [];
                             $require['item_id'] = $item->item_id;
@@ -616,28 +663,13 @@ class PackageModel extends BaseModel
                         return true;
                     }
                 } else {
-                    foreach ($this->items as $item) {
-                        $require = [];
-                        $require['item_id'] = $item->item_id;
-                        $require['warehouse_id'] = $item->item->warehouse_id;
-                        $require['order_item_id'] = $item->order_item_id;
-                        $require['sku'] = $item->item->sku;
-                        $require['quantity'] = $item->quantity;
-                        $this->requires()->create($require);
+                    if (strtotime($this->created_at) < strtotime('-3 days')) {
+                        $arr = $this->explodePackage();
+                        if ($arr) {
+                            $this->createChildPackage($arr);
+                        }
+                        return true;
                     }
-                    //todo v3测试，正式上线删除
-                    $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
-                    $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
-                    $this->order->update(['status' => 'NEED']);
-                    return true;
-                }
-            } else {
-                if (strtotime($this->created_at) < strtotime('-3 days')) {
-                    $arr = $this->explodePackage();
-                    if ($arr) {
-                        $this->createChildPackage($arr);
-                    }
-                    return true;
                 }
             }
         }
@@ -909,7 +941,7 @@ class PackageModel extends BaseModel
                     $buf[$this->warehouse_id][$i]['quantity'] = $stock->available_quantity;
                     $pquantity -= $stock->available_quantity;
                     $i++;
-                } else { 
+                } else {
                     $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
                     $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
                     $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
@@ -962,8 +994,8 @@ class PackageModel extends BaseModel
                     if ($oldWarehouseId != $warehouseId) {
                         $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                     } else {
-                        if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                            if(floatval($weight)-floatval($oldWeight) < 0.00000000001) {
+                        if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                            if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                 $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
                             } else {
                                 $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
@@ -1008,8 +1040,8 @@ class PackageModel extends BaseModel
                                 'tracking_no' => '0'
                             ]);
                         } else {
-                            if(!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                                if(floatval($weight)-floatval($oldWeight) < 0.00000000001) {
+                            if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                     $newPackage->update(['weight' => $weight, 'status' => 'PROCESSING']);
                                 } else {
                                     $newPackage->update([
@@ -1608,10 +1640,12 @@ class PackageModel extends BaseModel
                         $error[] = $key;
                         continue;
                     }
-                    $this->find($content['package_id'])->update(['tracking_no' => $content['tracking_no'],
-                                                                 'logistics_id' => $content['logistics_id']]);
+                    $this->find($content['package_id'])->update([
+                        'tracking_no' => $content['tracking_no'],
+                        'logistics_id' => $content['logistics_id']
+                    ]);
                     break;
-                }
+            }
         }
 
         return $error;

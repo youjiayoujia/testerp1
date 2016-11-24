@@ -32,7 +32,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 
                 </a>
                 <a href="{{ route('stockAdjustment.check', ['id'=>$adjust->id]) }}"  class="btn btn-info btn-xs" title='审核'>
-                    <span class="glyphicon glyphicon-pencil"></span>
+                    <span class="glyphicon glyphicon-comment"></span>
                     
                 </a>
                 @endif

@@ -102,6 +102,7 @@ class AdjustmentController extends Controller
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
+        $buf['adjust_by'] = request()->user()->id;
         $obj = $this->model->create($buf);
         $arr = request()->input('arr');
         for($i=0; $i<$len; $i++)
@@ -185,6 +186,7 @@ class AdjustmentController extends Controller
         }
         $obj = $model->adjustments;
         $obj_len = count($obj);
+        $buf['adjust_by'] = request()->user()->id;
         $this->model->find($id)->update($buf);
         for($i=0; $i<$len; $i++)
         {   

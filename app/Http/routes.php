@@ -491,6 +491,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logisticsZone/one/{id}',
         ['uses' => 'Logistics\ZoneController@one', 'as' => 'logisticsZone.one']);
+    Route::get('logisticsRule/one/{id}',
+        ['uses' => 'Logistics\RuleController@one', 'as' => 'logisticsRule.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::get('logistics/ajaxSupplier',
@@ -1232,5 +1234,8 @@ Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);
 Route::any('joomOrdersList', ['uses' => 'TestController@joomOrdersList']);
 Route::any('joomToShipping', ['uses' => 'TestController@joomToShipping']);
 Route::any('joomrefreshtoken', ['uses' => 'TestController@joomrefreshtoken']);
+
+Route::any('testReply/{id}',
+    ['as' => 'test.testReply', 'uses' => 'TestController@testReply']);
 
 

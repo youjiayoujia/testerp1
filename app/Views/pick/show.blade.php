@@ -21,16 +21,16 @@
     <table class='table table-striped'>
         <tbody>
             <tr>
-                <td>包裹总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'all']) }}">{{ $model->package->count() }}</a></td>
-                <td>异常包裹数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'ERROR']) }}">{{ $model->package()->where('status', 'ERROR')->count() }}</a></td>
+                <td>包裹总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'all']) }}">{{ $model->package()->withTrashed()->count() }}</a></td>
+                <td>异常包裹数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'ERROR']) }}">{{ $model->package()->withTrashed()->where('status', 'ERROR')->count() }}</a></td>
             </tr>
             <tr>
-                <td>未包装总数:</td><td>{{ $model->package()->whereIn('status', ['PICKING', 'NEW'])->count() }} <button type='button' href="javascript:" class='btn btn-info print' data-id="{{ $model->id }}" data-user="{{$user}}">打印</button></td>
-                <td>已打印(拣货中)总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'PICKING']) }}">{{ $model->package()->where('status', 'PICKING')->count() }}</a></td>
+                <td>未包装总数:</td><td>{{ $model->package()->withTrashed()->whereIn('status', ['PICKING', 'NEW'])->count() }} <button type='button' href="javascript:" class='btn btn-info print' data-id="{{ $model->id }}" data-user="{{$user}}">打印</button></td>
+                <td>已打印(拣货中)总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'PICKING']) }}">{{ $model->package()->withTrashed()->where('status', 'PICKING')->count() }}</a></td>
             </tr>
             <tr>
-                <td>已包装总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'PACKED']) }}">{{ $model->package()->where('status', 'PACKED')->count() }}</a></td>
-                <td>已发货总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'SHIPPED']) }}">{{ $model->package()->where('status', 'SHIPPED')->count() }}</a></td>
+                <td>已包装总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'PACKED']) }}">{{ $model->package()->withTrashed()->where('status', 'PACKED')->count() }}</a></td>
+                <td>已发货总数:</td><td><a href="{{ route('pickList.printPackageDetails', ['id' => $model->id, 'status' => 'SHIPPED']) }}">{{ $model->package()->withTrashed()->where('status', 'SHIPPED')->count() }}</a></td>
             </tr>
         </tbody>
     </table>

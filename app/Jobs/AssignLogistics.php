@@ -48,6 +48,8 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
              * 5. 包裹重量大于2kg
              *
              **/
+            
+            
             $job = new PlaceLogistics($this->package);
             $job = $job->onQueue('placeLogistics');
             $this->dispatch($job);

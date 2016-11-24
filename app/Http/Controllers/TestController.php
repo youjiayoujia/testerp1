@@ -70,8 +70,8 @@ class TestController extends Controller
     }
     public function test2()
     {
-        $package = PackageModel::find(1);
-        var_dump($package->canclePackage());
+        $package = PackageModel::find(3);
+        $package->forceDelete();
     }
 //    public function test2()
 //    {

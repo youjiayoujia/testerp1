@@ -6,6 +6,7 @@ use Cache;
 use App\Jobs\Job;
 use Exception;
 use App\Jobs\AssignLogistics;
+use App\Jobs\PlaceLogistics;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -47,6 +48,13 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success to assign stock.';
                 $this->package->eventLog('队列', '已匹配到库存,待拣货', json_encode($this->package));
+            } elseif ($this->package->status == 'ASSIGNED') {
+                $job = new PlaceLogistics($this->package);
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'Success to assign stock.';
+                $this->package->eventLog('队列', '已匹配到库存,待下单', json_encode($this->package));
             }
         } else {
             $this->result['status'] = 'success';

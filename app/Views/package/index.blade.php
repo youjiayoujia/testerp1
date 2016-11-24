@@ -175,6 +175,11 @@
 @stop
 @section('tableToolButtons')
     <div class="btn-group">
+        <a class="btn btn-success" href="{{ route('package.showAllView') }}">
+            查看已删除包裹信息
+        </a>
+    </div>
+    <div class="btn-group">
         <a class="btn btn-success implodePackage" href="javascript:">
             合并包裹
         </a>

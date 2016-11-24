@@ -6,6 +6,7 @@ use App\Models\Logistics\ErpRussiaModel;
 use Excel;
 use DB;
 use App\Jobs\AssignStocks;
+use App\Jobs\PlaceLogistics;
 use App\Base\BaseModel;
 use App\Models\RequireModel;
 use App\Models\Logistics\RuleModel;
@@ -546,13 +547,24 @@ class PackageModel extends BaseModel
     {
         $arr = [];
         foreach ($this->items as $key => $packageItem) {
-            $arr[$packageItem->item->warehouse_id][$key]['item_id'] = $packageItem->item_id;
-            $arr[$packageItem->item->warehouse_id][$key]['quantity'] = $packageItem->quantity;
-            $arr[$packageItem->item->warehouse_id][$key]['order_item_id'] = $packageItem->order_item_id;
+            $item = $packageItem->item;
+            $warehouse_id = 0;
+            $buf = $item->getTransitQuantityAttribute();
+            if(count($buf) > 1 || count($buf) == 0) {
+                $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+            } else {
+                foreach($buf as $key => $value) {
+                    $warehouse_id = $key;
+                    break;
+                }
+            }
+            $arr[$warehouse_id][$key]['item_id'] = $packageItem->item_id;
+            $arr[$warehouse_id][$key]['quantity'] = $packageItem->quantity;
+            $arr[$warehouse_id][$key]['order_item_id'] = $packageItem->order_item_id;
         }
         if (count($arr) > 1) {
             foreach ($this->items as $bufItem) {
-                $bufItem->delete();
+                $bufItem->forceDelete();
             }
             $j = 0;
             foreach ($arr as $k => $v) {
@@ -617,6 +629,7 @@ class PackageModel extends BaseModel
     {
         if ($this->canAssignStocks()) {
             $items = $this->setPackageItems();
+            var_dump($items);exit;
             if ($items) {
                 return $this->createPackageDetail($items);
             } else {
@@ -641,7 +654,16 @@ class PackageModel extends BaseModel
                                 $this->requires()->create($require);
                             }
                             //todo v3测试，正式上线删除
-                            $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                            $fItem = $this->items()->first();
+                            $arr = $fItem->item->getTransitQuantityAttribute();
+                            if(count($arr) > 1 || count($arr) == 0) {
+                                $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                            } else {
+                                foreach($arr as $key => $value) {
+                                    $warehouse_id = $key;
+                                    break;
+                                }
+                            }
                             $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
                             $this->order->update(['status' => 'NEED']);
                             return true;
@@ -657,7 +679,17 @@ class PackageModel extends BaseModel
                             $this->requires()->create($require);
                         }
                         //todo v3测试，正式上线删除
-                        $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                        $fItem = $this->items()->first();
+                        var_dump('123');exit;
+                        $arr = $fItem->item->getTransitQuantityAttribute();
+                        if(count($arr) > 1 || count($arr) == 0) {
+                            $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                        } else {
+                            foreach($arr as $key => $value) {
+                                $warehouse_id = $key;
+                                break;
+                            }
+                        }
                         $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
                         $this->order->update(['status' => 'NEED']);
                         return true;
@@ -921,33 +953,43 @@ class PackageModel extends BaseModel
     //设置多产品订单包裹产品
     public function setPackageItemFb()
     {
-        $buf = [];
-        $i = 0;
-        foreach ($this->items as $packageItem) {
-            $pquantity = $packageItem->quantity;
-            $stocks = StockModel::where([
-                'warehouse_id' => $this->warehouse_id,
-                'item_id' => $packageItem->item_id
-            ])->get()->sortByDesc('available_quantity');
-            if ($stocks->sum('available_quantity') < $packageItem->quantity) {
-                unset($buf);
-                return false;
+        $warehouses = WarehouseModel::where('is_available', '1')->get();
+        foreach($warehouses as $key => $wareshouse) {
+            $warehouseId = 0;
+            if($key == 0) {
+                $warehouseId = $this->warehouse_id;
             }
-            foreach ($stocks as $key => $stock) {
-                if ($stock->available_quantity < $pquantity) {
-                    $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
-                    $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
-                    $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
-                    $buf[$this->warehouse_id][$i]['quantity'] = $stock->available_quantity;
-                    $pquantity -= $stock->available_quantity;
-                    $i++;
-                } else {
-                    $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
-                    $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
-                    $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
-                    $buf[$this->warehouse_id][$i]['quantity'] = $pquantity;
-                    $i++;
-                    continue 2;
+            if($warehouse->id == $this->warehouse_id) {
+                continue;
+            }
+            $buf = [];
+            $i = 0;
+            foreach ($this->items as $packageItem) {
+                $pquantity = $packageItem->quantity;
+                $stocks = StockModel::where([
+                    'warehouse_id' => $warehouseId,
+                    'item_id' => $packageItem->item_id
+                ])->get()->sortByDesc('available_quantity');
+                if ($stocks->sum('available_quantity') < $packageItem->quantity) {
+                    unset($buf);
+                    return false;
+                }
+                foreach ($stocks as $key => $stock) {
+                    if ($stock->available_quantity < $pquantity) {
+                        $buf[$warehouseId][$i]['item_id'] = $packageItem->item_id;
+                        $buf[$warehouseId][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                        $buf[$warehouseId][$i]['order_item_id'] = $packageItem->order_item_id;
+                        $buf[$warehouseId][$i]['quantity'] = $stock->available_quantity;
+                        $pquantity -= $stock->available_quantity;
+                        $i++;
+                    } else {
+                        $buf[$warehouseId][$i]['item_id'] = $packageItem->item_id;
+                        $buf[$warehouseId][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                        $buf[$warehouseId][$i]['order_item_id'] = $packageItem->order_item_id;
+                        $buf[$warehouseId][$i]['quantity'] = $pquantity;
+                        $i++;
+                        continue 2;
+                    }
                 }
             }
         }
@@ -966,12 +1008,13 @@ class PackageModel extends BaseModel
         $oldTrackingNo = $this->tracking_no;
         $oldWeight = $this->weight;
         foreach ($this->items as $packageItem) {
-            $packageItem->delete();
+            $packageItem->forceDelete();
         }
         $this->order->update(['status' => 'PACKED']);
         $i = true;
         foreach ($items as $warehouseId => $packageItems) {
             if ($i) {
+                $i = false;
                 $weight = 0;
                 foreach ($packageItems as $key => $packageItem) {
                     $newPackageItem = $this->items()->create($packageItem);
@@ -990,22 +1033,37 @@ class PackageModel extends BaseModel
                 }
                 if (empty($oldWarehouseId)) {
                     $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                    $job = new AssignLogistics($this);
+                    $job->onQueue('assignLogistics');
+                    $this->dispatch($job);
                 } else {
                     if ($oldWarehouseId != $warehouseId) {
                         $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
                     } else {
-                        if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                            if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
-                                $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
-                            } else {
-                                $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                        if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
+                            if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                $this->update(['status' => 'PROCESSING']);
+                                continue;
                             }
+                            if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
+                                $this->update(['status' => 'ASSIGNED']);
+                                $job = new PlaceLogistics($this);
+                                $job->onQueue('placeLogistics');
+                                $this->dispatch($job);
+                                continue;
+                            }
+                            $this->update(['status' => 'WAITASSIGN']);
+                            $job = new AssignLogistics($this);
+                            $job->onQueue('assignLogistics');
+                            $this->dispatch($job);
                         } else {
                             $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                            $job = new AssignLogistics($this);
+                            $job->onQueue('assignLogistics');
+                            $this->dispatch($job);
                         }
                     }
                 }
-                $i = false;
             } else {
                 $newPackage = $this->create($this->toArray());
                 $weight = 0;
@@ -1039,22 +1097,37 @@ class PackageModel extends BaseModel
                                 'logistics_id' => '0',
                                 'tracking_no' => '0'
                             ]);
+                            $job = new AssignLogistics($newPackage);
+                            $job->onQueue('assignLogistics');
+                            $newPackage->dispatch($job);
                         } else {
-                            if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                                if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
-                                    $newPackage->update(['weight' => $weight, 'status' => 'PROCESSING']);
-                                } else {
-                                    $newPackage->update([
-                                        'status' => 'WAITASSIGN',
-                                        'weight' => $weight,
-                                        'logistics_id' => '0',
-                                        'tracking_no' => '0'
-                                    ]);
+                            if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
+                                if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                    $newPackage->update(['status' => 'PROCESSING']);
+                                    continue;
                                 }
+                                if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
+                                    $newPackage->update(['status' => 'ASSIGNED']);
+                                    $job = new PlaceLogistics($newPackage);
+                                    $job->onQueue('placeLogistics');
+                                    $newPackage->dispatch($job);
+                                    continue;
+                                }
+                                $newPackage->update(['status' => 'WAITASSIGN']);
+                                $job = new AssignLogistics($newPackage);
+                                $job->onQueue('assignLogistics');
+                                $newPackage->dispatch($job);
                             } else {
                                 $newPackage->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                                $job = new AssignLogistics($newPackage);
+                                $job->onQueue('assignLogistics');
+                                $newPackage->dispatch($job);
                             }
                         }
+                    } else {
+                        $job = new AssignLogistics($newPackage);
+                        $job->onQueue('assignLogistics');
+                        $newPackage->dispatch($job);
                     }
                 }
             }
@@ -1459,6 +1532,16 @@ class PackageModel extends BaseModel
         if (!$this->is_auto) {
             return false;
         }
+
+        $beforeSendFlag = $this->logistics->logisticsChannels()->where('channel_id', $this->channel_id)->first();
+        if(!$beforeSendFlag) {
+            return false;
+        }
+        $item = $this->items()->first();
+        if(!$beforeSendFlag->delivery || !$item->warehouse_position_id) {
+            return false;
+        }
+
         return true;
     }
 

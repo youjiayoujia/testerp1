@@ -6,20 +6,32 @@ function myecho($data){
 class SzPostXBAdapter extends BasicAdapter
 {
     public function __construct($config){
-//         $this->ShipServerUrl = $config['url'];
-//         $this->ecCompanyId =  $config['userId'];
-//         $this->scret = $config['userPassword'];
-//         $this->mailType = 'SALAMOER';
-//         $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
-         $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
-         $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
-         $this->ecCompanyId='44030324695000|5180120245';
-         $this->scret = '8U3Y0jt93C98u7036190';
+         $this->ShipServerUrl = $config['url'];
+         $this->ecCompanyId =  $config['userId'];
+         $this->scret = $config['userPassword'];
          $this->mailType = 'SALAMOER';
+         $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
+//         $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
+//         $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
+//         $this->ecCompanyId='44030324695000|5180120245';
+//         $this->scret = '8U3Y0jt93C98u7036190';
+//         $this->mailType = 'SALAMOER';
+        $this->sendInfo = array(
+            'j_company'  => $config['returnCompany'],                         //寄件人公司
+            'j_contact'  => $config['returnContact'],                        //寄件人
+            'j_tel'      => $config['returnPhone'],                          //电话
+            'j_address1' => $config['returnAddress'],                        //地址
+            'j_province' => $config['returnProvince'],                       //省
+            'j_city'     => $config['returnCity'],                           //市
+            'j_post_code'=> $config['returnZipcode'],                        //邮编
+            'j_country'  => $config['returnCountry'],                        //国家
+            //'custid' => '7555769565'
+        );
      }
      
     
     public function getTracking($package){
+        dd($this->sendInfo);
         $orderStr = '';
         $dateTime = date('Y-m-d H:i:s');
          list($name, $channel) = explode(',',$package->logistics->type);   

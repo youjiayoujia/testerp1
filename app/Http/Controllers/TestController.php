@@ -59,6 +59,7 @@ use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
 use Crypt;
+use App\Models\Item\ItemPrepareSupplierModel;
 
 class TestController extends Controller
 {
@@ -663,7 +664,9 @@ class TestController extends Controller
 
                          $sql = 'update items set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id;
                          DB::update($sql);
-                         echo $supplier->company .'<br/>';
+                         //更换备选
+                         DB::update('update item_prepare_suppliers set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id);
+
                          $supplier->delete(); //删除多余
                     }
                 }

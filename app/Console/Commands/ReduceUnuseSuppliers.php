@@ -43,6 +43,7 @@ class ReduceUnuseSuppliers extends Command
     {
         //
         $groups = SupplierModel::all()->groupBy('company');
+
         foreach ($groups as $group_key => $group){
             if($group->count() > 1){   //如果有多个相同的供货商
                 foreach($group as $key => $supplier){
@@ -52,6 +53,8 @@ class ReduceUnuseSuppliers extends Command
                         $sql = 'update items set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id;
                         DB::update($sql);
                         $supplier->delete(); //删除多余
+                        //更换备选
+                        DB::update('update item_prepare_suppliers set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id);
 
                         $this->info('#一行数据处理中...');
 

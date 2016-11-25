@@ -43,8 +43,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('countriesSort', 'CountriesSortController');
 
     //国家转换
-    Route::get('ajaxCountryFrom',
-        ['uses' => 'CountriesChangeController@ajaxCountryFrom', 'as' => 'ajaxCountryFrom']);
+    Route::get('ajaxCountryTo',
+        ['uses' => 'CountriesChangeController@ajaxCountryTo', 'as' => 'ajaxCountryTo']);
     Route::resource('countriesChange', 'CountriesChangeController');
 
     Route::get('eventChild/getInfo', ['uses' => 'EventChildController@getInfo', 'as' => 'eventChild.getInfo']);

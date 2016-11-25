@@ -6,16 +6,16 @@ function myecho($data){
 class SzPostXBAdapter extends BasicAdapter
 {
     public function __construct($config){
-        $this->ShipServerUrl = $config['url'];
-        $this->ecCompanyId =  $config['userId'];
-        $this->scret = $config['userPassword'];
-        $this->mailType = 'SALAMOER';
-        $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
-//         $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
-//         $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
-//         $this->ecCompanyId='44030324695000|5180120245';
-//         $this->scret = '8U3Y0jt93C98u7036190';
+//         $this->ShipServerUrl = $config['url'];
+//         $this->ecCompanyId =  $config['userId'];
+//         $this->scret = $config['userPassword'];
 //         $this->mailType = 'SALAMOER';
+//         $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
+         $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
+         $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
+         $this->ecCompanyId='44030324695000|5180120245';
+         $this->scret = '8U3Y0jt93C98u7036190';
+         $this->mailType = 'SALAMOER';
      }
      
     

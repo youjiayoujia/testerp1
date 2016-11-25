@@ -120,7 +120,8 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td>model</td>
+            <td>sku</td>
+            <td>中文名</td>
             <td>SKU*采购数量</td> 
             <td>采购类型</td>
             <!-- <td>供货商sku</td> -->
@@ -140,7 +141,8 @@
             
             <tr> 
                 <td>{{$purchaseItem->id}}<input type="hidden" name="arr[{{$k}}][id]" value="{{$purchaseItem->id }}"/></td>
-                <td>{{$purchaseItem->item->product->model}}</td>
+                <td>{{$purchaseItem->item->sku}}</td>
+                <td>{{$purchaseItem->item->c_name}}</td>
                 <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
                 <td>{{config('product.product_supplier.type')[$purchaseItem->supplier->type]}}</td>
                 <!-- <td>{{$purchaseItem->item->supplier_sku}}</td> -->   

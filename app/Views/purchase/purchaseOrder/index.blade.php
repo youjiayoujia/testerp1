@@ -118,7 +118,7 @@
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
-                    <th>{{ $sum_purchase_account}}+YF{{$purchaseOrder->total_postage}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->total_postage}}</th>
+                    <th>{{ $sum_purchase_account}}+YF{{$purchaseOrder->total_postage}}={{$sum_purchase_account+$purchaseOrder->total_postage}}</th>
                     <th>{{ $sum_purchase_storage_account}}</th>
                     <th id="warn_{{$purchaseOrder->id}}"></th>
                 </tr>

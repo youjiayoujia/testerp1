@@ -288,13 +288,23 @@
                             <span class="glyphicon glyphicon-pencil"></span> 编辑
                         </a>
                     @endif
-                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
+                    @if($order->status == 'PICKING' && ($order->amount * $order->rate) >= 20)
                         <button class="btn btn-danger btn-xs"
                                 data-toggle="modal"
                                 data-target="#withdraw{{ $order->id }}"
                                 title="撤单">
                             <span class="glyphicon glyphicon-link"></span> 撤单
                         </button>
+                    @endif
+                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'NEED' || $order->status == 'PACKED' || $order->status == 'REVIEW')
+                        <button class="btn btn-danger btn-xs"
+                                data-toggle="modal"
+                                data-target="#withdraw{{ $order->id }}"
+                                title="撤单">
+                            <span class="glyphicon glyphicon-link"></span> 撤单
+                        </button>
+                    @endif
+                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
                         <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                            data-id="{{ $order->id }}"
                            data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">

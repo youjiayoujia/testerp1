@@ -51,7 +51,6 @@ class LogisticsController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
-            'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
@@ -156,6 +155,7 @@ class LogisticsController extends Controller
             $data['channel_id'] = $k;
             $data['url'] = $v;
             $data['is_up'] = request('channel_id')[$k];
+            $data['delivery'] = request('delivery')[$k];
             $model->logisticsChannels()->create($data);
         }
         $str = '';
@@ -230,7 +230,6 @@ class LogisticsController extends Controller
             'logisticsChannels' => $logistics->logisticsChannels,
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
-            'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
             'selectedLimits' => $selectedLimits,
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
@@ -272,11 +271,15 @@ class LogisticsController extends Controller
                 if($logisticsChannels->first()->is_up != request('channel_id')[$k]) {
                     $logisticsChannels->update(['is_up' => request('channel_id')[$k]]);
                 }
+                if($logisticsChannels->first()->delivery != request('delivery')[$k]) {
+                    $logisticsChannels->update(['delivery' => request('delivery')[$k]]);
+                }
             }else {
                 $data['logistics_id'] = $id;
                 $data['channel_id'] = $k;
                 $data['url'] = $v;
                 $data['is_up'] = request('channel_id')[$k];
+                $data['delivery'] = request('delivery')[$k];
                 logisticsChannel::create($data);
             }
         }

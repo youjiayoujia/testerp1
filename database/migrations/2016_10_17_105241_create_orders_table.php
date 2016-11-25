@@ -22,7 +22,7 @@ class CreateOrdersTable extends Migration
 			$table->string('channel_listnum')->default('');
 			$table->string('by_id');
 			$table->string('email');
-			$table->enum('status', array('UNPAID','PAID','PREPARED','PARTIAL','NEED','PACKED','SHIPPED','COMPLETE','CANCEL','REVIEW'))->default('PAID');
+			$table->enum('status', array('UNPAID','PAID','PREPARED','PARTIAL','NEED','PACKED','SHIPPED','COMPLETE','CANCEL','REVIEW','PICKING'))->default('PAID');
 			$table->enum('active', array('NORMAL','VERIFY','CHARGEBACK','STOP','RESUME'))->default('NORMAL');
 			$table->enum('order_is_alert', array('0','1','2'))->default('0');
 			$table->float('amount', 15);

@@ -1,15 +1,24 @@
 <?php
 namespace App\Modules\Logistics\Adapter;
-
+function myecho($data){
+    echo "<pre/>";var_dump($data);exit;
+}
 class SzPostXBAdapter extends BasicAdapter
 {
     public function __construct($config){
-        $this->ShipServerUrl = $config['url'];
-        $this->ecCompanyId =  $config['userId'];
-        $this->scret = $config['userPassword'];
+//         $this->ShipServerUrl = $config['url'];
+//         $this->ecCompanyId =  $config['userId'];
+//         $this->scret = $config['userPassword'];
+//         $this->mailType = 'SALAMOER';
+//         $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
+        $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
+        $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
+        $this->ecCompanyId='44030324695000|5180120245';
+        $this->scret = '8U3Y0jt93C98u7036190';
+        //$this->scret = '3PWqq3I4Pcb703ZoM2rP';
         $this->mailType = 'SALAMOER';
-        $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
-    }
+     }
+     
     
     public function getTracking($package){
         $orderStr = '';
@@ -57,8 +66,9 @@ class SzPostXBAdapter extends BasicAdapter
             
         
     }
-    
+
     public function sendOrder($package,$shipcode){
+
         $proStr = '';
         $productNum = 0;
         $products_declared_cn = $package->items ? $package->items->first()->item->product->declared_cn : '裙子';
@@ -71,16 +81,19 @@ class SzPostXBAdapter extends BasicAdapter
         foreach ($package->items as $packageItem) {
             $productNum += $packageItem->quantity;
         }
-        $proStr .='<product><productNameCN>'.$products_declared_cn.'</productNameCN>
-        <productNameEN>'.$products_declared_en.'</productNameEN>
-        <productQantity>'.$productNum.'</productQantity>
-        <productCateCN>'.$category_name.'</productCateCN>
-        <productCateEN>'.$category_name_en.'</productCateEN>
-        <productId>'.$productId.'</productId>
-        <producingArea>CN</producingArea>
-        <productWeight>'.$totalWeight.'</productWeight>
-        <productPrice>'.$totalValue.'</productPrice></product>';
-      
+        $proStr .='<product>';
+        $proStr .='<productNameCN>'.$products_declared_cn.'</productNameCN>';
+        $proStr .='<productNameEN>'.$products_declared_en.'</productNameEN>';
+        $proStr .='<productQantity>'.$productNum.'</productQantity>';
+        $proStr .='<productCateCN>'.$category_name.'</productCateCN>';
+        $proStr .='<productCateEN>'.$category_name_en.'</productCateEN>';
+        $proStr .='<productCateEN>'.$category_name_en.'</productCateEN>';
+        $proStr .='<productId>'.$productId.'</productId>';
+        $proStr .='<producingArea>CN</producingArea>';
+        $proStr .='<productWeight>'.$totalWeight.'</productWeight>';
+        $proStr .='<productPrice>'.$totalValue.'</productPrice>';
+        $proStr .='</product>';
+                
         if($package->warehouse_id == 3){
             //深圳仓
             $this->sendInfo = array(
@@ -88,8 +101,8 @@ class SzPostXBAdapter extends BasicAdapter
                 'j_contact' => 'huangchaoyun',                      //寄件人
                 'j_tel' => '18038094536',                           //电话
                 'j_address1' => '2nd Floor,Buliding 6,No. 146 Pine Road,Mengli Garden Industrial, Longhua District,',//地址
-                /* 'j_address2' => 'No.41',
-                'j_address3' =>' Wuhe Road South LONGGANG', */
+                'j_address2' => 'No.41',
+                'j_address3' =>' Wuhe Road South LONGGANG',
                 'j_province' => 'GUANGDONG',                        //省
                 'j_city' => 'SHENZHEN',                             //市
                 'j_post_code' => '518129',                          //邮编
@@ -117,8 +130,58 @@ class SzPostXBAdapter extends BasicAdapter
         $batchNo = date('Ymd');
         $orderId = $package->order->channel_ordernum;       //订单ID
         list($name, $channel) = explode(',',$package->logistics->type);
-        $str = '';
-        $str .="<logisticsEventsRequest><logisticsEvent>
+        //$str = '';
+        $str = '<logisticsEventsRequest>';
+        $str .='<logisticsEvent>';
+        $str .='<eventHeader>';
+        $str .='<eventType>LOGISTICS_BATCH_SEND</eventType>';
+        $str .='<eventTime>'.$dateTime.'</eventTime>';
+        $str .='<eventSource>taobao</eventSource>';
+        $str .='<eventTarget>NPP</eventTarget>';
+        $str .='</eventHeader>';
+        $str .='<eventBody>';
+        $str .='<order>';
+        $str .='<orderInfos>'.$proStr.'</orderInfos>';
+        $str .='<ecCompanyId>'.$this->ecCompanyId.'</ecCompanyId>';
+        $str .='<logisticsOrderId>'.$orderId.'</logisticsOrderId>';
+        $str .='<isItemDiscard>true</isItemDiscard>';
+        $str .='<mailNo>'.$shipcode.'</mailNo>';
+        $str .='<LogisticsCompany>POST</LogisticsCompany>';
+        $str .='<LogisticsBiz>'.$channel.'</LogisticsBiz>';
+        $str .='<ReceiveAgentCode>POST</ReceiveAgentCode>';
+        $str .='<Rcountry>'.$package->shipping_country.'</Rcountry>';
+        $str .='<Rcity>'.$package->shipping_city.'</Rcity>';
+        $str .="<Raddress>".$package->shipping_address.' '.$package->shipping_address1."</Raddress>";
+        $str .='<Rpostcode>'.$package->shipping_zipcode.'</Rpostcode>';
+        $str .="<Rname>".$package->shipping_firstname . ' ' . $package->shipping_lastname."</Rname>";
+        $str .='<Rphone>'.$package->shipping_phone.'</Rphone>';
+        $str .="<Sname>".$this->sendInfo['j_contact']."</Sname>";
+        $str .="<Sprovince>".$this->sendInfo['j_province']."</Sprovince>";
+        $str .="<Scity>".$this->sendInfo['j_city']."</Scity>";
+        $str .="<Saddress>".$this->sendInfo['j_address1']."</Saddress>";
+        $str .="<Sphone>".$this->sendInfo['j_tel']."</Sphone>";
+        $str .="<Spostcode>".$this->sendInfo['j_post_code']."</Spostcode>";
+        $str .='<Itotleweight>'. $totalWeight.'</Itotleweight>';
+        $str .='<Itotlevalue>'. $totalValue.'</Itotlevalue>';
+        $str .='<totleweight>'. $totalWeight.'</totleweight>';
+        $str .='<hasBattery>false</hasBattery>';
+        $str .='<country>CN</country>';
+        $str .='<mailKind>3</mailKind>';
+        $str .='<mailClass>l</mailClass>';
+        $str .='<batchNo>'.$batchNo.'</batchNo>';
+        $str .='<mailType>'.$this->mailType.'</mailType>';
+        $str .='<faceType>2</faceType>';
+        $str .='<undeliveryOption>2</undeliveryOption>';
+        $str .='</order>';
+        $str .='</eventBody>';
+        $str .='</logisticsEvent>';
+        $str .='</logisticsEventsRequest>';
+        
+        
+        
+        
+        
+       /* $str .="<logisticsEventsRequest><logisticsEvent>
 <eventHeader>
 <eventType>LOGISTICS_BATCH_SEND</eventType>
 <eventTime>".$dateTime."</eventTime>
@@ -155,7 +218,7 @@ class SzPostXBAdapter extends BasicAdapter
 <hasBattery>false</hasBattery>
 <country>CN</country>
 <mailKind>3</mailKind>
-<mailClass>l</mailClass>
+<mailClass>L</mailClass>
 <batchNo>".$batchNo."</batchNo>
 <mailType>".$this->mailType."</mailType>
 <faceType>2</faceType>
@@ -164,12 +227,15 @@ class SzPostXBAdapter extends BasicAdapter
 </eventBody>
 </logisticsEvent>
 </logisticsEventsRequest>";
-        $data=preg_replace('/&/',' ',$str);
-        $newdata =  base64_encode(pack('H*', md5($data.$this->scret)));
-
+        $data=preg_replace('/&/',' ',$str);*/
+       //$str = simplexml_load_string($str);
+       // $data=$data->asXML();
+       // $data = iconv('GBK','UTF-8',$data);
+       //myecho($str);
+        $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;        
         $postD = array();
-        $postD['logistics_interface'] =$data;
+        $postD['logistics_interface'] =$str;
         $postD['data_digest'] =$newdata;
         $postD['msg_type'] ='B2C_TRADE';
         $postD['ecCompanyId'] =$this->ecCompanyId;

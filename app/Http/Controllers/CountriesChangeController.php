@@ -11,6 +11,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CountriesChangeModel;
+use App\Models\CountriesModel;
 
 class CountriesChangeController extends Controller
 {
@@ -20,5 +21,43 @@ class CountriesChangeController extends Controller
         $this->mainIndex = route('countriesChange.index');
         $this->mainTitle = '国家转换';
         $this->viewPath = 'countries.change.';
+    }
+
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'countries' => CountriesModel::all(),
+            'model' => $model,
+        ];
+        return view($this->viewPath . 'edit', $response);
+    }
+
+    /**
+     * 获取来源国家信息
+     */
+    public function ajaxCountryFrom()
+    {
+        if (request()->ajax()) {
+            $country = trim(request()->input('country_from'));
+            $buf = CountriesModel::where('code', 'like', '%' . $country . '%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach ($buf as $key => $value) {
+                $arr[$key]['id'] = $value->code;
+                $arr[$key]['text'] = $value->code . ' ' . $value->cn_name;
+            }
+            if ($total) {
+                return json_encode(['results' => $arr, 'total' => $total]);
+            } else {
+                return json_encode(false);
+            }
+        }
+
+        return json_encode(false);
     }
 }

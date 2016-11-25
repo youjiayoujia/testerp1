@@ -908,7 +908,6 @@ class PackageModel extends BaseModel
     //设置单产品订单包裹产品
     public function setSinglePackageItem()
     {
-        var_dump('in');exit;
         $packageItem = [];
         $originPackageItem = $this->items->first();
         $quantity = $originPackageItem->quantity;

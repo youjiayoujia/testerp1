@@ -1078,7 +1078,13 @@ class PackageModel extends BaseModel
     {
         $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
         foreach ($zones as $zone) {
-            if ($zone->inZone($this->shipping_country)) {
+            $country = CountriesModel::where('code', $this->shipping_country)->first();
+            if ($country) {
+                $code = $this->shipping_country;
+            } else {
+                $code = CountriesChangeModel::where('country_from', $this->shipping_country)->first()->country_to;
+            }
+            if ($zone->inZone($code)) {
                 if ($zone->type == 'first') {
                     if ($this->weight <= $zone->fixed_weight) {
                         $fee = $zone->fixed_price;

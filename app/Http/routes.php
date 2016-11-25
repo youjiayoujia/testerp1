@@ -42,6 +42,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
 
+    //国家转换
+    Route::resource('countriesChange', 'CountriesChangeController');
+
     Route::get('eventChild/getInfo', ['uses' => 'EventChildController@getInfo', 'as' => 'eventChild.getInfo']);
     Route::resource('eventChild', 'EventChildController');
     //3宝package

@@ -1,8 +1,6 @@
 <?php
 namespace App\Modules\Logistics\Adapter;
-function myecho($data){
-    echo "<pre/>";var_dump($data);exit;
-}
+
 class SzPostXBAdapter extends BasicAdapter
 {
     public function __construct($config){
@@ -17,7 +15,7 @@ class SzPostXBAdapter extends BasicAdapter
 //         $this->scret = '8U3Y0jt93C98u7036190';
 //         $this->mailType = 'SALAMOER';
         $this->sendInfo = array(
-            'j_company'  => $config['returnCompany'],                         //寄件人公司
+            'j_company'  => $config['returnCompany'],                        //寄件人公司
             'j_contact'  => $config['returnContact'],                        //寄件人
             'j_tel'      => $config['returnPhone'],                          //电话
             'j_address1' => $config['returnAddress'],                        //地址
@@ -31,10 +29,9 @@ class SzPostXBAdapter extends BasicAdapter
      
     
     public function getTracking($package){
-        dd($this->sendInfo);
         $orderStr = '';
         $dateTime = date('Y-m-d H:i:s');
-         list($name, $channel) = explode(',',$package->logistics->type);   
+        list($name, $channel) = explode(',',$package->logistics->type);
         $orderStr .= '{"ecCompanyId":"'.$this->ecCompanyId.'","eventTime":"'.$dateTime.'","logisticsOrderId":"'.$package->order->channel_ordernum.'","LogisticsCompany":"POST","LogisticsBiz":"'.$channel.'","mailType":"'.$this->mailType.'","faceType":"1"},';
         
         $orderStr = trim($orderStr,',');
@@ -124,7 +121,7 @@ class SzPostXBAdapter extends BasicAdapter
         $proStr .='<producingArea>CN</producingArea>';
         $proStr .='<productWeight>'.$totalWeight.'</productWeight>';
         $proStr .='<productPrice>'.$totalValue.'</productPrice>';
-        $proStr .='</product>';*/
+        $proStr .='</product>';
                
         if($package->warehouse_id == 3){
             //深圳仓
@@ -156,14 +153,12 @@ class SzPostXBAdapter extends BasicAdapter
                 'j_country' => 'CN',                                //国家
                 'custid' => '5796625949'
             );
-        }
+        }*/
          
         $dateTime = date('Y-m-d H:i:s');
         $batchNo = date('Ymd');
         $orderId = $package->order->channel_ordernum;       //订单ID
         list($name, $channel) = explode(',',$package->logistics->type);
-        //$str = '';
-        //$str = '<?xml version="1.0" encoding="utf-8">' . "\n";
         $str = '<logisticsEventsRequest>';
         $str .='<logisticsEvent>';
         $str .='<eventHeader>';
@@ -272,15 +267,12 @@ class SzPostXBAdapter extends BasicAdapter
         $postD['version']             = '2.0';*/
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
-        echo "<pre/>";var_dump($postD);
-        var_dump($result);
         if($result['responseItems']['response']['success'] == 'true'){
             return true;        
         }else{
            return false;
         }
-    }    
-   
+    }
     
     public function postCurlHttpsData($url, $data) { // 模拟提交数据函数
         $headers = array(     

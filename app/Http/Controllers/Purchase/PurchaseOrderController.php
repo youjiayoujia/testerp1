@@ -1014,14 +1014,16 @@ class PurchaseOrderController extends Controller
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -1030,6 +1032,8 @@ class PurchaseOrderController extends Controller
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
+
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
                 $coefficient_status = 3;
@@ -1060,6 +1064,7 @@ class PurchaseOrderController extends Controller
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
+            
             $need_purchase_num = ceil($needPurchaseNum);
             
             //($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';

@@ -6,17 +6,16 @@ function myecho($data){
 class SzPostXBAdapter extends BasicAdapter
 {
     public function __construct($config){
-//         $this->ShipServerUrl = $config['url'];
-//         $this->ecCompanyId =  $config['userId'];
-//         $this->scret = $config['userPassword'];
-//         $this->mailType = 'SALAMOER';
-//         $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
-        $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
-        $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
-        $this->ecCompanyId='44030324695000|5180120245';
-        $this->scret = '8U3Y0jt93C98u7036190';
-        //$this->scret = '3PWqq3I4Pcb703ZoM2rP';
+        $this->ShipServerUrl = $config['url'];
+        $this->ecCompanyId =  $config['userId'];
+        $this->scret = $config['userPassword'];
         $this->mailType = 'SALAMOER';
+        $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
+//         $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
+//         $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
+//         $this->ecCompanyId='44030324695000|5180120245';
+//         $this->scret = '8U3Y0jt93C98u7036190';
+//         $this->mailType = 'SALAMOER';
      }
      
     
@@ -71,36 +70,57 @@ class SzPostXBAdapter extends BasicAdapter
 
         $proStr = '';
         $productNum = 0;
-        $products_declared_cn = $package->items ? $package->items->first()->item->product->declared_cn : '裙子';
+        
+        /*$products_declared_cn = $package->items ? $package->items->first()->item->product->declared_cn : '裙子';
         $products_declared_en = $package->items ? $package->items->first()->item->product->declared_en : 'skirt';
         $totalWeight          = $package->total_weight * 1000;
         $totalValue           = $package->total_price * 1000;
         $category_name        = $package->items ? ($package->items->first()->item->catalog ? $package->items->first()->item->catalog->name : '裙子') : '裙子';      //获取分类信息
         $category_name_en     = $package->items ? ($package->items->first()->item->catalog ? $package->items->first()->item->catalog->c_name : 'skirt') : 'skirt';
+        */
         $productId            = $package->items ? $package->items->first()->item->product_id : '';
+        $totalWeight          = $package->total_weight * 1000;
+        $totalValue           = $package->total_price * 1000;
         foreach ($package->items as $packageItem) {
             $productNum += $packageItem->quantity;
+            $products_declared_cn = $packageItem->item->product->declared_cn;
+            $products_declared_en = $packageItem->item->product->declared_en;
+            $category_name        = $packageItem->item->catalog ? $packageItem->item->catalog->name : '裙子';      //获取分类信息
+            $category_name_en     = $packageItem->item->catalog ? $packageItem->item->catalog->c_name : 'skirt';
+            $single_weight        = $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
+            $single_value         = $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+            $proStr .='<product>';
+            $proStr .='<productNameCN>'.$products_declared_cn.'</productNameCN>';
+            $proStr .='<productNameEN>'.$products_declared_en.'</productNameEN>';
+            $proStr .='<productQantity>'.$productNum.'</productQantity>';
+            $proStr .='<productCateCN>'.$category_name.'</productCateCN>';
+            $proStr .='<productCateEN>'.$category_name_en.'</productCateEN>';
+            $proStr .='<productId>'.$productId.'</productId>';
+            $proStr .='<producingArea>CN</producingArea>';
+            $proStr .='<productWeight>'.$single_weight.'</productWeight>';
+            $proStr .='<productPrice>'.$single_value.'</productPrice>';
+            $proStr .='</product>';
         }
-        $proStr .='<product>';
+        
+        /*$proStr .='<product>';
         $proStr .='<productNameCN>'.$products_declared_cn.'</productNameCN>';
         $proStr .='<productNameEN>'.$products_declared_en.'</productNameEN>';
         $proStr .='<productQantity>'.$productNum.'</productQantity>';
         $proStr .='<productCateCN>'.$category_name.'</productCateCN>';
         $proStr .='<productCateEN>'.$category_name_en.'</productCateEN>';
-        $proStr .='<productCateEN>'.$category_name_en.'</productCateEN>';
         $proStr .='<productId>'.$productId.'</productId>';
         $proStr .='<producingArea>CN</producingArea>';
         $proStr .='<productWeight>'.$totalWeight.'</productWeight>';
         $proStr .='<productPrice>'.$totalValue.'</productPrice>';
-        $proStr .='</product>';
-                
+        $proStr .='</product>';*/
+               
         if($package->warehouse_id == 3){
             //深圳仓
             $this->sendInfo = array(
                 'j_company' => 'SALAMOER',                          //寄件人公司
                 'j_contact' => 'huangchaoyun',                      //寄件人
                 'j_tel' => '18038094536',                           //电话
-                'j_address1' => '2nd Floor,Buliding 6,No. 146 Pine Road,Mengli Garden Industrial, Longhua District,',//地址
+                'j_address1' => '2nd Floor,Buliding 6,No. 146 Pine Road,Mengli Garden Industrial, Longhua District',//地址
                 'j_address2' => 'No.41',
                 'j_address3' =>' Wuhe Road South LONGGANG',
                 'j_province' => 'GUANGDONG',                        //省
@@ -131,6 +151,7 @@ class SzPostXBAdapter extends BasicAdapter
         $orderId = $package->order->channel_ordernum;       //订单ID
         list($name, $channel) = explode(',',$package->logistics->type);
         //$str = '';
+        //$str = '<?xml version="1.0" encoding="utf-8">' . "\n";
         $str = '<logisticsEventsRequest>';
         $str .='<logisticsEvent>';
         $str .='<eventHeader>';
@@ -151,19 +172,19 @@ class SzPostXBAdapter extends BasicAdapter
         $str .='<ReceiveAgentCode>POST</ReceiveAgentCode>';
         $str .='<Rcountry>'.$package->shipping_country.'</Rcountry>';
         $str .='<Rcity>'.$package->shipping_city.'</Rcity>';
-        $str .="<Raddress>".$package->shipping_address.' '.$package->shipping_address1."</Raddress>";
+        $str .="<Raddress>".htmlspecialchars($package->shipping_address.' '.$package->shipping_address1)."</Raddress>";
         $str .='<Rpostcode>'.$package->shipping_zipcode.'</Rpostcode>';
         $str .="<Rname>".$package->shipping_firstname . ' ' . $package->shipping_lastname."</Rname>";
         $str .='<Rphone>'.$package->shipping_phone.'</Rphone>';
-        $str .="<Sname>".$this->sendInfo['j_contact']."</Sname>";
-        $str .="<Sprovince>".$this->sendInfo['j_province']."</Sprovince>";
-        $str .="<Scity>".$this->sendInfo['j_city']."</Scity>";
-        $str .="<Saddress>".$this->sendInfo['j_address1']."</Saddress>";
-        $str .="<Sphone>".$this->sendInfo['j_tel']."</Sphone>";
-        $str .="<Spostcode>".$this->sendInfo['j_post_code']."</Spostcode>";
-        $str .='<Itotleweight>'. $totalWeight.'</Itotleweight>';
-        $str .='<Itotlevalue>'. $totalValue.'</Itotlevalue>';
-        $str .='<totleweight>'. $totalWeight.'</totleweight>';
+        $str .='<Sname>'.$this->sendInfo['j_contact'].'</Sname>';
+        $str .='<Sprovince>'.$this->sendInfo['j_province'].'</Sprovince>';
+        $str .='<Scity>'.$this->sendInfo['j_city'].'</Scity>';
+        $str .='<Saddress>'.$this->sendInfo['j_address1'].'</Saddress>';
+        $str .='<Sphone>'.$this->sendInfo['j_tel'].'</Sphone>';
+        $str .='<Spostcode>'.$this->sendInfo['j_post_code'].'</Spostcode>';
+        $str .='<Itotleweight>'.$totalWeight.'</Itotleweight>';
+        $str .='<Itotlevalue>'.$totalValue.'</Itotlevalue>';
+        $str .='<totleweight>'.$totalWeight.'</totleweight>';
         $str .='<hasBattery>false</hasBattery>';
         $str .='<country>CN</country>';
         $str .='<mailKind>3</mailKind>';
@@ -235,11 +256,11 @@ class SzPostXBAdapter extends BasicAdapter
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;        
         $postD = array();
-        $postD['logistics_interface'] =$str;
-        $postD['data_digest'] =$newdata;
-        $postD['msg_type'] ='B2C_TRADE';
-        $postD['ecCompanyId'] =$this->ecCompanyId;
-        $postD['version'] ='2.0';
+        $postD['logistics_interface'] = $str;
+        $postD['data_digest']         = $newdata;
+        $postD['msg_type']            = 'B2C_TRADE';
+        $postD['ecCompanyId']         = $this->ecCompanyId;
+        $postD['version']             = '2.0';
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
         echo "<pre/>";var_dump($postD);

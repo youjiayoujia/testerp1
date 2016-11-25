@@ -497,9 +497,9 @@ class OrderController extends Controller
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
         $model->update(['status' => 'PREPARED']);
+        $model->packagesToQueue();
         $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '审核更新,id=' . $order_id, $to, $from);
-
         return 1;
     }
 

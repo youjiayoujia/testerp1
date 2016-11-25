@@ -10,6 +10,10 @@
 
 namespace App\Models;
 
+use Queue;
+use App\Jobs\AssignStocks;
+use App\Jobs\AssignLogistics;
+use App\Jobs\PlaceLogistics;
 use Tool;
 use Exception;
 use Storage;
@@ -502,6 +506,30 @@ class OrderModel extends BaseModel
             $total += $package->calculateLogisticsFee();
         }
         return $total;
+    }
+
+    public function packagesToQueue()
+    {
+        foreach($this->packages as $package) {
+            switch($package->status) {
+                case 'NEW':
+                    $job = new AssignStocks($package);
+                    Queue::pushOn('assignStocks', $job);
+                    break;
+                case 'WAITASSIGN':
+                    $job = new AssignLogistics($package);
+                    Queue::pushOn('assignLogistics', $job);
+                    break;
+                case 'ASSIGNED':
+                    $job = new PlaceLogistics($package);
+                    Queue::pushOn('placeLogistics', $job);
+                    break;
+                case 'NEED':
+                    $job = new AssignStocks($package);
+                    Queue::pushOn('assignStocks', $job);
+                    break;
+            }
+        }
     }
 
     //订单可用状态

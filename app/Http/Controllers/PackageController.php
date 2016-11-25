@@ -973,7 +973,7 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->whereIn('status', ['WAITASSIGN', 'NEED'])
+            ->where('status', 'WAITASSIGN')
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {

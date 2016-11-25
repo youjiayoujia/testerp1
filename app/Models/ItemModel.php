@@ -575,7 +575,7 @@ class ItemModel extends BaseModel
     //分配库存
     public function assignStock($quantity)
     {
-        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1;});
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1 && $query->warehouse->type == 'local';});
         if ($stocks->sum('available_quantity') >= $quantity) {
             $warehouseStocks = $stocks->groupBy('warehouse_id');
             //默认仓库
@@ -633,7 +633,7 @@ class ItemModel extends BaseModel
     public function matchStock($quantity)
     {
         $result = [];
-        $stocks = $this->stocks->sortByDesc('available_quantity');
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1 && $query->warehouse->type == 'local';});
         if ($stocks->sum('available_quantity') >= $quantity) {
             //单仓库
             foreach ($stocks->groupBy('warehouse_id') as $warehouseID => $warehouseStocks) {

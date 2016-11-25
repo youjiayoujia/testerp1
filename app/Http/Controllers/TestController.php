@@ -70,8 +70,8 @@ class TestController extends Controller
     }
     public function test2()
     {
-        $package = PackageModel::find(3);
-        $package->forceDelete();
+        $package = OrderModel::find(1);
+        $package->packagesToQueue();
     }
 //    public function test2()
 //    {

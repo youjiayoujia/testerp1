@@ -647,7 +647,7 @@ $(document).on('change', '#selectaccount1', function(){
 
 $('#confirm').click(function(){
 	var token_id =$("#selectaccount").val();
-	var groupId3 = $("#groupId3").val();
+	var groupId3 = $("#groupId4").val();
 	if(groupId3=='none')
 	{
 		alert('无法同步该分组');

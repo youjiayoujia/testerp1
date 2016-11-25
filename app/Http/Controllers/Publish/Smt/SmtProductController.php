@@ -1105,6 +1105,8 @@ class SmtProductController extends Controller
         
         //获取帐号信息
         $account = AccountModel::find($token_id);
+        echo "<pre/>";
+        print_r($account);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         foreach($product_statues_type as $type)
         {                           

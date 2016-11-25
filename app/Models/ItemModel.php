@@ -212,9 +212,9 @@ class ItemModel extends BaseModel
     {
         $zaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+            if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
-                    if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                         $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }  
                 }
@@ -229,9 +229,9 @@ class ItemModel extends BaseModel
     {
         $szaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+            if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
-                    if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                         $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }
                 }
@@ -700,16 +700,17 @@ class ItemModel extends BaseModel
             $data['c_name'] = $item->c_name;
             $zaitu_num = 0;
             foreach ($item->purchase as $purchaseItem) {
-                if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+                if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                     if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
-                            if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                            if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                                 $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
                             } 
                         }
                     }
                 }
             }
+            //print_r($zaitu_num);exit;
             
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
@@ -840,8 +841,9 @@ class ItemModel extends BaseModel
             } else {
                 PurchasesModel::create($data);
             }
-
-            return $data;
+            if(count($item_id_array)==1){
+                return $data;
+            }   
         }
     }
 
@@ -1071,7 +1073,7 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        $erp_products_data = DB::select('select distinct(products_sku),products_id,pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
+        $erp_products_data = DB::select('select distinct(products_sku),products_id,products_html_mod,pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive

@@ -989,6 +989,7 @@ class PackageModel extends BaseModel
     //设置多产品订单包裹产品
     public function setPackageItemFb()
     {
+<<<<<<< HEAD
         $warehouses = WarehouseModel::where('is_available', '1')->where('type', 'local')->get();
         foreach ($warehouses as $key => $warehouse) {
             $warehouseId = $warehouse->id;
@@ -1002,6 +1003,34 @@ class PackageModel extends BaseModel
                 ])->get()->sortByDesc('available_quantity');
                 if ($stocks->sum('available_quantity') < $pquantity) {
                     unset($stocks);
+=======
+        $buf = [];
+        $i = 0;
+        foreach ($this->items as $packageItem) {
+            $pquantity = $packageItem->quantity;
+            $stocks = StockModel::where([
+                'warehouse_id' => $this->warehouse_id,
+                'item_id' => $packageItem->item_id
+            ])->get()->sortByDesc('available_quantity');
+            if ($stocks->sum('available_quantity') < $packageItem->quantity) {
+                unset($buf);
+                return false;
+            }
+            foreach ($stocks as $key => $stock) {
+                if ($stock->available_quantity < $pquantity) {
+                    $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
+                    $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                    $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
+                    $buf[$this->warehouse_id][$i]['quantity'] = $stock->available_quantity;
+                    $pquantity -= $stock->available_quantity;
+                    $i++;
+                } else {
+                    $buf[$this->warehouse_id][$i]['item_id'] = $packageItem->item_id;
+                    $buf[$this->warehouse_id][$i]['warehouse_position_id'] = $stock->warehouse_position_id;
+                    $buf[$this->warehouse_id][$i]['order_item_id'] = $packageItem->order_item_id;
+                    $buf[$this->warehouse_id][$i]['quantity'] = $pquantity;
+                    $i++;
+>>>>>>> master
                     continue 2;
                 }
                 foreach ($stocks as $key => $stock) {
@@ -1077,10 +1106,18 @@ class PackageModel extends BaseModel
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
                     } else {
+<<<<<<< HEAD
                         if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                             if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
                                 $this->update(['status' => 'PROCESSING']);
                                 continue;
+=======
+                        if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                            if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
+                                $this->update(['weight' => $weight, 'status' => 'PROCESSING']);
+                            } else {
+                                $this->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+>>>>>>> master
                             }
                             if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
                                 $this->update(['status' => 'ASSIGNED']);
@@ -1139,6 +1176,7 @@ class PackageModel extends BaseModel
                             $job = new AssignLogistics($newPackage);
                             Queue::pushOn('assignLogistics', $job);
                         } else {
+<<<<<<< HEAD
                             if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                 if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
                                     $newPackage->update(['status' => 'PROCESSING']);
@@ -1149,6 +1187,18 @@ class PackageModel extends BaseModel
                                     $job = new PlaceLogistics($newPackage);
                                     Queue::pushOn('placeLogistics', $job);
                                     continue;
+=======
+                            if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
+                                if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
+                                    $newPackage->update(['weight' => $weight, 'status' => 'PROCESSING']);
+                                } else {
+                                    $newPackage->update([
+                                        'status' => 'WAITASSIGN',
+                                        'weight' => $weight,
+                                        'logistics_id' => '0',
+                                        'tracking_no' => '0'
+                                    ]);
+>>>>>>> master
                                 }
                                 $newPackage->update(['status' => 'WAITASSIGN']);
                                 $job = new AssignLogistics($newPackage);
@@ -1217,8 +1267,13 @@ class PackageModel extends BaseModel
     {
         $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
         foreach ($zones as $zone) {
-            if ($zone->inZone($this->shipping_country)) {
-                $fee = '';
+            $country = CountriesModel::where('code', $this->shipping_country)->first();
+            if ($country) {
+                $code = $this->shipping_country;
+            } else {
+                $code = CountriesChangeModel::where('country_from', $this->shipping_country)->first()->country_to;
+            }
+            if ($zone->inZone($code)) {
                 if ($zone->type == 'first') {
                     if ($this->weight <= $zone->fixed_weight) {
                         $fee = $zone->fixed_price;
@@ -1562,7 +1617,7 @@ class PackageModel extends BaseModel
     {
         if ($type == 'UPDATE') {
             //判断订单状态
-            if (!in_array($this->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            if (!in_array($this->status, ['NEED', 'PROCESSING', 'PICKING', 'PACKED'])) {
                 return false;
             }
         } else {

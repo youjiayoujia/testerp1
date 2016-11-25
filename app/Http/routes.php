@@ -42,6 +42,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
 
+    //国家转换
+    Route::resource('countriesChange', 'CountriesChangeController');
+
     Route::get('eventChild/getInfo', ['uses' => 'EventChildController@getInfo', 'as' => 'eventChild.getInfo']);
     Route::resource('eventChild', 'EventChildController');
     //3宝package
@@ -1241,5 +1244,6 @@ Route::any('joomrefreshtoken', ['uses' => 'TestController@joomrefreshtoken']);
 
 Route::any('testReply/{id}',
     ['as' => 'test.testReply', 'uses' => 'TestController@testReply']);
+Route::any('tryGetLogtisticsNo/{id}',[ 'uses' => 'TestController@tryGetLogtisticsNo']);
 
 

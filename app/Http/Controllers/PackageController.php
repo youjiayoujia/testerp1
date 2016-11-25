@@ -170,7 +170,7 @@ class PackageController extends Controller
                 continue;
             }
             $buf[$key][0] = $package->realTimeLogistics();
-            $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? round($package->calculateLogisticsFee(), 2) : 0);
+            $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
         }
 
         return $buf;

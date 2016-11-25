@@ -220,9 +220,9 @@ class PurchaseOrderController extends Controller
                     foreach($v as $key=>$vo){
                         $item[$key]=$vo;    
                     }
-                    if($v['active']>0){
+                    /*if($v['active']>0){
                         $item['active_status']=1;
-                    }
+                    }*/
                     if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
                         $item['costExamineStatus']=2;
                         ItemModel::where('sku',$purchaseItem->sku)->update(['purchase_price'=>$item['purchase_cost']]); 
@@ -281,12 +281,28 @@ class PurchaseOrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = base64_encode(serialize($model));
         $data['examineStatus']=$examineStatus;
-        $data['status'] = 1;
+        if($examineStatus==1){
+            $data['status'] = 1;
+        }
+        if($examineStatus==3){
+            $data['status'] = 5;
+        }
+        if($examineStatus==0){
+            $data['status'] = 0;
+        }
         $model->update($data);
         //更新采购需求数据
         $temp_arr = [];
         foreach($model->purchaseItem as $purchaseitemModel){
-            $purchaseitemModel->update(['status'=>1]);
+            if($examineStatus==1){
+                $purchaseitemModel->update(['status'=>1]);
+            }
+            if($examineStatus==3){
+                $purchaseitemModel->update(['status'=>5]);
+            }
+            if($examineStatus==0){
+                $purchaseitemModel->update(['status'=>0]);
+            }
             $temp_arr[] = $purchaseitemModel->item_id;
         }
         $itemModel = new ItemModel();
@@ -560,6 +576,9 @@ class PurchaseOrderController extends Controller
         //更新采购需求
         $temp_arr = [];
         foreach($this->model->find($id)->purchaseItem as $p_item){
+            if($off==1){
+                $p_item->update(['status'=>'5']);
+            }
             $temp_arr[] = $p_item->item_id;
         }
         $itemModel = new ItemModel();
@@ -928,9 +947,9 @@ class PurchaseOrderController extends Controller
                 foreach($arr as $id){
                     $temp_arr = [];
                     $purchaseOrder = $this->model->find($id);
-                    $purchaseOrder->update(['write_off'=>1,'status'=>4]);
+                    $purchaseOrder->update(['write_off'=>2,'status'=>4]);
                     foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
-                        $purchaseitemModel->update(['status'=>4]);
+                        $purchaseitemModel->update(['status'=>5]);
                         $temp_arr[] = $purchaseitemModel->item_id;
                     }
 
@@ -972,9 +991,13 @@ class PurchaseOrderController extends Controller
             $itemModel = ItemModel::find($purchaseItemModel->item_id);
             //实时计算建议采购量
             $zaitu_num = 0;//在途
-            if ($purchaseItemModel->status > 0 || $purchaseItemModel->status < 4) {
-                if (!$purchaseItemModel->purchaseOrder->write_off) {
-                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty;
+            if ($purchaseItemModel->status >= 0 && $purchaseItemModel->status < 4) {
+                if($purchaseItemModel->purchaseOrder){
+                    if (!$purchaseItemModel->purchaseOrder->write_off) {
+                        if($purchaseItemModel->purchaseOrder->status>=0&&$purchaseItemModel->purchaseOrder->status<4){
+                            $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty;
+                        }
+                    }
                 }
             }
 
@@ -991,14 +1014,16 @@ class PurchaseOrderController extends Controller
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -1007,6 +1032,8 @@ class PurchaseOrderController extends Controller
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
+
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
                 $coefficient_status = 3;
@@ -1037,9 +1064,11 @@ class PurchaseOrderController extends Controller
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
+            
             $need_purchase_num = ceil($needPurchaseNum);
             
-            ($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';
+            //($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';
+            $data[$purchaseItemModel->id]['quantity']='实时建议采购值'.$need_purchase_num;
             //计算总价
             $total_price += $purchaseItemModel->purchase_cost*$purchaseItemModel->purchase_num;
             //计算采购价和系统价格是否一致

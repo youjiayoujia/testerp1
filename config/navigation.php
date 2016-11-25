@@ -304,11 +304,11 @@ return [
                     'url' => 'logistics.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '物流分配规则',
-                    'url' => 'logisticsRule.index',
-                    'icon' => '',
-                ],
+//                [
+//                    'name' => '物流分配规则',
+//                    'url' => 'logisticsRule.index',
+//                    'icon' => '',
+//                ],
                 [
                     'name' => '渠道展示编码',
                     'url' => 'logisticsTransport.index',
@@ -764,6 +764,11 @@ return [
             [
                 'name' => '国家Number信息',
                 'url' => 'countries.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家转换',
+                'url' => 'countriesChange.index',
                 'icon' => '',
             ],
             [

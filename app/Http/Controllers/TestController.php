@@ -59,6 +59,7 @@ use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
 use Crypt;
+
 class TestController extends Controller
 {
     private $itemModel;
@@ -68,6 +69,21 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
         $this->orderModel = $orderModel;
     }
+    //测试包裹站台是否满足 物流下单状态；
+    //进行物流下单
+
+
+    public function tryGetLogtisticsNo($id){
+
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
+    }
+
     public function test2()
     {
         $package = PackageModel::find(1);
@@ -633,6 +649,29 @@ class TestController extends Controller
     }
     public function jdtestCrm()
     {
+
+        $groups = SupplierModel::all()->groupBy('company');
+
+        foreach ($groups as $group_key => $group){
+            if($group->count() > 1){   //如果有多个相同的供货商
+                foreach($group as $key => $supplier){
+                    if($key == 0){ //保留id最小的供货商，然后把其他的 sku 关联到 最小的供货商id  其余的全删除
+
+                        $correct_supplier_id = $supplier->id;
+
+                    }else{
+
+                         $sql = 'update items set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id;
+                         DB::update($sql);
+                         echo $supplier->company .'<br/>';
+                         $supplier->delete(); //删除多余
+                    }
+                }
+
+            }
+
+        }
+        dd('结束');
         /*
          * 写入队列
          */

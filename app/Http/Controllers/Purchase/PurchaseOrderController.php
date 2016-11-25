@@ -1062,7 +1062,8 @@ class PurchaseOrderController extends Controller
             }
             $need_purchase_num = ceil($needPurchaseNum);
             
-            ($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';
+            //($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';
+            $data[$purchaseItemModel->id]['quantity']='实时建议采购值'.$need_purchase_num;
             //计算总价
             $total_price += $purchaseItemModel->purchase_cost*$purchaseItemModel->purchase_num;
             //计算采购价和系统价格是否一致

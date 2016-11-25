@@ -1003,7 +1003,6 @@ class PackageModel extends BaseModel
                 ])->get()->sortByDesc('available_quantity');
                 if ($stocks->sum('available_quantity') < $pquantity) {
                     unset($stocks);
-
                     continue 2;
                 }
                 foreach ($stocks as $key => $stock) {
@@ -1206,7 +1205,8 @@ class PackageModel extends BaseModel
 
     public function calculateLogisticsFee()
     {
-        $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
+        $logisticsId = !empty($this->logistics_id) ? $this->logistics_id : $this->realTimeLogistics()->id;
+        $zones = ZoneModel::where('logistics_id', $logisticsId)->get();
         foreach ($zones as $zone) {
             $country = CountriesModel::where('code', $this->shipping_country)->first();
             if ($country) {
@@ -1368,7 +1368,7 @@ class PackageModel extends BaseModel
             $trackingUrl = $rule->logistics->url;
             $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
 
-            return $rule->logistics->code;
+            return $rule->logistics;
         }
 
         return '虚拟匹配未匹配到';

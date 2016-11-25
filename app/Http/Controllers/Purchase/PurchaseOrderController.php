@@ -565,6 +565,7 @@ class PurchaseOrderController extends Controller
     
     
     public function write_off($id){
+        $url = $_SERVER['HTTP_REFERER'];
         $off = request()->input("off");
         if($off==1){
             $this->model->find($id)->update(['write_off'=>$off+1,'status'=>4]);
@@ -583,8 +584,7 @@ class PurchaseOrderController extends Controller
         }
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);
-        
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . $remark));
+        return redirect($url)->with('alert', $this->alert('success', $this->mainTitle . $id.$remark));
     }
 
     public function addPost($id){

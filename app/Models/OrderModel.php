@@ -585,14 +585,14 @@ class OrderModel extends BaseModel
         }
 
         //客户留言需审核
-//        if ($order->customer_remark != null && $order->customer_remark != '') {
-//            $order->update(['status' => 'REVIEW']);
-//        }
+        if ($order->customer_remark != null && $order->customer_remark != '') {
+            $order->update(['status' => 'REVIEW']);
+        }
 
         //客户备注需审核
-//        if (isset($data['remark']) and !empty($data['remark'])) {
-//            $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
-//        }
+        if (isset($data['remark']) and !empty($data['remark'])) {
+            $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
+        }
 
         //黑名单需审核
         if ($order->status != 'UNPAID' && $order->checkBlack()) {

@@ -278,7 +278,7 @@ class SzPostXBAdapter extends BasicAdapter
     
     public function postCurlHttpsData($url, $data) { // 模拟提交数据函数
         $headers = array(     
-            'application/x-www-form-urlencoded; charset=UTF-8'
+            'Content-Type:application/x-www-form-urlencoded; charset=UTF-8'
         );
     
         $curl = curl_init (); // 启动一个CURL会话

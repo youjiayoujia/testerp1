@@ -173,7 +173,7 @@
         			<div class="form-group">
 						<label class="col-sm-2">账号:</label>
 						<div class="col-sm-4">
-							<select  id="selectaccount" class="form-control">
+							<select  id="selectaccount1" class="form-control">
 								<option value="">---请选择---</option>
 								@foreach($accountList as $account)
         						    <option value="{{ $account->id }}">{{ $account->account}}</option>'
@@ -184,7 +184,7 @@
 					<div class="form-group">
 						<label class="col-sm-2">产品分组</label>
 						<div class="col-sm-4">
-							<select  id="groupId3"  class="form-control">
+							<select  id="groupId4"  class="form-control">
 								<option value="">=所有分组=</option>
 							</select>
 
@@ -619,6 +619,26 @@ $(document).on('change', '#selectaccount', function(){
 			success: function(data){
 				if (data.status){
 					$('#groupId3').append(data.data);
+				}
+			}
+		});
+	}
+});
+$(document).on('change', '#selectaccount1', function(){
+	var token_id = $(this).val();
+	$('#groupId3').empty();
+	if (token_id == ''){ //账号为空，隐藏分组信息
+		return false;
+	}else {
+		//异步获取账号信息
+		$.ajax({
+			url: "{{ route('smtProduct.showAccountProductGroup') }}",
+			data: 'token_id='+token_id,
+			type: 'POST',
+			dataType: 'JSON',
+			success: function(data){
+				if (data.status){
+					$('#groupId4').append(data.data);
 				}
 			}
 		});

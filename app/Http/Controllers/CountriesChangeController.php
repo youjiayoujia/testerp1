@@ -40,10 +40,10 @@ class CountriesChangeController extends Controller
     /**
      * 获取来源国家信息
      */
-    public function ajaxCountryFrom()
+    public function ajaxCountryTo()
     {
         if (request()->ajax()) {
-            $country = trim(request()->input('country_from'));
+            $country = trim(request()->input('country_to'));
             $buf = CountriesModel::where('code', 'like', '%' . $country . '%')->get();
             $total = $buf->count();
             $arr = [];

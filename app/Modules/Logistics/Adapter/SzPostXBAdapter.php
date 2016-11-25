@@ -249,22 +249,16 @@ class SzPostXBAdapter extends BasicAdapter
 </logisticsEvent>
 </logisticsEventsRequest>";
         $data=preg_replace('/&/',' ',$str);*/
-       //$str = simplexml_load_string($str);
-       // $data=$data->asXML();
-       // $data = iconv('GBK','UTF-8',$data);
-       //myecho($str);
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
-        $url = $this->ServerUrl;        
-        $postD = array();
+        $url = $this->ServerUrl;
+        $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';
+        /*$postD = array();
         $postD['logistics_interface'] = $str;
         $postD['data_digest']         = $newdata;
         $postD['msg_type']            = 'B2C_TRADE';
         $postD['ecCompanyId']         = $this->ecCompanyId;
-        $postD['version']             = '2.0';
+        $postD['version']             = '2.0';*/
         $result = $this->postCurlHttpsData($url,$postD);
-
-        echo "------------<pre/>";var_dump($result);
-
         $result = $this->XmlToArray($result);
         echo "<pre/>";var_dump($postD);
         var_dump($result);
@@ -278,7 +272,7 @@ class SzPostXBAdapter extends BasicAdapter
     
     public function postCurlHttpsData($url, $data) { // 模拟提交数据函数
         $headers = array(     
-            'Content-Type:application/x-www-form-urlencoded; charset=UTF-8'
+            'application/x-www-form-urlencoded; charset=UTF-8'
         );
     
         $curl = curl_init (); // 启动一个CURL会话

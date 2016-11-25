@@ -211,7 +211,7 @@ class PurchaseOrderController extends Controller
                     }
                 }
             }
-                
+
             foreach($data['arr'] as $k=>$v){
                 if($v['id']){
                     $purchaseItem=PurchaseItemModel::find($v['id']);
@@ -220,23 +220,24 @@ class PurchaseOrderController extends Controller
                     foreach($v as $key=>$vo){
                         $item[$key]=$vo;    
                     }
+                    $item['warehouse_id'] = $data['warehouse_id'];
                     /*if($v['active']>0){
                         $item['active_status']=1;
                     }*/
-                    if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
+                    /*if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
                         $item['costExamineStatus']=2;
                         ItemModel::where('sku',$purchaseItem->sku)->update(['purchase_price'=>$item['purchase_cost']]); 
                     }else{
                         $item['costExamineStatus']=0;   
-                    }
+                    }*/
                     if($purchaseItem->purchaseOrder->examineStatus ==1){
                         if($purchaseItem->status < 4){
-                        $data['examineStatus']=2;
+                            $data['examineStatus']=2;
                         }
                     }
                     $item['start_buying_time']=date('Y-m-d h:i:s',time());
-                    if($purchaseItem->status < 4){
-                    $purchaseItem->update($item);
+                    if($purchaseItem->status != 4){
+                        $purchaseItem->update($item);
                     }
                     $data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
                     unset($item);
@@ -248,7 +249,10 @@ class PurchaseOrderController extends Controller
             $data['costExamineStatus']=2;
         }
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
-        $model->update($data);
+        if($model->status!=4){
+            $model->update($data);
+        }
+        
         //更新采购需求
 
         $temp_arr = [];

@@ -663,6 +663,24 @@ class PackageController extends Controller
         return view($this->viewPath . 'editTrackingNo', $response);
     }
 
+    public function multiPlace($tmp)
+    {
+        $arr = [];
+        $buf = explode(',', $tmp);
+        $name = UserModel::find(request()->user()->id)->name;
+        $orderId = $this->model->find($buf[0])->order->id;
+        foreach ($buf as $key => $packageId) {
+            $model = $this->model->find($packageId);
+            if($model) {
+                $job = new PlaceLogistics($model, 'UPDATE');
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+            }
+        }
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '已重新匹配.'));
+    }
+
     public function implodePackage($tmp)
     {
         $arr = [];

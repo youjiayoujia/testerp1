@@ -947,9 +947,9 @@ class PurchaseOrderController extends Controller
                 foreach($arr as $id){
                     $temp_arr = [];
                     $purchaseOrder = $this->model->find($id);
-                    $purchaseOrder->update(['write_off'=>1,'status'=>4]);
+                    $purchaseOrder->update(['write_off'=>2,'status'=>4]);
                     foreach($purchaseOrder->purchaseItem as $purchaseitemModel){
-                        $purchaseitemModel->update(['status'=>4]);
+                        $purchaseitemModel->update(['status'=>5]);
                         $temp_arr[] = $purchaseitemModel->item_id;
                     }
 
@@ -991,9 +991,13 @@ class PurchaseOrderController extends Controller
             $itemModel = ItemModel::find($purchaseItemModel->item_id);
             //实时计算建议采购量
             $zaitu_num = 0;//在途
-            if ($purchaseItemModel->status > 0 || $purchaseItemModel->status < 4) {
-                if (!$purchaseItemModel->purchaseOrder->write_off) {
-                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty;
+            if ($purchaseItemModel->status >= 0 && $purchaseItemModel->status < 4) {
+                if($purchaseItemModel->purchaseOrder){
+                    if (!$purchaseItemModel->purchaseOrder->write_off) {
+                        if($purchaseItemModel->purchaseOrder->status>=0&&$purchaseItemModel->purchaseOrder->status<4){
+                            $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty;
+                        }
+                    }
                 }
             }
 

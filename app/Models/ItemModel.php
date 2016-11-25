@@ -841,8 +841,9 @@ class ItemModel extends BaseModel
             } else {
                 PurchasesModel::create($data);
             }
-
-            return $data;
+            if(count($item_id_array)==1){
+                return $data;
+            }   
         }
     }
 

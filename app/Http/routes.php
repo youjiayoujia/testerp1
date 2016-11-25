@@ -668,6 +668,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //包裹导出
     Route::get('exportPackage/extraField',
         ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
+    Route::get('exportPackage/extraField',
+        ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
     Route::post('exportPackage/exportPackageDetail',
         ['uses' => 'ExportPackageController@exportPackageDetail', 'as' => 'exportPackage.exportPackageDetail']);
     Route::get('exportPackage/exportPackageView',
@@ -675,8 +677,14 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/multiPlace/{arr}',
+        ['uses' => 'PackageController@multiPlace', 'as' => 'package.multiPlace']);
     Route::get('package/downloadLogisticsTno',
         ['uses' => 'PackageController@downloadLogisticsTno', 'as' => 'package.downloadLogisticsTno']);
+    Route::get('package/getAllInfo',
+        ['uses' => 'PackageController@getAllInfo', 'as' => 'package.getAllInfo']);
+    Route::get('package/showAllView',
+        ['uses' => 'PackageController@showAllView', 'as' => 'package.showAllView']);
     Route::get('package/errorToShipped',
         ['uses' => 'PackageController@errorToShipped', 'as' => 'package.errorToShipped']);
     Route::get('package/exportInfo',

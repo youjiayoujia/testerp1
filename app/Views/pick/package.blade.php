@@ -45,32 +45,57 @@
                 <tbody class='new'>
                 @foreach($packages as $package)
                     @if($package->has_pick)
-                        @foreach($package->items as $key => $packageitem)
-                            <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
-                                @if($key == '0')
-                                <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
-                                <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
-                                @endif
-                                <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
-                                <td class='col-lg-3'>
-                                    @foreach($packageitem->item->product->wrapLimit as $limit)  
-                                        {{ $limit->name }}
-                                    @endforeach
-                                </td>
-                                <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
-                                <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
-                                @if($key == '0')
-                                    @if($package->status != 'PACKED')
-                                    <td class='status col-lg-1' rowspan="{{$package->items()->count()}}"><font color='red'>{{ $package->status ? $package->status_name : '' }}</font></td>
-                                    @else
-                                    <td class='status col-lg-1' rowspan="{{$package->items()->count()}}">{{ $package->status ? $package->status_name : '' }}</td>
+                        @if(empty($package->deleted_at))
+                            @foreach($package->items as $key => $packageitem)
+                                <tr data-id="{{ $package->id}}" class="{{ $package->id}}" data-status='SIMPLE'>
+                                    @if($key == '0')
+                                    <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                    <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
                                     @endif
-                                @endif
-                                @if($key == '0')
-                                <td class='col-lg-1' rowspan="{{$package->items()->count()}}"><button type='button' class='cz btn btn-info'>撤销</button></td>
-                                @endif
-                            </tr>
-                        @endforeach
+                                    <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
+                                    <td class='col-lg-3'>
+                                        @foreach($packageitem->item->product->wrapLimit as $limit)  
+                                            {{ $limit->name }}
+                                        @endforeach
+                                    </td>
+                                    <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
+                                    <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
+                                    @if($key == '0')
+                                        @if($package->status != 'PACKED')
+                                        <td class='status col-lg-1' rowspan="{{$package->items()->count()}}"><font color='red'>{{ $package->status ? $package->status_name : '' }}</font></td>
+                                        @else
+                                        <td class='status col-lg-1' rowspan="{{$package->items()->count()}}">{{ $package->status ? $package->status_name : '' }}</td>
+                                        @endif
+                                    @endif
+                                    @if($key == '0')
+                                    <td class='col-lg-1' rowspan="{{$package->items()->count()}}"><button type='button' class='cz btn btn-info'>撤销</button></td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        @else
+                            @foreach($package->items()->withTrashed()->get() as $key => $packageitem)
+                                <tr data-id="{{ $package->id}}" class="{{ $package->id}}" data-status='CANCEL'>
+                                    @if($key == '0')
+                                    <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                    <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                                    @endif
+                                    <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
+                                    <td class='col-lg-3'>
+                                        @foreach($packageitem->item->product->wrapLimit as $limit)  
+                                            {{ $limit->name }}
+                                        @endforeach
+                                    </td>
+                                    <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
+                                    <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
+                                    @if($key == '0')
+                                        <td class='status col-lg-1' rowspan="{{$package->items()->count()}}">CANCEL</td>
+                                    @endif
+                                    @if($key == '0')
+                                    <td class='col-lg-1' rowspan="{{$package->items()->count()}}"><button type='button' class='cz btn btn-info'>撤销</button></td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        @endif
                     @endif
                 @endforeach
                 </tbody>
@@ -93,25 +118,47 @@
                 <tbody class='old'>
                 @foreach($packages as $package)
                     @if(!$package->has_pick)
-                        @foreach($package->items as $key => $packageitem)
-                            <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
-                                @if($key == '0')
-                                <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
-                                <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
-                                @endif
-                                <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
-                                <td class='col-lg-3'>
-                                    @foreach($packageitem->item->product->wrapLimit as $limit)  
-                                        {{ $limit->name }}
-                                    @endforeach
-                                </td>
-                                <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
-                                <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
-                                @if($key == '0')
-                                <td class='status col-lg-1' rowspan="{{$package->items()->count()}}"><font color='red'>{{ $package->status ? $package->status_name : '' }}</font></td>
-                                @endif
-                            </tr>
-                        @endforeach
+                        @if(empty($package->deleted_at))
+                            @foreach($package->items as $key => $packageitem)
+                                <tr data-id="{{ $package->id}}" class="{{ $package->id}}" data-status='SIMPLE'>
+                                    @if($key == '0')
+                                    <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                    <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                                    @endif
+                                    <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
+                                    <td class='col-lg-3'>
+                                        @foreach($packageitem->item->product->wrapLimit as $limit)  
+                                            {{ $limit->name }}
+                                        @endforeach
+                                    </td>
+                                    <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
+                                    <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
+                                    @if($key == '0')
+                                    <td class='status col-lg-1' rowspan="{{$package->items()->count()}}"><font color='red'>{{ $package->status ? $package->status_name : '' }}</font></td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        @else
+                            @foreach($package->items()->withTrashed()->get() as $key => $packageitem)
+                                <tr data-id="{{ $package->id}}" class="{{ $package->id}}" data-status='CANCEL'>
+                                    @if($key == '0')
+                                    <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                    <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                                    @endif
+                                    <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
+                                    <td class='col-lg-3'>
+                                        @foreach($packageitem->item->product->wrapLimit as $limit)  
+                                            {{ $limit->name }}
+                                        @endforeach
+                                    </td>
+                                    <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
+                                    <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
+                                    @if($key == '0')
+                                    <td class='status col-lg-1' rowspan="{{$package->items()->count()}}">CANCEL</td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        @endif
                     @endif
                 @endforeach
                 </tbody>
@@ -177,6 +224,9 @@ $(document).ready(function(){
             $.each($('.new tr'), function(){
                 tmp = $(this);
                 if(tmp.find('.sku').text() == val) {
+                    if(tmp.data('status') == 'CANCEL') {
+                        return true;
+                    }
                     picked_quantity = parseInt(tmp.find('.picked_quantity').text());
                     quantity = parseInt(tmp.find('.quantity').text());
                     if(quantity > picked_quantity) {
@@ -218,6 +268,9 @@ $(document).ready(function(){
                 package_id = tmp.data('id');
                 if(tmp.find('.sku').text() == val && parseInt(tmp.find('.quantity').text()) >  parseInt(tmp.find('.picked_quantity').text())) {
                     old_flag = 1;
+                    if(tmp.data('status') == 'CANCEL') {
+                        return true;
+                    }
                     tmp.find('.picked_quantity').text(parseInt(tmp.find('.picked_quantity').text()) + 1);
                     sku = tmp.find('.sku').text();
                     if(parseInt(tmp.find('.picked_quantity').text()) == parseInt(tmp.find('.quantity').text())) {

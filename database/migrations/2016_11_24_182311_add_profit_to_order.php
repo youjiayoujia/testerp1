@@ -13,7 +13,7 @@ class AddProfitToOrder extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->decimal('profit', 5, 4)->comment('订单利润')->after('aliexpress_loginId');
+            $table->decimal('profit', 12, 4)->comment('订单利润')->after('gross_margin');
         });
     }
 

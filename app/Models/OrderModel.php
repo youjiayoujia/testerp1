@@ -46,6 +46,7 @@ class OrderModel extends BaseModel
         'order_is_alert',
         'amount',
         'gross_margin',
+        'profit',
         'profit_rate',
         'amount_product',
         'amount_shipping',
@@ -311,7 +312,7 @@ class OrderModel extends BaseModel
 
     public function messages()
     {
-        return $this->hasMany('App\Models\Message\MessageModel', 'channel_ordernum', 'channel_order_number');
+        return $this->hasMany('App\Models\Message\MessageModel', 'channel_order_number', 'channel_ordernum');
     }
 
     //ebay消息记录
@@ -475,11 +476,10 @@ class OrderModel extends BaseModel
     public function getAllItemCostAttribute()
     {
         $total = 0;
-        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($this->items as $item) {
             $total += $item->item->purchase_price * $item->quantity;
         }
-        return $total * $currency;
+        return $total;
     }
 
     public function getPartialOverAttribute()
@@ -510,8 +510,8 @@ class OrderModel extends BaseModel
 
     public function packagesToQueue()
     {
-        foreach($this->packages as $package) {
-            switch($package->status) {
+        foreach ($this->packages as $package) {
+            switch ($package->status) {
                 case 'NEW':
                     $job = new AssignStocks($package);
                     Queue::pushOn('assignStocks', $job);
@@ -645,7 +645,7 @@ class OrderModel extends BaseModel
             }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
-                $order->update(['status' => 'CANCEl',]);
+                $order->update(['status' => 'REVIEW',]);
                 $order->remark($orderItem['channel_sku'] . '找不到对应产品.', 'ITEM');
             }
             $order->items()->create($orderItem);
@@ -744,13 +744,15 @@ class OrderModel extends BaseModel
     public function calculateProfitProcess()
     {
         $rate = CurrencyModel::where('code', $this->currency)->first()->rate;
-        $orderAmount = $this->amount * $rate;
-        $orderCosting = $this->all_item_cost;
+        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
+        $orderAmount = ($this->amount + $this->amount_shipping) * $rate;
+        $itemCost = $this->all_item_cost * $rmbRate;
+        $logisticsCost = $this->logistics_fee * $rmbRate;
         $orderChannelFee = $this->calculateOrderChannelFee();
-        $orderRate = ($orderAmount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $orderAmount;
-
-        $this->update(['profit' => $orderRate]);
-        return $orderRate;
+        $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $orderChannelFee, 4);
+        $orderProfitRate = $orderProfit / $orderAmount;
+        $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);
+        return $orderProfitRate;
     }
 
     //计算平台费
@@ -779,25 +781,30 @@ class OrderModel extends BaseModel
     //黑名单验证
     public function checkBlack()
     {
-        $channel = $this->channel->where('id', $this->channel_id)->get();
-        $driver = '';
-        foreach ($channel as $val) {
-            $driver = $val->driver;
-        }
-        if ($driver == 'wish') {
-            $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
-            $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
-        } elseif ($driver == 'aliexpress') {
-            $blacklist = BlacklistModel::where('by_id', $this->by_id);
-        } else {
-            $blacklist = BlacklistModel::where('email', $this->email);
-        }
-        if ($blacklist->count() > 0) {
-            $this->update(['blacklist' => '0']);
-            foreach ($blacklist->get() as $value) {
-                if ($value->type == 'CONFIRMED' || $value->type == 'SUSPECTED') {
-                    return true;
-                }
+        $channel = $this->channel->find($this->channel_id);
+        $count = 0;
+        $blackList = BlacklistModel::whereIN('type', ['CONFIRMED', 'SUSPECTED']);
+        if ($channel) {
+            switch ($channel->driver) {
+                case 'wish':
+                    $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
+                    $count = $blackList->where('zipcode', $this->shipping_zipcode)
+                        ->where('name', $name)->count();
+                    break;
+                case 'aliexpress':
+                    if ($this->by_id) {
+                        $count = $blackList->where('by_id', $this->by_id)->count();
+                    }
+                    break;
+                default:
+                    if ($this->email) {
+                        $count = $blackList->where('email', $this->email)->count();;
+                    }
+                    break;
+            }
+            if ($count > 0) {
+                $this->update(['blacklist' => '0']);
+                return true;
             }
         }
         return false;

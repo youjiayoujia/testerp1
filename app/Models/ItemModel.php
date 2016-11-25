@@ -279,6 +279,7 @@ class ItemModel extends BaseModel
                 }
             }
         }
+
         $warehouses = WarehouseModel::all();
         foreach($warehouses as $warehouse){
             if(!array_key_exists($warehouse->id,$data)){

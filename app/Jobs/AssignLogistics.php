@@ -36,47 +36,37 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
+        $order = $this->package->order;
         $this->package->assignLogistics();
-        if ($this->package->status == 'ASSIGNED') {
-            /**
-             * todo:订单审核判断
-             *
-             * 1. 利润率
-             * 2. 黑名单
-             * 3. 特殊需求
-             * 4. 客户留言
-             * 5. 包裹重量大于2kg
-             *
-             **/
-            $order = $this->package->order;
-            if ($order->status != 'CANCEL') {
-                //验证黑名单
-                // if ($order->checkBlack()) {
-                //     $order->update(['status' => 'CANCEL']);
-                //     $order->remark('黑名单需审核.', 'BLACK');
-                // }
-                // //特殊需求
-                // if (!empty($order->customer_remark)) {
-                //     $order->update(['status' => 'CANCEL']);
-                //     $order->remark('特殊需求需审核.', 'REQUIRE');
-                // }
-                // //订单留言
-                // if (count($order->messages) == 1) {
-                //     $order->update(['status' => 'CANCEL']);
-                //     $order->remark('客户有订单留言.', 'MESSAGE');
-                // }
-                // //包裹重量大于2kg
-                // if ($this->package->weight >= 2) {
-                //     $order->update(['status' => 'CANCEL']);
-                //     $order->remark('包裹重量大于2kg.', 'WEIGHT');
-                // }
-                // $order->calculateProfitProcess();
-                // //利润率判断
-                // if ($order->profit <= 0 or $order->profit >= 0.04) {
-                //     $order->update(['status' => 'CANCEL']);
-                //     $order->remark('订单利润率小于0或者大于40%.', 'PROFIT');
-                // }
-                if ($order->status != 'CANCEL') {
+        if ($order->status != 'REVIEW') {
+            //验证黑名单
+            if ($order->checkBlack()) {
+                $order->update(['status' => 'REVIEW']);
+                $order->remark('黑名单需审核.', 'BLACK');
+            }
+            //特殊需求
+            if (!empty($order->customer_remark)) {
+                $order->update(['status' => 'REVIEW']);
+                $order->remark('特殊需求需审核.', 'REQUIRE');
+            }
+            //订单留言
+            if ($order->messages->count() == 1 and $order->messages->first()->replies->count() == 0) {
+                $order->update(['status' => 'REVIEW']);
+                $order->remark('客户有订单留言.', 'MESSAGE');
+            }
+            //包裹重量大于2kg
+            if ($this->package->weight >= 2) {
+                $order->update(['status' => 'REVIEW']);
+                $order->remark('包裹重量大于2kg.', 'WEIGHT');
+            }
+            //利润率判断
+            $profitRate = $order->calculateProfitProcess();
+            if ($profitRate <= 0 or $profitRate >= 0.4) {
+                $order->update(['status' => 'REVIEW']);
+                $order->remark('订单利润率小于0或者大于40%.', 'PROFIT');
+            }
+            if ($this->package->status == 'ASSIGNED') {
+                if ($order->status != 'REVIEW') {
                     $job = new PlaceLogistics($this->package);
                     $job = $job->onQueue('placeLogistics');
                     $this->dispatch($job);
@@ -98,7 +88,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'Fail to assign logistics.';
             $this->package->eventLog('队列', 'Fail to assign logistics.', json_encode($this->package));
         }
-        $this->lasting = round(microtime(true) - $start, 3);
+        $this->lasting = round(microtime(true) - $start, 2);
         $this->log('AssignLogistics');
     }
 }

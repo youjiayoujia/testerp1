@@ -504,7 +504,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
     Route::get('logistics/ajaxLogistics',
         ['uses' => 'Logistics\TemplateController@ajaxLogistics', 'as' => 'logistics.ajaxLogistics']);
-    Route::get('template/preview',
+    Route::any('template/preview',
         ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
     Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);

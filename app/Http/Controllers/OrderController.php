@@ -557,7 +557,7 @@ class OrderController extends Controller
             if ($model) {
                 $from = json_encode($model);
                 if ($model->status = 'REVIEW') {
-                    $model->update(['status' => 'PREPARED']);
+                    $model->update(['status' => 'PREPARED', 'is_review' => '1']);
                     $job = new DoPackages($model);
                     $job->onQueue('doPackages');
                     $this->dispatch($job);

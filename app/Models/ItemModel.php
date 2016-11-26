@@ -69,7 +69,8 @@ class ItemModel extends BaseModel
         'cost',
         'package_weight',
         'competition_url',
-        'products_history_values'
+        'products_history_values',
+        'new_status'
     ];
 
     public function product()
@@ -362,6 +363,7 @@ class ItemModel extends BaseModel
             'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
             'filterSelects' => ['status' => config('item.status'),
+                                'new_status' => config('item.new_status'),
                                 'warehouse_id' =>$this->getArray('App\Models\WarehouseModel', 'name'),
                                ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],

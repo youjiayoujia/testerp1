@@ -551,21 +551,21 @@ class PackageModel extends BaseModel
             $item = $packageItem->item;
             $warehouse_id = 0;
             $buf = $item->getTransitQuantityAttribute();
-            foreach($buf as $key => $value) {
+            foreach ($buf as $key => $value) {
                 $flag = 0;
-                foreach($value as $k => $v) {
-                    if($v) {
+                foreach ($value as $k => $v) {
+                    if ($v) {
                         $flag = 1;
                     }
                 }
-                if(!$flag) {
+                if (!$flag) {
                     unset($buf[$key]);
                 }
             }
-            if(count($buf) > 1 || count($buf) == 0) {
+            if (count($buf) > 1 || count($buf) == 0) {
                 $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
             } else {
-                foreach($buf as $key => $value) {
+                foreach ($buf as $key => $value) {
                     $warehouse_id = $key;
                     break;
                 }
@@ -667,21 +667,21 @@ class PackageModel extends BaseModel
                             //todo v3测试，正式上线删除
                             $fItem = $this->items()->first();
                             $arr = $fItem->item->getTransitQuantityAttribute();
-                            foreach($arr as $key => $value) {
+                            foreach ($arr as $key => $value) {
                                 $flag = 0;
-                                foreach($value as $k => $v) {
-                                    if($v) {
+                                foreach ($value as $k => $v) {
+                                    if ($v) {
                                         $flag = 1;
                                     }
                                 }
-                                if(!$flag) {
+                                if (!$flag) {
                                     unset($arr[$key]);
                                 }
                             }
-                            if(count($arr) > 1 || count($arr) == 0) {
+                            if (count($arr) > 1 || count($arr) == 0) {
                                 $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
                             } else {
-                                foreach($arr as $key => $value) {
+                                foreach ($arr as $key => $value) {
                                     $warehouse_id = $key;
                                     break;
                                 }
@@ -705,21 +705,21 @@ class PackageModel extends BaseModel
                         //todo v3测试，正式上线删除
                         $fItem = $this->items()->first();
                         $arr = $fItem->item->getTransitQuantityAttribute();
-                        foreach($arr as $key => $value) {
+                        foreach ($arr as $key => $value) {
                             $flag = 0;
-                            foreach($value as $k => $v) {
-                                if($v) {
+                            foreach ($value as $k => $v) {
+                                if ($v) {
                                     $flag = 1;
                                 }
                             }
-                            if(!$flag) {
+                            if (!$flag) {
                                 unset($arr[$key]);
                             }
                         }
-                        if(count($arr) > 1 || count($arr) == 0) {
+                        if (count($arr) > 1 || count($arr) == 0) {
                             $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
                         } else {
-                            foreach($arr as $key => $value) {
+                            foreach ($arr as $key => $value) {
                                 $warehouse_id = $key;
                                 break;
                             }
@@ -990,7 +990,7 @@ class PackageModel extends BaseModel
     public function setPackageItemFb()
     {
         $warehouses = WarehouseModel::where('is_available', '1')->where('type', 'local')->get();
-        foreach($warehouses as $key => $warehouse) {
+        foreach ($warehouses as $key => $warehouse) {
             $warehouseId = $warehouse->id;
             $buf = [];
             $i = 0;
@@ -1067,7 +1067,13 @@ class PackageModel extends BaseModel
                     Queue::pushOn('assignLogistics', $job);
                 } else {
                     if ($oldWarehouseId != $warehouseId) {
-                        $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '', 'tracking_no' => '']);
+                        $this->update([
+                            'warehouse_id' => $warehouseId,
+                            'status' => 'WAITASSIGN',
+                            'weight' => $weight,
+                            'logistics_id' => '',
+                            'tracking_no' => ''
+                        ]);
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
                     } else {
@@ -1086,7 +1092,12 @@ class PackageModel extends BaseModel
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
                         } else {
-                            $this->update(['status' => 'WAITASSIGN', 'weight' => $weight, 'logistics_id' => '', 'tracking_no' => '']);
+                            $this->update([
+                                'status' => 'WAITASSIGN',
+                                'weight' => $weight,
+                                'logistics_id' => '',
+                                'tracking_no' => ''
+                            ]);
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
                         }
@@ -1557,7 +1568,7 @@ class PackageModel extends BaseModel
     {
         if ($type == 'UPDATE') {
             //判断订单状态
-            if (!in_array($this->status, ['NEED', 'PROCESSING', 'PICKING', 'PACKED'])) {
+            if (!in_array($this->status, ['NEED', 'PROCESSING', 'PICKING', 'PACKED', 'SHIPPED'])) {
                 return false;
             }
         } else {

@@ -30,8 +30,8 @@
             <td>{{ $pickList->warehouse ? $pickList->warehouse->name : '仓库信息有误'}}</td>
             <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
             <td>{{ $pickList->logistic ? $pickList->logistic->name : '混合物流'}}</td>
-            <td>{{ $pickList->package()->whereIn('status', ['PICKING', 'ERROR'])->count() }}</td>
-            <td>{{ $pickList->package()->whereIn('status', ['PACKED', 'SHIPPED'])->count() }}</td>
+            <td>{{ $pickList->package()->withTrashed()->whereIn('status', ['PICKING', 'ERROR'])->count() }}</td>
+            <td>{{ $pickList->package()->withTrashed()->whereIn('status', ['PACKED', 'SHIPPED'])->count() }}</td>
             <td>{{ $pickList->status_name }}</td>
             <td>{{ $pickList->pickByName ? $pickList->pickByName->name : ''}}</td>
             <td>{{ $pickList->pick_at }}</td>

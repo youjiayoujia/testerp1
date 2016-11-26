@@ -35,7 +35,7 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
      * @return void
      */
     /**
-     * 
+     *
      *  因为可能遇到匹配到了多个仓库，所以不能再这边放入队列
      *  所以在createPackageItems中放入队列
      */

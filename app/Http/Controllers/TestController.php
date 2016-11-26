@@ -947,7 +947,7 @@ class TestController extends Controller
         //$package = PackageModel::findOrFail(3113);
         $id = request()->get('id');
         $package = PackageModel::where('id', $id)->first();
-        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED','SHIPPED'])) {
             $result = $package->placeLogistics('UPDATE');
         } else {
             $result = $package->placeLogistics();

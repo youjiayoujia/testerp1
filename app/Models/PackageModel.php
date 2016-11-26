@@ -653,7 +653,7 @@ class PackageModel extends BaseModel
                                 $job = new AssignStocks($package);
                                 Queue::pushOn('assignStocks', $job);
                             }
-                            return true;
+                            return false;
                         } else {
                             foreach ($this->items as $item) {
                                 $require = [];
@@ -690,7 +690,7 @@ class PackageModel extends BaseModel
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
                             $this->order->update(['status' => 'NEED']);
-                            return true;
+                            return false;
                         }
                     } else {
                         foreach ($this->items as $item) {
@@ -728,7 +728,7 @@ class PackageModel extends BaseModel
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
                         $this->order->update(['status' => 'NEED']);
-                        return true;
+                        return false;
                     }
                 } else {
                     if (strtotime($this->created_at) < strtotime('-3 days')) {
@@ -736,7 +736,7 @@ class PackageModel extends BaseModel
                         if ($arr) {
                             $this->createChildPackage($arr);
                         }
-                        return true;
+                        return false;
                     }
                 }
             }

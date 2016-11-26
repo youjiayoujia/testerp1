@@ -305,13 +305,13 @@
                             <span class="glyphicon glyphicon-link"></span> 撤单
                         </button>
                     @endif
-                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
-                        <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                           data-id="{{ $order->id }}"
-                           data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
-                            <span class="glyphicon glyphicon-pencil"></span> 删除
-                        </a>
-                    @endif
+                    {{--@if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')--}}
+                        {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
+                           {{--data-id="{{ $order->id }}"--}}
+                           {{--data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">--}}
+                            {{--<span class="glyphicon glyphicon-pencil"></span> 删除--}}
+                        {{--</a>--}}
+                    {{--@endif--}}
                     @foreach($order->items as $item)
                         @if($item->is_refund == 0)
                             <button class="btn btn-primary btn-xs"

@@ -49,6 +49,7 @@ class CreateItemsTable extends Migration
 			$table->string('carriage_limit')->nullable();
 			$table->string('package_limit')->nullable();
 			$table->string('status')->nullable();
+			$table->integer('new_status')->nullable()->default('0');
 			$table->boolean('is_available')->nullable()->default(1);
 			$table->string('remark')->nullable();
 			$table->timestamps();

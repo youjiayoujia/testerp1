@@ -98,11 +98,11 @@
                         <span class="glyphicon glyphicon-check"></span>
                     </a>
                 @endif
-                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))
+{{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
                     <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
                         <span class="glyphicon glyphicon-refresh"></span>
                     </a>
-                @endif
+                {{--@endif--}}
                 <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>

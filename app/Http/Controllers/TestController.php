@@ -87,8 +87,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(1);
-        var_dump($package->items->toarray());
+        $package = OrderModel::find(1);
+        $package->packagesToQueue();
     }
 //    public function test2()
 //    {

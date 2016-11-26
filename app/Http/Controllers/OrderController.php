@@ -496,8 +496,8 @@ class OrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
-        $model->update(['status' => 'PREPARED']);
-        if($model->packages()->count()) {
+        $model->update(['status' => 'PREPARED', 'is_review' => 1]);
+        if ($model->packages()->count()) {
             $model->packagesToQueue();
         } else {
             $job = new DoPackages($model);

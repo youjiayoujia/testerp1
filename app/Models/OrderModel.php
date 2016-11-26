@@ -42,6 +42,7 @@ class OrderModel extends BaseModel
         'by_id',
         'email',
         'status',
+        'is_review',
         'active',
         'order_is_alert',
         'amount',

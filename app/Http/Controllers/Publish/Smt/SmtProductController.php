@@ -1031,7 +1031,7 @@ class SmtProductController extends Controller
         $token_id = request()->input('token_id');
         if ($token_id){ //有账号信息
             $group_list = $this->getLocalProductGroupList($token_id);
-            //$option_str = '<option value="">=所有分组=</option>';
+            $option_str = '<option value="">=所有分组=</option>';
             //$option_str .= '<option value="none">未分组</option>';
             if (!empty($group_list)){
                 foreach($group_list as $id => $item){

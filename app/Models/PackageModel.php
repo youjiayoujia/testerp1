@@ -105,7 +105,8 @@ class PackageModel extends BaseModel
                 'channelAccount' => ['account' => $arr1]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
-            'doubleRelatedSearchFields' => ['logistics' => ['catalog' => ['name']]],
+            'doubleRelatedSearchFields' => ['logistics' => ['catalog' => ['name']],
+                                            'items' => ['item' => ['sku']]],
         ];
     }
 

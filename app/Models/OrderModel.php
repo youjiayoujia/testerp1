@@ -363,13 +363,17 @@ class OrderModel extends BaseModel
                 'country' => ['code'],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
-                'userService' => ['name']
+                'userService' => ['name'],
+                'packages' => ['tracking_no'],
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => $arr],
                 'items' => ['item_status' => config('item.status')],
                 'remarks' => ['type' => config('order.review_type')],
-            ]
+            ],
+            'doubleRelatedSearchFields' => [
+                'packages' => ['logistics' => ['code']],
+            ],
         ];
     }
 

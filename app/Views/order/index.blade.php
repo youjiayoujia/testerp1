@@ -233,8 +233,11 @@
                                 <div class="col-lg-2">
                                     <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>包裹状态</strong> : {{ $package->status_name }}
+                                </div>
+                                <div class="col-lg-1">
+                                    <strong>是否标记</strong> : {{ $package->is_mark == '1' ? '是' : '否' }}
                                 </div>
                                 <div class="col-lg-1">
                                     <button class="btn btn-primary btn-xs split"

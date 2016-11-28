@@ -352,6 +352,7 @@ class OrderModel extends BaseModel
             ],
             'filterSelects' => [
                 'status' => config('order.status'),
+                'review_type' => config('order.review_type'),
                 'active' => config('order.active'),
                 'is_chinese' => config('order.is_chinese')
             ],

@@ -47,7 +47,7 @@ class EbayAdapter implements AdapterInterface
         $returnOrders = [];
         $this->siteID = 0;
         $this->verb = 'GetOrders';
-        $OrderStatus = $status[0];
+        $OrderStatus = $status;
         if (empty($nextToken)) {
             $nextToken = 1;
         }

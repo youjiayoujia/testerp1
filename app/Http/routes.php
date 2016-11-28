@@ -426,6 +426,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('item/changePurchaseAdmin/{id}',
         ['uses' => 'ItemController@changePurchaseAdmin', 'as' => 'changePurchaseAdmin']);
     Route::any('item/question/{id}', ['uses' => 'ItemController@question', 'as' => 'item.question']);
+    
+    Route::any('item/changeNewSku/{id}', ['uses' => 'ItemController@changeNewSku', 'as' => 'item.changeNewSku']);
+
     Route::any('item/addSupplier/{id}', ['uses' => 'ItemController@addSupplier', 'as' => 'item.addSupplier']);
     Route::any('item/questionStatus', ['uses' => 'ItemController@questionStatus', 'as' => 'item.questionStatus']);
     Route::any('item/extraQuestion', ['uses' => 'ItemController@extraQuestion', 'as' => 'item.extraQuestion']);
@@ -504,7 +507,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
     Route::get('logistics/ajaxLogistics',
         ['uses' => 'Logistics\TemplateController@ajaxLogistics', 'as' => 'logistics.ajaxLogistics']);
-    Route::get('template/preview',
+    Route::any('template/preview',
         ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
     Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);

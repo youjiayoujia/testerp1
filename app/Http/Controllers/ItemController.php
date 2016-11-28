@@ -588,4 +588,15 @@ class ItemController extends Controller
 
     }
 
+    //修改转新品状态
+    public function changeNewSku($id)
+    {
+        $url = $_SERVER['HTTP_REFERER'];
+        $model = $this->model->find($id);
+        $new_status = request()->input('new_status');
+        $model->update(['new_status'=>$new_status]);
+        return redirect($url)->with('alert', $this->alert('success', $model->sku.'已转新品.'));
+        //print_r($new_status);exit;
+    }
+
 }

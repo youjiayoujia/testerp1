@@ -152,6 +152,7 @@ return [
         'channel_name' => '渠道名称',
         'account.account' => '渠道帐号',
         'is_chinese' => '竞拍状态',
+        'review_type' => '审核类型',
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',
@@ -168,7 +169,8 @@ return [
         'catalog.id' => '品类',
         'spu_id' => 'SPU',
         'logistics.catalog.name' => '物流分类',
-        'order.channel_ordernum' => '渠道运单号',
+        'order.channel_ordernum' => '渠道订单号',
         'purchaseItem.productItem.sku' => 'sku',
+        'new_status' => '是否为新品'
     ],
 ];

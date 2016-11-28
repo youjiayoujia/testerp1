@@ -52,23 +52,26 @@ Class AliexpressAdapter implements AdapterInterface
             $nextToken = 1;
         }
         $orders = [];
-        $orderStatus = $status[0];
         $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
             strtotime($startDate));
         $startDate = $startDate>'2016-10-27 17:00:00'?$startDate:'2016-10-27 17:00:00';
         $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
             strtotime($endDate));
-        $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
+        $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $status . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
+
 
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
         $orderList = json_decode($orderjson, true,512,JSON_BIGINT_AS_STRING);
         unset($orderjson);
         if (isset($orderList['orderList'])) {
             foreach ($orderList['orderList'] as $list) {
-                $thisOrder = orderModel::where('channel_ordernum',
-                    $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
-                if ($thisOrder) {
-                    continue;
+                //echo $list['orderStatus'];exit;
+                if($list['orderStatus'] !='IN_CANCEL'){
+                    $thisOrder = orderModel::where('channel_ordernum',
+                        $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
+                    if ($thisOrder) {
+                        continue;
+                    }
                 }
                 $param = "orderId=" . $list['orderId'];
                 $orderjson = $this->getJsonData('api.findOrderById', $param);
@@ -211,7 +214,11 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['shipping_state'] = isset($orderDetail ["receiptAddress"] ["province"])?$orderDetail ["receiptAddress"] ["province"]:'';
         $orderInfo['shipping_country'] = isset($orderDetail ["receiptAddress"] ["country"])?$orderDetail ["receiptAddress"] ["country"]:'';
         $orderInfo['shipping_zipcode'] = isset($orderDetail ["receiptAddress"] ["zip"])?$orderDetail ["receiptAddress"] ["zip"]:'';
-        $orderInfo['status'] = 'PAID';
+        if($list['orderStatus']=='IN_CANCEL'){
+            $orderInfo['status'] = 'CANCEL';
+        }else{
+            $orderInfo['status'] = 'PAID';
+        }
         $leftSendGoodDay = isset($list["leftSendGoodDay"])?(int)$list["leftSendGoodDay"]:0;
         $leftSendGoodHour = isset($list["leftSendGoodHour"])?(int)$list["leftSendGoodHour"]:0;
         $leftSendGoodMin = isset($list["leftSendGoodMin"])?(int)$list["leftSendGoodMin"]:0;

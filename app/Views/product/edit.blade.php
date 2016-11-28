@@ -76,7 +76,9 @@
         <div class="form-group col-md-3">
             <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select id="supplier_id" class="form-control supplier" name="supplier_id">
-               <option value="{{$product->supplier->id}}">{{$product->supplier->name}}</option>
+                @if($product->supplier)
+                    <option value="{{$product->supplier->id}}">{{$product->supplier->name}}</option>
+                @endif
             </select>
         </div> 
         <div class="form-group col-md-3">
@@ -197,11 +199,12 @@
 
     <div class='row'>
         <div class="form-group col-md-12" style="">
-            <label for="color">物流限制</label>
+            <label for="color">物流限制</label><br>
             @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, $logisticsLimit_arr)? 'checked' : '' }} >{{$carriage_limit->name}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, $logisticsLimit_arr)? 'checked' : '' }} >@if($carriage_limit->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$carriage_limit->ico}}" />@else{{$carriage_limit->name}} @endif
                     </label>
+                    <br>
             @endforeach
         </div>
         <div class="form-group col-md-12" style="">

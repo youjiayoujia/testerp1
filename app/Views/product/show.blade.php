@@ -137,7 +137,7 @@
             </div>
             @foreach($logisticsLimit_arr as $key=>$logistics_limit)
                 <div class="col-lg-12" @if($key==0)style="margin-top:10px" @endif>
-                    {{$key+1}}. {{$logistics_limit}}
+                    <img width="30px" src="{{config('logistics.limit_ico_src').$logistics_limit}}" />
                 </div>
             @endforeach
         </div>

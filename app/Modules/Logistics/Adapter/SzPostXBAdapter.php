@@ -1,28 +1,37 @@
 <?php
 namespace App\Modules\Logistics\Adapter;
-function myecho($data){
-    echo "<pre/>";var_dump($data);exit;
-}
+
 class SzPostXBAdapter extends BasicAdapter
 {
     public function __construct($config){
-        $this->ShipServerUrl = $config['url'];
-        $this->ecCompanyId =  $config['userId'];
-        $this->scret = $config['userPassword'];
-        $this->mailType = 'SALAMOER';
-        $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
+         $this->ShipServerUrl = $config['url'];
+         $this->ecCompanyId =  $config['userId'];
+         $this->scret = $config['userPassword'];
+         $this->mailType = 'SALAMOER';
+         $this->ServerUrl = 'http://shipping.11185.cn:8000/mqrysrv/OrderImportMultiServlet';
 //         $this->ServerUrl = 'http://219.134.187.38:8089/mqrysrv/OrderImportMultiServlet';
 //         $this->ShipServerUrl = 'http://219.134.187.38:8089/produceWeb/barCodesAssgineServlet';
 //         $this->ecCompanyId='44030324695000|5180120245';
 //         $this->scret = '8U3Y0jt93C98u7036190';
 //         $this->mailType = 'SALAMOER';
+        $this->sendInfo = array(
+            'j_company'  => $config['returnCompany'],                        //寄件人公司
+            'j_contact'  => $config['returnContact'],                        //寄件人
+            'j_tel'      => $config['returnPhone'],                          //电话
+            'j_address1' => $config['returnAddress'],                        //地址
+            'j_province' => $config['returnProvince'],                       //省
+            'j_city'     => $config['returnCity'],                           //市
+            'j_post_code'=> $config['returnZipcode'],                        //邮编
+            'j_country'  => $config['returnCountry'],                        //国家
+            //'custid' => '7555769565'
+        );
      }
      
     
     public function getTracking($package){
         $orderStr = '';
         $dateTime = date('Y-m-d H:i:s');
-         list($name, $channel) = explode(',',$package->logistics->type);   
+        list($name, $channel) = explode(',',$package->logistics->type);
         $orderStr .= '{"ecCompanyId":"'.$this->ecCompanyId.'","eventTime":"'.$dateTime.'","logisticsOrderId":"'.$package->order->channel_ordernum.'","LogisticsCompany":"POST","LogisticsBiz":"'.$channel.'","mailType":"'.$this->mailType.'","faceType":"1"},';
         
         $orderStr = trim($orderStr,',');
@@ -112,7 +121,7 @@ class SzPostXBAdapter extends BasicAdapter
         $proStr .='<producingArea>CN</producingArea>';
         $proStr .='<productWeight>'.$totalWeight.'</productWeight>';
         $proStr .='<productPrice>'.$totalValue.'</productPrice>';
-        $proStr .='</product>';*/
+        $proStr .='</product>';
                
         if($package->warehouse_id == 3){
             //深圳仓
@@ -144,14 +153,12 @@ class SzPostXBAdapter extends BasicAdapter
                 'j_country' => 'CN',                                //国家
                 'custid' => '5796625949'
             );
-        }
+        }*/
          
         $dateTime = date('Y-m-d H:i:s');
         $batchNo = date('Ymd');
         $orderId = $package->order->channel_ordernum;       //订单ID
         list($name, $channel) = explode(',',$package->logistics->type);
-        //$str = '';
-        //$str = '<?xml version="1.0" encoding="utf-8">' . "\n";
         $str = '<logisticsEventsRequest>';
         $str .='<logisticsEvent>';
         $str .='<eventHeader>';
@@ -249,29 +256,23 @@ class SzPostXBAdapter extends BasicAdapter
 </logisticsEvent>
 </logisticsEventsRequest>";
         $data=preg_replace('/&/',' ',$str);*/
-       //$str = simplexml_load_string($str);
-       // $data=$data->asXML();
-       // $data = iconv('GBK','UTF-8',$data);
-       //myecho($str);
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
-        $url = $this->ServerUrl;        
-        $postD = array();
+        $url = $this->ServerUrl;
+        $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';
+        /*$postD = array();
         $postD['logistics_interface'] = $str;
         $postD['data_digest']         = $newdata;
         $postD['msg_type']            = 'B2C_TRADE';
         $postD['ecCompanyId']         = $this->ecCompanyId;
-        $postD['version']             = '2.0';
+        $postD['version']             = '2.0';*/
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
-        echo "<pre/>";var_dump($postD);
-        var_dump($result);
         if($result['responseItems']['response']['success'] == 'true'){
             return true;        
         }else{
            return false;
         }
-    }    
-   
+    }
     
     public function postCurlHttpsData($url, $data) { // 模拟提交数据函数
         $headers = array(     
@@ -280,8 +281,8 @@ class SzPostXBAdapter extends BasicAdapter
     
         $curl = curl_init (); // 启动一个CURL会话
         curl_setopt ( $curl, CURLOPT_URL, $url ); // 要访问的地址
-        //curl_setopt ( $curl, CURLOPT_SSL_VERIFYPEER, 0 ); // 对认证证书来源的检查
-        //curl_setopt ( $curl, CURLOPT_SSL_VERIFYHOST, 2 ); // 从证书中检查SSL加密算法是否存在
+        curl_setopt ( $curl, CURLOPT_SSL_VERIFYPEER, 0 ); // 对认证证书来源的检查
+        curl_setopt ( $curl, CURLOPT_SSL_VERIFYHOST, 2 ); // 从证书中检查SSL加密算法是否存在
         //curl_setopt ( $curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT'] ); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt ( $curl, CURLOPT_FOLLOWLOCATION, 1 ); // 使用自动跳转

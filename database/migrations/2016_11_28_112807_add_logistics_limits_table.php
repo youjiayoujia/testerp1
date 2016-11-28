@@ -27,6 +27,8 @@ class AddLogisticsLimitsTable extends Migration
     {
         Schema::table('logistics_limits', function (Blueprint $table) {
             //
+            $table->dropColumn('ico');
+
         });
     }
 }

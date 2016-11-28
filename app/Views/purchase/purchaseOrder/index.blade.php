@@ -37,6 +37,9 @@
                 已打印次数:</br></br>
                 总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchasePostage->sum('postage')}}</br>
                 运单号:
+                @foreach($purchaseOrder->purchasePostage as $postage)
+                    {{$postage->post_coding}}</br>
+                @endforeach
             </td>
             <td> 
                 <div>{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>

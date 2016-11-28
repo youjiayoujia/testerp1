@@ -348,7 +348,6 @@ class OrderModel extends BaseModel
                 'by_id',
                 'shipping_firstname',
                 'currency',
-                'profit_rate'
             ],
             'filterSelects' => [
                 'status' => config('order.status'),
@@ -356,8 +355,8 @@ class OrderModel extends BaseModel
                 'is_chinese' => config('order.is_chinese')
             ],
             'sectionSelect' => [
-                'price' => ['amount'],
-                'time' => ['created_at']
+                'price' => ['amount', 'profit', 'profit_rate'],
+                'time' => ['created_at'],
             ],
             'relatedSearchFields' => [
                 'country' => ['code'],

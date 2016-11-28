@@ -890,12 +890,12 @@
             <option value="low">低于</option>
         </select>
     </div>
-    <div class="btn-group" role="group">
-        <select class="form-control special" name="special" id="special">
-            <option value="null">特殊要求</option>
-            <option value="yes">有特殊要求</option>
-        </select>
-    </div>
+    {{--<div class="btn-group" role="group">--}}
+        {{--<select class="form-control special" name="special" id="special">--}}
+            {{--<option value="null">特殊要求</option>--}}
+            {{--<option value="yes">有特殊要求</option>--}}
+        {{--</select>--}}
+    {{--</div>--}}
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             展示类型

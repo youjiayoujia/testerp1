@@ -386,6 +386,10 @@ class PackageModel extends BaseModel
                 $color = 'info';
                 break;
         }
+        if($this->order->status == 'REVIEW') {
+            $color = 'danger';
+        }
+
         return $color;
     }
 

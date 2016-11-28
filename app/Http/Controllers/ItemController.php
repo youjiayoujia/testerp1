@@ -249,7 +249,7 @@ class ItemController extends Controller
         }
         $logisticsLimit_arr = [];
         foreach($model->product->logisticsLimit->toArray() as $key=>$arr){
-            $logisticsLimit_arr[$key] = $arr['name'];              
+            $logisticsLimit_arr[$key] = $arr['ico'];              
         }
         
         $wrapLimit_arr = [];

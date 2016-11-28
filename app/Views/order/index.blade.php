@@ -880,16 +880,16 @@
 @stop
 @stop
 @section('tableToolButtons')
-    <div class="btn-group" role="group">
-        <input class="form-control lr" id="lr" placeholder="利润" name="lr">
-    </div>
-    <div class="btn-group" role="group">
-        <select class="form-control sx" name="sx" id="sx">
-            <option value="null">利润筛选</option>
-            <option value="high">高于</option>
-            <option value="low">低于</option>
-        </select>
-    </div>
+    {{--<div class="btn-group" role="group">--}}
+        {{--<input class="form-control lr" id="lr" placeholder="利润" name="lr">--}}
+    {{--</div>--}}
+    {{--<div class="btn-group" role="group">--}}
+        {{--<select class="form-control sx" name="sx" id="sx">--}}
+            {{--<option value="null">利润筛选</option>--}}
+            {{--<option value="high">高于</option>--}}
+            {{--<option value="low">低于</option>--}}
+        {{--</select>--}}
+    {{--</div>--}}
     {{--<div class="btn-group" role="group">--}}
         {{--<select class="form-control special" name="special" id="special">--}}
             {{--<option value="null">特殊要求</option>--}}

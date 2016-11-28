@@ -329,17 +329,17 @@ class MessageController extends Controller
 
         if ($message->reply(request()->all())) {
             /*
-             * 写入队列      出错 暂时取消 写入队列
+             * 写入队列
              */
 
-/*            $reply = ReplyModel::where('message_id',$id)->get()->first();
+            $reply = ReplyModel::where('message_id',$id)->get()->first();
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
-            $this->dispatch($job);*/
-            $account = $message->account;
+            $this->dispatch($job);
+/*            $account = $message->account;
             $reply = ReplyModel::where('message_id',$id)->get()->first();
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $channel->sendMessages($reply);
+            $channel->sendMessages($reply);*/
 
             if ($this->workflow == 'keeping') {
                 return redirect(route('message.process'))

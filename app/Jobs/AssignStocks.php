@@ -35,7 +35,7 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
      * @return void
      */
     /**
-     * 
+     *
      *  因为可能遇到匹配到了多个仓库，所以不能再这边放入队列
      *  所以在createPackageItems中放入队列
      */
@@ -46,6 +46,7 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
             if ($this->package->status == 'WAITASSIGN') {
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success to assign stock.';
+                $this->package->eventLog('队列', '已匹配到库存,待分配', json_encode($this->package));
             } elseif ($this->package->status == 'PROCESSING') { //todo:如果缺货订单匹配到了库存，不是原匹配仓库，需要匹配物流下单
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success to assign stock.';

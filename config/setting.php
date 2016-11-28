@@ -153,6 +153,8 @@ return [
         'account.account' => '渠道帐号',
         'is_chinese' => '竞拍状态',
         'remarks.type' => '审核类型',
+        'packages.logistics.code' => '物流方式简码',
+        'packages.tracking_no' => '追踪号',
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',

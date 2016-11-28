@@ -49,6 +49,9 @@
                         ]<a></div>
             </td>
             <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
+                @foreach($item->product->logisticsLimit as $logistics)
+                    @if($logistics->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}" />@else{{$logistics->name}} @endif<br>
+                @endforeach
                 开发时间：{{ $item->created_at }}<br>
                 【包装方式：<br>
                 <?php if($item->product){ ?>

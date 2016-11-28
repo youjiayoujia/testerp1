@@ -9,7 +9,7 @@
 
 
         <label for="ico" class='control-label'>图标</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" placeholder="图标" name='ico' value="{{ old('ico') ? old('ico') : $model->ico }}">
+        <input type='text' class="form-control" placeholder="图标" name='ico' value="{{ old('ico')}}">
     </div>
 </div>
 @stop

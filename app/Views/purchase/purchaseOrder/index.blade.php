@@ -36,7 +36,10 @@
                 {{$purchaseOrder->post_coding }}</br>
                 已打印次数:</br></br>
                 总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchasePostage->sum('postage')}}</br>
-                运单号:
+                运单号:<br>
+                @foreach($purchaseOrder->purchasePostage as $postage)
+                    {{$postage->post_coding}}</br>
+                @endforeach
             </td>
             <td> 
                 <div>{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>
@@ -160,12 +163,6 @@
                     </a>
                 @endif
 
-                @if($purchaseOrder->status ==1)
-                    <a  href="/purchaseOrder/printInWarehouseOrder/{{$purchaseOrder->id}}"  title="入库单" class="btn btn-danger btn-xs" data-url="">
-                         入库单
-                    </a>
-                @endif
-
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
                     <a  href="javascript:" title="核销" class="btn btn-success btn-xs hexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen">核销</span>
@@ -199,6 +196,12 @@
                    data-url="{{ route('purchaseOrder.destroy', ['id' => $purchaseOrder->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span>
                 </a>  -->
+                <br><br>
+                @if($purchaseOrder->status ==1||$purchaseOrder->status ==2||$purchaseOrder->status ==3)
+                    <a  href="/purchaseOrder/printInWarehouseOrder/{{$purchaseOrder->id}}"  title="入库单" class="btn btn-danger btn-xs" data-url="">
+                         入库单
+                    </a>
+                @endif
             </td>
         </tr>
         <!-- 模态框（Modal） -->

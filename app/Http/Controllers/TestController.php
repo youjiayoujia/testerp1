@@ -84,7 +84,11 @@ class TestController extends Controller
         }
         dd($result);
     }
-
+    public function test_3()
+    {echo 3331213;exit;
+        $package = PackageModel::find(1);
+        var_dump($package->items->toarray());
+    }
     public function test2()
     {
         $package = PackageModel::find(1);

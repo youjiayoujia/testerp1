@@ -16,6 +16,7 @@
  *
  */
 Route::get('test1', 'TestController@testYw');
+Route::get('test_3', 'TestController@test_3');
 Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
 Route::post('api/curlApiChangeWarehousePositon',

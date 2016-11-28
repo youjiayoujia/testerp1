@@ -2,6 +2,7 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th>物流限制名称</th>
+    <th>图标</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -11,6 +12,14 @@
         <tr>
             <td>{{ $logisticsLimits->id }}</td>
             <td>{{ $logisticsLimits->name }}</td>
+
+            <td>
+                @if($logisticsLimits->ico)
+                    <img width="40px" src="{{config('logistics.limit_ico_src').$logisticsLimits->ico}}" />
+                @else
+                    无
+                @endif
+            </td>
             <td>{{ $logisticsLimits->created_at }}</td>
             <td>{{ $logisticsLimits->updated_at }}</td>
             <td>

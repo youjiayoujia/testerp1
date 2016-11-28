@@ -9,6 +9,9 @@
             <div class="col-lg-4">
                 <strong>物流限制</strong>: {{ $model->name }}
             </div>
+            <div class="col-lg-4">
+                <strong>图标</strong>: {{ $model->ico }}
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

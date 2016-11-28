@@ -1603,6 +1603,10 @@ class PackageModel extends BaseModel
                     ]);
                 } else {
                     $item = $this->items->first();
+                    if(in_array($this->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $this->is_upload) {
+                        $this->is_mark = 0;
+                        $this->save();
+                    }
                     if (empty($item->warehouse_position_id)) {
                         $this->update([
                             'status' => 'NEED',
@@ -1768,7 +1772,12 @@ class PackageModel extends BaseModel
                         $error[] = $key;
                         continue;
                     }
-                    $this->find($content['package_id'])->update([
+                    $package = $this->find($content['package_id']);
+                    if(in_array($package->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $package->is_upload) {
+                        $package->is_mark = 0;
+                        $package->save();
+                    }
+                    $package->update([
                         'tracking_no' => $content['tracking_no'],
                         'logistics_id' => $content['logistics_id']
                     ]);

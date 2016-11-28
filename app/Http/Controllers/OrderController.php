@@ -497,9 +497,15 @@ class OrderController extends Controller
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
         $model->update(['status' => 'PREPARED']);
+        if($model->packages()->count()) {
+            $model->packagesToQueue();
+        } else {
+            $job = new DoPackages($model);
+            $job = $job->onQueue('doPackages');
+            $this->dispatch($job);
+        }
         $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '审核更新,id=' . $order_id, $to, $from);
-
         return 1;
     }
 
@@ -557,7 +563,7 @@ class OrderController extends Controller
             if ($model) {
                 $from = json_encode($model);
                 if ($model->status = 'REVIEW') {
-                    $model->update(['status' => 'PREPARED']);
+                    $model->update(['status' => 'PREPARED', 'is_review' => '1']);
                     $job = new DoPackages($model);
                     $job->onQueue('doPackages');
                     $this->dispatch($job);

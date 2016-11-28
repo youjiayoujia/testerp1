@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddIsReviewReviewTypeToOrder extends Migration
+class AddProfitToOrder extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,7 @@ class AddIsReviewReviewTypeToOrder extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->enum('review_type', ['REQUIRE', 'PROFIT', 'MESSAGE', 'BLACK', 'WEIGHT', 'ITEM'])
-                ->comment('审核类型')->after('platform');
-            $table->enum('is_reviewed', ['0', '1'])
-                ->comment('是否审核')->default('1')->after('review_type');
+            $table->decimal('profit', 12, 4)->comment('订单利润')->after('gross_margin');
         });
     }
 
@@ -28,8 +25,7 @@ class AddIsReviewReviewTypeToOrder extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('review_type');
-            $table->dropColumn('is_reviewed');
+            $table->dropColumn('profit');
         });
     }
 }

@@ -10,6 +10,10 @@
 
 namespace App\Models;
 
+use Queue;
+use App\Jobs\AssignStocks;
+use App\Jobs\AssignLogistics;
+use App\Jobs\PlaceLogistics;
 use Tool;
 use Exception;
 use Storage;
@@ -38,10 +42,12 @@ class OrderModel extends BaseModel
         'by_id',
         'email',
         'status',
+        'is_review',
         'active',
         'order_is_alert',
         'amount',
         'gross_margin',
+        'profit',
         'profit_rate',
         'amount_product',
         'amount_shipping',
@@ -91,12 +97,11 @@ class OrderModel extends BaseModel
     ];
 
     private $canPackageStatus = ['PREPARED'];
+    private $canCancelStatus = ['SHIPPED', 'COMPLETE'];
 
     public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
 
-    /**
-     * 退款rules
-     */
+    //退款rules
     public $rules = [
         'create' => [
             'refund_amount' => 'required',
@@ -109,17 +114,7 @@ class OrderModel extends BaseModel
         ],
     ];
 
-    public function getOrderWeightAttribute()
-    {
-        $items = $this->items;
-        $weight = 0;
-        foreach ($items as $item) {
-            $weight += $item->item->weight * $item->quantity;
-        }
-
-        return $weight;
-    }
-
+    //添加rules
     public function rule($request)
     {
         $arr = [
@@ -137,10 +132,8 @@ class OrderModel extends BaseModel
             'transaction_number' => 'required',
             'amount' => 'required',
             'amount_product' => 'required',
-//            'amount_shipping' => 'required',
             'amount_coupon' => 'required',
             'shipping_firstname' => 'required',
-//            'shipping_lastname' => 'required',
             'shipping_address' => 'required',
             'shipping_city' => 'required',
             'shipping_state' => 'required',
@@ -189,12 +182,11 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
+    //更新rules
     public function updateRule($request)
     {
         $arr = [
-//            'amount_shipping' => 'required',
             'shipping_firstname' => 'required',
-//            'shipping_lastname' => 'required',
             'shipping_address' => 'required',
             'shipping_city' => 'required',
             'shipping_state' => 'required',
@@ -241,6 +233,108 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
+    //未付款订单
+    public function unpaidOrder()
+    {
+        return $this->belongsTo('App\Models\Order\UnpaidOrderModel', 'by_id', 'ordernum');
+    }
+
+    //订单产品
+    public function items()
+    {
+        return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
+    }
+
+    //订单包裹
+    public function packages()
+    {
+        return $this->hasMany('App\Models\PackageModel', 'order_id', 'id');
+    }
+
+    //订单渠道
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
+    }
+
+    //订单渠道账号
+    public function channelAccount()
+    {
+        return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
+    }
+
+    //订单国家
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+
+    //订单币种
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\CurrencyModel', 'currency', 'code');
+    }
+
+    //运营人员
+    public function userAffairer()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'affairer', 'id');
+    }
+
+    //客服人员
+    public function userService()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'customer_service', 'id');
+    }
+
+    //运营人员
+    public function userOperator()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'operator', 'id');
+    }
+
+    //订单备注
+    public function remarks()
+    {
+        return $this->hasMany('App\Models\Order\RemarkModel', 'order_id', 'id');
+    }
+
+    //退款记录
+    public function refunds()
+    {
+        return $this->hasMany('App\Models\Order\RefundModel', 'order_id', 'id');
+    }
+
+    //订单需求
+    public function requires()
+    {
+        return $this->hasMany('App\Models\RequireModel', 'order_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany('App\Models\Message\MessageModel', 'channel_order_number', 'channel_ordernum');
+    }
+
+    //ebay消息记录
+    public function ebayMessageList()
+    {
+        return $this->hasMany('App\Models\Message\SendEbayMessageListModel', 'order_id', 'id');
+    }
+
+    //订单重量
+    public function getOrderWeightAttribute()
+    {
+        $items = $this->items;
+        $weight = 0;
+        foreach ($items as $item) {
+            $weight += $item->item->weight * $item->quantity;
+        }
+
+        return $weight;
+    }
+
+    //多重查询
     public function getMixedSearchAttribute()
     {
         foreach (ChannelModel::all() as $channel) {
@@ -278,82 +372,14 @@ class OrderModel extends BaseModel
         ];
     }
 
-    public function unpaidOrder()
-    {
-        return $this->belongsTo('App\Models\Order\UnpaidOrderModel', 'by_id', 'ordernum');
-    }
-
-    public function items()
-    {
-        return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
-    }
-
-    public function packages()
-    {
-        return $this->hasMany('App\Models\PackageModel', 'order_id', 'id');
-    }
-
-    public function channel()
-    {
-        return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
-    }
-
-    public function channelAccount()
-    {
-        return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
-    }
-
-    public function country()
-    {
-        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
-    }
-
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\CurrencyModel', 'currency', 'code');
-    }
-
-    public function userAffairer()
-    {
-        return $this->belongsTo('App\Models\UserModel', 'affairer', 'id');
-    }
-
-    public function userService()
-    {
-        return $this->belongsTo('App\Models\UserModel', 'customer_service', 'id');
-    }
-
-    public function userOperator()
-    {
-        return $this->belongsTo('App\Models\UserModel', 'operator', 'id');
-    }
-
-    public function remarks()
-    {
-        return $this->hasMany('App\Models\Order\RemarkModel', 'order_id', 'id');
-    }
-
-    public function refunds()
-    {
-        return $this->hasMany('App\Models\Order\RefundModel', 'order_id', 'id');
-    }
-
-    public function requires()
-    {
-        return $this->hasMany('App\Models\RequireModel', 'order_id');
-    }
-
-    public function ebayMessageList()
-    {
-        return $this->hasMany('App\Models\Message\SendEbayMessageListModel', 'order_id', 'id');
-    }
-
+    //状态名称
     public function getStatusNameAttribute()
     {
         $config = config('order.status');
         return isset($config[$this->status]) ? $config[$this->status] : '';
     }
 
+    //状态颜色
     public function getStatusColorAttribute()
     {
         switch ($this->status) {
@@ -382,18 +408,21 @@ class OrderModel extends BaseModel
         return $color;
     }
 
+    //激活名称
     public function getActiveNameAttribute()
     {
         $arr = config('order.active');
         return $arr[$this->active];
     }
 
+    //是否部分发货
     public function getIsPartialNameAttribute()
     {
         $arr = config('order.whether');
         return $arr[$this->is_partial];
     }
 
+    //是否手工发货
     public function getByHandNameAttribute()
     {
         $arr = config('order.whether');
@@ -406,18 +435,21 @@ class OrderModel extends BaseModel
         return $arr[$this->is_affair];
     }
 
+    //地址是否验证
     public function getAddressConfirmNameAttribute()
     {
         $arr = config('order.address');
         return $arr[$this->address_confirm];
     }
 
+    //撤销原因
     public function getWithdrawNameAttribute()
     {
         $arr = config('order.withdraw');
         return $arr[$this->withdraw];
     }
 
+    //物流方式
     public function getLogisticsAttribute()
     {
         $logistics = '';
@@ -429,6 +461,7 @@ class OrderModel extends BaseModel
         return $logistics;
     }
 
+    //追踪号
     public function getCodeAttribute()
     {
         $code = '';
@@ -440,18 +473,14 @@ class OrderModel extends BaseModel
         return $code;
     }
 
-    /**
-     * 订单成本获取器
-     * @return int
-     */
+    //订单成本
     public function getAllItemCostAttribute()
     {
         $total = 0;
-        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
         foreach ($this->items as $item) {
             $total += $item->item->purchase_price * $item->quantity;
         }
-        return $total * $currency;
+        return $total;
     }
 
     public function getPartialOverAttribute()
@@ -464,11 +493,13 @@ class OrderModel extends BaseModel
         return true;
     }
 
+    //订单产品数量
     public function getOrderQuantityAttribute()
     {
         return $this->items->sum('quantity');
     }
 
+    //物流成本
     public function getLogisticsFeeAttribute()
     {
         $total = 0;
@@ -478,11 +509,83 @@ class OrderModel extends BaseModel
         return $total;
     }
 
+    public function packagesToQueue()
+    {
+        foreach ($this->packages as $package) {
+            switch ($package->status) {
+                case 'NEW':
+                    $job = new AssignStocks($package);
+                    Queue::pushOn('assignStocks', $job);
+                    break;
+                case 'WAITASSIGN':
+                    $job = new AssignLogistics($package);
+                    Queue::pushOn('assignLogistics', $job);
+                    break;
+                case 'ASSIGNED':
+                    $job = new PlaceLogistics($package);
+                    Queue::pushOn('placeLogistics', $job);
+                    break;
+                case 'NEED':
+                    $job = new AssignStocks($package);
+                    Queue::pushOn('assignStocks', $job);
+                    break;
+            }
+        }
+    }
+
+    //订单可用状态
     public function getActiveItemsAttribute()
     {
         return $this->items->where('is_active', '1');
     }
 
+    //订单状态
+    public function getStatusTextAttribute()
+    {
+        return config('order.status.' . $this->status);
+    }
+
+    //售后状态
+    public function getActiveTextAttribute()
+    {
+        return config('order.active.' . $this->active);
+    }
+
+    //ebay订单历史
+    public function getSendEbayMessageHistoryAttribute()
+    {
+        if (!$this->ebayMessageList->isEmpty()) {
+            return $this->ebayMessageList;
+        } else {
+            return false;
+        }
+    }
+
+    //订单备注
+    public function getOrderReamrksAttribute()
+    {
+        $remarks = '';
+        if (!$this->remarks->isEmpty()) {
+            foreach ($this->remarks as $remark) {
+                $remarks .= empty($remarks) ? $remark->remark : $remark->remark . ';';
+
+            }
+        }
+        return $remarks;
+    }
+
+    /**
+     * 根据单号取订单记录
+     * @param $query
+     * @param $ordernum
+     * @return mixed
+     */
+    public function scopeOfOrdernum($query, $ordernum)
+    {
+        return $query->where('ordernum', $ordernum);
+    }
+
+    //退款
     public function refundCreate($data, $file = null)
     {
         $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
@@ -524,32 +627,7 @@ class OrderModel extends BaseModel
         return 1;
     }
 
-    public function checkBlack()
-    {
-        $channel = $this->channel->where('id', $this->channel_id)->get();
-        $driver = '';
-        foreach ($channel as $val) {
-            $driver = $val->driver;
-        }
-        if ($driver == 'wish') {
-            $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
-            $blacklist = BlacklistModel::where('zipcode', $this->shipping_zipcode)->where('name', $name);
-        } elseif ($driver == 'aliexpress') {
-            $blacklist = BlacklistModel::where('by_id', $this->by_id);
-        } else {
-            $blacklist = BlacklistModel::where('email', $this->email);
-        }
-        if ($blacklist->count() > 0) {
-            $this->update(['blacklist' => '0']);
-            foreach ($blacklist->get() as $value) {
-                if ($value->type == 'CONFIRMED' || $value->type == 'SUSPECTED') {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
+    //创建订单
     public function createOrder($data)
     {
         $data['ordernum'] = str_replace('.', '', microtime(true));
@@ -568,8 +646,8 @@ class OrderModel extends BaseModel
             }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
-                $order->update(['is_reviewed' => 0, 'review_type' => 'ITEM']);
-                $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
+                $order->update(['status' => 'REVIEW',]);
+                $order->remark($orderItem['channel_sku'] . '找不到对应产品.', 'ITEM');
             }
             $order->items()->create($orderItem);
         }
@@ -581,17 +659,20 @@ class OrderModel extends BaseModel
         return $order;
     }
 
+    //更新订单
     public function updateOrder($data, $order)
     {
         $order = $order->update($data);
         return $order;
     }
 
-    public function remark($remark, $user_id = 0)
+    //添加订单备注
+    public function remark($remark, $type = 'DEFAULT', $user_id = 0)
     {
-        return $this->remarks()->create(['remark' => $remark, 'user_id' => $user_id]);
+        return $this->remarks()->create(['type' => $type, 'remark' => $remark, 'user_id' => $user_id]);
     }
 
+    //判断是否可打包
     public function canPackage()
     {
         //判断订单ACTIVE状态
@@ -613,6 +694,16 @@ class OrderModel extends BaseModel
         return true;
     }
 
+    //创建包裹
+    public function createPackage()
+    {
+        if ($this->canPackage()) {
+            return $this->createVirtualPackage();
+        }
+        return false;
+    }
+
+    //创建虚拟包裹
     public function createVirtualPackage()
     {
         $package = [];
@@ -650,58 +741,22 @@ class OrderModel extends BaseModel
         return $package;
     }
 
-    /**
-     * @param array $items
-     * @return bool
-     */
-    public function createPackage()
-    {
-        if ($this->canPackage()) {
-            return $this->createVirtualPackage();
-        }
-        return false;
-    }
-
-    /**
-     * 根据单号取订单记录
-     * @param $query
-     * @param $ordernum
-     * @return mixed
-     */
-    public function scopeOfOrdernum($query, $ordernum)
-    {
-        return $query->where('ordernum', $ordernum);
-    }
-
-    /**
-     * 计算利润率并处理
-     *
-     * @param none
-     * @return 利润率 小数
-     *
-     */
+    //计算利润率
     public function calculateProfitProcess()
     {
-        $currency = CurrencyModel::where('code', $this->currency)->first()->rate;
-        $orderAmount = $this->amount * $currency;
-        $orderCosting = $this->all_item_cost;
+        $rate = CurrencyModel::where('code', $this->currency)->first()->rate;
+        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
+        $orderAmount = ($this->amount + $this->amount_shipping) * $rate;
+        $itemCost = $this->all_item_cost * $rmbRate;
+        $logisticsCost = $this->logistics_fee * $rmbRate;
         $orderChannelFee = $this->calculateOrderChannelFee();
-        $orderRate = ($orderAmount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $orderAmount;
-//        if ($this->status != 'CANCEL' && $orderRate <= 0) {
-//            //利润率为负撤销0
-//            $this->OrderCancle();
-//        }
-
-        return $orderRate;
+        $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $orderChannelFee, 4);
+        $orderProfitRate = $orderProfit / $orderAmount;
+        $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);
+        return $orderProfitRate;
     }
 
-    /**
-     *  计算平台费
-     *
-     * @param $order 订单 $orderItems 订单条目
-     * @return $sum
-     *
-     */
+    //计算平台费
     public function calculateOrderChannelFee()
     {
         $sum = 0;
@@ -724,6 +779,38 @@ class OrderModel extends BaseModel
         return $sum;
     }
 
+    //黑名单验证
+    public function checkBlack()
+    {
+        $channel = $this->channel->find($this->channel_id);
+        $count = 0;
+        $blackList = BlacklistModel::whereIN('type', ['CONFIRMED', 'SUSPECTED']);
+        if ($channel) {
+            switch ($channel->driver) {
+                case 'wish':
+                    $name = trim($this->shipping_lastname . ' ' . $this->shipping_firstname);
+                    $count = $blackList->where('zipcode', $this->shipping_zipcode)
+                        ->where('name', $name)->count();
+                    break;
+                case 'aliexpress':
+                    if ($this->by_id) {
+                        $count = $blackList->where('by_id', $this->by_id)->count();
+                    }
+                    break;
+                default:
+                    if ($this->email) {
+                        $count = $blackList->where('email', $this->email)->count();;
+                    }
+                    break;
+            }
+            if ($count > 0) {
+                $this->update(['blacklist' => '0']);
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 订单撤销
      *
@@ -732,7 +819,7 @@ class OrderModel extends BaseModel
     public function cancelOrder($type, $reason = '')
     {
         if ($this->status != 'CANCEL') {
-            if (!in_array($this->status, ['SHIPPED', 'COMPLETE'])) {
+            if (!in_array($this->status, $this->canCancelStatus)) {
                 //取消包裹
                 foreach ($this->packages as $package) {
                     $package->cancelPackage();
@@ -749,36 +836,4 @@ class OrderModel extends BaseModel
         }
         return true;
     }
-
-    public function getStatusTextAttribute()
-    {
-        return config('order.status.' . $this->status);
-    }
-
-    public function getActiveTextAttribute()
-    {
-        return config('order.active.' . $this->active);
-    }
-
-    public function getSendEbayMessageHistoryAttribute()
-    {
-        if (!$this->ebayMessageList->isEmpty()) {
-            return $this->ebayMessageList;
-        } else {
-            return false;
-        }
-    }
-
-    public function getOrderReamrksAttribute()
-    {
-        $remarks = '';
-        if (!$this->remarks->isEmpty()) {
-            foreach ($this->remarks as $remark) {
-                $remarks .= empty($remarks) ? $remark->remark : $remark->remark . ';';
-
-            }
-        }
-        return $remarks;
-    }
-
 }

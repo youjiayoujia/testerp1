@@ -106,15 +106,6 @@
         </div>
     </div>
     <div class="row">
-        <div class='form-group col-lg-4'>
-            <label for="logistics_limits">物流限制</label>
-            <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
-                <option value=''></option>
-                @foreach($limits as $limit)
-                    <option value="{{ $limit->id }}" {{ $model->hasLimits($limit->id) ? 'selected' : ''}}>{{$limit->name}}</option>
-                @endforeach
-            </select>
-        </div>
         <div class="form-group col-lg-2">
             <label for="is_express" class="control-label">平邮or快递</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -200,6 +191,51 @@
                         <div class="radio">
                             <label>
                                 <input type="radio" name="channel_id[{{ $channel->id }}]" value="0" checked>不上传
+                            </label>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">缺货是否标记发货</div>
+        <div class="panel-body">
+            @if($channels->count() == $logisticsChannels->count())
+                @foreach($channels as $channel)
+                    @foreach($logisticsChannels as $logisticsChannel)
+                        @if($channel->id == $logisticsChannel->channel_id)
+                            <div class="form-group col-lg-2">
+                                <label for="delivery[{{ $channel->id }}]" class="control-label">{{ $channel->name }}平台</label>
+                                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="delivery[{{ $channel->id }}]" value="1" {{ $logisticsChannel->delivery == '1' ? 'checked' : '' }}>是
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="delivery[{{ $channel->id }}]" value="0" {{ $logisticsChannel->delivery == '0' ? 'checked' : '' }}>否
+                                    </label>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                @endforeach
+            @endif
+            @if($logisticsChannels->count() == 0)
+                @foreach($channels as $channel)
+                    <div class="form-group col-lg-2">
+                        <label for="delivery[{{ $channel->id }}]" class="control-label">{{ $channel->name }}平台</label>
+                        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="delivery[{{ $channel->id }}]" value="1" checked>是
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="delivery[{{ $channel->id }}]" value="0">否
                             </label>
                         </div>
                     </div>

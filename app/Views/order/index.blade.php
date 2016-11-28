@@ -48,13 +48,12 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
+                <div>{{ round($order->profit_rate,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
                 <div>
-                    毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->logistics_fee) * $rmbRate - $order->calculateOrderChannelFee()) }}
-                    USD
+                    毛利润: {{ $order->profit }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
@@ -128,13 +127,13 @@
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             {{--@if($orderItem->item)--}}
-                                {{--<div class="col-lg-2">--}}
-                                    {{--<img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">--}}
-                                {{--</div>--}}
+                            {{--<div class="col-lg-2">--}}
+                            {{--<img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">--}}
+                            {{--</div>--}}
                             {{--@else--}}
-                                {{--<div class="col-lg-2">--}}
-                                    {{--<img src="{{ asset('default.jpg') }}" width="50px">--}}
-                                {{--</div>--}}
+                            {{--<div class="col-lg-2">--}}
+                            {{--<img src="{{ asset('default.jpg') }}" width="50px">--}}
+                            {{--</div>--}}
                             {{--@endif--}}
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
@@ -255,7 +254,9 @@
                                                             <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
                                                         </div>
                                                         <div class='col-lg-1'>
-                                                            <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
+                                                            <button type='button' class='btn btn-primary confirm_quantity' name=''>
+                                                                确认
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <div class='split_package'></div>
@@ -288,13 +289,23 @@
                             <span class="glyphicon glyphicon-pencil"></span> 编辑
                         </a>
                     @endif
-                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
+                    @if($order->status == 'PICKING' && ($order->amount * $order->rate) >= 20)
                         <button class="btn btn-danger btn-xs"
                                 data-toggle="modal"
                                 data-target="#withdraw{{ $order->id }}"
                                 title="撤单">
                             <span class="glyphicon glyphicon-link"></span> 撤单
                         </button>
+                    @endif
+                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'NEED' || $order->status == 'PACKED' || $order->status == 'REVIEW')
+                        <button class="btn btn-danger btn-xs"
+                                data-toggle="modal"
+                                data-target="#withdraw{{ $order->id }}"
+                                title="撤单">
+                            <span class="glyphicon glyphicon-link"></span> 撤单
+                        </button>
+                    @endif
+                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
                         <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                            data-id="{{ $order->id }}"
                            data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
@@ -1171,16 +1182,16 @@
                 var ids = "";
 
                 for (var i = 0; i < checkbox.length; i++) {
-                    if(!checkbox[i].checked)continue;
-                    ids += checkbox[i].value+",";
+                    if (!checkbox[i].checked)continue;
+                    ids += checkbox[i].value + ",";
                 }
-                ids = ids.substr(0,(ids.length)-1);
+                ids = ids.substr(0, (ids.length) - 1);
                 $.ajax({
-                    url : "{{ route('partReview') }}",
-                    data : {ids:ids},
-                    dataType : 'json',
-                    type : 'get',
-                    success:function(result){
+                    url: "{{ route('partReview') }}",
+                    data: {ids: ids},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
                         window.location.reload();
                     }
                 })

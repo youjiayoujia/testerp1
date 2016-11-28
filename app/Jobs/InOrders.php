@@ -91,7 +91,9 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             }
         } else { //客户撤单
             $order = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
-            $order->cancelOrder(4);//撤单，4为客户撤单类型
+            if ($order) {
+                $order->cancelOrder(4);//撤单，4为客户撤单类型
+            }
         }
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('InOrders', json_encode($this->order));

@@ -59,6 +59,8 @@ use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
 use Crypt;
+use App\Models\Item\ItemPrepareSupplierModel;
+
 class TestController extends Controller
 {
     private $itemModel;
@@ -68,10 +70,25 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
         $this->orderModel = $orderModel;
     }
+    //测试包裹站台是否满足 物流下单状态；
+    //进行物流下单
+
+
+    public function tryGetLogtisticsNo($id){
+
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
+    }
+
     public function test2()
     {
-        $package = PackageModel::find(1);
-        var_dump($package->canclePackage());
+        $package = OrderModel::find(1);
+        $package->packagesToQueue();
     }
 //    public function test2()
 //    {
@@ -633,6 +650,31 @@ class TestController extends Controller
     }
     public function jdtestCrm()
     {
+
+        $groups = SupplierModel::all()->groupBy('company');
+
+        foreach ($groups as $group_key => $group){
+            if($group->count() > 1){   //如果有多个相同的供货商
+                foreach($group as $key => $supplier){
+                    if($key == 0){ //保留id最小的供货商，然后把其他的 sku 关联到 最小的供货商id  其余的全删除
+
+                        $correct_supplier_id = $supplier->id;
+
+                    }else{
+
+                         $sql = 'update items set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id;
+                         DB::update($sql);
+                         //更换备选
+                         DB::update('update item_prepare_suppliers set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id);
+
+                         $supplier->delete(); //删除多余
+                    }
+                }
+
+            }
+
+        }
+        dd('结束');
         /*
          * 写入队列
          */
@@ -642,7 +684,7 @@ class TestController extends Controller
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
         }
-        dd('已执行！ fight 2！！！');
+        dd('已执行！ fight 3333！！！');
 
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
@@ -799,19 +841,30 @@ class TestController extends Controller
     public function testReply($id){
 
 
+        //测试单个塞入队列
+        /*
+ * 写入队列
+ */
+/*        $reply = ReplyModel::find($id);
+            $job = new SendMessages($reply);
+            $job = $job->onQueue('SendMessages');
+            $this->dispatch($job);
+        dd($reply);*/
+
+
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
-                $reply = ReplyModel::find($id);
+                $replys = ReplyModel::where('status','FAIL')->get();
+                foreach ($replys as $reply){
+                    $channel = Channel::driver($account->channel->driver, $account->api_config);
+                    $channel->sendMessages($reply);
+                }
 
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-
-                $channel->sendMessages($reply);
-                exit;
+                dd('已经操作233');
 
             }
         }
 
-        dd($reply);
     }
     /**
      * Curl Post JSON 数据
@@ -894,7 +947,7 @@ class TestController extends Controller
         //$package = PackageModel::findOrFail(3113);
         $id = request()->get('id');
         $package = PackageModel::where('id', $id)->first();
-        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED','SHIPPED'])) {
             $result = $package->placeLogistics('UPDATE');
         } else {
             $result = $package->placeLogistics();

@@ -120,10 +120,11 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td>model</td>
+            <td>sku</td>
+            <td>中文名</td>
             <td>SKU*采购数量</td> 
             <td>采购类型</td>
-            <td>供货商sku</td>
+            <!-- <td>供货商sku</td> -->
               
             <td>样图</td>
             <td>状态</td>
@@ -140,10 +141,11 @@
             
             <tr> 
                 <td>{{$purchaseItem->id}}<input type="hidden" name="arr[{{$k}}][id]" value="{{$purchaseItem->id }}"/></td>
-                <td>{{$purchaseItem->item->product->model}}</td>
+                <td>{{$purchaseItem->item->sku}}</td>
+                <td>{{$purchaseItem->item->c_name}}</td>
                 <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
                 <td>{{config('product.product_supplier.type')[$purchaseItem->supplier->type]}}</td>
-                <td>{{$purchaseItem->item->supplier_sku}}</td>   
+                <!-- <td>{{$purchaseItem->item->supplier_sku}}</td> -->   
                 
                 <td>
                 @if($purchaseItem->item->product->default_image>0) 
@@ -315,6 +317,12 @@
                     <label for="size">运费</label>
                     <input class="form-control" id="total_postage" placeholder="运费" name='total_postage' value="{{ old('total_postage') ?  old('total_postage') : $model->total_postage }}">
                 </div>
+                <div class="form-group col-sm-3">
+                    <div class="form-group">
+                        <label for="name">外部单号</label>
+                        <input class="form-control" id="name" placeholder="外部单号" name='post_coding' value="{{$model->post_coding}}">
+                    </div>
+                </div> 
             </div>
         </div>
     </div>
@@ -356,21 +364,7 @@
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
         </div>
     </div> 
-    <div class="panel panel-default">
-        <div class="panel-heading">添加外部单号</div>
-        <div class="panel-body" id="">
-            <div class='row'>
-                <div class="form-group col-sm-2">
-                    <div class="form-group">
-                        <label for="name">外部单号</label>
-                        <input class="form-control" id="name" placeholder="外部单号" name='post_coding' value="{{$model->post_coding}}">
-                    </div>
-                </div>            
-            </div>       
-             
-        </div>
-        
-    </div> 
+     
 @stop
 @section('pageJs')
     <script type='text/javascript'>

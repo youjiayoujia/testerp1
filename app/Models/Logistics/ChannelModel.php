@@ -24,6 +24,7 @@ class ChannelModel extends BaseModel
         'channel_id',
         'url',
         'is_up',
+        'delivery',
     ];
 
     public $rules = [

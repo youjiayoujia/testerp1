@@ -98,11 +98,11 @@
                         <span class="glyphicon glyphicon-check"></span>
                     </a>
                 @endif
-                @if(in_array($package->status,['PROCESSING','PICKING','PACKED']))
+{{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
                     <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
                         <span class="glyphicon glyphicon-refresh"></span>
                     </a>
-                @endif
+                {{--@endif--}}
                 <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>
@@ -175,8 +175,18 @@
 @stop
 @section('tableToolButtons')
     <div class="btn-group">
+        <a class="btn btn-success" href="{{ route('package.showAllView') }}">
+            查看已删除包裹信息
+        </a>
+    </div>
+    <div class="btn-group">
         <a class="btn btn-success implodePackage" href="javascript:">
             合并包裹
+        </a>
+    </div>
+    <div class="btn-group">
+        <a class="btn btn-success multiPlace" href="javascript:">
+            批量下单
         </a>
     </div>
     <div class="btn-group" role="group">
@@ -219,9 +229,9 @@
         </a>
     </div>
     <!-- <div class="btn-group"> -->
-        <!-- <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}"> -->
-            <!-- 发货统计 -->
-        <!-- </a> -->
+    <!-- <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}"> -->
+    <!-- 发货统计 -->
+    <!-- </a> -->
     <!-- </div> -->
 @stop
 @section('childJs')
@@ -409,6 +419,23 @@
                 $('.confirm_quantity').attr('name', id);
                 $('.package_num').val('');
                 $('.split_package').html('');
+            })
+
+            $(document).on('click', '.multiPlace', function () {
+                arr = new Array();
+                i = 0;
+                $.each($('.single:checked'), function () {
+                    tmp = $(this).parent().next().text();
+                    arr[i] = tmp;
+                    i++;
+                })
+                if (arr.length) {
+                    if (confirm('确认批量下单?')) {
+                        location.href = "{{ route('package.multiPlace', ['arr' => '']) }}/" + arr;
+                    }
+                } else {
+                    alert('未选择包裹信息');
+                }
             })
 
             $(document).on('click', '.implodePackage', function () {

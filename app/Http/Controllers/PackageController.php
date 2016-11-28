@@ -108,6 +108,56 @@ class PackageController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    public function showAllView()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view($this->viewPath.'showCondition', $response);
+    }
+
+    public function getAllInfo()
+    {
+        $packageId = request('packageid');
+        $trackingNo = request('trackingno');
+        $model = $this->model->onlyTrashed()->find($packageId);
+        if(!$model) {
+            $model = $this->model->onlyTrashed()->where('tracking_no', $tracking_no)->first();
+            if(!$model) {
+                return 'no infomation';
+            }
+        }
+        $str = "<table class='table table-bordered'><thead>
+                <th>包裹id</th>
+                <th>订单号</th>
+                <th>追踪号</th>
+                <th>仓库</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th colspan='3'>产品信息</thead><tbody>";
+        $items = $model->items()->onlyTrashed()->get();
+        foreach( $items as $key => $item) {
+            if($key == 0) {
+                $str .= "<tr><td rowspan='".$items->count()."'>".$model->id."</td>
+                         <td rowspan='".$items->count()."'>".$model->order->ordernum."</td>
+                         <td rowspan='".$items->count()."'>".$model->tracking_no."</td>
+                         <td rowspan='".$items->count()."'>".($model->warehouse ? $model->warehouse->name : '') . "</td>
+                         <td rowspan='".$items->count()."'>".($model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多'))."</td>
+                         <td rowspan='".$items->count()."'>已删除</td>
+                         <td>".$item->item->sku."</td>
+                         <td>".($item->warehousePosition ? $item->warehousePosition->name : '')."</td>
+                         <td>".$item->quantity."</td></tr>";
+            } else {
+                $str .= "<tr><td>".$item->item->sku."</td>
+                         <td>".($item->warehousePosition ? $item->warehousePosition->name : '')."</td>
+                         <td>".$item->quantity."</td></tr>";
+            }
+        }
+        $str .= "</tbody></table>";
+        return $str;
+    }
+
     public function ajaxRealTime()
     {
         $arr = request('arr');
@@ -119,8 +169,8 @@ class PackageController extends Controller
                 $buf[$key][1] = 0;
                 continue;
             }
-            $buf[$key][0] = $package->realTimeLogistics();
-            $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? round($package->calculateLogisticsFee(), 2) : 0);
+            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->code : '';
+            $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
         }
 
         return $buf;
@@ -613,6 +663,24 @@ class PackageController extends Controller
         return view($this->viewPath . 'editTrackingNo', $response);
     }
 
+    public function multiPlace($tmp)
+    {
+        $arr = [];
+        $buf = explode(',', $tmp);
+        $name = UserModel::find(request()->user()->id)->name;
+        $orderId = $this->model->find($buf[0])->order->id;
+        foreach ($buf as $key => $packageId) {
+            $model = $this->model->find($packageId);
+            if($model) {
+                $job = new PlaceLogistics($model, 'UPDATE');
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
+            }
+        }
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '已重新匹配.'));
+    }
+
     public function implodePackage($tmp)
     {
         $arr = [];
@@ -645,10 +713,10 @@ class PackageController extends Controller
                 } else {
                     $arr[$packageItem->item_id]['quantity'] += $packageItem->quantity;
                 }
-                $packageItem->delete();
+                $packageItem->forceDelete();
             }
             if ($key) {
-                $model->delete();
+                $model->forceDelete();
             }
         }
         $model = $this->model->with('items')->find($buf[0]);
@@ -665,9 +733,9 @@ class PackageController extends Controller
         $newPackage->update(['status' => 'NEW', 'weight' => $weight]);
         $newPackage->order->update(['status' => 'REVIEW']);
         foreach ($model->items as $item) {
-            $item->delete();
+            $item->forceDelete();
         }
-        $model->delete();
+        $model->forceDelete();
         $to = json_encode($newPackage);
         $this->eventLog($name, '合并包裹', $to, $from);
 
@@ -702,7 +770,7 @@ class PackageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('warning', $this->mainTitle . '拆后包裹个数还是1.'));
         } else {
             foreach ($model->items as $item) {
-                $item->delete();
+                $item->forceDelete();
             }
             foreach ($tmp as $packageId => $info) {
                 $newPackage = $this->model->create($model->toArray());
@@ -732,7 +800,7 @@ class PackageController extends Controller
                 $this->eventLog($name, '拆分包裹', $to);
                 $newPackage->order->update(['status' => 'REVIEW']);
             }
-            $model->delete();
+            $model->forceDelete();
         }
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '包裹拆分成功.'));
@@ -923,7 +991,7 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->whereIn('status', ['WAITASSIGN', 'NEED'])
+            ->where('status', 'WAITASSIGN')
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {

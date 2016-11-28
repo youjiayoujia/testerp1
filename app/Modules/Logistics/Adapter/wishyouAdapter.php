@@ -238,7 +238,6 @@ Class WishyouAdapter extends BasicAdapter
 
 		    $buyer_state = $orderInfo->shipping_city ? $orderInfo->shipping_city : ',';//上传的省，默认是用城市名代替
 		    
-			$wishID = $orderInfo->transaction_number;   //交易编号
 		    //上传的省为空用逗号代替
 		    $buyer_state = $orderInfo->shipping_state ? $orderInfo->shipping_state :',';
 		     foreach($orderInfo->items  as $key => $item){

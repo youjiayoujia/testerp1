@@ -368,7 +368,7 @@ class OrderModel extends BaseModel
             'selectRelatedSearchs' => [
                 'channel' => ['name' => $arr],
                 'items' => ['item_status' => config('item.status')],
-                'remarks' => ['review_type' => config('order.review_type')],
+                'remarks' => ['type' => config('order.review_type')],
             ]
         ];
     }

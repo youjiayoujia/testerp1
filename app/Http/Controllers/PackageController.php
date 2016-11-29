@@ -363,7 +363,9 @@ class PackageController extends Controller
             })->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->count(),
-            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
+            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->get()->filter(function($single){
+                return $single->order ? ($single->order->status != 'REVIEW' ? true : false) : false;
+            })->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),

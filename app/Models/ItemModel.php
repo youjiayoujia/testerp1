@@ -497,6 +497,8 @@ class ItemModel extends BaseModel
                 $this->update([
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
                 ]);
+                $this->createPurchaseNeedData([$this->id]);
+
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -515,6 +517,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -532,6 +535,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -549,6 +553,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -570,6 +575,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;

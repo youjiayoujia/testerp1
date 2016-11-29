@@ -10,6 +10,7 @@
 namespace App\Models\Package;
 
 use App\Base\BaseModel;
+use Excel;
 
 class ExportModel extends BaseModel
 {
@@ -135,21 +136,12 @@ class ExportModel extends BaseModel
         !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
         $path = $path.'excelProcess.xls';
-        $fd = fopen($path, 'r');
-        $arr = [];
-        while(!feof($fd))
-        {
-            $row = fgetcsv($fd);
-            $arr[] = $row;
+        $data = Excel::load($path, function($reader){
+            return $reader->all()->toarray(); 
+        })->toarray();
+        foreach($data as $key => $value) {
+            $arr[$key] = $value['tracking_no'];
         }
-        fclose($fd);
-        if(!$arr[count($arr)-1]) {
-            unset($arr[count($arr)-1]);
-        }
-        foreach($arr as $key => $value) {
-            $arr[$key] = $value[0];
-        }
-        
         return $arr;
     }
 

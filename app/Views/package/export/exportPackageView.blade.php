@@ -56,7 +56,10 @@
 
         <div class="form-group col-lg-2">
             <label for="name" class='control-label'>根据挂号码导出</label>
+            <div class='input-group'>
             <input type='file' name='accordingTracking'>
+            <a href="javascript:" class='btn btn-info tracking_no'>模板</a>
+        </div>
         </div>
     </div>
 @stop
@@ -68,7 +71,11 @@ $(document).ready(function(){
     $('.status').select2();
     $('.logistics_id').select2();
     $('.begin_shipped_at').datetimepicker({theme:'dark'});
-    $('.over_shipped_at').datetimepicker({theme:'dark'})
+    $('.over_shipped_at').datetimepicker({theme:'dark'});
+
+    $('.tracking_no').click(function(){
+        location.href="{{ route('exportPackage.getTnoExcel')}}";
+    })
 })
 </script>
 @stop

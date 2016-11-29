@@ -200,99 +200,68 @@ class ExportPackageController extends Controller
     public function exportPackageDetail()
     {
         ini_set('memory_limit', '2G');
-        if(!request()->hasFile('accordingTracking')) {
-            $field = $this->model->find(request('field_id'));
-            $fieldItems = $field->items;
-            $arr = [];
-            foreach($fieldItems as $fieldItem) {
-                $arr[$fieldItem->level] = $fieldItem->name;
-            }
-            ksort($arr);
-            $packages = '';
-            if(request()->has('channel_id')) {
-                $packages = PackageModel::where('channel_id', request('channel_id'));
-            }
-            if(request()->has('warehouse_id')) {
-                $packages = $packages->where('warehouse_id', request('warehouse_id'));
-            }
-            if(request()->has('logistics_id')) {
-                $packages = $packages->where('logistics_id', request('logistics_id'));
-            }
-            if(request()->has('status')) {
-                $packages = $packages->where('status', request('status'));
-            }
-            if(request()->has('begin_shipped_at') && request()->has('over_shipped_at')) {
-                $packages = $packages->whereRaw('shipped_at >=  ? and shipped_at <= ?', [request('begin_shipped_at'), request('over_shipped_at')]);
-            }
-            $packages = $packages->get($arr);
-            if(!empty($packages)) {
-                $buf = config('exportPackage');
-                $extras = [];
-                foreach($field->extra as $extra) {
-                    $extras[$extra->fieldLevel]['name'] = $extra->fieldName;
-                    $extras[$extra->fieldLevel]['value'] = $extra->fieldValue;
-                }
-                ksort($extras);
-                $rows = $this->model->calArray($packages, $buf, $arr, $extras);
-                $name = 'export_packages';
-                Excel::create($name, function($excel) use ($rows){
-                    $excel->sheet('', function($sheet) use ($rows){
-                        $sheet->fromArray($rows);
-                    });
-                })->download('csv');
-            } else {
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '条件给的有问题信息有误'));
-            }
-        } else {
+        $field = $this->model->find(request('field_id'));
+        $fieldItems = $field->items;
+        $arr = [];
+        foreach($fieldItems as $fieldItem) {
+            $arr[$fieldItem->level] = $fieldItem->name;
+        }
+        ksort($arr);
+        $packages = '';
+        if(request()->has('channel_id')) {
+            $packages = PackageModel::where('channel_id', request('channel_id'));
+        }
+        if(request()->has('warehouse_id')) {
+            $packages = $packages->where('warehouse_id', request('warehouse_id'));
+        }
+        if(request()->has('logistics_id')) {
+            $packages = $packages->where('logistics_id', request('logistics_id'));
+        }
+        if(request()->has('status')) {
+            $packages = $packages->where('status', request('status'));
+        }
+        if(request()->has('begin_shipped_at') && request()->has('over_shipped_at')) {
+            $packages = $packages->whereRaw('shipped_at >=  ? and shipped_at <= ?', [request('begin_shipped_at'), request('over_shipped_at')]);
+        }
+        if(request()->hasFile('accordingTracking')) {
             $file = request()->file('accordingTracking');
-            $arr = $this->model->processGoods($file);
+            $buf = $this->model->processGoods($file);
             $packageStatus = config('package');
-            $errors = [];
-            $rows = [];
-            foreach($arr as $key => $tracking_no) {
-                $model = PackageModel::where('tracking_no', $tracking_no)->first();
-                if(!$model) {
-                    $model = PackageModel::where('logistics_order_number', $tracking_no)->first();
-                    if(!$model) {
-                       $errors[$key]['id'] = $tracking_no;
-                        $errors[$key]['remark'] = '对应包裹不存在';
-                        continue; 
-                    }
-                }
-                $rows[$key] = [
-                    '包裹Id' => $model->id,
-                    '渠道' => $model->channel ? $model->channel->name : '',
-                    '渠道账号' => $model->channelAccount ? $model->channelAccount->name : '',
-                    '订单号' => $model->order ? $model->order->ordernum : '',
-                    '仓库' => $model->warehouse ? $model->warehouse->name : '',
-                    '物流' => $model->logistics ? $model->logistics->code : '',
-                    '类型' => $model->type =='SINGLE' ? '单单' : ($model->type == 'MULTI' ? '多多' : '单多'),
-                    '物流成本' => $model->cost + $model->cost1,
-                    '重量' => $model->weight,
-                    '实际重量' => $model->actual_weight,
-                    '追踪号' => $model->tracking_no,
-                    '追踪链接' => $model->tracking_link,
-                    '是否标记' => $model->is_mark ? '是' : '否',
-                    'email' => $model->email,
-                    '发货名字' => $model->shipping_firstname . ' '. $model->shipping_lastname,
-                    '发货地址' => $model->shipping_address,
-                    '发货地址1' => $model->shipping_address1,
-                    '发货城市' => $model->shipping_city,
-                    '发货省/州' => $model->shipping_state,
-                    '发货国家' => $model->shipping_country,
-                    '发货邮编' => $model->shipping_zipcode,
-                    '发货电话' => $model->shipping_phone,
-                    '发货时间' => $model->shipped_at,
-                    'status' => $packageStatus[$model->status],
-                ];
+            $packages = PackageModel::whereIn('tracking_no', $buf)->orWhere(function($query) use ($buf){
+                $query = $query->whereIn('logistics_order_number', $buf);
+            });
+        }
+        $packages = $packages->get($arr);
+        if(!empty($packages)) {
+            $buf = config('exportPackage');
+            $extras = [];
+            foreach($field->extra as $extra) {
+                $extras[$extra->fieldLevel]['name'] = $extra->fieldName;
+                $extras[$extra->fieldLevel]['value'] = $extra->fieldValue;
             }
-            $name = 'export_packages_tracking';
+            ksort($extras);
+            $rows = $this->model->calArray($packages, $buf, $arr, $extras);
+            $name = 'export_packages';
             Excel::create($name, function($excel) use ($rows){
                 $excel->sheet('', function($sheet) use ($rows){
                     $sheet->fromArray($rows);
                 });
             })->download('csv');
+        } else {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '条件给的有问题信息有误'));
         }
-        
+    }
+
+    public function getTnoExcel()
+    {
+        $rows[] = [
+            'tracking_no' => '',
+        ];
+        $name = 'package_export';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
     }
 }

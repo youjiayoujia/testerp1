@@ -212,9 +212,9 @@ class ExportPackageController extends Controller
         $fieldItems = $field->items;
         $arr = [];
         foreach ($fieldItems as $fieldItem) {
-            $arr[$fieldItem->level] = $fieldItem->name;
+            $arr[$fieldItem->level]['name'] = $fieldItem->name;
+            $arr[$fieldItem->level]['type'] = 'database';
         }
-        ksort($arr);
         $packages = '';
         if (request()->has('channel_id')) {
             $packages = PackageModel::where('channel_id', request('channel_id'));
@@ -247,9 +247,11 @@ class ExportPackageController extends Controller
             foreach ($field->extra as $extra) {
                 $extras[$extra->fieldLevel]['name'] = $extra->fieldName;
                 $extras[$extra->fieldLevel]['value'] = $extra->fieldValue;
+                $extras[$extra->fieldLevel]['type'] = 'extra';
             }
-            ksort($extras);
-            $rows = $this->model->calArray($packages, $buf, $arr, $extras);
+            $fields = array_merge($arr, $extras);
+            ksort($fields);
+            $rows = $this->model->calArray($packages, $buf, $fields);
             $name = 'export_packages';
             Excel::create($name, function ($excel) use ($rows) {
                 $excel->sheet('', function ($sheet) use ($rows) {

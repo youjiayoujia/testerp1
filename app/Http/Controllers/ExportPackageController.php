@@ -231,7 +231,7 @@ class ExportPackageController extends Controller
                 $query = $query->whereIn('logistics_order_number', $buf);
             });
         }
-        $packages = $packages->get($arr);
+        $packages = $packages->get();
         if(!empty($packages)) {
             $buf = config('exportPackage');
             $extras = [];

@@ -69,7 +69,8 @@ class ItemModel extends BaseModel
         'cost',
         'package_weight',
         'competition_url',
-        'products_history_values'
+        'products_history_values',
+        'new_status'
     ];
 
     public function product()
@@ -363,6 +364,7 @@ class ItemModel extends BaseModel
             'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
             'filterSelects' => ['status' => config('item.status'),
+                                'new_status' => config('item.new_status'),
                                 'warehouse_id' =>$this->getArray('App\Models\WarehouseModel', 'name'),
                                ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
@@ -495,6 +497,8 @@ class ItemModel extends BaseModel
                 $this->update([
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
                 ]);
+                $this->createPurchaseNeedData([$this->id]);
+
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -513,6 +517,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -530,6 +535,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -547,6 +553,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -568,6 +575,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;

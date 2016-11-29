@@ -27,7 +27,7 @@
                 @endif
             </td>
             <td class='packageId' data-id="{{ $package->id }}">{{ $package->id }}</td>
-            <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+            <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}<br/>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
             <td>{{ $package->order ? $package->order->amount . $package->order->currency : '订单金额有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->shipping_firstname . $package->shipping_lastname }}</td>
@@ -35,7 +35,10 @@
             <td>
                 <button class="btn btn-{{ $package->status_color }} btn-xs">
                     {{ $package->status_name }}
-                </button>
+                </button><br/>
+                @if($package->order->status == 'REVIEW')
+                <small>订单待审核</small>
+                @endif
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
@@ -84,33 +87,34 @@
             <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
             <td colspan='6'>
-
-                <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
-                    <span class="glyphicon glyphicon-eye-open"></span>
-                </a>
-                @if(in_array($package->status, ['NEED', 'PROCESSING', 'ASSIGNED', 'TRACKINGFAILED']))
-                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
-                        <span class="glyphicon glyphicon-random"></span>
+                @if($package->order->status != 'REVIEW')
+                    <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
+                        <span class="glyphicon glyphicon-eye-open"></span>
                     </a>
+                    @if(in_array($package->status, ['NEED', 'PROCESSING', 'ASSIGNED', 'TRACKINGFAILED']))
+                        <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
+                            <span class="glyphicon glyphicon-random"></span>
+                        </a>
+                    @endif
+                    @if($package->status == 'ERROR')
+                        <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
+                            <span class="glyphicon glyphicon-check"></span>
+                        </a>
+                    @endif
+    {{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
+                        <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
+                            <span class="glyphicon glyphicon-refresh"></span>
+                        </a>
+                    {{--@endif--}}
+                    <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                    <button class="btn btn-primary btn-xs split"
+                            data-toggle="modal"
+                            data-target="#split" data-id="{{ $package->id }}" title='拆分包裹'>
+                        <span class="glyphicon glyphicon-tasks"></span>
+                    </button>
                 @endif
-                @if($package->status == 'ERROR')
-                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
-                        <span class="glyphicon glyphicon-check"></span>
-                    </a>
-                @endif
-{{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
-                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
-                        <span class="glyphicon glyphicon-refresh"></span>
-                    </a>
-                {{--@endif--}}
-                <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </a>
-                <button class="btn btn-primary btn-xs split"
-                        data-toggle="modal"
-                        data-target="#split" data-id="{{ $package->id }}" title='拆分包裹'>
-                    <span class="glyphicon glyphicon-tasks"></span>
-                </button>
                 @if($package->logistics_id != 0)
                     <a href="{{ route('preview', ['id'=>$package->id]) }}" target="_blank" class="btn btn-info btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 面单预览

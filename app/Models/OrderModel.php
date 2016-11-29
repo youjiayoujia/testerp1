@@ -42,6 +42,7 @@ class OrderModel extends BaseModel
         'by_id',
         'email',
         'status',
+        'is_review',
         'active',
         'order_is_alert',
         'amount',
@@ -347,7 +348,6 @@ class OrderModel extends BaseModel
                 'by_id',
                 'shipping_firstname',
                 'currency',
-                'profit_rate'
             ],
             'filterSelects' => [
                 'status' => config('order.status'),
@@ -355,19 +355,24 @@ class OrderModel extends BaseModel
                 'is_chinese' => config('order.is_chinese')
             ],
             'sectionSelect' => [
-                'price' => ['amount'],
-                'time' => ['created_at']
+                'price' => ['amount', 'profit', 'profit_rate'],
+                'time' => ['created_at'],
             ],
             'relatedSearchFields' => [
                 'country' => ['code'],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
-                'userService' => ['name']
+                'userService' => ['name'],
+                'packages' => ['tracking_no'],
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => $arr],
                 'items' => ['item_status' => config('item.status')],
-            ]
+                'remarks' => ['type' => config('order.review_type')],
+            ],
+            'doubleRelatedSearchFields' => [
+                'packages' => ['logistics' => ['code']],
+            ],
         ];
     }
 
@@ -759,23 +764,17 @@ class OrderModel extends BaseModel
     public function calculateOrderChannelFee()
     {
         $sum = 0;
-        $orderItems = $this->items;
-        $channel = $this->channel;
-        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
-        foreach ($orderItems as $orderItem) {
-            $buf = $orderItem->item->catalog->channels->where('id',
+        foreach ($this->items as $item) {
+            $channelRate = $item->item->catalog->channels->where('id',
                 $this->channelAccount->catalog_rates_channel_id)->first();
-            if ($buf) {
-                $buf = $buf->pivot;
-                $flat_rate_value = $buf->flat_rate;
-                $rate_value = $buf->rate;
-                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value / 100 + $flat_rate_value * $currency;
+            if ($channelRate) {
+                $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
             } else {
                 return 0;
             }
         }
 
-        return $sum;
+        return $sum * $this->rate;
     }
 
     //黑名单验证

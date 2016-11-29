@@ -105,7 +105,8 @@ class PackageModel extends BaseModel
                 'channelAccount' => ['account' => $arr1]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
-            'doubleRelatedSearchFields' => ['logistics' => ['catalog' => ['name']]],
+            'doubleRelatedSearchFields' => ['logistics' => ['catalog' => ['name']],
+                                            'items' => ['item' => ['sku']]],
         ];
     }
 
@@ -386,6 +387,10 @@ class PackageModel extends BaseModel
                 $color = 'info';
                 break;
         }
+        if($this->order->status == 'REVIEW') {
+            $color = 'danger';
+        }
+
         return $color;
     }
 
@@ -653,7 +658,7 @@ class PackageModel extends BaseModel
                                 $job = new AssignStocks($package);
                                 Queue::pushOn('assignStocks', $job);
                             }
-                            return true;
+                            return false;
                         } else {
                             foreach ($this->items as $item) {
                                 $require = [];
@@ -690,7 +695,7 @@ class PackageModel extends BaseModel
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
                             $this->order->update(['status' => 'NEED']);
-                            return true;
+                            return false;
                         }
                     } else {
                         foreach ($this->items as $item) {
@@ -728,7 +733,7 @@ class PackageModel extends BaseModel
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
                         $this->order->update(['status' => 'NEED']);
-                        return true;
+                        return false;
                     }
                 } else {
                     if (strtotime($this->created_at) < strtotime('-3 days')) {
@@ -736,7 +741,7 @@ class PackageModel extends BaseModel
                         if ($arr) {
                             $this->createChildPackage($arr);
                         }
-                        return true;
+                        return false;
                     }
                 }
             }
@@ -1599,6 +1604,10 @@ class PackageModel extends BaseModel
                     ]);
                 } else {
                     $item = $this->items->first();
+                    if(in_array($this->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $this->is_upload) {
+                        $this->is_mark = 0;
+                        $this->save();
+                    }
                     if (empty($item->warehouse_position_id)) {
                         $this->update([
                             'status' => 'NEED',
@@ -1764,7 +1773,12 @@ class PackageModel extends BaseModel
                         $error[] = $key;
                         continue;
                     }
-                    $this->find($content['package_id'])->update([
+                    $package = $this->find($content['package_id']);
+                    if(in_array($package->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $package->is_upload) {
+                        $package->is_mark = 0;
+                        $package->save();
+                    }
+                    $package->update([
                         'tracking_no' => $content['tracking_no'],
                         'logistics_id' => $content['logistics_id']
                     ]);

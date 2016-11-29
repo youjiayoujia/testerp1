@@ -49,6 +49,9 @@
                         ]<a></div>
             </td>
             <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
+                @foreach($item->product->logisticsLimit as $logistics)
+                    @if($logistics->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}" />@else{{$logistics->name}} @endif<br>
+                @endforeach
                 开发时间：{{ $item->created_at }}<br>
                 【包装方式：<br>
                 <?php if($item->product){ ?>
@@ -236,6 +239,9 @@
                 <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-user"></span>
                 </a>
+                <a data-toggle="modal" data-target="#add_to_new{{$item->id}}" title="转新品操作" class="btn btn-info btn-xs" id="add_to_new">
+                    <span class="glyphicon glyphicon-camera"></span>
+                </a>
                 <a data-toggle="modal" data-target="#question_{{$item->id}}" title="常见问题" class="btn btn-info btn-xs" id="ques">
                     <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
@@ -309,6 +315,45 @@
             </div>
         </form>
         <!-- 模态框转采购负责人结束（Modal） -->
+
+        <!-- 模态框（Modal）转新品操作 -->
+        <form action="/item/changeNewSku/{{$item->id}}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="add_to_new{{$item->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           转新品
+                        </h4>
+                     </div>
+                     <div class="modal-body">
+                         <div>当前状态:{{config('item.new_status')[$item->new_status]}}</div><br>
+                         <div>更改状态
+                            <select class='form-control' name="new_status" id="">
+                                <option value='1'>转新品</option>
+                                <option value='0'>取消转新品</option>
+                            </select>
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 模态框（Modal）转新品操作 -->
 
         <!-- 模态框（Modal）提问 -->
         <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">

@@ -10,6 +10,7 @@
 namespace App\Models\Package;
 
 use App\Base\BaseModel;
+use Excel;
 
 class ExportModel extends BaseModel
 {
@@ -135,21 +136,12 @@ class ExportModel extends BaseModel
         !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
         $path = $path.'excelProcess.xls';
-        $fd = fopen($path, 'r');
-        $arr = [];
-        while(!feof($fd))
-        {
-            $row = fgetcsv($fd);
-            $arr[] = $row;
+        $data = Excel::load($path, function($reader){
+            return $reader->all()->toarray(); 
+        })->toarray();
+        foreach($data as $key => $value) {
+            $arr[$key] = $value['tracking_no'];
         }
-        fclose($fd);
-        if(!$arr[count($arr)-1]) {
-            unset($arr[count($arr)-1]);
-        }
-        foreach($arr as $key => $value) {
-            $arr[$key] = $value[0];
-        }
-        
         return $arr;
     }
 
@@ -233,6 +225,60 @@ class ExportModel extends BaseModel
                         break;
                     case 'status':
                         $rows[$k][$buf['status']] = config('package')[$package->status];
+                        break;
+                    case 'id':
+                        $rows[$k][$buf['id']] = $package->id;
+                        break;
+                    case 'shipping_country':
+                        $rows[$k][$buf['shipping_country']] = $package->shipping_country;
+                        break;
+                    case 'shipping_cn_country':
+                        $rows[$k][$buf['shipping_cn_country']] = $package->country ? $package->country->cn_name : '';
+                        break;
+                    case 'shipping_enall_country':
+                        $rows[$k][$buf['shipping_enall_country']] = $package->country ? $package->country->name : '';
+                        break;
+                    case 'shipped_at':
+                        $rows[$k][$buf['shipped_at']] = $package->shipped_at;
+                        break;
+                    case 'shipping_type':
+                        $rows[$k][$buf['shipping_type']] = $package->logistics ? $package->logistics->type : '';
+                        break;
+                    case 'amount':
+                        $rows[$k][$buf['amount']] = $package->total_price;
+                        break;
+                    case 'buyer_id':
+                        $rows[$k][$buf['buyer_id']] = $package->order ? $package->order->by_id : '';
+                        break;
+                    case 'currency':
+                        $rows[$k][$buf['currency']] = $package->order ? $package->order->currency : '';
+                        break;
+                    case 'expected_logistics_fee':
+                        $rows[$k][$buf['expected_logistics_fee']] = $package->calculateLogisticsFee();
+                        break;
+                    case 'double_check':
+                        $rows[$k][$buf['double_check']] = $package->status == 'SHIPPED' ? '2' : '1';
+                        break;
+                    case 'sku_en':
+                        $rows[$k][$buf['sku_en']] = $package->getDeclaredInfo()['declared_en'];
+                        break;
+                    case 'sku_cn':
+                        $rows[$k][$buf['sku_cn']] = $package->getDeclaredInfo()['declared_cn'];
+                        break;
+                    case 'sku_quantity':
+                        $rows[$k][$buf['sku_quantity']] = $package->items()->count();
+                        break;
+                    case 'sku_cost':
+                        $rows[$k][$buf['sku_cost']] = $package->single_price;
+                        break;
+                    case 'sku_declared_value':
+                        $rows[$k][$buf['sku_declared_value']] = $package->getDeclaredInfo()['declared_value'];
+                        break;
+                    case 'sku_all_quantity':
+                        $rows[$k][$buf['sku_all_quantity']] = $package->items()->sum('quantity');
+                        break;
+                    case 'sku_and_quantity':
+                        $rows[$k][$buf['sku_and_quantity']] = $package->sku_info;
                         break;
                 }
             }

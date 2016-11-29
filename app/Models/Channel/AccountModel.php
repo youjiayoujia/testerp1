@@ -99,7 +99,7 @@ class AccountModel extends BaseModel
                 $status = ['Shipped', 'Unshipped', 'PartiallyShipped'];
                 break;
             case 'aliexpress':
-                $status = ['WAIT_SELLER_SEND_GOODS'];
+                $status = ['IN_CANCEL','WAIT_SELLER_SEND_GOODS'];
                 break;
             case 'lazada':
                 $status = ['pending'];

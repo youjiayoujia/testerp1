@@ -53,7 +53,7 @@ class smtProductSku extends BaseModel
                 'ipmSkuStock' => config('smt_product.skuStockStatus'),
             ],
             'sectionSelect' => [
-                'price' => ['skuPrice','profitRate'],
+                'price' => ['skuPrice'],
             ]
             
         ];

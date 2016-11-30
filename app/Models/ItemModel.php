@@ -779,7 +779,7 @@ class ItemModel extends BaseModel
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
                 ->where('order_items.quantity', '>=', 5)
                 ->where('order_items.item_id', $item['id'])
-                ->sum('order_items.id');
+                ->count('order_items.id');
             $thirtyDaySellNum += $pifaThirty;
 
 

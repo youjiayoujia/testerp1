@@ -723,7 +723,7 @@ class ItemModel extends BaseModel
             
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
+                orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
 
             $data['zaitu_num'] = $zaitu_num;
@@ -745,6 +745,14 @@ class ItemModel extends BaseModel
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
+            //7天批发订单销量
+            $pifaSeven = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $sevenDaySellNum += $pifaSeven;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -754,6 +762,14 @@ class ItemModel extends BaseModel
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
+            //14天批发订单销量
+            $pifaFourteen = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $fourteenDaySellNum += $pifaFourteen;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -763,6 +779,15 @@ class ItemModel extends BaseModel
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
+            //30天批发订单销量
+            $pifaThirty = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->sum('order_items.id');
+            $thirtyDaySellNum += $pifaThirty;
+
 
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
@@ -800,7 +825,12 @@ class ItemModel extends BaseModel
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
-            $data['need_purchase_num'] = ceil($needPurchaseNum);
+            if($item->status=='cleaning'){
+                $data['need_purchase_num'] = $data['need_total_num'];
+            }else{
+                $data['need_purchase_num'] = ceil($needPurchaseNum);
+            }
+            
             //退款订单数
             $refund_num = $item->orderItem->where('is_refund', '1')->count();
             $all_order_num = 0;

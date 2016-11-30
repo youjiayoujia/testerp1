@@ -909,7 +909,7 @@ class ItemModel extends BaseModel
             $data['need_percent'] = $data['fifteenday_total_order_num'] ? round ($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'] ,4):0;
             //缺货总数
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id')[0]->num;
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.deleted_at is null')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //平均缺货天数
             $data['avg_need_day'] = round(DB::select('select avg('.time().'-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 

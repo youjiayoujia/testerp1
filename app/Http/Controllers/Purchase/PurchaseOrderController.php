@@ -1007,7 +1007,8 @@ class PurchaseOrderController extends Controller
 
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+                orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //虚库存
             $xu_kucun = $itemModel->available_quantity-$data['need_total_num'];

@@ -920,10 +920,10 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * ajax请求  sku
+     * 批量修改采购单状态
      *
      * @param none
-     * @return obj
+     * @return 1
      * 
      */
     public function purchaseExmaine()
@@ -966,7 +966,7 @@ class PurchaseOrderController extends Controller
                     $this->model->find($id)->update(['close_status'=>1]);
 
                     foreach($this->model->find($id)->purchaseItem as $purchaseitemModel){
-                        $purchaseitemModel->update(['status'=>4]);
+                        //$purchaseitemModel->update(['status'=>4]);
                         $temp_arr[] = $purchaseitemModel->item_id;
                     }
 

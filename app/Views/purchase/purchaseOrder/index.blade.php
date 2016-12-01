@@ -36,7 +36,10 @@
                 {{$purchaseOrder->post_coding }}</br>
                 已打印次数:</br></br>
                 总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchasePostage->sum('postage')}}</br>
-                运单号:
+                运单号:<br>
+                @foreach($purchaseOrder->purchasePostage as $postage)
+                    {{$postage->post_coding}}</br>
+                @endforeach
             </td>
             <td> 
                 <div>{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>
@@ -118,7 +121,7 @@
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
-                    <th>{{ $sum_purchase_account}}+YF{{$purchaseOrder->total_postage}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->total_postage}}</th>
+                    <th>{{ $sum_purchase_account}}+YF{{$purchaseOrder->total_postage}}={{$sum_purchase_account+$purchaseOrder->total_postage}}</th>
                     <th>{{ $sum_purchase_storage_account}}</th>
                     <th id="warn_{{$purchaseOrder->id}}"></th>
                 </tr>
@@ -134,11 +137,16 @@
                 @endif</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
-                	<a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/1" title="审核" class="btn btn-info btn-xs">
+                	<a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/1" title="审核通过" class="btn btn-info btn-xs">
                          <span class="glyphicon glyphicon-ok-sign">审核通过</span>
                     </a>
                     <a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/3" title="审核不通过" class="btn btn-info btn-xs">
                          <span class="glyphicon glyphicon-ok-sign">审核不通过</span>
+                    </a>
+                @endif
+                @if($purchaseOrder->examineStatus==3)
+                    <a href="/purchaseOrder/changeExamineStatus/{{$purchaseOrder->id}}/0" title="撤销审核" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign">撤销审核</span>
                     </a>
                 @endif
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">
@@ -152,12 +160,6 @@
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
                     <a  href="javascript:"  title="待核销" class="btn btn-danger btn-xs daihexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen">待核销</span>
-                    </a>
-                @endif
-
-                @if($purchaseOrder->status ==1)
-                    <a  href="/purchaseOrder/printInWarehouseOrder/{{$purchaseOrder->id}}"  title="入库单" class="btn btn-danger btn-xs" data-url="">
-                         入库单
                     </a>
                 @endif
 
@@ -194,6 +196,12 @@
                    data-url="{{ route('purchaseOrder.destroy', ['id' => $purchaseOrder->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span>
                 </a>  -->
+                <br><br>
+                @if($purchaseOrder->status ==1||$purchaseOrder->status ==2||$purchaseOrder->status ==3)
+                    <a  href="/purchaseOrder/printInWarehouseOrder/{{$purchaseOrder->id}}"  title="入库单" class="btn btn-danger btn-xs" data-url="">
+                         入库单
+                    </a>
+                @endif
             </td>
         </tr>
         <!-- 模态框（Modal） -->

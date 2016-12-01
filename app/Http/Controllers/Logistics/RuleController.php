@@ -44,18 +44,37 @@ class RuleController extends Controller
      */
     public function create()
     {
+        $arr = explode('/', $_SERVER['HTTP_REFERER']);
+        $logistics_id = $arr[count($arr) - 1];
+        $logistics_name = LogisticsModel::where('id', $logistics_id)->first()->name;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logisticses' => LogisticsModel::where('is_enable', '1')->get(),
             'catalogs' => CatalogModel::all(),
             'countrySorts' => CountriesSortModel::all(),
             'channels' => ChannelModel::all(), 
             'logisticsLimits' => LimitsModel::all(),
             'accounts' => AccountModel::all(),
             'transports' => TransportModel::all(),
+            'logistics_id' => $logistics_id,
+            'logistics_name' => $logistics_name,
         ];
 
         return view($this->viewPath . 'create', $response);
+    }
+
+    /**
+     * 某个物流方式分配规则首页
+     */
+    public function one($id)
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model, $this->model->where('type_id', $id)),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'id' => $id,
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 
     /**

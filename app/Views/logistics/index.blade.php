@@ -11,10 +11,9 @@
     <th>驱动名</th>
     <th>对接方式</th>
     {{--<th class="sort" data-field="pool_quantity">号码池数量(未用/已用/总数)</th>--}}
-    <th>物流限制</th>
     <th>物流编码</th>
     <th>平邮or快递</th>
-    <th>是否启用</th>
+    <th class="sort" data-field="is_enable">是否启用</th>
     <th class="sort" data-field="is_confirm">面单是否确认</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -22,7 +21,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $logistics)
-        <tr>
+        <tr class="dark-{{ $logistics->enable_color }}">
             <td>{{ $logistics->id }}</td>
             <td>{{ $logistics->priority != 0 ? $logistics->priority : '' }}</td>
             <td>{{ $logistics->code }}</td>
@@ -34,7 +33,6 @@
             <td>{{ $logistics->driver }}</td>
             <td>{{ $logistics->docking == 'CODE' ? $logistics->docking_name . '(' . explode('/', $logistics->pool_quantity)[0] . ')' : $logistics->docking_name }}</td>
             {{--<td>{{ $logistics->pool_quantity }}</td>--}}
-            <td>{{ $logistics->limit($logistics->limit) }}</td>
             <td>{{ $logistics->logistics_code }}</td>
             <td>{{ $logistics->is_express == '1' ? '快递' : '平邮' }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
@@ -72,6 +70,9 @@
                 @endif
                 <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-usd"></span> 分区报价
+                </a>
+                <a href="{{ route('logisticsRule.one', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
+                    <span class="glyphicon glyphicon-usd"></span> 分配规则
                 </a>
                 <a class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"

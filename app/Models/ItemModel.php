@@ -69,7 +69,8 @@ class ItemModel extends BaseModel
         'cost',
         'package_weight',
         'competition_url',
-        'products_history_values'
+        'products_history_values',
+        'new_status'
     ];
 
     public function product()
@@ -212,9 +213,9 @@ class ItemModel extends BaseModel
     {
         $zaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+            if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
-                    if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                         $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }  
                 }
@@ -229,9 +230,9 @@ class ItemModel extends BaseModel
     {
         $szaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
+            if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
-                    if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                         $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                     }
                 }
@@ -248,7 +249,7 @@ class ItemModel extends BaseModel
         $stockCollection = $this->stocks->groupBy('warehouse_id');
         foreach($stockCollection as $colleciton){
             $data[$colleciton[0]->warehouse_id]['all_quantity'] = $colleciton->sum('all_quantity');
-            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity');
+            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity')-$this->warehouse_ouf_of_stock[$colleciton[0]->warehouse_id]['need'];
         }
         $warehouses = WarehouseModel::all();
         foreach($warehouses as $warehouse){
@@ -279,6 +280,7 @@ class ItemModel extends BaseModel
                 }
             }
         }
+
         $warehouses = WarehouseModel::all();
         foreach($warehouses as $warehouse){
             if(!array_key_exists($warehouse->id,$data)){
@@ -295,9 +297,29 @@ class ItemModel extends BaseModel
     {
         $item_id = $this->id;
         $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
-                packages.id = package_items.package_id')[0]->num;
+                packages.id = package_items.package_id and packages.deleted_at is null')[0]->num;
 
         return $num;
+    }
+
+    //分仓欠货数量
+    public function getWarehouseOutOfStockAttribute()
+    {
+        $item_id = $this->id;
+        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
+                packages.id = package_items.package_id group by packages.warehouse_id');
+        $data = [];
+
+        $warehouses = WarehouseModel::all();
+        foreach($warehouses as $warehouse){
+            $data[$warehouse->id]['need'] = 0; 
+        }
+
+        foreach ($num as $key => $value) {
+            $data[$value->warehouse_id]['need'] += $value->num;
+        }    
+
+        return $data;
     }
 
     //最近一次采购时间
@@ -342,7 +364,8 @@ class ItemModel extends BaseModel
             'relatedSearchFields' => ['supplier' => ['name'] ],
             'filterFields' => [],
             'filterSelects' => ['status' => config('item.status'),
-                                'warehouse' =>$this->getArray('App\Models\WarehouseModel', 'name'),
+                                'new_status' => config('item.new_status'),
+                                'warehouse_id' =>$this->getArray('App\Models\WarehouseModel', 'name'),
                                ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'sectionSelect' => [],
@@ -474,6 +497,8 @@ class ItemModel extends BaseModel
                 $this->update([
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
                 ]);
+                $this->createPurchaseNeedData([$this->id]);
+
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -492,6 +517,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -509,6 +535,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -526,6 +553,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -547,6 +575,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
+            $this->createPurchaseNeedData([$this->id]);
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -555,7 +584,7 @@ class ItemModel extends BaseModel
     //分配库存
     public function assignStock($quantity)
     {
-        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1;});
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1 && $query->warehouse->type == 'local';});
         if ($stocks->sum('available_quantity') >= $quantity) {
             $warehouseStocks = $stocks->groupBy('warehouse_id');
             //默认仓库
@@ -613,7 +642,7 @@ class ItemModel extends BaseModel
     public function matchStock($quantity)
     {
         $result = [];
-        $stocks = $this->stocks->sortByDesc('available_quantity');
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function($query){ return $query->warehouse->is_available == 1 && $query->warehouse->type == 'local';});
         if ($stocks->sum('available_quantity') >= $quantity) {
             //单仓库
             foreach ($stocks->groupBy('warehouse_id') as $warehouseID => $warehouseStocks) {
@@ -666,14 +695,12 @@ class ItemModel extends BaseModel
     public function createPurchaseNeedData($item_id_array=null)
     {
         ini_set('memory_limit', '2048M');
+        //$item_id_array=['39547'];
         if(!$item_id_array){
             $items = $this->all();
         }else{
             $items = $this->find($item_id_array);
         }
-        
-        //$crr = array('21372','21373','29644','30974','32076','42437','47534','54980','57370','57616','59186');
-        //$items = $this->find($crr);
         
         $requireModel = new RequireModel();
         foreach ($items as $item) {
@@ -682,19 +709,21 @@ class ItemModel extends BaseModel
             $data['c_name'] = $item->c_name;
             $zaitu_num = 0;
             foreach ($item->purchase as $purchaseItem) {
-                if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
+                if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
                     if($purchaseItem->purchaseOrder){
                         if (!$purchaseItem->purchaseOrder->write_off) {
-                            if($purchaseItem->purchaseOrder->status>0||$purchaseItem->purchaseOrder->status<4){
+                            if($purchaseItem->purchaseOrder->status>=0&&$purchaseItem->purchaseOrder->status<4){
                                 $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
                             } 
                         }
                     }
                 }
             }
+            //print_r($zaitu_num);exit;
+            
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
+                orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
 
             $data['zaitu_num'] = $zaitu_num;
@@ -716,6 +745,14 @@ class ItemModel extends BaseModel
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
+            //7天批发订单销量
+            $pifaSeven = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $sevenDaySellNum += $pifaSeven;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -725,6 +762,14 @@ class ItemModel extends BaseModel
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
+            //14天批发订单销量
+            $pifaFourteen = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $fourteenDaySellNum += $pifaFourteen;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -734,6 +779,15 @@ class ItemModel extends BaseModel
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
+            //30天批发订单销量
+            $pifaThirty = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $thirtyDaySellNum += $pifaThirty;
+
 
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
@@ -771,7 +825,12 @@ class ItemModel extends BaseModel
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
-            $data['need_purchase_num'] = ceil($needPurchaseNum);
+            if($item->status=='cleaning'){
+                $data['need_purchase_num'] = $data['need_total_num'];
+            }else{
+                $data['need_purchase_num'] = ceil($needPurchaseNum);
+            }
+            
             //退款订单数
             $refund_num = $item->orderItem->where('is_refund', '1')->count();
             $all_order_num = 0;
@@ -821,6 +880,9 @@ class ItemModel extends BaseModel
             } else {
                 PurchasesModel::create($data);
             }
+            if(count($item_id_array)==1){
+                return $data;
+            }   
         }
     }
 
@@ -847,7 +909,7 @@ class ItemModel extends BaseModel
             $data['need_percent'] = $data['fifteenday_total_order_num'] ? round ($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'] ,4):0;
             //缺货总数
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id')[0]->num;
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.deleted_at is null')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //平均缺货天数
             $data['avg_need_day'] = round(DB::select('select avg('.time().'-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
@@ -1050,7 +1112,7 @@ class ItemModel extends BaseModel
     {
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
-        $erp_products_data = DB::select('select distinct(products_sku),products_id,pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
+        $erp_products_data = DB::select('select distinct(products_sku),products_id,products_html_mod,pack_method,spu,products_warring_string,model,products_history_values,products_with_battery,products_with_adapter,products_with_fluid,products_with_powder,
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive

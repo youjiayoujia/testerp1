@@ -17,7 +17,8 @@ class LimitsModel extends BaseModel
     protected $table = 'logistics_limits';
 
     protected $fillable = [
-        'name'
+        'name',
+        'ico'
     ];
 
     public $searchFields = ['name' => '物流限制名称'];

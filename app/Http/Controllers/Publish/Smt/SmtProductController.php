@@ -1032,7 +1032,7 @@ class SmtProductController extends Controller
         if ($token_id){ //有账号信息
             $group_list = $this->getLocalProductGroupList($token_id);
             $option_str = '<option value="">=所有分组=</option>';
-            $option_str .= '<option value="none">未分组</option>';
+            //$option_str .= '<option value="none">未分组</option>';
             if (!empty($group_list)){
                 foreach($group_list as $id => $item){
                     $option_str .= '<option value="'.$item['group_id'].'">'.$item['group_name'].'</option>';
@@ -1106,6 +1106,7 @@ class SmtProductController extends Controller
         //获取帐号信息
         $account = AccountModel::find($token_id);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
+        
         foreach($product_statues_type as $type)
         {                           
             $result = $channel->getOnlineProduct($type,1,100,$groupId); 
@@ -1714,5 +1715,12 @@ class SmtProductController extends Controller
         }else{
             $this->ajax_return('没有符合条件的广告信息',false);
         }
+    }
+    
+    /**
+     * 根据广告ID获取详情描述图片、本地刊登时的详情信息字段的数据
+     * @param unknown $productId  产品ID
+     */
+    public function syncProductDataById($productId){        
     }
 }

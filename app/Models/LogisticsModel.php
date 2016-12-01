@@ -133,15 +133,35 @@ class LogisticsModel extends BaseModel
         $config['userPassword'] = $this->supplier->password;
         $config['key'] = $this->supplier->secret_key;
 
-        $config['returnCompany'] = $this->emailTemplate->unit;
-        $config['returnContact'] = $this->emailTemplate->sender;
-        $config['returnPhone'] = $this->emailTemplate->phone;
-        $config['returnAddress'] = $this->emailTemplate->address;
-        $config['returnZipcode'] = $this->emailTemplate->zipcode;
-        $config['returnCountry'] = $this->emailTemplate->country_code;
-        $config['returnProvince'] = $this->emailTemplate->province;
-        $config['returnCity'] = $this->emailTemplate->city;
+        if(!empty($this->emailTemplate)){
+            $config['returnCompany'] = $this->emailTemplate->unit;
+            $config['returnContact'] = $this->emailTemplate->sender;
+            $config['returnPhone'] = $this->emailTemplate->phone;
+            $config['returnAddress'] = $this->emailTemplate->address;
+            $config['returnZipcode'] = $this->emailTemplate->zipcode;
+            $config['returnCountry'] = $this->emailTemplate->country_code;
+            $config['returnProvince'] = $this->emailTemplate->province;
+            $config['returnCity'] = $this->emailTemplate->city;
+        }
+
         return $config;
+    }
+
+    //物流方式停用启用颜色
+    public function getEnableColorAttribute()
+    {
+        switch ($this->is_enable) {
+            case '0':
+                $color = 'danger';
+                break;
+            case '1':
+                $color = '';
+                break;
+            default:
+                $color = '';
+                break;
+        }
+        return $color;
     }
 
     public function getDockingNameAttribute()

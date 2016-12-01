@@ -159,6 +159,7 @@
     						</div>
     							<div class="col-sm-12">
     							<?php
+    							/*
     							$newaccont = array();
     							$newaccont = $token;
     							ksort($newaccont);    
@@ -167,7 +168,7 @@
     							    echo '<div class ="col-sm-3">';
     							    echo $key.':'.'<input type="checkbox"  name="account"  value="'.$new.'" >';
     							    echo '</div>';
-    							}
+    							}*/
     							?>
     
     						</div>

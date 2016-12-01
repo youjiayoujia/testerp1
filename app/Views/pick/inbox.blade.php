@@ -54,7 +54,7 @@
         <tbody>
         @foreach($packages as $k => $package)
             <table class='table table-bordered table-condensed'>
-                @foreach($package->items as $key => $packageitem)
+                @foreach($package->items()->withTrashed()->get() as $key => $packageitem)
                     <tr data-id="{{$package->id}}">
                         @if($key == '0')
                             <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1' name="{{ $k+1 }}" data-cname="{{ $packageitem->item->c_name}}">{{ $package->id }}</td>
@@ -141,6 +141,7 @@
                                 }
                                 return false;
                             }
+                            return false;
                         }
                     }
                 });

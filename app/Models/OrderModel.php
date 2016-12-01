@@ -369,6 +369,7 @@ class OrderModel extends BaseModel
                 'channel' => ['name' => $arr],
                 'items' => ['item_status' => config('item.status')],
                 'remarks' => ['type' => config('order.review_type')],
+                'packages' => ['is_mark' => config('order.is_mark')],
             ],
             'doubleRelatedSearchFields' => [
                 'packages' => ['logistics' => ['code']],

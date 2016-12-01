@@ -236,7 +236,7 @@ class MessageController extends Controller
         }
         if ($message->dontRequireReply(request()->user()->id)) {
             if ($this->workflow == 'keeping') {
-                return redirect(route('message.process1',['id'=>$id]))
+                return redirect(route('message.process',['id'=>$id]))
                     ->with('alert', $this->alert('success', '上条信息已标记稍后处理.'));
             }
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功.'));

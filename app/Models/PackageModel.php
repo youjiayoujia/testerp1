@@ -1227,7 +1227,12 @@ class PackageModel extends BaseModel
             if ($country) {
                 $code = $this->shipping_country;
             } else {
-                $code = CountriesChangeModel::where('country_from', $this->shipping_country)->first()->country_to;
+                $countryChange = CountriesChangeModel::where('country_from', $this->shipping_country)->first();
+                if ($countryChange) {
+                    $code = $countryChange->country_to;
+                } else {
+                    $code = '';
+                }
             }
             if ($zone->inZone($code)) {
                 if ($zone->type == 'first') {

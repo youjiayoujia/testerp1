@@ -627,19 +627,25 @@ class OrderModel extends BaseModel
         if (!in_array($this->status, $this->canPackageStatus)) {
             return false;
         }
-
+        var_dump('1111');
+        var_dump($this->active_items->count());
+        if($this->active_items->count() < 1) {
+            var_dump($this->items->toarray());
+        }
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
             $this->status = 'REVIEW';
             $this->save();
             return false;
         }
+        var_dump('2222');exit;
 
         return true;
     }
 
     public function createVirtualPackage()
     {
+        var_dump('123');
         $package = [];
         //channel
         $package['channel_id'] = $this->channel_id ? $this->channel_id : '';
@@ -658,6 +664,7 @@ class OrderModel extends BaseModel
         $package['shipping_zipcode'] = $this->shipping_zipcode ? $this->shipping_zipcode : '';
         $package['shipping_phone'] = $this->shipping_phone ? $this->shipping_phone : '';
         $package['status'] = 'NEW';
+        var_dump('46');
         $package = $this->packages()->create($package);
         if ($package) {
             foreach ($this->items->toArray() as $packageItem) {
@@ -669,8 +676,10 @@ class OrderModel extends BaseModel
                     $newPackageItem = $package->items()->create($packageItem);
                 }
             }
+            var_dump('4567');
             $package->update(['weight' => $package->total_weight]);
         }
+        var_dump($package->toarray());exit;
 
         return $package;
     }
@@ -681,6 +690,9 @@ class OrderModel extends BaseModel
      */
     public function createPackage()
     {
+        
+        var_dump($this->toarray());
+        var_dump($this->canPackage());exit;
         if ($this->canPackage()) {
             return $this->createVirtualPackage();
         }

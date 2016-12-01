@@ -191,7 +191,7 @@ class OrderController extends Controller
     {
         $startDate = request()->input('start_date');
         $endDate = request()->input('end_date');
-        $orders = $this->model->where('create_time', '<=', $endDate)->where('create_time', '>=', $startDate);
+        $orders = $this->model->where('created_at', '<=', $endDate)->where('created_at', '>=', $startDate);
         $data['totalAmount'] = '';
         $data['averageProfit'] = '';
         $data['totalPlatform'] = '';

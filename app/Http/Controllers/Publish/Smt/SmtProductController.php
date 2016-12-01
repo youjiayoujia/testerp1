@@ -1716,4 +1716,11 @@ class SmtProductController extends Controller
             $this->ajax_return('没有符合条件的广告信息',false);
         }
     }
+    
+    /**
+     * 根据广告ID获取详情描述图片、本地刊登时的详情信息字段的数据
+     * @param unknown $productId  产品ID
+     */
+    public function syncProductDataById($productId){        
+    }
 }

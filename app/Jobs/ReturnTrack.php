@@ -178,7 +178,9 @@ class ReturnTrack extends Job implements SelfHandling, ShouldQueue
                                     $remark = $result['info'];
 
                                 } else {
+                                    $is_success = false;
                                     $remark = '未知错误' . var_export($order_status, true);
+                                    $result = $order_status;
                                 }
                                 if ($is_success) {
                                     ItemModel::where('package_id', $package->id)->update(array(

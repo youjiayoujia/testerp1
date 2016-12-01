@@ -265,8 +265,6 @@ class SzPostXBAdapter extends BasicAdapter
         $postD['version']             = '2.0';*/
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
-        echo '<pre>';
-        print_r($result);
         if($result['responseItems']['response']['success'] == 'true'){
             return true;        
         }else{

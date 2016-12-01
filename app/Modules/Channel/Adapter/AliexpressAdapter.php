@@ -526,7 +526,8 @@ Class AliexpressAdapter implements AdapterInterface
     {
         $msgSourcesArr =array('message_center','order_msg');
         $method = 'api.queryMsgRelationList';
-        $filter = 'readStat';
+        $filter = 'readStat'; // 标签：未读
+        //$filter = 'dealStat';  // 标签：未处理
         $pageSize = 100; //每页个数
         $j = 0;
         $message_list = [];
@@ -552,7 +553,7 @@ Class AliexpressAdapter implements AdapterInterface
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
-                        $message_list[$j]['message_id'] = $item['channelId'];
+                        $message_list[$j]['message_id'] = $item['lastMessageId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
                         $message_list[$j]['to'] = '客服';

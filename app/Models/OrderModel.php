@@ -765,23 +765,17 @@ class OrderModel extends BaseModel
     public function calculateOrderChannelFee()
     {
         $sum = 0;
-        $orderItems = $this->items;
-        $channel = $this->channel;
-        $currency = CurrencyModel::where('code', 'RMB')->first()->rate;
-        foreach ($orderItems as $orderItem) {
-            $buf = $orderItem->item->catalog->channels->where('id',
+        foreach ($this->items as $item) {
+            $channelRate = $item->item->catalog->channels->where('id',
                 $this->channelAccount->catalog_rates_channel_id)->first();
-            if ($buf) {
-                $buf = $buf->pivot;
-                $flat_rate_value = $buf->flat_rate;
-                $rate_value = $buf->rate;
-                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value / 100 + $flat_rate_value * $currency;
+            if ($channelRate) {
+                $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
             } else {
                 return 0;
             }
         }
 
-        return $sum;
+        return $sum * $this->rate;
     }
 
     //黑名单验证

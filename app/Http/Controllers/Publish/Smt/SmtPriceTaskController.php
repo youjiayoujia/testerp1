@@ -182,43 +182,43 @@ class SmtPriceTaskController extends Controller
                     }
                     
                     $rs['aeopAeProductSKUs'] = $aeopAeProductSKUs;                    
-                    $arr = array();
-                    $arr['productId']              = $rs['productId']; 
-                    $arr['subject']                = $rs['subject'];
-                    $arr['categoryId']             = $rs['categoryId'];
-                    $arr['detail']                 = $rs['detail']; 
-                    $arr['deliveryTime']           = $rs['deliveryTime'];     
-                    $arr['productPrice']           = $rs['productPrice']; 
-                    $arr['freightTemplateId']      = $rs['freightTemplateId']; 
-                    $arr['isImageDynamic']         = $rs['isImageDynamic'] == 1 ? 'true' : 'false';
-                    $arr['imageURLs']              = $rs['imageURLs']; 
-                    $arr['productUnit']            = $rs['productUnit']; 
-                    $arr['packageType']            = $rs['packageType'] ? 'true' : 'false'; //*
-                    if($arr['packageType']){                    
-                        $arr['lotNum']   = $rs['lotNum'];
+                    $post_arr = array();
+                    $post_arr['productId']              = $rs['productId']; 
+                    $post_arr['subject']                = $rs['subject'];
+                    $post_arr['categoryId']             = $rs['categoryId'];
+                    $post_arr['detail']                 = $rs['detail']; 
+                    $post_arr['deliveryTime']           = $rs['deliveryTime'];     
+                    $post_arr['productPrice']           = $rs['productPrice']; 
+                    $post_arr['freightTemplateId']      = $rs['freightTemplateId']; 
+                    $post_arr['isImageDynamic']         = $rs['isImageDynamic'] == 1 ? 'true' : 'false';
+                    $post_arr['imageURLs']              = $rs['imageURLs']; 
+                    $post_arr['productUnit']            = $rs['productUnit']; 
+                    $post_arr['packageType']            = $rs['packageType'] ? 'true' : 'false'; //*
+                    if($post_arr['packageType']){                    
+                        $post_arr['lotNum']   = $rs['lotNum'];
                     }
-                    $arr['packageLength']          = $rs['packageLength'];
-                    $arr['packageWidth']           = $rs['packageWidth']; 
-                    $arr['packageHeight']          = $rs['packageHeight']; 
-                    $arr['grossWeight']            = $rs['grossWeight'];
-                    $arr['wsValidNum']             = $rs['wsValidNum'];
-                    $arr['isPackSell']             = $rs['isPackSell'];//新增的必要参数
-                    $arr['reduceStrategy']        = $rs['reduceStrategy'];
-                    $arr['currencyCode']           = $rs['currencyCode'];
-                    $arr['aeopAeProductSKUs']      = json_encode( $rs['aeopAeProductSKUs']); 
-                    $arr['aeopAeProductPropertys'] = json_encode($rs['aeopAeProductPropertys']);                                     
+                    $post_arr['packageLength']          = $rs['packageLength'];
+                    $post_arr['packageWidth']           = $rs['packageWidth']; 
+                    $post_arr['packageHeight']          = $rs['packageHeight']; 
+                    $post_arr['grossWeight']            = $rs['grossWeight'];
+                    $post_arr['wsValidNum']             = $rs['wsValidNum'];
+                    $post_arr['isPackSell']             = $rs['isPackSell'];//新增的必要参数
+                    $post_arr['reduceStrategy']        = $rs['reduceStrategy'];
+                    $post_arr['currencyCode']           = $rs['currencyCode'];
+                    $post_arr['aeopAeProductSKUs']      = json_encode( $rs['aeopAeProductSKUs']); 
+                    $post_arr['aeopAeProductPropertys'] = json_encode($rs['aeopAeProductPropertys']);                                     
                     
-                    $product_json = $smtApi->getJsonDataUsePostMethod( "api.editAeProduct", $arr);
+                    $product_json = $smtApi->getJsonDataUsePostMethod( "api.editAeProduct", $post_arr);
                     $res = json_decode($product_json,true);
-                    if(isset($res['success'])){
-                        $update= array();
+                    $update= array();
+                    if(isset($res['success'])){                        
                         $update['status'] = 2;
                         $update['shipment_id'] = $newSkuPrice['shipment_id'];
                         $update['re_pirce']  = $newSkuPrice['price'];
                         $update['api_time'] = date('Y-m-d H:i:s',time());
                         $this->smt_price_task_model->where('id',$task['id'])->update($update);
-                    }else{
-                        $update= array();                        
+                        unset($update);
+                    }else{                                 
                         $update['status'] = 3;
                         $update['shipment_id'] = $newSkuPrice['shipment_id'];
                         $update['re_pirce']  = $newSkuPrice['price'];
@@ -226,12 +226,14 @@ class SmtPriceTaskController extends Controller
                         $updater['remark'] = '未知错误';
                         if(isset($updateresult['error_message']))
                         {
-                            $arr['remark'] = $res['error_message'];
+                            $update['remark'] = $res['error_message'];
                         }
                         $this->smt_price_task_model->where('id',$task['id'])->update($update);
+                        unset($update);
                     }                                      
                 }                             
             }
+            $arr = array();
             $arr['status'] =2;
             $this->model->where('id',$id)->update($arr);
         }

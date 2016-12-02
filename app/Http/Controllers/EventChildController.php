@@ -62,7 +62,7 @@ class EventChildController extends Controller
         }
         $models = $category->child()->where('type_id', $id)->get()->sortByDesc('when');
         $html = '';
-        foreach($models as $model) {
+        foreach($models as $key => $model) {
             $to = json_decode($model->to_arr);
             if($to) {
                 $to = $this->stdClass_to_array($to);
@@ -73,8 +73,10 @@ class EventChildController extends Controller
             }
             if(!$from) {
                 $html .= "<div class='panel panel-default'>
-                        <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
-                        <div class='panel-body' style='display:none'><div class='col-lg-12'>";
+                        <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "
+                    <a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample".$key."' aria-expanded='false' aria-controls='collapseExample'>数据详情</a>
+                        </div>
+                        <div class='panel-body collapse' id='collapseExample".$key."'><div class='col-lg-12'>";
                 foreach($to as $key => $value) {
                     $html .= "<div class='row'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                     if(is_array($value)) {
@@ -108,8 +110,8 @@ class EventChildController extends Controller
                 continue;     
             }
             $html .= "<div class='panel panel-default'>
-                        <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
-                        <div class='panel-body'><div class='col-lg-12'>";
+                        <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "<a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample".$key."' aria-expanded='false' aria-controls='collapseExample'>数据详情</a></div>
+                        <div class='panel-body collapse'  id='collapseExample".$key."'><div class='col-lg-12'>";
             $flag = 1;
             $this->calcTwoArr($from,$to);
             foreach($from as $key => $value) {

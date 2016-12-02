@@ -653,7 +653,24 @@ class TestController extends Controller
     }
     public function jdtestCrm()
     {
+        foreach (AccountModel::all() as $account) {
+            if ($account->account == 'Coolcoola04@126.com') { //测试diver
 
+                //$reply = ReplyModel::find(13);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $data = $channel->getMessages();
+                dd(json_decode($data,true));
+                exit;
+                $messageList = $channel->getMessages();
+                print_r($messageList);
+                exit;
+            }
+        }
+
+
+
+        dd('exit');
         $groups = SupplierModel::all()->groupBy('company');
 
         foreach ($groups as $group_key => $group){

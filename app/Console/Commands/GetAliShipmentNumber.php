@@ -60,6 +60,20 @@ class GetAliShipmentNumber extends Command
                     $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
                     $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
 
+                    /**
+                     * step1: 填写阿里订单信息
+                     */
+                    //订单价格
+                    if(empty($purchase_order->alibaba_price) && !empty($order_detail['orderModel']['sumPayment'])){
+                        $purchase_order->alibaba_price = $order_detail['orderModel']['sumPayment'];
+                    }
+
+                    //订单状态
+                    $purchase_order->alibaba_price = !empty($order_detail['orderModel']['status']) ? $order_detail['orderModel']['status'] : null;
+                    
+                    /**
+                     * step2: 获取物流单号
+                     */
                     if(!empty($order_detail['orderModel']['logisticsOrderList'])){
                         foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
                             if(!empty($item_logistics['logisticsBillNo'])) {
@@ -85,6 +99,8 @@ class GetAliShipmentNumber extends Command
                         }
                     }
                 }
+            $purchase_order->save();
+
         }
         $this->info('finish.');
     }

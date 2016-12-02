@@ -151,6 +151,7 @@ return [
         'channel_name' => '渠道名称',
         'account.account' => '渠道帐号',
         'is_chinese' => '竞拍状态',
+        'packages.is_mark' => '是否标记',
         'remarks.type' => '审核类型',
         'packages.logistics.code' => '物流方式简码',
         'packages.tracking_no' => '追踪号',

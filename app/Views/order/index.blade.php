@@ -124,6 +124,8 @@
                                         ebay站点: {{ $order->shipping_country }}
                                     @endif
                                 @endif
+                                <br>
+                                {{ $orderItem->orders_item_number }}
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             {{--@if($orderItem->item)--}}

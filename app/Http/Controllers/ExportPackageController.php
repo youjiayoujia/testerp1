@@ -54,7 +54,8 @@ class ExportPackageController extends Controller
         $fieldNames = request('fieldNames');
         foreach ($fieldNames as $fieldName) {
             $level = request($fieldName . ',level') ? request($fieldName . ',level') : 'Z';
-            $model->items()->create(['name' => $fieldName, 'level' => $level]);
+            $defaultName = request($fieldName . ',name');
+            $model->items()->create(['name' => $fieldName, 'level' => $level, 'defaultName' => $defaultName]);
         }
         if (request()->has('arr')) {
             $arr = request('arr');
@@ -63,7 +64,7 @@ class ExportPackageController extends Controller
                     $model->extra()->create([
                         'fieldName' => $arr['fieldName'][$key],
                         'fieldValue' => $arr['fieldValue'][$key],
-                        'fieldLevel' => $arr['fieldLevel'][$key]
+                        'fieldLevel' => $arr['fieldLevel'][$key],
                     ]);
                 }
             }
@@ -149,7 +150,8 @@ class ExportPackageController extends Controller
             foreach ($items as $key => $value) {
                 if (array_key_exists($key, $arr_items)) {
                     $level = request($arr_items[$key] . ",level") ? request($arr_items[$key] . ",level") : 'z';
-                    $value->update(['name' => $arr_items[$key], 'level' => $level]);
+                    $defaultName = request($arr_items[$key] . ",name");
+                    $value->update(['name' => $arr_items[$key], 'level' => $level, 'defaultName' => $defaultName]);
                 } else {
                     $value->delete();
                 }
@@ -157,11 +159,13 @@ class ExportPackageController extends Controller
         } else {
             foreach ($items as $key => $value) {
                 $level = request($arr_items[$key] . ",level") ? request($arr_items[$key] . ",level") : 'z';
-                $value->update(['name' => $arr_items[$key], 'level' => $level]);
+                $defaultName = request($arr_items[$key] . ",name");
+                $value->update(['name' => $arr_items[$key], 'level' => $level, 'defaultName' => $defaultName]);
             }
             for ($i = $items->count(); $i < count($arr_items); $i++) {
                 $level = request($arr_items[$i] . ",level") ? request($arr_items[$i] . ",level") : 'z';
-                $model->items()->create(['name' => $arr_items[$i], 'level' => $level]);
+                $defaultName = request($arr_items[$key] . ",name");
+                $model->items()->create(['name' => $arr_items[$i], 'level' => $level, 'defaultName' => $defaultName]);
             }
         }
         $extras = $model->extra;
@@ -213,6 +217,7 @@ class ExportPackageController extends Controller
         $arr = [];
         foreach ($fieldItems as $fieldItem) {
             $arr[$fieldItem->level]['name'] = $fieldItem->name;
+            $arr[$fieldItem->level]['defaultName'] = $fieldItem->defaultName;
             $arr[$fieldItem->level]['type'] = 'database';
         }
         $packages = '';
@@ -234,14 +239,26 @@ class ExportPackageController extends Controller
         }
         if (request()->hasFile('accordingTracking')) {
             $file = request()->file('accordingTracking');
-            $buf = $this->model->processGoods($file);
+            $buf = $this->model->processGoods($file, 'tracking_no');
+            if(!$buf) {
+                return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '请查看excel表格是否有问题'));
+            }
             $packageStatus = config('package');
             $packages = PackageModel::whereIn('tracking_no', $buf)->orWhere(function ($query) use ($buf) {
                 $query = $query->whereIn('logistics_order_number', $buf);
             });
         }
+        if (request()->hasFile('accordingPackageId')) {
+            $file = request()->file('accordingPackageId');
+            $buf = $this->model->processGoods($file, 'package_id');
+            if(!$buf) {
+                return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '请查看excel表格是否有问题'));
+            }
+            $packageStatus = config('package');
+            $packages = PackageModel::whereIn('id', $buf);
+        }
         $packages = $packages->get();
-        if (!empty($packages)) {
+        if ($packages->count()) {
             $buf = config('exportPackage');
             $extras = [];
             foreach ($field->extra as $extra) {
@@ -253,13 +270,16 @@ class ExportPackageController extends Controller
             ksort($fields);
             $rows = $this->model->calArray($packages, $buf, $fields);
             $name = 'export_packages';
+            if(!$rows) {
+                return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '导出信息有误，请查看模板是否有问题'));
+            }
             Excel::create($name, function ($excel) use ($rows) {
                 $excel->sheet('', function ($sheet) use ($rows) {
                     $sheet->fromArray($rows);
                 });
             })->download('csv');
         } else {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '条件给的有问题信息有误'));
+            return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '根据条件找不到包裹信息'));
         }
     }
 
@@ -267,6 +287,19 @@ class ExportPackageController extends Controller
     {
         $rows[] = [
             'tracking_no' => '',
+        ];
+        $name = 'package_export';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    public function getTnoExcelById()
+    {
+        $rows[] = [
+            'package_id' => '',
         ];
         $name = 'package_export';
         Excel::create($name, function ($excel) use ($rows) {

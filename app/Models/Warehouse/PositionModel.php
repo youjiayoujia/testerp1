@@ -36,6 +36,20 @@ class PositionModel extends BaseModel
             ]
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'warehouse_id' => $this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
+            ],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+            'doubleRelatedSearchFields' => [],
+        ];
+    }
+
     //查询
     public $searchFields = ['name' => '库位名'];
     

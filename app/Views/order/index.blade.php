@@ -467,7 +467,6 @@
                             <div class='row'>
                                 <div class="form-group col-lg-4">
                                     <label for="ordernum" class='control-label'>订单号</label>
-                                    <label class="text-danger">(已付款时长: {{ '' }} 天)</label>
                                     <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') ? old('ordernum') : $order->ordernum }}" readonly>
                                 </div>
                                 <div class="form-group col-lg-2">
@@ -602,7 +601,6 @@
                                 <div class="form-group col-lg-12">
                                     <label for="image">上传截图：</label>
                                     <label class="text-danger">(图片最大支持上传40Kb)</label>
-                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <input name='image' type='file'/>
                                 </div>
                             </div>

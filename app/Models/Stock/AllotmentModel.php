@@ -21,6 +21,20 @@ class AllotmentModel extends BaseModel
      */
     public $fillable = ['allotment_id', 'out_warehouse_id', 'in_warehouse_id', 'remark', 'allotment_by', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'check_status' => ['0' => '未审核', '1' => '未通过', '2' => '已通过'],
+            ],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+            'doubleRelatedSearchFields' => [],
+        ];
+    }
+
     /**
      * search field 
      *

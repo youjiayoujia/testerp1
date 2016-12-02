@@ -24,6 +24,20 @@ class AdjustmentModel extends BaseModel
     // 用于查询
     public $searchFields = ['adjust_form_id' => '调整单号'];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'status' => ['0' => '未审核', '1' => '未通过', '2' => '已通过'],
+            ],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+            'doubleRelatedSearchFields' => [],
+        ];
+    }
+
     /**
      * get the relationship between the two module 
      *

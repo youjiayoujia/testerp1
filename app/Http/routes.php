@@ -44,6 +44,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('countriesSort', 'CountriesSortController');
 
     //国家转换
+    Route::get('ajaxCountryTo',
+        ['uses' => 'CountriesChangeController@ajaxCountryTo', 'as' => 'ajaxCountryTo']);
     Route::resource('countriesChange', 'CountriesChangeController');
 
     Route::get('eventChild/getInfo', ['uses' => 'EventChildController@getInfo', 'as' => 'eventChild.getInfo']);
@@ -425,6 +427,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('item/changePurchaseAdmin/{id}',
         ['uses' => 'ItemController@changePurchaseAdmin', 'as' => 'changePurchaseAdmin']);
     Route::any('item/question/{id}', ['uses' => 'ItemController@question', 'as' => 'item.question']);
+    
+    Route::any('item/changeNewSku/{id}', ['uses' => 'ItemController@changeNewSku', 'as' => 'item.changeNewSku']);
+
     Route::any('item/addSupplier/{id}', ['uses' => 'ItemController@addSupplier', 'as' => 'item.addSupplier']);
     Route::any('item/questionStatus', ['uses' => 'ItemController@questionStatus', 'as' => 'item.questionStatus']);
     Route::any('item/extraQuestion', ['uses' => 'ItemController@extraQuestion', 'as' => 'item.extraQuestion']);
@@ -503,7 +508,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
     Route::get('logistics/ajaxLogistics',
         ['uses' => 'Logistics\TemplateController@ajaxLogistics', 'as' => 'logistics.ajaxLogistics']);
-    Route::get('template/preview',
+    Route::any('template/preview',
         ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
     Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);
@@ -665,6 +670,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'AllReportController@packageReport', 'as' => 'allReport.report']);
     Route::resource('allReport', 'AllReportController');
     //包裹导出
+    Route::get('exportPackage/getTnoExcel',
+        ['uses' => 'ExportPackageController@getTnoExcel', 'as' => 'exportPackage.getTnoExcel']);
+    Route::get('exportPackage/extraField',
+        ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
     Route::get('exportPackage/extraField',
         ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
     Route::post('exportPackage/exportPackageDetail',
@@ -674,8 +683,14 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/multiPlace/{arr}',
+        ['uses' => 'PackageController@multiPlace', 'as' => 'package.multiPlace']);
     Route::get('package/downloadLogisticsTno',
         ['uses' => 'PackageController@downloadLogisticsTno', 'as' => 'package.downloadLogisticsTno']);
+    Route::get('package/getAllInfo',
+        ['uses' => 'PackageController@getAllInfo', 'as' => 'package.getAllInfo']);
+    Route::get('package/showAllView',
+        ['uses' => 'PackageController@showAllView', 'as' => 'package.showAllView']);
     Route::get('package/errorToShipped',
         ['uses' => 'PackageController@errorToShipped', 'as' => 'package.errorToShipped']);
     Route::get('package/exportInfo',

@@ -206,7 +206,7 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'packages' => ($status != 'all' ? $model->package->where('status', $status) : $model->package),
+            'packages' => ($status != 'all' ? $model->package()->where('status', $status)->withTrashed()->get() : $model->package()->withTrashed()->get()),
         ];
 
         return view($this->viewPath.'printPackages', $response);
@@ -380,7 +380,7 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__,'包装'),
             'model' => $model,
             'pickListItems' => $model->pickListItem,
-            'packages' => $model->package,
+            'packages' => $model->package()->withTrashed()->get(),
             'logistics' => LogisticsModel::all(),
         ];
         if($model->type == 'MULTI')
@@ -480,12 +480,12 @@ class PickListController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $sum = 0;
-        foreach($picklist->package as $package)
+        foreach($picklist->package()->withTrashed()->get() as $package)
         {
             if(!in_array($package->status, ['PACKED', 'SHIPPED'])) {
                 $package->status = 'ERROR';
                 $package->save();
-                foreach($package->items as $packageItem) {
+                foreach($package->items()->withTrashed()->get() as $packageItem) {
                     $sum += $packageItem->quantity - $packageItem->picked_quantity;
                     $errorLists = ErrorListModel::where('item_id', $packageItem->item_id)->get();
                     if($errorLists->count()) {

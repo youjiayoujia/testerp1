@@ -29,21 +29,39 @@
                 </thead>
                 <tbody class='old'>
                 @foreach($packages as $package)
-                    @foreach($package->items as $key => $packageitem)
-                        <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
-                            @if($key == '0')
-                            <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
-                            <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
-                            @endif
-                            <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
-                            <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>
-                            <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
-                            <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
-                            @if($key == '0')
-                            <td class='status col-lg-1' rowspan="{{$package->items()->count()}}">{{ $package->status ? $package->status_name : '' }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
+                    @if(empty($package->deleted_at))
+                        @foreach($package->items()->get() as $key => $packageitem)
+                            <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
+                                @if($key == '0')
+                                <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                                @endif
+                                <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
+                                <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>
+                                <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
+                                <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
+                                @if($key == '0')
+                                <td class='status col-lg-1' rowspan="{{$package->items()->count()}}">{{ $package->status ? $package->status_name : '' }}</td>
+                                @endif
+                            </tr>
+                        @endforeach
+                    @else
+                        @foreach($package->items()->withTrashed()->get() as $key => $packageitem)
+                            <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
+                                @if($key == '0')
+                                <td rowspan="{{$package->items()->withTrashed()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                <td rowspan="{{$package->items()->withTrashed()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                                @endif
+                                <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
+                                <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>
+                                <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
+                                <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
+                                @if($key == '0')
+                                <td class='status col-lg-1' rowspan="{{$package->items()->withTrashed()->count()}}">已取消</td>
+                                @endif
+                            </tr>
+                        @endforeach
+                    @endif
                 @endforeach
                 </tbody>
             </table>

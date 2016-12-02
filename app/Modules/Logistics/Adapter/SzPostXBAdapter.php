@@ -207,8 +207,6 @@ class SzPostXBAdapter extends BasicAdapter
         
         
         
-        
-        
        /* $str .="<logisticsEventsRequest><logisticsEvent>
 <eventHeader>
 <eventType>LOGISTICS_BATCH_SEND</eventType>

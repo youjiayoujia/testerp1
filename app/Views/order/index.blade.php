@@ -48,13 +48,12 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
+                <div>{{ round($order->profit_rate,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
                 <div>
-                    毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->logistics_fee) * $rmbRate - $order->calculateOrderChannelFee()) }}
-                    USD
+                    毛利润: {{ $order->profit }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
@@ -125,16 +124,18 @@
                                         ebay站点: {{ $order->shipping_country }}
                                     @endif
                                 @endif
+                                <br>
+                                {{ $orderItem->orders_item_number }}
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             {{--@if($orderItem->item)--}}
-                                {{--<div class="col-lg-2">--}}
-                                    {{--<img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">--}}
-                                {{--</div>--}}
+                            {{--<div class="col-lg-2">--}}
+                            {{--<img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">--}}
+                            {{--</div>--}}
                             {{--@else--}}
-                                {{--<div class="col-lg-2">--}}
-                                    {{--<img src="{{ asset('default.jpg') }}" width="50px">--}}
-                                {{--</div>--}}
+                            {{--<div class="col-lg-2">--}}
+                            {{--<img src="{{ asset('default.jpg') }}" width="50px">--}}
+                            {{--</div>--}}
                             {{--@endif--}}
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
@@ -234,8 +235,11 @@
                                 <div class="col-lg-2">
                                     <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>包裹状态</strong> : {{ $package->status_name }}
+                                </div>
+                                <div class="col-lg-1">
+                                    <strong>是否标记</strong> : {{ $package->is_mark == '1' ? '是' : '否' }}
                                 </div>
                                 <div class="col-lg-1">
                                     <button class="btn btn-primary btn-xs split"
@@ -255,7 +259,9 @@
                                                             <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
                                                         </div>
                                                         <div class='col-lg-1'>
-                                                            <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
+                                                            <button type='button' class='btn btn-primary confirm_quantity' name=''>
+                                                                确认
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <div class='split_package'></div>
@@ -304,13 +310,13 @@
                             <span class="glyphicon glyphicon-link"></span> 撤单
                         </button>
                     @endif
-                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
-                        <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                           data-id="{{ $order->id }}"
-                           data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
-                            <span class="glyphicon glyphicon-pencil"></span> 删除
-                        </a>
-                    @endif
+                    {{--@if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')--}}
+                        {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
+                           {{--data-id="{{ $order->id }}"--}}
+                           {{--data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">--}}
+                            {{--<span class="glyphicon glyphicon-pencil"></span> 删除--}}
+                        {{--</a>--}}
+                    {{--@endif--}}
                     @foreach($order->items as $item)
                         @if($item->is_refund == 0)
                             <button class="btn btn-primary btn-xs"
@@ -876,22 +882,22 @@
 @stop
 @stop
 @section('tableToolButtons')
-    <div class="btn-group" role="group">
-        <input class="form-control lr" id="lr" placeholder="利润" name="lr">
-    </div>
-    <div class="btn-group" role="group">
-        <select class="form-control sx" name="sx" id="sx">
-            <option value="null">利润筛选</option>
-            <option value="high">高于</option>
-            <option value="low">低于</option>
-        </select>
-    </div>
-    <div class="btn-group" role="group">
-        <select class="form-control special" name="special" id="special">
-            <option value="null">特殊要求</option>
-            <option value="yes">有特殊要求</option>
-        </select>
-    </div>
+    {{--<div class="btn-group" role="group">--}}
+        {{--<input class="form-control lr" id="lr" placeholder="利润" name="lr">--}}
+    {{--</div>--}}
+    {{--<div class="btn-group" role="group">--}}
+        {{--<select class="form-control sx" name="sx" id="sx">--}}
+            {{--<option value="null">利润筛选</option>--}}
+            {{--<option value="high">高于</option>--}}
+            {{--<option value="low">低于</option>--}}
+        {{--</select>--}}
+    {{--</div>--}}
+    {{--<div class="btn-group" role="group">--}}
+        {{--<select class="form-control special" name="special" id="special">--}}
+            {{--<option value="null">特殊要求</option>--}}
+            {{--<option value="yes">有特殊要求</option>--}}
+        {{--</select>--}}
+    {{--</div>--}}
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             展示类型
@@ -1181,16 +1187,16 @@
                 var ids = "";
 
                 for (var i = 0; i < checkbox.length; i++) {
-                    if(!checkbox[i].checked)continue;
-                    ids += checkbox[i].value+",";
+                    if (!checkbox[i].checked)continue;
+                    ids += checkbox[i].value + ",";
                 }
-                ids = ids.substr(0,(ids.length)-1);
+                ids = ids.substr(0, (ids.length) - 1);
                 $.ajax({
-                    url : "{{ route('partReview') }}",
-                    data : {ids:ids},
-                    dataType : 'json',
-                    type : 'get',
-                    success:function(result){
+                    url: "{{ route('partReview') }}",
+                    data: {ids: ids},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
                         window.location.reload();
                     }
                 })
@@ -1216,7 +1222,7 @@
                     dataType: 'json',
                     type: 'get',
                     success: function (result) {
-                        window.location.reload();
+//                        window.location.reload();
                     }
                 });
             }

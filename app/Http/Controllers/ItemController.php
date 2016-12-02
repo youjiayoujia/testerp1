@@ -249,7 +249,7 @@ class ItemController extends Controller
         }
         $logisticsLimit_arr = [];
         foreach($model->product->logisticsLimit->toArray() as $key=>$arr){
-            $logisticsLimit_arr[$key] = $arr['name'];              
+            $logisticsLimit_arr[$key] = $arr['ico'];              
         }
         
         $wrapLimit_arr = [];
@@ -586,6 +586,22 @@ class ItemController extends Controller
     {
         $this->model->oneKeyUpdateSku();
 
+    }
+
+    //修改转新品状态
+    public function changeNewSku($id)
+    {
+        $url = $_SERVER['HTTP_REFERER'];
+        $model = $this->model->find($id);
+        $new_status = request()->input('new_status');
+        $model->update(['new_status'=>$new_status]);
+        $remark = '已取消转新品';
+        if($new_status){
+            $remark = '已转新品';
+        }
+        
+        return redirect($url)->with('alert', $this->alert('success', $model->sku.$remark));
+        //print_r($new_status);exit;
     }
 
 }

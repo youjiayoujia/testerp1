@@ -220,11 +220,12 @@
 
     <div class='row'>
         <div class="form-group col-md-12" style="">
-            <label for="color">物流限制</label>  
+            <label for="color">物流限制</label> <br> 
                 @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}'>{{$carriage_limit->name}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}'>@if($carriage_limit->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$carriage_limit->ico}}" />@else{{$carriage_limit->name}} @endif
                     </label>
+                    <br>
                 @endforeach   
         </div>
         <div class="form-group col-md-12" style="">

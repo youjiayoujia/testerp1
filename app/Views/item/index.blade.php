@@ -24,7 +24,7 @@
     <th class="sort" data-field="sku">产品名称</th>
     <th class="sort" data-field="c_name">sku</th>
     <th>重量</th>
-    <th>仓位</th>
+    <th>默认仓库</th>
     <th>申报资料</th>
     <th>注意事项</th>
     <th>小计</th>
@@ -44,23 +44,29 @@
                 <!-- 100条sql -->
                 <img src="{{ asset($item->product?$item->product->dimage:'') }}" width="100px" data-toggle="modal" data-target="#imgModal_{{$item->id}}" style="cursor:pointer;">
                 <br><br>
-                <div style='text-align:center' ><a href='' data-toggle="modal" data-target="#imgModal_{{$item->id}}">[{{$item->product?count($item->product->shape):0}}]<a></div>
+                <div style='text-align:center'>
+                    <a href='' data-toggle="modal" data-target="#imgModal_{{$item->id}}">[{{$item->product?count($item->product->shape):0}}
+                        ]<a></div>
             </td>
             <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
-                                    开发时间：{{ $item->created_at }}<br>
-                                    【包装方式：<br>
-                                    <?php if($item->product){ ?>
-                                    @foreach($item->product->wrapLimit as $wrap)
-                                        {{$wrap->name}}<br>
-                                    @endforeach
-                                    】
-                                    <?php } ?>
-                                </td>
+                @foreach($item->product->logisticsLimit as $logistics)
+                    @if($logistics->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}" />@else{{$logistics->name}} @endif<br>
+                @endforeach
+                开发时间：{{ $item->created_at }}<br>
+                【包装方式：<br>
+                <?php if($item->product){ ?>
+                @foreach($item->product->wrapLimit as $wrap)
+                    {{$wrap->name}}<br>
+                @endforeach
+                】
+                <?php } ?>
+            </td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->weight }}kg</td>
-            <td>{{ $item->warehouse?$item->warehouse->name:'' }}<br>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
-            <td>{{ $item->product?$item->product->declared_en:'' }}<br>{{ $item->product?$item->product->declared_cn:'' }}<br>
-                    ${{$item->declared_value}}
+            <td>{{ isset($item->purchaseAdminer)?$item->purchaseAdminer->warehouse_id:'' }}</td>
+            <td>{{ $item->product?$item->product->declared_en:'' }}
+                <br>{{ $item->product?$item->product->declared_cn:'' }}<br>
+                ${{$item->declared_value}}
             </td>
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>
@@ -80,7 +86,8 @@
                 <div>14天销量：{{$item->getsales('-14 day')}}</div>
                 <div>28天销量：{{$item->getsales('-28 day')}}</div>
                 <div>建议采购值：{{$item->createPurchaseNeedData([$item->id])['need_purchase_num']}}</div>
-                <div>库存周数：{{$item->getsales('-7 day')==0?0:($item->available_quantity+$item->normal_transit_quantity)/$item->getsales('-7 day')}}</div>
+                <div>
+                    库存周数：{{$item->getsales('-7 day')==0?0:($item->available_quantity+$item->normal_transit_quantity)/$item->getsales('-7 day')}}</div>
             </td>
             <td>{{ config('item.status')[$item->status]}}</td>
             <td>{{ $item->purchaseAdminer?$item->purchaseAdminer->name:''}}</td>
@@ -97,7 +104,6 @@
                 </a>
 
 
-
                 <div class="modal fade" id="myModal_{{$item->id}}" role="dialog" aria-labelledby="myModalLabel">
                     <div class="modal-dialog" role="document" style="width:710px;">
                         <div class="modal-content">
@@ -111,7 +117,8 @@
                                     <div class="form-group form-inline sets" id="setkey_0">
                                         <table class="table table-bordered">
                                             <tr>
-                                                <td colspan="3">当前分类：{{ $item->catalog?$item->catalog->all_name:'' }}</td>
+                                                <td colspan="3">
+                                                    当前分类：{{ $item->catalog?$item->catalog->all_name:'' }}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="3">产品名称：{{ $item->c_name }}</td>
@@ -135,7 +142,7 @@
                                             <tr>
                                                 <td>产品重量：
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 110px;"  disabled>
+                                                        <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 110px;" disabled>
                                                         <span class="input-group-addon">Kg</span>
                                                     </div>
 
@@ -164,10 +171,10 @@
                                                                 delay: 250,
                                                                 data: function (params) {
                                                                     return {
-                                                                        name:params.term,
+                                                                        name: params.term,
                                                                     };
                                                                 },
-                                                                results: function(data, page) {
+                                                                results: function (data, page) {
                                                                 }
                                                             },
                                                         });
@@ -215,13 +222,13 @@
                     </div>
                 </div>
             </td>
-            
+
             <td>
                 <a href="{{ route('item.show', ['id'=>$item->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 <a href="{{ route('item.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 
+                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
                 <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-primary btn-xs" data-id="{{ $item->id }}">
                     <span class="glyphicon glyphicon-print"></span>
@@ -232,13 +239,16 @@
                 <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-user"></span>
                 </a>
+                <a data-toggle="modal" data-target="#add_to_new{{$item->id}}" title="转新品操作" class="btn btn-info btn-xs" id="add_to_new">
+                    <span class="glyphicon glyphicon-camera"></span>
+                </a>
                 <a data-toggle="modal" data-target="#question_{{$item->id}}" title="常见问题" class="btn btn-info btn-xs" id="ques">
                     <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $item->id }}"
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 
+                    <span class="glyphicon glyphicon-trash"></span>
                 </a>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
@@ -249,29 +259,67 @@
         </tr>
 
         <!-- 图片模态框（Modal -->
-            <div class="modal fade" id="imgModal_{{$item->id}}"  role="dialog" 
-               aria-labelledby="myModalLabel" aria-hidden="true">
-               <div class="modal-dialog" style="width:800px">
-                  <div class="modal-content">
-                     
-                     <div class="modal-body">
+        <div class="modal fade" id="imgModal_{{$item->id}}" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width:800px">
+                <div class="modal-content">
+
+                    <div class="modal-body">
                         <!-- 50条sql -->
                         @if($item->product)
                             @foreach($item->product->shape as $image)
-                                <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
+                                <a href="{{ asset($image) }}" target='_blank'><img src="{{ asset($image) }}" width="244px"></a>
                             @endforeach
                         @endif
-                     </div>
-                     
-                  </div>
+                    </div>
+
+                </div>
             </div>
-            </div>   
+        </div>
         <!-- 图片模态框结束（Modal） -->
 
         <!-- 模态框（Modal）转采购负责人 -->
         <form action="/item/changePurchaseAdmin/{{$item->id}}" method="post">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <div class="modal fade" id="switch_purchase_{{$item->id}}"  role="dialog" 
+            <div class="modal fade" id="switch_purchase_{{$item->id}}" role="dialog"
+                 aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                转移采购负责人
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div>
+                            <br>
+                            <div>
+                                转移至：<select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select>
+                                或者：<input type="text" value='' placeholder="姓名" name='manual_name' id='manual_name'>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                                提交
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- 模态框转采购负责人结束（Modal） -->
+
+        <!-- 模态框（Modal）转新品操作 -->
+        <form action="/item/changeNewSku/{{$item->id}}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="add_to_new{{$item->id}}"  role="dialog" 
                aria-labelledby="myModalLabel" aria-hidden="true">
                <div class="modal-dialog">
                   <div class="modal-content">
@@ -281,18 +329,23 @@
                               &times;
                         </button>
                         <h4 class="modal-title" id="myModalLabel">
-                           转移采购负责人
+                           转新品
                         </h4>
                      </div>
                      <div class="modal-body">
-                         <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div><br>
-                         <div>转移至：<select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select>  或者：<input type="text" value='' placeholder="姓名" name='manual_name' id='manual_name'></div>
+                         <div>当前状态:{{config('item.new_status')[$item->new_status]}}</div><br>
+                         <div>更改状态
+                            <select class='form-control' name="new_status" id="">
+                                <option value='1'>转新品</option>
+                                <option value='0'>取消转新品</option>
+                            </select>
+                        </div>
                      </div>
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default" 
                            data-dismiss="modal">关闭
                         </button>
-                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                        <button type="submit" class="btn btn-primary">
                            提交
                         </button>
                      </div>
@@ -300,122 +353,123 @@
             </div>
             </div>
         </form>
-        <!-- 模态框转采购负责人结束（Modal） -->
+        <!-- 模态框（Modal）转新品操作 -->
 
         <!-- 模态框（Modal）提问 -->
         <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <div class="modal fade" id="question_{{$item->id}}"  role="dialog" 
-               aria-labelledby="myModalLabel" aria-hidden="true">
-               <div class="modal-dialog">
-                  <div class="modal-content">
-                     <div class="modal-header">
-                        <button type="button" class="close" 
-                           data-dismiss="modal" aria-hidden="true">
-                              &times;
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel">
-                           常见问题提问
-                        </h4>
-                     </div>
+            <div class="modal fade" id="question_{{$item->id}}" role="dialog"
+                 aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                常见问题提问
+                            </h4>
+                        </div>
 
-                     <div class="modal-body">
-                        
+                        <div class="modal-body">
 
-                        <div>向
-                            <select name='question_group'>
-                                @foreach(config('product.question.types') as $key=>$value)
-                                    <option value="{{$key}}">{{$value}}</option>
-                                @endforeach
-                            </select>
-                        分组提问</div>
-                        <br>
-                        <div><textarea rows="3" cols="88" name='question_content'></textarea></div>
-                        <div><input type='file' name='uploadImage'></div>
-                     </div>
-                     
-                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" 
-                           data-dismiss="modal">关闭
-                        </button>
-                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
-                           提交
-                        </button>
-                     </div>
-                  </div>
-            </div>
+
+                            <div>向
+                                <select name='question_group'>
+                                    @foreach(config('product.question.types') as $key=>$value)
+                                        <option value="{{$key}}">{{$value}}</option>
+                                    @endforeach
+                                </select>
+                                分组提问
+                            </div>
+                            <br>
+                            <div><textarea rows="3" cols="88" name='question_content'></textarea></div>
+                            <div><input type='file' name='uploadImage'></div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                                提交
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
         <!-- 模态框提问结束（Modal） -->
 
         <!-- 添加供应商模态框（Modal -->
-            <form action="/item/addSupplier/{{$item->id}}" method="post" enctype="multipart/form-data">
+        <form action="/item/addSupplier/{{$item->id}}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <div class="modal fade" id="add_supplier_{{$item->id}}"  role="dialog" 
-               aria-labelledby="myModalLabel" aria-hidden="true">
-               <div class="modal-dialog">
-                  <div class="modal-content">
-                     <div class="modal-header">
-                        <button type="button" class="close" 
-                           data-dismiss="modal" aria-hidden="true">
-                              &times;
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel">
-                           添加备选供应商
-                        </h4>
-                     </div>
+            <div class="modal fade" id="add_supplier_{{$item->id}}" role="dialog"
+                 aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                添加备选供应商
+                            </h4>
+                        </div>
 
-                     <div class="modal-body">        
-                        <select id="supplier_id" style="width:550px" class="form-control supplier" name="supplier_id">
-                           <option value="{{$item->supplier?$item->supplier->id:0}}">{{$item->supplier?$item->supplier->name:''}}</option>
-                        </select>
-                     </div>
-                     
-                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" 
-                           data-dismiss="modal">关闭
-                        </button>
-                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
-                           提交
-                        </button>
-                     </div>
-                  </div>
-            </div>
+                        <div class="modal-body">
+                            <select id="supplier_id" style="width:550px" class="form-control supplier" name="supplier_id">
+                                <option value="{{$item->supplier?$item->supplier->id:0}}">{{$item->supplier?$item->supplier->name:''}}</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                                提交
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
         <!-- 添加供应商模态框结束（Modal） -->
 
     @endforeach
 
-        <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-   aria-labelledby="myModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <button type="button" class="close"
-               data-dismiss="modal" aria-hidden="true">
-                  &times;
-            </button>
-            <h4 class="modal-title" id="myModalLabel">
-               上传表格修改sku状态
-            </h4>
-         </div>
-             <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
-                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                 <input type="file" name="upload" >
-                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default"
-                       data-dismiss="modal">关闭
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
                     </button>
-                    <button type="submit" class="btn btn-primary" >
-                       提交
-                    </button>
-                 </div>
-             </form>
+                    <h4 class="modal-title" id="myModalLabel">
+                        上传表格修改sku状态
+                    </h4>
+                </div>
+                <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="file" name="upload">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default"
+                                data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            提交
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 
 @stop
@@ -465,7 +519,7 @@
 
             $.ajax({
                 url: url,
-                data: {item_ids:item_ids},
+                data: {item_ids: item_ids},
                 dataType: 'json',
                 type: 'get',
                 success: function (result) {
@@ -482,13 +536,13 @@
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                  return {
-                    user:params.term,
-                    item_id: $(this).attr('id'),
-                  };
+                    return {
+                        user: params.term,
+                        item_id: $(this).attr('id'),
+                    };
                 },
-                results: function(data, page) {
-                    
+                results: function (data, page) {
+
                 }
             },
         });
@@ -499,38 +553,38 @@
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                  return {
-                    supplier:params.term,
-                  };
+                    return {
+                        supplier: params.term,
+                    };
                 },
-                results: function(data, page) {
-                    
+                results: function (data, page) {
+
                 }
             },
         });
 
-        function changeSelectVlaue(selected,type,productId){
+        function changeSelectVlaue(selected, type, productId) {
             var id = selected.val();
-            if(id){
+            if (id) {
                 $.ajax({
                     url: "{{route('product.ajaxReturnLogistics')}}",
-                    data: {id: id,type:type},
+                    data: {id: id, type: type},
                     dataType: 'json',
                     type: 'get',
                     success: function ($returnInfo) {
-                        if($returnInfo != {{config('status.ajax.fail')}}){
-                            switch(type){
+                        if ($returnInfo != {{config('status.ajax.fail')}}) {
+                            switch (type) {
                                 case 'catalog':
-                                    $('#logistics-'+productId).html('');
-                                    $('#logistics-'+productId).append('<option value="none"> 请选择 </option>');
-                                    $.each($returnInfo,function (index,item) {
-                                        $('#logistics-'+productId).append('<option value="' + item.id + '">' + item.code + '</option>');
+                                    $('#logistics-' + productId).html('');
+                                    $('#logistics-' + productId).append('<option value="none"> 请选择 </option>');
+                                    $.each($returnInfo, function (index, item) {
+                                        $('#logistics-' + productId).append('<option value="' + item.id + '">' + item.code + '</option>');
                                     });
                                 case 'logistics':
-                                    $('#zones-'+productId).html('');
-                                    $('#zones-'+productId).append('<option value="none"> 请选择 </option>');
-                                    $.each($returnInfo,function (index,item) {
-                                        $('#zones-'+productId).append('<option value="' + item.id + '">' + item.zone + '</option>');
+                                    $('#zones-' + productId).html('');
+                                    $('#zones-' + productId).append('<option value="none"> 请选择 </option>');
+                                    $.each($returnInfo, function (index, item) {
+                                        $('#zones-' + productId).append('<option value="' + item.id + '">' + item.zone + '</option>');
                                     });
                                 default:
                                     return false;
@@ -545,23 +599,23 @@
          * 计算价格
          * @param productId
          */
-        function doComputePrice(productId){
+        function doComputePrice(productId) {
 
-            var zone_id        = $('#zones-'+productId).val();
-            var channel_id     = $('#channel-'+productId).val();
-            var profit_id      = $('#profit-'+productId).val();
-            var product_weight = $('#weight-'+productId).val();
-            var target_price   = $('#target-price-'+productId).val();
+            var zone_id = $('#zones-' + productId).val();
+            var channel_id = $('#channel-' + productId).val();
+            var profit_id = $('#profit-' + productId).val();
+            var product_weight = $('#weight-' + productId).val();
+            var target_price = $('#target-price-' + productId).val();
 
-            if(zone_id == 'none'){
+            if (zone_id == 'none') {
                 alert('物流分区不能为空');
                 return false;
             }
-            if(profit_id == ''){
+            if (profit_id == '') {
                 alert('利润率不能为空');
                 return false;
             }
-            if(product_weight == ''){
+            if (product_weight == '') {
                 alert('产品重量不能为空');
                 return false;
             }
@@ -571,32 +625,39 @@
                 url: "{{  route('product.ajaxReturnPrice') }}",
                 dataType: 'json',
                 'type': 'get',
-                data: {product_id:productId,zone_id:zone_id,channel_id:channel_id,profit_id:profit_id,product_weight:product_weight,target_price:target_price},
-                success:function (returnInfo){
+                data: {
+                    product_id: productId,
+                    zone_id: zone_id,
+                    channel_id: channel_id,
+                    profit_id: profit_id,
+                    product_weight: product_weight,
+                    target_price: target_price
+                },
+                success: function (returnInfo) {
 
-                    if(returnInfo['status'] == 1){
-                        $.each(returnInfo['data'],function (i ,item) {
+                    if (returnInfo['status'] == 1) {
+                        $.each(returnInfo['data'], function (i, item) {
 
-                            if(item.channel_price_big !=false){
+                            if (item.channel_price_big != false) {
 
                             }
-                            var channel_rate_price_big   = (item.channel_price_big != false) ? '<font color="red">('+item.channel_price_big+')</font>' : '';
-                            var channel_rate_price_small = (item.channel_price_small != false) ? '<font color="red">('+item.channel_price_small+')</font>' : '';
+                            var channel_rate_price_big = (item.channel_price_big != false) ? '<font color="red">(' + item.channel_price_big + ')</font>' : '';
+                            var channel_rate_price_small = (item.channel_price_small != false) ? '<font color="red">(' + item.channel_price_small + ')</font>' : '';
 
                             html += '<tr>';
-                            html += '<td>'+(i+1)+'</td><td>'+item.channel_name+'</td><td>'+item.sale_price_big+channel_rate_price_big+'</td><td>'+item.sale_price_small+channel_rate_price_small+'</td>';
+                            html += '<td>' + (i + 1) + '</td><td>' + item.channel_name + '</td><td>' + item.sale_price_big + channel_rate_price_big + '</td><td>' + item.sale_price_small + channel_rate_price_small + '</td>';
                             /*html += '<td>'+item.profit_id+'->'+item.sale_price_small+'</td>';*/
-                            html += '<td>'+item.profitability.profit+'</td>';
+                            html += '<td>' + item.profitability.profit + '</td>';
                             html += '</tr>';
 
-                            $('#result-price-'+productId).html(html);
-                            $('#result-table-'+productId).show();
+                            $('#result-price-' + productId).html(html);
+                            $('#result-table-' + productId).show();
                         });
-                    }else{
+                    } else {
                         alert('出错了，请检查下物流分区，汇率是否有误 ');
                     }
                 },
-                error:function () {
+                error: function () {
                     alert('参数不完整，计算失败；品类渠道的税率是否编辑？');
 
                 }

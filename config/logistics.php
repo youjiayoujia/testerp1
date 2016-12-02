@@ -21,4 +21,7 @@ return [
     //回邮地址
     'return_address' => [],
 
+    //物流限制图标
+    'limit_ico_src' => '/image/logistic_limit/'
+
 ];

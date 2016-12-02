@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="col-lg-9">
-            <div class="row" id="templateDiv"></div>
+            <iframe id="templateDiv" width="800px" height="800px" src=""></iframe>
         </div>
     </div>
 @stop
@@ -30,16 +30,9 @@
             $('.preview').on('click', function () {
                 var package_id = $('#package_id').val();
                 var logistics_id = $('#logistics_id').val();
-                $.ajax({
-                    url: "{{ route('template.preview') }}",
-                    data: {package_id: package_id, logistics_id: logistics_id},
-                    type: 'get',
-                    success: function (result) {
-                        $('#templateDiv').html(result);
-                        $('#confirmBtn').show();
-                    }
-                });
-
+                var url = '{{ route('template.preview') }}' + '?package_id=' + package_id + '&logistics_id=' + logistics_id;
+                $('#templateDiv').attr("src", url);
+                $('#confirmBtn').show();
             });
 
             //确认

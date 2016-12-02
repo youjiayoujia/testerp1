@@ -211,7 +211,7 @@ class PurchaseOrderController extends Controller
                     }
                 }
             }
-                
+
             foreach($data['arr'] as $k=>$v){
                 if($v['id']){
                     $purchaseItem=PurchaseItemModel::find($v['id']);
@@ -220,23 +220,24 @@ class PurchaseOrderController extends Controller
                     foreach($v as $key=>$vo){
                         $item[$key]=$vo;    
                     }
+                    $item['warehouse_id'] = $data['warehouse_id'];
                     /*if($v['active']>0){
                         $item['active_status']=1;
                     }*/
-                    if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
+                    /*if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
                         $item['costExamineStatus']=2;
                         ItemModel::where('sku',$purchaseItem->sku)->update(['purchase_price'=>$item['purchase_cost']]); 
                     }else{
                         $item['costExamineStatus']=0;   
-                    }
+                    }*/
                     if($purchaseItem->purchaseOrder->examineStatus ==1){
                         if($purchaseItem->status < 4){
-                        $data['examineStatus']=2;
+                            $data['examineStatus']=2;
                         }
                     }
                     $item['start_buying_time']=date('Y-m-d h:i:s',time());
-                    if($purchaseItem->status < 4){
-                    $purchaseItem->update($item);
+                    if($purchaseItem->status != 4){
+                        $purchaseItem->update($item);
                     }
                     $data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
                     unset($item);
@@ -248,7 +249,10 @@ class PurchaseOrderController extends Controller
             $data['costExamineStatus']=2;
         }
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
-        $model->update($data);
+        if($model->status!=4){
+            $model->update($data);
+        }
+        
         //更新采购需求
 
         $temp_arr = [];
@@ -565,6 +569,7 @@ class PurchaseOrderController extends Controller
     
     
     public function write_off($id){
+        $url = $_SERVER['HTTP_REFERER'];
         $off = request()->input("off");
         if($off==1){
             $this->model->find($id)->update(['write_off'=>$off+1,'status'=>4]);
@@ -583,8 +588,7 @@ class PurchaseOrderController extends Controller
         }
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);
-        
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . $remark));
+        return redirect($url)->with('alert', $this->alert('success', $this->mainTitle . $id.$remark));
     }
 
     public function addPost($id){
@@ -916,10 +920,10 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * ajax请求  sku
+     * 批量修改采购单状态
      *
      * @param none
-     * @return obj
+     * @return 1
      * 
      */
     public function purchaseExmaine()
@@ -962,7 +966,7 @@ class PurchaseOrderController extends Controller
                     $this->model->find($id)->update(['close_status'=>1]);
 
                     foreach($this->model->find($id)->purchaseItem as $purchaseitemModel){
-                        $purchaseitemModel->update(['status'=>4]);
+                        //$purchaseitemModel->update(['status'=>4]);
                         $temp_arr[] = $purchaseitemModel->item_id;
                     }
 
@@ -1003,33 +1007,38 @@ class PurchaseOrderController extends Controller
 
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+                orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //虚库存
             $xu_kucun = $itemModel->available_quantity-$data['need_total_num'];
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $purchaseItemModel->item_id)
                 ->sum('order_items.quantity');
+            if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
+
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
                 $coefficient_status = 3;
@@ -1060,6 +1069,7 @@ class PurchaseOrderController extends Controller
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
+            
             $need_purchase_num = ceil($needPurchaseNum);
             
             //($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';

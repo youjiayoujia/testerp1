@@ -68,6 +68,7 @@ class BlacklistModel extends BaseModel
             ],
             'filterFields' => [
                 'ordernum',
+                'by_id',
                 'name',
                 'email',
                 'zipcode'

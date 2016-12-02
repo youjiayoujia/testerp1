@@ -4,6 +4,7 @@
     <th class="sort" data-field="id">ID</th>
     <th>平台</th>
     <th>订单号</th>
+    <th>买家ID</th>
     <th>姓名</th>
     <th>邮箱</th>
     <th>邮编</th>
@@ -32,6 +33,7 @@
                 <td>{{ $blacklist->id }}</td>
                 <td>{{ $blacklist->channel->name }}</td>
                 <td>{{ $blacklist->ordernum }}</td>
+                <td>{{ $blacklist->by_id }}</td>
                 <td>{{ $blacklist->name }}</td>
                 <td>{{ $blacklist->email }}</td>
                 <td>{{ $blacklist->zipcode }}</td>

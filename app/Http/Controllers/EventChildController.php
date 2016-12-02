@@ -74,7 +74,7 @@ class EventChildController extends Controller
             if(!$from) {
                 $html .= "<div class='panel panel-default'>
                         <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
-                        <div class='panel-body'><div class='col-lg-12'>";
+                        <div class='panel-body' style='display:none'><div class='col-lg-12'>";
                 foreach($to as $key => $value) {
                     $html .= "<div class='row'>to['".$key."']<span class='glyphicon glyphicon-arrow-right'></span>";
                     if(is_array($value)) {

@@ -169,7 +169,8 @@ class PackageController extends Controller
                 $buf[$key][1] = 0;
                 continue;
             }
-            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->code : '';
+            var_dump(is_string($package->realTimeLogistics()));exit;
+            $buf[$key][0] = !is_string($package->realTimeLogistics()) ? $package->realTimeLogistics()->code : '';
             $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
         }
 

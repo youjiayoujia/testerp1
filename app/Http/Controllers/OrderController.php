@@ -605,7 +605,7 @@ class OrderController extends Controller
         }
         return 1;
     }
-
+    //撤单
     public function withdrawUpdate($id)
     {
         $userName = UserModel::find(request()->user()->id);
@@ -618,6 +618,23 @@ class OrderController extends Controller
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
 
         return redirect($this->mainIndex);
+    }
+    //ajax撤单
+    public function ajaxWithdraw()
+    {
+        $id = request()->input('id');
+        if (!empty($id)) {
+            $userName = UserModel::find(request()->user()->id);
+            $from = json_encode($this->model->find($id));
+            request()->flash();
+            $data = request()->all();
+            $order = $this->model->find($id);
+            $order->cancelOrder($data['withdraw']);
+            $to = json_encode($this->model->find($id));
+            $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
+        }
+
+        return 1;
     }
 
     public function withdraw($id)

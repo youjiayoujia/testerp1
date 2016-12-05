@@ -16,6 +16,7 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
 use App\Models\ItemModel;
 use App\Models\UserModel;
 use App\Models\Stock\InModel;
@@ -828,12 +829,17 @@ class PurchaseOrderController extends Controller
     public function newProductupdateArriveLog(){
         $global = 1;
         $data = request()->all();
+        $colorinfo = 'success';
+        $tip = "入库成功";
         $arrivel_log = PurchaseItemArrivalLogModel::where('purchase_item_id',$data['purchase_item_id'])->get()->first();
         $purchase_item = $arrivel_log->purchaseItem;
 
         $warehousePosition = StockModel::where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->where('item_id',$purchase_item->item_id)->get()->first();
-                
-        if(!$warehousePosition){ 
+        $warehouse_po_id = PositionModel::where('name',$data['position'])->where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->get()->first();
+        //echo '<pre>';print_r(count($warehouse_po_id));exit;
+        if(count($warehouse_po_id)==0){ 
+            $tip = "库位不存在,请重新填写库位入库";
+            $colorinfo = 'danger';
             $purchase_item->update(['status'=>'6']);
             $global = 0;
         }else{
@@ -848,9 +854,10 @@ class PurchaseOrderController extends Controller
             if($datas['storage_qty']>=$purchase_item->purchase_num){
                 $datas['status'] = 4;
             }
+            //
             
             $purchase_item->update($datas);
-            $purchase_item->item->in($warehousePosition->warehouse_position_id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
+            $purchase_item->item->in($warehouse_po_id->id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
             
         }
         //need包裹分配库存
@@ -883,7 +890,8 @@ class PurchaseOrderController extends Controller
         }
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);
-        return redirect(route('purchaseItemIndex')); 
+
+        return redirect(route('purchaseItemIndex'))->with('alert', $this->alert($colorinfo, $tip)); 
     }
 
     /**

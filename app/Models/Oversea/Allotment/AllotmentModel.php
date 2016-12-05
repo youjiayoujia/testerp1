@@ -19,7 +19,7 @@ class AllotmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['warehouse_id', 'name', 'transport', 'formula', 'created_at'];
+    protected $fillable = ['allotment_num', 'out_warehouse_id', 'in_warehouse_id', 'allotment_by', 'status', 'check_by', 'check_status', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -30,10 +30,30 @@ class AllotmentModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['name' => '物流名'];
+    public $searchFields=['allotment_num' => '调拨单号'];
 
-    public function warehouse()
+    public function outWarehouse()
     {
-        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'out_warehouse_id', 'id');
+    }
+
+    public function inWarehouse()
+    {
+        return $this->belongsTo('App\Models\WarehouseModel', 'in_warehouse_id', 'id');
+    }
+
+    public function allotmentBy()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'allotment_by', 'id');
+    }
+
+    public function checkBy()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'check_by', 'id');
+    }
+
+    public function allotmentForms()
+    {
+        return $this->hasMany('App\Models\Oversea\Allotment\AllotmentFormModel', 'parent_id', 'id');
     }
 }

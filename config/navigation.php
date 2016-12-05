@@ -278,6 +278,11 @@ return [
                     'url' => 'firstLeg.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '调拨单',
+                    'url' => 'overseaAllotment.index',
+                    'icon' => '',
+                ],
                 
             ],
         ],

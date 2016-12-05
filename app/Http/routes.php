@@ -74,7 +74,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //入库
     Route::resource('stockIn', 'Stock\InController');
 
-    //海外仓调拨     
+    //海外仓调拨    
+    Route::get('overseaAllotment/add', ['uses' => 'Oversea\AllotmentController@ajaxAllotmentAdd', 'as' => 'overseaAllotment.add']); 
     Route::resource('overseaAllotment', 'Oversea\AllotmentController');
     //海外仓头程物流
     Route::resource('firstLeg', 'Oversea\FirstLegController');

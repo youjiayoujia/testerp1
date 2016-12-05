@@ -15,6 +15,7 @@ class CreateOverseadAllotmentForms extends Migration
         Schema::create('oversead_allotment_forms', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('item_id')->comment('item id')->default(0);
+            $table->integer('warehouse_position_id')->comment('库位id')->default(0);
             $table->integer('quantity')->comment('数量')->default(0);
             $table->integer('parent_id')->comment('调拨单id')->default(0);
             $table->timestamps();

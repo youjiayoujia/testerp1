@@ -23,7 +23,7 @@ class GetAliShipmentNumber extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '采购单的物流单号以及订单信息';
 
     /**
      * Create a new command instance.

@@ -769,12 +769,14 @@ class OrderModel extends BaseModel
         if ($this->items->count() > 0) {
             foreach ($this->items as $item) {
                 if ($item->item) {
-                    $channelRate = $item->item->catalog->channels->where('id',
-                        $this->channelAccount->catalog_rates_channel_id)->first();
-                    if ($channelRate) {
-                        $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
-                    } else {
-                        return 0;
+                    if ($item->item->catalog) {
+                        $channelRate = $item->item->catalog->channels->where('id',
+                            $this->channelAccount->catalog_rates_channel_id)->first();
+                        if ($channelRate) {
+                            $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
+                        } else {
+                            return 0;
+                        }
                     }
                 }
             }

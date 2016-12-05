@@ -111,7 +111,7 @@ abstract class Controller extends BaseController
                     case 'relatedSearchFields':
                         foreach ($related as $relation_ship => $name_arr) {
                             foreach ($name_arr as $k => $name) {
-                                if ($name) {
+                                if ($name != '') {
                                     $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
                                         $query = $query->where($k, 'like', '%' . $name . '%');
                                     });
@@ -123,7 +123,7 @@ abstract class Controller extends BaseController
                         foreach ($related as $relation_ship1 => $value1) {
                             foreach ($value1 as $relation_ship2 => $value2) {
                                 foreach ($value2 as $key => $name) {
-                                    if ($name) {
+                                    if ($name != '') {
                                         $list = $list->whereHas($relation_ship1,
                                             function ($query) use ($relation_ship2, $name, $key) {
                                                 $query = $query->wherehas($relation_ship2,
@@ -153,7 +153,7 @@ abstract class Controller extends BaseController
                     case 'selectRelatedSearchs':
                         foreach ($related as $relation_ship => $contents) {
                             foreach ($contents as $name => $single) {
-                                if ($single) {
+                                if ($single != '') {
                                     $list = $list->whereHas($relation_ship, function ($query) use ($name, $single) {
                                         $query = $query->where($name, $single);
                                     });

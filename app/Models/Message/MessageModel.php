@@ -460,36 +460,28 @@ class MessageModel extends BaseModel{
 
     public function getChannelMessageOrderId(){
         $fields_ary = $this->MessageFieldsDecodeBase64;
-        if($fields_ary){
-            switch ($this->getChannelDiver()){
-                case 'ebay':
-                    $order_id = $fields_ary['ItemID'];
-                    if(!empty($order_id)){
-                        $order_obj = OrderModel::where('transaction_number','=',$order_id)->first();
-                        $order_id = empty($order_obj) ? '' : $order_obj->id;
-                    }else{
-                        $order_id = '';
-                    }
-                    break;
-                case 'wish':
-                    $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
-                    $order_obj = OrderModel::where('transaction_number','=',$transaction_id)->first();
-                    $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
-                    break;
-                case 'aliexpress':
-                    if(!empty($fields_ary['order_id'])){
-                        $order_obj = OrderModel::where('channel_ordernum','=',$fields_ary['order_id'])->first();
-                        $order_id = (!empty($order_obj)) ? $order_obj->id : '';
-                    }else{
-                        $order_id = '';
-                    }
-                    break;
-                default:
+        switch ($this->getChannelDiver()){
+            case 'ebay':
+                $order_id = $fields_ary['ItemID'];
+                if(!empty($order_id)){
+                    $order_obj = OrderModel::where('transaction_number','=',$order_id)->first();
+                    $order_id = empty($order_obj) ? '' : $order_obj->id;
+                }else{
                     $order_id = '';
-            }
-        }else{
-            $order_id = '';
+                }
+                break;
+            case 'wish':
+                $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
+                $order_obj = OrderModel::where('transaction_number','=',$transaction_id)->first();
+                $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
+                break;
+            case 'aliexpress':
+                $order_id = !empty($this->Order->id) ? $this->Order->id : '';
+                break;
+            default:
+                $order_id = '';
         }
+
         return $order_id;
     }
 

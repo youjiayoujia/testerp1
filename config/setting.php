@@ -176,5 +176,6 @@ return [
         'purchaseItem.productItem.sku' => 'sku',
         'new_status' => '是否为新品',
         'items.item.sku' => 'sku',
+        'check_status' => '审核状态',
     ],
 ];

@@ -14,11 +14,11 @@
 @foreach($result as $_result)
     <tr>
         <td>{{$_result->id}}</td>
-        <td>{{$_result->post_coding}}</td>
+        <td class='post_coding'>{{$_result->post_coding}}</td>
         <td><?php if($_result->purchase_order_id==''){echo "未关联";}else{echo "已关联";} ?></td>
         <td><a target="_blank" href="{{ route('purchaseOrder.show', ['id'=>$_result->purchase_order_id]) }}">{{$_result->purchase_order_id}}</a></td>
-        <td></td>
-        <td>{{$_result->updated_at}}</td>
+        <td class='scan_person'></td>
+        <td class='scan_time'>{{$_result->updated_at}}</td>
         <td>
             @if($_result->purchase_order_id!='')
             <a href="javascript:" class="btn btn-danger btn-xs delete_item" data-id="{{$_result->id}}">

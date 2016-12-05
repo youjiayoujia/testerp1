@@ -165,11 +165,11 @@ class PackageController extends Controller
         foreach ($arr as $key => $id) {
             $package = $this->model->find($id);
             if (!$package) {
-                $buf[$key][0] = '虚拟匹配未匹配到';
+                $buf[$key][0] = '包裹未找到';
                 $buf[$key][1] = 0;
                 continue;
             }
-            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->code : '';
+            $buf[$key][0] = !is_string($package->realTimeLogistics()) ? $package->realTimeLogistics()->code : '虚拟匹配未匹配到';
             $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
         }
 
@@ -1462,6 +1462,12 @@ class PackageController extends Controller
         }
         if ($model->status != 'ERROR') {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹状态不是异常.'));
+        }
+        foreach($model->items as $packageItem) {
+            $packageItem->item->holdout($packageItem->warehouse_position_id,
+                $packageItem->quantity,
+                'PACKAGE',
+                $packageItem->id);
         }
         $model->update(['status' => 'PACKED']);
 

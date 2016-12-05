@@ -120,10 +120,10 @@
             </div>
             <div class="col-lg-3 text-left">
                 <a type="button" class="btn btn-default" href="{{ route('pickList.oldPrint') }}">
-                    原面单重新打印 <span class="badge">0</span>
+                    原面单重新打印
                 </a>
                 <a type="button" class="btn btn-default" href="{{ route('pickList.updatePrint') }}">
-                    更换物流面单 <span class="badge">0</span>
+                    更换物流面单
                 </a>
             </div>
         </div>

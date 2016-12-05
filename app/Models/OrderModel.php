@@ -597,38 +597,40 @@ class OrderModel extends BaseModel
         if ($file != '' && $file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
             Storage::disk('product')->put($data['image'], file_get_contents($file->getRealPath()));
-            if ($data['type'] == 'FULL') {
-                $total = 0;
-                foreach ($data['arr']['id'] as $id) {
-                    $orderItem = $this->items->find($id);
-                    $orderItem->update(['is_refund' => 1]);
-                    $total = $orderItem['price'] * $orderItem['quantity'] + $total;
-                }
-                $data['refund_amount'] = $total;
-                $data['price'] = $total;
-            }
-            if ($data['type'] == 'PARTIAL') {
-                foreach ($data['tribute_id'] as $id) {
-                    $orderItem = $this->items->find($id);
-                    $orderItem->update(['is_refund' => 1]);
-                }
-            }
-            $data['customer_id'] = request()->user()->id;
-            $refund = new RefundModel;
-            $refund_new = $refund->create($data);
-            if ($data['type'] == 'FULL') {
-                foreach ($data['arr']['id'] as $fullid) {
-                    $orderItem = $this->items->find($fullid);
-                    $orderItem->update(['refund_id' => $refund_new->id]);
-                }
-            } else {
-                foreach ($data['tribute_id'] as $partid) {
-                    $orderItem = $this->items->find($partid);
-                    $orderItem->update(['refund_id' => $refund_new->id]);
-                }
-            }
-            return;
+        } else {
+            $data['image'] = '';
         }
+        if ($data['type'] == 'FULL') {
+            $total = 0;
+            foreach ($data['arr']['id'] as $id) {
+                $orderItem = $this->items->find($id);
+                $orderItem->update(['is_refund' => 1]);
+                $total = $orderItem['price'] * $orderItem['quantity'] + $total;
+            }
+            $data['refund_amount'] = $total;
+            $data['price'] = $total;
+        }
+        if ($data['type'] == 'PARTIAL') {
+            foreach ($data['tribute_id'] as $id) {
+                $orderItem = $this->items->find($id);
+                $orderItem->update(['is_refund' => 1]);
+            }
+        }
+        $data['customer_id'] = request()->user()->id;
+        $refund = new RefundModel();
+        $refund_new = $refund->create($data);
+        if ($data['type'] == 'FULL') {
+            foreach ($data['arr']['id'] as $fullid) {
+                $orderItem = $this->items->find($fullid);
+                $orderItem->update(['refund_id' => $refund_new->id]);
+            }
+        } else {
+            foreach ($data['tribute_id'] as $partid) {
+                $orderItem = $this->items->find($partid);
+                $orderItem->update(['refund_id' => $refund_new->id]);
+            }
+        }
+
         return 1;
     }
 
@@ -688,7 +690,6 @@ class OrderModel extends BaseModel
         if (!in_array($this->status, $this->canPackageStatus)) {
             return false;
         }
-
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
             $this->status = 'REVIEW';

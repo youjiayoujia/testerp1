@@ -159,7 +159,7 @@ class PositionController extends Controller
         if(request()->ajax()) {
             $position = trim(request('position'));
             $warehouse_id = trim(request('warehouse_id'));
-            $buf = $this->model->where(['warehouse_id' => $warehouse_id, 'is_available'=>'1'])->where('name', 'like', '%'.$position.'%')->get();
+            $buf = $this->model->where(['warehouse_id' => $warehouse_id, 'is_available'=>'1'])->where('name', 'like', '%'.$position.'%')->take('20')->get();
             $total = $buf->count();
             $arr = [];
             foreach($buf as $key => $value) {

@@ -309,6 +309,12 @@ class SpuController extends Controller
                 $arr = [];
                 $arr[] = $value['2'];
                 if(count($itemModel)){
+                    $aa = $itemModel->product->logisticsLimit->toArray();
+                    foreach($aa as $_aa){
+                        if($_aa['id']!=$value['2']){
+                            $arr [] = $_aa['id'];
+                        }   
+                    }
                     $itemModel->product->logisticsLimit()->sync($arr);
                 }
             }

@@ -15,6 +15,7 @@ use App\Models\UserModel;
 use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
+use App\Models\Product\SupplierModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -1146,9 +1147,14 @@ class ItemModel extends BaseModel
                 $old_data['purchase_price'] = $data->products_value;
                 $old_data['weight'] = $data->products_weight;
                 $old_data['package_weight'] = $data->weightWithPacket;
-                $old_data['supplier_id'] = $data->products_suppliers_id;
+                //供应商
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id = "'.$data->products_suppliers_id.'"');
+                $my_supplier_id = SupplierModel::where('company',trim($supp_name[0]->suppliers_company))->get()->first();
+                $old_data['supplier_id'] = $my_supplier_id->id;
                 $old_data['quality_standard'] = $data->products_check_standard;
-                $old_data['warehouse_id'] = $data->product_warehouse_id==1000?1:2;
+                //$old_data['warehouse_id'] = $data->product_warehouse_id==1000?1:2;
+                $old_data['warehouse_id'] = $itemModel->purchaseAdminer?$itemModel->purchaseAdminer->warehouse_id:'3';
                 $old_data['warehouse_position'] = $data->products_location;
                 $old_data['purchase_url'] = $data->products_more_img;
                 $old_data['competition_url'] = $data->productsPhotoStandard;
@@ -1186,11 +1192,23 @@ class ItemModel extends BaseModel
                 $old_data['sku_history_values'] = $data->products_history_values;
 
                 $crr =[];
+                //多对多供应商转换id
                 $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
-
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id in('.$data->products_suppliers_ids.')');
+                $supp_name_arr = [];
+                foreach ($supp_name as $_supp_name) {
+                    $supp_name_arr[] = trim($_supp_name->suppliers_company);
+                }
+                $my_suppliers_id_two = SupplierModel::whereIn('company',$supp_name_arr)->get(['id'])->toArray();
+                foreach($my_suppliers_id_two as $_my_suppliers_id_two){
+                    $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
+                }
+                //echo '<pre>';
+                //print_r($my_suppliers_id_arr);exit;
                 $itemModel->update($old_data);
                 $itemModel->product->update($old_data);
-                $itemModel->skuPrepareSupplier()->sync($crr);
+                $itemModel->skuPrepareSupplier()->sync($my_suppliers_id_arr);
             }else{
                 //新增
                 //添加库位
@@ -1202,6 +1220,13 @@ class ItemModel extends BaseModel
                         PositionModel::create($position);
                     }
                 }
+                //供应商
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id = "'.$data->products_suppliers_id.'"');
+                $my_supplier_id = SupplierModel::where('company',trim($supp_name[0]->suppliers_company))->get()->first();
+                //print_r($my_supplier_id);
+                //exit;
+                //print_r($supp_name);exit;
                 //创建spu
                 $spuData['spu'] = $data->spu;
                 if(count(SpuModel::where('spu',$data->spu)->get())){
@@ -1216,12 +1241,13 @@ class ItemModel extends BaseModel
                 $productData['spu_id'] = $spu_id;
                 $productData['name'] = $data->products_name_en;
                 $productData['c_name'] = $data->products_name_cn;
-                $productData['supplier_id'] = $data->products_suppliers_id;
+                $productData['supplier_id'] = $my_supplier_id->id;
                 $productData['purchase_url'] = $data->products_more_img;
                 $productData['notify'] = $data->products_warring_string;
                 //采购价
                 $productData['purchase_price'] = $data->products_value;
                 $productData['warehouse_id'] = $data->product_warehouse_id==1000?'1':'2';
+                //$productData['warehouse_id'] =$itemModel->purchaseAdminer->warehouse_id;
                 $volume = unserialize($data->products_volume);
                 //长宽高
                 if($volume!=''){
@@ -1285,8 +1311,10 @@ class ItemModel extends BaseModel
                 $skuData['c_name'] = $data->products_name_cn;
                 $skuData['weight'] = $data->products_weight;
                 $skuData['warehouse_id'] = $data->product_warehouse_id==1000?'1':'2';
+                //$skuData['warehouse_id'] = $itemModel->purchaseAdminer->warehouse_id;
                 $skuData['warehouse_position'] = $data->products_location;
-                $skuData['supplier_id'] = $data->products_suppliers_id;
+                
+                $skuData['supplier_id'] = $my_supplier_id->id;
                 $skuData['purchase_url'] = $data->products_more_img;
                 $skuData['purchase_price'] = $data->products_value;
                 $skuData['cost'] = $data->products_value;
@@ -1302,9 +1330,23 @@ class ItemModel extends BaseModel
                 $skuData['is_available'] = $data->productsIsActive; 
                 //创建sku
                 $itemModel = ItemModel::create($skuData);
+
+                //多对多供应商转换id
+                $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id in('.$data->products_suppliers_ids.')');
+                $supp_name_arr = [];
+                foreach ($supp_name as $_supp_name) {
+                    $supp_name_arr[] = trim($_supp_name->suppliers_company);
+                }
+                $my_suppliers_id_two = SupplierModel::whereIn('company',$supp_name_arr)->get(['id'])->toArray();
+                foreach($my_suppliers_id_two as $_my_suppliers_id_two){
+                    $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
+                }
+
                 foreach(explode(',',$data->products_suppliers_ids) as $_supplier_id){
                     $arr['supplier_id'] = $_supplier_id;
-                    $itemModel->skuPrepareSupplier()->attach($arr);
+                    $itemModel->skuPrepareSupplier()->attach($my_suppliers_id_arr);
                 }
             }    
         }

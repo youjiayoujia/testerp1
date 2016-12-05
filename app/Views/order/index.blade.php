@@ -29,9 +29,6 @@
             <td><strong>{{ $order->id }}</strong></td>
             <td>
                 {{ $order->channel_ordernum }}
-                @if($order->fulfill_by == 'AFN')
-                    <span class="label label-danger">亚马逊配送</span>
-                @endif
             </td>
             {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>

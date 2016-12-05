@@ -311,7 +311,6 @@ class SpuController extends Controller
                 if(count($itemModel)){
                     $itemModel->product->logisticsLimit()->sync($arr);
                 }
-                exit;
             }
             
             /*foreach ($data_array as $key => $value) {

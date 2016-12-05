@@ -27,7 +27,7 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td class='packageId' data-id="{{ $package->id }}">{{ $package->id }}</td>
+            <td class='packageId' data-id="{{ $package->id }}"><strong>{{ $package->id }}</strong></td>
             <td>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
             <td>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
             <td>{{ $package->order ? $package->order->amount . $package->order->currency : '订单金额有误' }}</td>

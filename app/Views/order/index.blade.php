@@ -26,7 +26,7 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td>{{ $order->id }}</td>
+            <td><strong>{{ $order->id }}</strong></td>
             <td>
                 {{ $order->channel_ordernum }}
                 @if($order->fulfill_by == 'AFN')

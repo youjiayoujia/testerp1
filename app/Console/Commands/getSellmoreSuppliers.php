@@ -53,7 +53,7 @@ class getSellmoreSuppliers extends Command
             }else{
                 foreach ($data as $value){
 
-                    if ($value->suppliers_id < 26034)
+                    if ($value->suppliers_id <= 26034)
                         continue;
 
                     if(!empty(SupplierModel::find($value->suppliers_id))){

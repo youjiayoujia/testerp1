@@ -60,6 +60,10 @@
             <input type='text' class="form-control" id="volumn" placeholder="仓库体积" name='volumn' value="{{ old('volumn') }}">
         </div>
         <div class="form-group col-lg-4">
+            <label>仓库编码(海外仓专用)</label>
+            <input type='text' class="form-control" placeholder="仓库编码" name='code' value="{{ old('code') }}">
+        </div>
+        <div class="form-group col-lg-4">
             <label for="is_available">仓库是否启用</label>
             <div class='radio'>
                 <label>

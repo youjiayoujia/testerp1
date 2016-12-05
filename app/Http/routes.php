@@ -73,10 +73,16 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('stockUnhold', 'Stock\UnholdController');
     //入库
     Route::resource('stockIn', 'Stock\InController');
+
+    //海外仓调拨     
+    Route::resource('overseaAllotment', 'Oversea\AllotmentController');
+    //海外仓头程物流
+    Route::resource('firstLeg', 'Oversea\FirstLegController');
+
     //Fba库存信息
-    Route::get('fbaStock/updateStock',
-        ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);
-    Route::resource('fbaStock', 'Oversea\StockController');
+    // Route::get('fbaStock/updateStock',
+    //     ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);
+    // Route::resource('fbaStock', 'Oversea\StockController');
 
     //包装排行榜
     Route::get('packReport/download', ['uses' => 'PackReportController@download', 'as' => 'packReport.download']);
@@ -89,28 +95,33 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('pickReport/createData', ['uses' => 'PickReportController@createData', 'as' => 'pickReport.createData']);
     Route::resource('pickReport', 'PickReportController');
     //海外仓箱子
-    Route::get('box/boxSub', ['uses' => 'Oversea\BoxController@boxSub', 'as' => 'box.boxSub']);
-    Route::resource('box', 'Oversea\BoxController');
+    // Route::get('box/boxSub', ['uses' => 'Oversea\BoxController@boxSub', 'as' => 'box.boxSub']);
+    // Route::resource('box', 'Oversea\BoxController');
     //申请表
-    Route::post('report/packageStore/{id}',
-        ['uses' => 'Oversea\ReportController@packageStore', 'as' => 'report.packageStore']);
-    Route::get('report/sendExec', ['uses' => 'Oversea\ReportController@sendExec', 'as' => 'report.sendExec']);
-    Route::get('report/shipment', ['uses' => 'Oversea\ReportController@shipment', 'as' => 'report.shipment']);
-    Route::get('report/check/{id}', ['uses' => 'Oversea\ReportController@check', 'as' => 'report.check']);
-    Route::post('report/checkResult/{id}',
-        ['uses' => 'Oversea\ReportController@checkResult', 'as' => 'report.checkResult']);
-    Route::get('report/createBox', ['uses' => 'Oversea\ReportController@createBox', 'as' => 'report.createBox']);
-    Route::get('report/ctrlZ', ['uses' => 'Oversea\ReportController@ctrlZ', 'as' => 'report.ctrlZ']);
-    Route::get('report/reportFormUpdate',
-        ['uses' => 'Oversea\ReportController@reportFormUpdate', 'as' => 'report.reportFormUpdate']);
-    Route::get('report/package/{id}', ['uses' => 'Oversea\ReportController@package', 'as' => 'report.package']);
-    Route::get('report/pick/{id}', ['uses' => 'Oversea\ReportController@pick', 'as' => 'report.pick']);
-    Route::get('report/add', ['uses' => 'Oversea\ReportController@add', 'as' => 'report.add']);
-    Route::resource('report', 'Oversea\ReportController');
+    // Route::post('report/packageStore/{id}',
+    //     ['uses' => 'Oversea\ReportController@packageStore', 'as' => 'report.packageStore']);
+    // Route::get('report/sendExec', ['uses' => 'Oversea\ReportController@sendExec', 'as' => 'report.sendExec']);
+    // Route::get('report/shipment', ['uses' => 'Oversea\ReportController@shipment', 'as' => 'report.shipment']);
+    // Route::get('report/check/{id}', ['uses' => 'Oversea\ReportController@check', 'as' => 'report.check']);
+    // Route::post('report/checkResult/{id}',
+    //     ['uses' => 'Oversea\ReportController@checkResult', 'as' => 'report.checkResult']);
+    // Route::get('report/createBox', ['uses' => 'Oversea\ReportController@createBox', 'as' => 'report.createBox']);
+    // Route::get('report/ctrlZ', ['uses' => 'Oversea\ReportController@ctrlZ', 'as' => 'report.ctrlZ']);
+    // Route::get('report/reportFormUpdate',
+    //     ['uses' => 'Oversea\ReportController@reportFormUpdate', 'as' => 'report.reportFormUpdate']);
+    // Route::get('report/package/{id}', ['uses' => 'Oversea\ReportController@package', 'as' => 'report.package']);
+    // Route::get('report/pick/{id}', ['uses' => 'Oversea\ReportController@pick', 'as' => 'report.pick']);
+    // Route::get('report/add', ['uses' => 'Oversea\ReportController@add', 'as' => 'report.add']);
+    // Route::resource('report', 'Oversea\ReportController');
     //建议采购
-    Route::get('suggestForm/createForms',
-        ['uses' => 'Oversea\SuggestFormController@createForms', 'as' => 'suggestForm.createForms']);
-    Route::resource('suggestForm', 'Oversea\SuggestFormController');
+    // Route::get('suggestForm/createForms',
+    //     ['uses' => 'Oversea\SuggestFormController@createForms', 'as' => 'suggestForm.createForms']);
+    // Route::resource('suggestForm', 'Oversea\SuggestFormController');
+
+    //物流对账正确信息详情
+    Route::get('shipmentCostError/showError/{id}',
+        ['uses' => 'ShipmentCostErrorController@showError', 'as' => 'shipmentCostError.showError']);
+    Route::resource('shipmentCostError', 'ShipmentCostErrorController');
 
     //物流对账正确信息详情
     Route::get('shipmentCostError/showError/{id}',

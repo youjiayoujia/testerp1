@@ -30,7 +30,9 @@
             <div class="col-lg-2">
                 <strong>容积(m3)</strong>: {{ $model->volumn }}
             </div>
-
+            <div class="col-lg-2">
+                <strong>仓库编码</strong>: {{ $model->code }}
+            </div>
             <div class="col-lg-2">
                 <strong>是否启用</strong>: {{ $model->is_available == '1' ? '是' : '否' }}
             </div>

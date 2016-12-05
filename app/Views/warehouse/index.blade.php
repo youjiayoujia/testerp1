@@ -9,6 +9,7 @@
     <th>联系电话</th>
     <th>类型</th>
     <th class="sort" data-field="volumn">容积</th>
+    <th>仓库编码</th>
     <th>是否启用</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
@@ -25,6 +26,7 @@
             <td>{{ $warehouse->telephone }}</td>
             <td>{{ $warehouse->type == 'local' ? '本地仓库' : ($warehouse->type == 'oversea' ? '海外仓库' : ($warehouse->type == 'third' ? '第三方仓库' : 'fba本地仓')) }}</td>
             <td>{{ $warehouse->volumn }}(m<small>3</small>)</td>
+            <td>{{ $warehouse->code }}</td>
             <td>{{ $warehouse->is_available == '1' ? '是' : '否'}}</td>
             <td>{{ $warehouse->created_at }}</td>
             <td>

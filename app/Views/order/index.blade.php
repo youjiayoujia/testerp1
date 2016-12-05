@@ -83,7 +83,7 @@
                 @if($order->customer_remark)
                     <div class="divider"></div>
                     <div class="text-danger">
-                        {{ $order->customer_remark }}
+                        {!! $order->customer_remark !!}
                     </div>
                 @endif
                 @if($order->remarks)
@@ -311,11 +311,11 @@
                         </button>
                     @endif
                     {{--@if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')--}}
-                        {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
-                           {{--data-id="{{ $order->id }}"--}}
-                           {{--data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">--}}
-                            {{--<span class="glyphicon glyphicon-pencil"></span> 删除--}}
-                        {{--</a>--}}
+                    {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
+                    {{--data-id="{{ $order->id }}"--}}
+                    {{--data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">--}}
+                    {{--<span class="glyphicon glyphicon-pencil"></span> 删除--}}
+                    {{--</a>--}}
                     {{--@endif--}}
                     @foreach($order->items as $item)
                         @if($item->is_refund == 0)
@@ -881,20 +881,20 @@
 @stop
 @section('tableToolButtons')
     {{--<div class="btn-group" role="group">--}}
-        {{--<input class="form-control lr" id="lr" placeholder="利润" name="lr">--}}
+    {{--<input class="form-control lr" id="lr" placeholder="利润" name="lr">--}}
     {{--</div>--}}
     {{--<div class="btn-group" role="group">--}}
-        {{--<select class="form-control sx" name="sx" id="sx">--}}
-            {{--<option value="null">利润筛选</option>--}}
-            {{--<option value="high">高于</option>--}}
-            {{--<option value="low">低于</option>--}}
-        {{--</select>--}}
+    {{--<select class="form-control sx" name="sx" id="sx">--}}
+    {{--<option value="null">利润筛选</option>--}}
+    {{--<option value="high">高于</option>--}}
+    {{--<option value="low">低于</option>--}}
+    {{--</select>--}}
     {{--</div>--}}
     {{--<div class="btn-group" role="group">--}}
-        {{--<select class="form-control special" name="special" id="special">--}}
-            {{--<option value="null">特殊要求</option>--}}
-            {{--<option value="yes">有特殊要求</option>--}}
-        {{--</select>--}}
+    {{--<select class="form-control special" name="special" id="special">--}}
+    {{--<option value="null">特殊要求</option>--}}
+    {{--<option value="yes">有特殊要求</option>--}}
+    {{--</select>--}}
     {{--</div>--}}
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1111,12 +1111,12 @@
                 id = $(this).attr('name');
                 if (quantity > 1) {
                     $.get(
-                            "{{ route('package.returnSplitPackage')}}",
-                            {quantity: quantity, id: id},
-                            function (result) {
-                                $('.split_package').html('');
-                                $('.split_package').html(result);
-                            }, 'html'
+                        "{{ route('package.returnSplitPackage')}}",
+                        {quantity: quantity, id: id},
+                        function (result) {
+                            $('.split_package').html('');
+                            $('.split_package').html(result);
+                        }, 'html'
                     );
                 } else {
                     alert('数量不能小于1');
@@ -1143,9 +1143,9 @@
                     type: 'get',
                     success: function (result) {
                         $("#statistics").text(
-                                '总计金额:$' + result['totalAmount'] + ' ' +
-                                '平均利润率:' + result['averageProfit'] + '%' + ' ' +
-                                '总平台费:$' + result['totalPlatform']
+                            '总计金额:$' + result['totalAmount'] + ' ' +
+                            '平均利润率:' + result['averageProfit'] + '%' + ' ' +
+                            '总平台费:$' + result['totalPlatform']
                         );
                     }
                 });

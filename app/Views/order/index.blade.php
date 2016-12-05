@@ -1,15 +1,12 @@
 @extends('common.table')
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuanOrder()">全选</th>
-    <th class="sort" data-field="id">ID</th>
-    <th class="sort" data-field="ordernum">订单号</th>
-    <th class="sort" data-field="channel_ordernum">渠道订单号</th>
+    <th class="sort" data-field="id">内单号</th>
+    <th class="sort" data-field="channel_ordernum">平台订单号</th>
     {{--<th class="sort" data-field="channel">渠道</th>--}}
-    <th class="sort" data-field="channel_account_id">渠道账号</th>
-    <th>邮箱</th>
+    <th class="sort" data-field="channel_account_id">销售账号</th>
     <th>买家ID</th>
     <th>物流</th>
-    <th>追踪号</th>
     <th>收货人</th>
     <th>国家</th>
     <th class="sort" data-field="amount"><strong class="text-success">总金额</strong></th>
@@ -29,8 +26,7 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td>{{ $order->id }}</td>
-            <td>{{ $order->ordernum }}</td>
+            <td><strong>{{ $order->id }}</strong></td>
             <td>
                 {{ $order->channel_ordernum }}
                 @if($order->fulfill_by == 'AFN')
@@ -39,10 +35,8 @@
             </td>
             {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
-            <td>{{ $order->email }}</td>
-            <td>{{ $order->by_id }}</td>
-            <td>{{ $order->logistics }}<br>{{ $order->shipping }}</td>
-            <td>{{ $order->code }}</td>
+            <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
+            <td>{{ $order->logistics }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
@@ -140,7 +134,7 @@
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>
-                                {{ $orderItem->item->warehouse->name }}
+                                {{ $orderItem->item->warehouse?$orderItem->item->warehouse->name:'' }}
                             </div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">

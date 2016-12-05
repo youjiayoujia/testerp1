@@ -65,6 +65,66 @@
                     }
                 });
             });
+
+            $('#save').click(function () {
+/*                if ($('#do-chaeck').val() == 'true'){
+                    var status = $('#order-operate').val();
+                    if (status) {
+                        $('#reply-content').submit();
+                    } else {
+                        alert('请先选择订单操作');
+                    }
+                }*/
+                $('#reply-content').submit();
+
+            });
+
+            $('#do-review-order').click( function () {
+                if(confirm('确定审核？')){
+                    var order_id =  $('#order-id').val();
+                    $.ajax({
+                        url: "{{route('updateStatus')}}",
+                        data: 'order_id=' + order_id,
+                        type: 'GET',
+                        success: function (data) {
+                            console.log(data);
+                            if(data == '1'){
+                                alert('审核成功');
+                                $('#do-review-order').attr('disabled',true);
+                            }else{
+                                alert('审核失败');
+                            }
+                        }
+                    });
+                }
+            });
+            $('#do-withdraw-order').click(function () {
+                if(confirm('确定撤单？')){
+                    var order_id = $('#order-id').val();
+                    var withdraw = $('#withdraw').val();
+                    var withdraw_reason = $('#withdraw_reason').val();
+
+                    if(withdraw == 'NULL' || withdraw_reason == ''){
+                        alert('请编辑撤单原因，选择撤单类型');
+                        return false;
+                    }
+
+                    $.ajax({
+                        url: "{{route('ajaxWithdraw')}}",
+                        data: 'id=' + order_id+'&withdraw='+withdraw+'&withdraw_reason='+withdraw_reason,
+                        type: 'POST',
+                        success: function (data) {
+                            if(data == '1'){
+                                alert('撤单成功');
+                                $('#withdrawOrder').modal('hide')
+                            }else{
+                                alert('撤单失败');
+                            }
+                        }
+                    });
+                }
+            });
+
         });
 
         function changeSome(text,type){
@@ -162,6 +222,7 @@
                     }, 'json'
             );
         }
+
     </script>
 
 

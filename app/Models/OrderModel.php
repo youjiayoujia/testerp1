@@ -99,7 +99,7 @@ class OrderModel extends BaseModel
     private $canPackageStatus = ['PREPARED'];
     private $canCancelStatus = ['SHIPPED', 'COMPLETE'];
 
-    public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
+    public $searchFields = ['id' => '内单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
 
     //退款rules
     public $rules = [
@@ -342,7 +342,6 @@ class OrderModel extends BaseModel
         }
         return [
             'filterFields' => [
-                'ordernum',
                 'channel_ordernum',
                 'email',
                 'by_id',

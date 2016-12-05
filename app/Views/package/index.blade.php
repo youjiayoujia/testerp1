@@ -3,6 +3,7 @@
     <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class="sort" data-field="id">包裹号</th>
     <th>内单号</th>
+    <th>平台订单号</th>
     <th>订单金额</th>
     <th>仓库</th>
     <th>收货人</th>
@@ -27,8 +28,8 @@
                 @endif
             </td>
             <td class='packageId' data-id="{{ $package->id }}">{{ $package->id }}</td>
-            <td>{{ $package->order ? $package->order->id : '订单号有误' }}
-                <br/>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
+            <td>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
+            <td>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
             <td>{{ $package->order ? $package->order->amount . $package->order->currency : '订单金额有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->shipping_firstname . $package->shipping_lastname }}</td>
@@ -89,13 +90,13 @@
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
                 <td colspan='2'>{{ $packageItem->quantity }}</td>
-                <td colspan='2'>单件重量:{{ $packageItem->item->weight }}</td>
+                <td colspan='3'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
             <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='2'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
+            <td colspan='3'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
             <td colspan='6'>
                 @if($package->order->status != 'REVIEW')
                     <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>

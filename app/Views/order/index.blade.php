@@ -35,7 +35,6 @@
             </td>
             {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
-            <td>{{ $order->email }}</td>
             <td>{{ $order->email }}<br/>{{ $order->by_id }}</td>
             <td>{{ $order->logistics }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>

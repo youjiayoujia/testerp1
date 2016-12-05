@@ -90,8 +90,9 @@
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
-            <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
-            <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
+            <td colspan='3'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
+            <td colspan='3'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
+            <td colspan='2'>是否标记: {{ $package->is_mark == '1' ? '是' : '否' }}</td>
             <td colspan='2'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
             <td colspan='6'>
                 @if($package->order->status != 'REVIEW')

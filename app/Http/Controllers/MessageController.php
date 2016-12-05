@@ -347,48 +347,6 @@ class MessageController extends Controller
 
         if ($message->reply(request()->all())) {
 
-            /**
-             * 处理订单
-             */
-/*            $order_operte = request()->input('order-operate');
-            $order_id = request()->input('order-id');
-
-            if (!empty($order_operte) && !empty($order_id)) {
-
-               // OrderModel
-                if ($order_operte == '1') { // 审核
-                    $username = request()->user()->name;
-
-                    $from = json_encode(OrderModel::find($order_id));
-                    $model = $this->model->find($order_id);
-                    $model->update(['status' => 'PREPARED', 'is_review' => 1]);
-                    if ($model->packages()->count()) {
-                        $model->packagesToQueue();
-                    } else {
-                        $job = new DoPackages($model);
-                        $job = $job->onQueue('doPackages');
-                        $this->dispatch($job);
-                    }
-                    $to = json_encode($this->model->find($order_id));
-                    $this->eventLog($username, '审核更新,id=' . $order_id, $to, $from);
-
-                } elseif ( $order_operte == '2'){ // 撤单
-
-                    $userName = UserModel::find(request()->user()->id);
-                    $from = json_encode($this->model->find($id));
-                    request()->flash();
-                    $data = request()->all();
-                    $order = $this->model->find($id);
-                    $order->cancelOrder($data['withdraw']);
-                    $to = json_encode($this->model->find($id));
-                    $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
-
-                    return redirect($this->mainIndex);
-
-
-                }
-            }*/
-
             /*
              * 写入队列
              */

@@ -164,13 +164,13 @@ abstract class Controller extends BaseController
                     case 'sectionSelect':
                         foreach ($related as $kind => $content) {
                             if(!empty($content['begin']) && !empty($content['end'])) {
-                                $list = $list->whereBetween($kind, [$content['begin'], $content['end']]);
+                                $list = $list->whereBetween($kind, [str_replace('/', '-', $content['begin']), str_replace('/', '-', $content['end'])]);
                             }
                             if(empty($content['begin']) && !empty($content['end'])) {
-                                $list = $list->where($kind, '<', $content['end']);
+                                $list = $list->where($kind, '<', str_replace('/', '-', $content['end']));
                             }
                             if(!empty($content['begin']) && empty($content['end'])) {
-                                $list = $list->where($kind, '>', $content['begin']);
+                                $list = $list->where($kind, '>', str_replace('/', '-', $content['begin']));
                             }
                         }
                         break;

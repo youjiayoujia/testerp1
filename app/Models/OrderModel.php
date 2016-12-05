@@ -766,18 +766,12 @@ class OrderModel extends BaseModel
     public function calculateOrderChannelFee()
     {
         $sum = 0;
-        if ($this->items->count() > 0) {
-            foreach ($this->items as $item) {
-                if ($item->item) {
-                    if ($item->item->catalog) {
-                        $channelRate = $item->item->catalog->channels->where('id',
-                            $this->channelAccount->catalog_rates_channel_id)->first();
-                        if ($channelRate) {
-                            $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
-                        } else {
-                            return 0;
-                        }
-                    }
+        foreach ($this->items as $item) {
+            if ($item->item and $item->item->catalog) {
+                $channelRate = $item->item->catalog->channels->where('id',
+                    $this->channelAccount->catalog_rates_channel_id)->first();
+                if ($channelRate) {
+                    $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
                 }
             }
         }

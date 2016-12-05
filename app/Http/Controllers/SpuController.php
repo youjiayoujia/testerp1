@@ -263,7 +263,7 @@ class SpuController extends Controller
      */
     public function insertLan()
     {
-        ini_set('memory_limit','2048M');
+        /*ini_set('memory_limit','2048M');
         $last_id = SpuMultiOptionModel::all()->last()->spu_id;
         $spus = $this->model->where('id','>',$last_id)->get();
         foreach ($spus as $spu) {
@@ -275,7 +275,7 @@ class SpuController extends Controller
             SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>6]);
             SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>7]);
             SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>8]);
-        }
+        }*/
     }
 
     public function insertData()
@@ -301,8 +301,20 @@ class SpuController extends Controller
         Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
             $reader->noHeading();
             $data_array = $reader->all()->toArray();
-            
+
             foreach ($data_array as $key => $value) {
+                if($key==0)continue;
+                
+                $itemModel = ItemModel::where('sku',$value['1'])->first();
+                $arr = [];
+                $arr[] = $value['2'];
+                if(count($itemModel)){
+                    $itemModel->product->logisticsLimit()->sync($arr);
+                }
+                exit;
+            }
+            
+            /*foreach ($data_array as $key => $value) {
                 $itemModel = ItemModel::where('sku',$value['1'])->first();
                 if(count($itemModel)){
                     $catalogModel = CatalogModel::where('c_name',$value['3'])->first();
@@ -314,7 +326,7 @@ class SpuController extends Controller
                     }
                 }
                 
-            }
+            }*/
             /*foreach ($data_array as $key => $value) {
                 if($key==0)continue;
                 //print_r($value);exit;

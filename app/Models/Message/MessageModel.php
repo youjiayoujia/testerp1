@@ -65,6 +65,11 @@ class MessageModel extends BaseModel{
         return $this->hasOne('App\Models\ChannelModel','id','channel_id');
     }
 
+    public function Order(){
+        return $this->belongsTo('App\Models\OrderModel', 'channel_order_number','channel_ordernum');
+
+    }
+
     public function getChannelNameAttribute(){
         if(!empty($this->channel_id)){
             return $this->channel->name;
@@ -533,6 +538,16 @@ class MessageModel extends BaseModel{
             return '平台账号';
         }
     }
+
+    /**
+     *
+     */
+/*    public function getIsAliOptionMsgAttribute(){
+        if ($this->related == '0'){
+            $messages = $this->where('channel_order_number', $this->channel_order_number)->get();
+            dd($messages);
+        }
+    }*/
 
 
 }

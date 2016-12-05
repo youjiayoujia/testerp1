@@ -86,9 +86,8 @@ class MessageController extends Controller
             }
 
             $emailarr=config('user.email');
-           //dd($message->MessageInfo);
-            //dd($message->ChannelParams);
 
+            $IsOption = $this->IsAliOptionOrderMsg($message);
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
                 'message' => $message,
@@ -100,12 +99,31 @@ class MessageController extends Controller
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
+                'is_ali_msg_option' => $IsOption
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
 
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '该信息已被他人处理.'));
 
+    }
+
+    /**
+     * 验证是否为订单未回复消息
+     * @param $messageObj
+     * @return bool
+     */
+    public function IsAliOptionOrderMsg($messageObj)
+    {
+        if (!empty($messageObj->channel_order_number) && $messageObj->getChannelDiver() == 'aliexpress') {
+
+            $count = $this->model->where('channel_order_number', $messageObj->channel_order_number)->count();
+            $order = $messageObj->Order;
+            if ($count == 1 && !empty($order)) {
+                return $order->id;
+            }
+        }
+        return false;
     }
 
     public function content($id)
@@ -328,6 +346,49 @@ class MessageController extends Controller
         $this->validate(request(), $reply->rules('create')); //
 
         if ($message->reply(request()->all())) {
+
+            /**
+             * 处理订单
+             */
+/*            $order_operte = request()->input('order-operate');
+            $order_id = request()->input('order-id');
+
+            if (!empty($order_operte) && !empty($order_id)) {
+
+               // OrderModel
+                if ($order_operte == '1') { // 审核
+                    $username = request()->user()->name;
+
+                    $from = json_encode(OrderModel::find($order_id));
+                    $model = $this->model->find($order_id);
+                    $model->update(['status' => 'PREPARED', 'is_review' => 1]);
+                    if ($model->packages()->count()) {
+                        $model->packagesToQueue();
+                    } else {
+                        $job = new DoPackages($model);
+                        $job = $job->onQueue('doPackages');
+                        $this->dispatch($job);
+                    }
+                    $to = json_encode($this->model->find($order_id));
+                    $this->eventLog($username, '审核更新,id=' . $order_id, $to, $from);
+
+                } elseif ( $order_operte == '2'){ // 撤单
+
+                    $userName = UserModel::find(request()->user()->id);
+                    $from = json_encode($this->model->find($id));
+                    request()->flash();
+                    $data = request()->all();
+                    $order = $this->model->find($id);
+                    $order->cancelOrder($data['withdraw']);
+                    $to = json_encode($this->model->find($id));
+                    $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
+
+                    return redirect($this->mainIndex);
+
+
+                }
+            }*/
+
             /*
              * 写入队列
              */
@@ -336,10 +397,6 @@ class MessageController extends Controller
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
-/*            $account = $message->account;
-            $reply = ReplyModel::where('message_id',$id)->get()->first();
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $channel->sendMessages($reply);*/
 
             if ($this->workflow == 'keeping') {
                 return redirect(route('message.process'))

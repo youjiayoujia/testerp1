@@ -554,6 +554,7 @@ Class AliexpressAdapter implements AdapterInterface
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
                         $message_list[$j]['message_id'] = $item['lastMessageId'];
+                        $message_list[$j]['list_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
                         $message_list[$j]['to'] = '客服';
@@ -1022,12 +1023,13 @@ Class AliexpressAdapter implements AdapterInterface
     }
     public function sendMessages($replyMessage)
     {
+
         // TODO: Implement sendMessages() method.
         $message_obj = $replyMessage->message;
         if(!empty($message_obj)){
             // step1:发信息
             $send_param = [];
-            $channelId = rawurlencode($message_obj->message_id);
+            $channelId = rawurlencode($message_obj->list_id);
             $buyerId = rawurlencode($message_obj->from);
             if($message_obj->label == '订单留言'){
                 $msgSources = rawurlencode('order_msg');
@@ -1043,7 +1045,7 @@ Class AliexpressAdapter implements AdapterInterface
                 if($api_return_array['result']["isSuccess"]){
                     //step2: 更新消息为已读
                     $update_param = [];
-                    $update_param['channelId']  = $message_obj->message_id;
+                    $update_param['channelId']  = $message_obj->list_id;
                     $update_param['msgSources'] = $msgSources;
 
                     $this->getJsonData('api.updateMsgRead',http_build_query($update_param));

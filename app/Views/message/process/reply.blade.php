@@ -10,7 +10,7 @@
     <div class="panel panel-primary">
         <div class="panel-heading"><strong>回复:</strong></div>
         <div class="panel-body">
-            <form action="{{ route('message.reply', ['id'=>$message->id]) }}" method="POST" onsubmit="return check()" ;>
+            <form action="{{ route('message.reply', ['id'=>$message->id]) }}" method="POST" id="reply-content" ;>
                 {!! csrf_field() !!}
                 <div class="row">
                     <div class="col-lg-3">
@@ -81,7 +81,96 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="form-group">
-                            <button id="save" type="submit" class="btn btn-primary">回复</button>
+                            @if($is_ali_msg_option)
+
+
+
+
+
+                                <input type="hidden" id="do-chaeck" value="true">
+                                <input type="hidden" name="order-id" id="order-id" value="{{$is_ali_msg_option}}">
+                                <div class="col-lg-4">
+                                    <div class="row">
+
+                                        @if($message->Order)
+                                            @if($message->Order->status == 'REVIEW')
+                                                <small class="text-danger glyphicon glyphicon-asterisk"></small><label>订单操作</label>
+
+                                                <button type="button" id="do-review-order" class="btn btn-success btn-xs">审核</button>
+                                                <button type="button" class="btn btn-danger btn-xs" data-target="#withdrawOrder" data-toggle="modal" >撤单</button>
+
+
+                                         {{--       <button class="btn btn-danger btn-xs"
+                                                        data-toggle="modal"
+                                                        data-target="#withdraw{{ $order->id }}"
+                                                        title="撤单">
+                                                    <span class="glyphicon glyphicon-link"></span> 撤单
+                                                </button>--}}
+
+                                                <div class="modal fade" id="withdrawOrder" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <form action="" method="POST">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                    <h4 class="modal-title" id="myModalLabel">撤单</h4>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div class="form-group col-lg-6">
+                                                                            <label for="withdraw" class='control-label'>撤单原因</label>
+                                                                            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                                                            <select class="form-control" name="withdraw" id="withdraw">
+                                                                                <option value="NULL">==选择原因==</option>
+                                                                                @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
+                                                                                    <option value="{{ $withdraw_key }}">
+                                                                                        {{ $withdraw }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-lg-6">
+                                                                            <label for="withdraw_reason" class='control-label'>原因</label>
+                                                                            <textarea class="form-control" rows="3" name='withdraw_reason' id="withdraw_reason"></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                                                    <button type="button" class="btn btn-primary" id="do-withdraw-order">提交</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <div class="row">
+                                        <button id="save" type="button" class="btn btn-primary">回复</button>
+
+                                    </div>
+
+
+{{--                                    <select class="form-control" name="order-operate" id="order-operate">
+                                        <option value="">-请选择-</option>
+                                        <option value="1">已审核</option>
+                                        <option value="2">撤  单</option>
+
+                                    </select>--}}
+                                </div>
+                            @else
+                                <input type="hidden" id="do-chaeck" value="false">
+
+                                <button id="save" type="button" class="btn btn-primary">回复</button>
+                            @endif
+
+
                             @if($driver == 'aliexpress')
                                 <div style="float: right;">
                                 <?php
@@ -104,7 +193,8 @@
         </div>
     </div>
 <script>
-    function check() {
+/*    function check() {
+        console.log(222);
         var to_email = $("#to_email").val();
         //对电子邮件的验证
         if (!to_email.indexOf("@")) {
@@ -112,7 +202,7 @@
             return false;
         }
         return true;
-    }
+    }*/
 </script>
 <div class="panel panel-primary">
     <div class="panel-heading"><strong>操作</strong></div>
@@ -171,14 +261,16 @@
                 }
             };
             // 点击发表时删除数据
-            document.getElementById("save").onclick = function () {
+/*            document.getElementById("save").onclick = function () {
+                console.log(111);
+                return;
                 editor.value = "";
                 if (!window.localStorage) {
                     UserData.remove('editor-text');
                 } else {
                     localStorage.removeItem('editor-text');
                 }
-            };
+            };*/
 
             function setImg(id) {
                 var value = $('#textcontent').val();

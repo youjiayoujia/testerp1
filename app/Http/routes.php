@@ -656,6 +656,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('updateRecover', ['uses' => 'OrderController@updateRecover', 'as' => 'updateRecover']);
     Route::get('withdraw/{id}', ['uses' => 'OrderController@withdraw', 'as' => 'withdraw']);
     Route::post('withdrawUpdate/{id}', ['uses' => 'OrderController@withdrawUpdate', 'as' => 'withdrawUpdate']);
+    Route::any('ajaxWithdraw', ['uses' => 'OrderController@ajaxWithdraw', 'as' => 'ajaxWithdraw']);
     Route::any('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
     Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);

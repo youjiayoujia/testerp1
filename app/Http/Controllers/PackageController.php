@@ -438,9 +438,9 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
         }
-//        $job = new PlaceLogistics($model, 'UPDATE');
-//        $job = $job->onQueue('placeLogistics');
-//        $this->dispatch($job);
+        $job = new PlaceLogistics($model, 'UPDATE');
+        $job = $job->onQueue('placeLogistics');
+        $this->dispatch($job);
 
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '包裹已重新下物流单'));
     }

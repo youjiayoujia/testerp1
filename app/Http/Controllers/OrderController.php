@@ -596,10 +596,7 @@ class OrderController extends Controller
             }
             if ($this->model->find($id)->packages) {
                 foreach ($this->model->find($id)->packages as $package) {
-                    foreach ($package->items as $item) {
-                        $item->delete();
-                    }
-                    $package->delete();
+                    $package->cancelPackage();
                 }
             }
         }
@@ -614,6 +611,11 @@ class OrderController extends Controller
         $data = request()->all();
         $order = $this->model->find($id);
         $order->cancelOrder($data['withdraw']);
+        if ($order->packages) {
+            foreach ($order->packages as $package) {
+                $package->cancelPackage();
+            }
+        }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
 

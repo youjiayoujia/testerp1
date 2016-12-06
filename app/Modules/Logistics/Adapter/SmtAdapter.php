@@ -189,7 +189,7 @@ class SmtAdapter extends BasicAdapter
         }else{
             $res = $this->getOnlineLogisticsInfo($channel_account_id,$orderId);
             echo "<pre>";
-            print_r($result);
+            print_r($res);
             $onlineLogisticsId = $package->logistics_order_number;
             if(array_key_exists('success', $res) && $res['success']){
                 if(!empty($res['result'])){

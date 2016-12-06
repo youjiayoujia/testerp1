@@ -19,7 +19,7 @@ class AllotmentFormModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['item_id', 'warehouse_position_id', 'quantity', 'parent_id'];
+    protected $fillable = ['item_id', 'warehouse_position_id', 'quantity', 'inboxed_quantity', 'parent_id'];
 
     // 规则验证
     public $rules = [

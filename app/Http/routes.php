@@ -1,4 +1,4 @@
-<?php
+g<?php
 /*
   |--------------------------------------------------------------------------
   | Application Routes
@@ -75,6 +75,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('stockIn', 'Stock\InController');
 
     //海外仓调拨  
+    Route::get('overseaAllotment/inboxed/{id}', ['uses' => 'Oversea\AllotmentController@inboxed', 'as' => 'overseaAllotment.inboxed']);   
     Route::get('overseaAllotment/pick/{id}', ['uses' => 'Oversea\AllotmentController@pick', 'as' => 'overseaAllotment.pick']);   
     Route::post('overseaAllotment/checkResult/{id}', ['uses' => 'Oversea\AllotmentController@checkResult', 'as' => 'overseaAllotment.checkResult']);   
     Route::get('overseaAllotment/check/{id}', ['uses' => 'Oversea\AllotmentController@check', 'as' => 'overseaAllotment.check']);   
@@ -83,6 +84,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //海外仓头程物流
     Route::resource('firstLeg', 'Oversea\FirstLegController');
 
+    //箱子信息
+    Route::get('overseaBox/createbox', ['uses' => 'Oversea\BoxController@createbox', 'as' => 'overseaBox.createbox']);
+    Route::resource('box', 'Oversea\BoxController');
     //Fba库存信息
     // Route::get('fbaStock/updateStock',
     //     ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);

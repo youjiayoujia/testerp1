@@ -35,12 +35,16 @@
                 @if($overseaAllotment->check_status == 'new')
                     <a href="{{ route('overseaAllotment.check', ['id'=>$overseaAllotment->id]) }}" class="btn btn-success btn-xs" title='审核调拨单'>
                         <span class="glyphicon glyphicon-comment"></span>
-                        
                     </a>
                 @endif
                 @if($overseaAllotment->check_status == 'pass')
-                    <a href="{{route('overseaAllotment.pick', ['id'=>$overseaAllotment->id])}}" class="btn btn-success btn-xs" title='打印拣货单'>
+                    <a href="javascript:" class="btn btn-success btn-xs print" title='打印拣货单'>
                         <span class="glyphicon glyphicon-print"></span>
+                    </a>
+                @endif
+                @if(in_array($overseaAllotment->status, ['pick','inboxed']))
+                    <a href="{{route('overseaAllotment.inboxed', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='装箱'>
+                        <span class="glyphicon glyphicon-gift"></span>
                     </a>
                 @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"

@@ -165,9 +165,9 @@ class AllotmentController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        // if($model->status == 'new') {
-        //     $model->update(['status'=>'pick']);
-        // }
+        if($model->status == 'new') {
+            $model->update(['status'=>'pick']);
+        }
         $allotmentforms = AllotmentFormModel::where('parent_id', $id)->get()->sortBy(function($query){
             return $query->position->name;
         });
@@ -180,6 +180,23 @@ class AllotmentController extends Controller
         $this->eventLog($name, '打印拣货单', $to, $to);
         
         return view($this->viewPath.'pick', $response);
+    }
+
+    public function inboxed($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->status = 'inboxed';
+        $model->save();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'forms' => $model->allotmentForms,
+        ];
+        
+        return view($this->viewPath.'inboxed', $response);
     }
 
     /**

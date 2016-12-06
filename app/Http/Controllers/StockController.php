@@ -349,9 +349,16 @@ class StockController extends Controller
         }
         $total = $stocks->count();
         $arr = [];
-        foreach($stocks as $key => $stock) {
-            $arr[$key]['id'] = $stock->item_id;
-            $arr[$key]['text'] = $stock->item->sku;
+        if(!empty($warehouse)) {
+            foreach($stocks as $key => $stock) {
+                $arr[$key]['id'] = $stock->item_id;
+                $arr[$key]['text'] = $stock->item->sku;
+            }
+        } else {
+            foreach($stocks as $key => $stock) {
+                $arr[$key]['id'] = $stock->id;
+                $arr[$key]['text'] = $stock->sku;
+            }
         }
         if($total)
             return json_encode(['results' => $arr, 'total' => $total]);

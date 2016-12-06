@@ -26,9 +26,9 @@ class BoxController extends Controller
         $id = request('id');
         $model = $this->model->create(['parent_id' => $id, 'boxnum' => 'box'.time()]);
         if($model) {
-            return json_encode($model->boxnum);
+            return $model->boxnum;
         } else {
-            return json_encode(false);
+            return false;
         }
     }
 }

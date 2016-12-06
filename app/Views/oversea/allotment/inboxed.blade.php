@@ -22,7 +22,7 @@
         <div class='form-group col-lg-8'>
             <div class='col-lg-2'>
                 <button type='button' class='btn btn-info search'>确认</button>
-                <button type='button' class='btn btn-warning createBox'><i class="glyphicon glyphicon-plus"></i> 新建装箱信息</button>
+                <button type='button' class='btn btn-warning createbox'><i class="glyphicon glyphicon-plus"></i> 新建装箱信息</button>
             </div>
             <div class='col-lg-2'>
                 <input type='text' class='form-control boxnum' placeholder='箱号'>
@@ -72,8 +72,8 @@
                         <td class='col-lg-2'>{{ $form->id }}</td>
                         <td class='col-lg-2 sku' data-id="{{ $form->item_id}}">{{ $form->item ? $form->item->sku : '' }}</td>
                         <td class='col-lg-2 remark'>{{ $form->item ? $form->item->remark : '' }}</td>
-                        <td class='col-lg-1'>{{ $form->quantity}}</td>
-                        <td class='col-lg-1'>{{ $form->inboxed_quantity }}</td>
+                        <td class='col-lg-1 quantity'>{{ $form->quantity}}</td>
+                        <td class='col-lg-1 inboxed_quantity'>{{ $form->inboxed_quantity }}</td>
                         <td class='col-lg-2 status'>
                         @if($form->inbox_quantity != $form->quantity)
                         <font color='red'>包装中</font></td>
@@ -117,7 +117,6 @@
     <button type="reset" class="btn btn-default">取消</button>
 @stop
 @section('pageJs')
-<script src="{{ asset('js/jquery.min.js') }}"></script>
 <script type='text/javascript'>
 $(document).on('keypress', function (event) {
     if(event.keyCode == '13') {
@@ -165,7 +164,7 @@ $(document).ready(function(){
         block.remove();
     });
 
-    $(document).on('click', '.createBox', function(){
+    $(document).on('click', '.createbox', function(){
         id = $('.modelId').val();
         boxnum = $('.boxnum').val();
         if(!boxnum) {
@@ -184,7 +183,7 @@ $(document).ready(function(){
                     {id:id},
                     function(result){
                         if(result) {
-                            $('.box').val(result);
+                            $('.boxnum').val(result);
                         } else {
                             alert('箱子创建失败');
                         }
@@ -196,47 +195,25 @@ $(document).ready(function(){
     $(document).on('click', '.search', function(){
         val = $('.searchsku').val();
         $('.notFindSku').text('');
-        extern_flag = 0;
-        out_js = 0;
         $('.searchsku').val('');
+        extern_flag = 0;
         $('.searchsku').focus();
         if(val) {
-            if(!$('.boxId').val()) {
+            if(!$('.boxnum').val()) {
                 alert('请新建装箱信息');
                 return false;
             }
             $.each($('.old tr'), function(){
                 tmp = $(this);
                 inbox_quantity = parseInt(tmp.find('.inbox_quantity').text());
-                report_quantity = parseInt(tmp.find('.report_quantity').text());
-                if(tmp.find('.sku').text() == val && report_quantity >  inbox_quantity) {
-                    out_js = 1;
-                    if((parseFloat($('.box_weight').val()) + parseFloat(tmp.data('weight'))) > 20) {
-                        $('.notFindSku').text('重量超过20kg,请重换箱子');
-                        return false;
-                    }
+                quantity = parseInt(tmp.find('.quantity').text());
+                if(tmp.find('.sku').text() == val && quantity >  inbox_quantity) {
                     extern_flag = 1;
                     tmp.find('.inbox_quantity').text(parseInt(tmp.find('.inbox_quantity').text()) + 1);
-                    if(parseInt(tmp.find('.inbox_quantity').text()) == report_quantity) {
+                    if(parseInt(tmp.find('.inbox_quantity').text()) == quantity) {
                         tmp.find('.status').text('数量已匹配')
                     }
-                    id = tmp.data('id');
-                    sku = tmp.find('.sku').text();
-                    item_id = tmp.find('.sku').data('id');
-                    box_id = $('.boxId').val();
-                    $.ajax({
-                        url:"{{ route('test2')}}",
-                        data:{id:id, itemId:item_id,boxId:box_id},
-                        dataType:'json',
-                        type:'get',
-                        success:function(result) {
-                            if(!result) {
-                                return false;
-                            }
-                            $('.box_weight').val(parseFloat($('.box_weight').val())+parseFloat(result));
-                            $('.box_quantity').val(parseInt($(".box_quantity").val()) + 1);
-                        }
-                    });
+                    
                     arr = new Array();
                     i=0;
                     str = '';

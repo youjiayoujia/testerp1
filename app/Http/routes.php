@@ -1,4 +1,4 @@
-g<?php
+<?php
 /*
   |--------------------------------------------------------------------------
   | Application Routes
@@ -86,7 +86,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
 
     //箱子信息
     Route::get('overseaBox/createbox', ['uses' => 'Oversea\BoxController@createbox', 'as' => 'overseaBox.createbox']);
-    Route::resource('box', 'Oversea\BoxController');
+    Route::resource('overseaBox', 'Oversea\BoxController');
     //Fba库存信息
     // Route::get('fbaStock/updateStock',
     //     ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);

@@ -1077,6 +1077,7 @@ class PackageModel extends BaseModel
                             'status' => 'WAITASSIGN',
                             'weight' => $weight,
                             'logistics_id' => '',
+                            'logistics_order_number' => '',
                             'tracking_no' => ''
                         ]);
                         $job = new AssignLogistics($this);
@@ -1101,6 +1102,7 @@ class PackageModel extends BaseModel
                                 'status' => 'WAITASSIGN',
                                 'weight' => $weight,
                                 'logistics_id' => '',
+                                'logistics_order_number' => '',
                                 'tracking_no' => ''
                             ]);
                             $job = new AssignLogistics($this);
@@ -1138,8 +1140,9 @@ class PackageModel extends BaseModel
                                 'warehouse_id' => $warehouseId,
                                 'status' => 'WAITASSIGN',
                                 'weight' => $weight,
-                                'logistics_id' => '0',
-                                'tracking_no' => '0'
+                                'logistics_id' => '',
+                                'tracking_no' => '',
+                                'logistics_order_number' => '',
                             ]);
                             $job = new AssignLogistics($newPackage);
                             Queue::pushOn('assignLogistics', $job);

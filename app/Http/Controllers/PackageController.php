@@ -25,6 +25,7 @@ use Exception;
 use App\Jobs\AssignStocks;
 use App\Models\NumberModel;
 use App\Models\UserModel;
+use App\Models\Message\ReplyModel;
 use Cache;
 
 class PackageController extends Controller
@@ -378,6 +379,7 @@ class PackageController extends Controller
             'packageShipping' => $this->model->where('status', 'PACKED')->count(),
             'packageException' => $this->model->where('status', 'ERROR')->count(),
             'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
+            'message_replies_failed' => ReplyModel::where('status','FAIL')->count(),
         ];
 
         return view($this->viewPath . 'flow', $response);

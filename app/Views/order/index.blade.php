@@ -33,7 +33,7 @@
             {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
-            <td>{{ $order->logistics }}</td>
+            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>

@@ -19,23 +19,52 @@
             <td>{{ $overseaAllotment->outWarehouse ? $overseaAllotment->outWarehouse->name : ''}}</td>
             <td>{{ $overseaAllotment->inWarehouse ? $overseaAllotment->inWarehouse->name : ''}}</td>
             <td>{{ $overseaAllotment->allotmentBy ? $overseaAllotment->allotmentBy->name : ''}}</td>
-            <td>{{ config('oversea.allotmentStatus')[$overseaAllotment->status] }}</td>
+            <td>{{ $overseaAllotment->status_name }}</td>
             <td>{{ $overseaAllotment->checkBy ? $overseaAllotment->checkBy->name : ''}}</td>
             <td>{{ $overseaAllotment->check_status == 'new' ? '未审核' : ($overseaAllotment->check_status == 'fail' ? '未审核' : '已审核')}}</td>
             <td>{{ $overseaAllotment->created_at }}</td>
             <td>
                 <a href="{{ route('overseaAllotment.show', ['id'=>$overseaAllotment->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                    <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
+                @if($overseaAllotment->check_status == 'new')
                 <a href="{{ route('overseaAllotment.edit', ['id'=>$overseaAllotment->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
+                @endif
+                @if($overseaAllotment->check_status == 'new')
+                    <a href="{{ route('overseaAllotment.check', ['id'=>$overseaAllotment->id]) }}" class="btn btn-success btn-xs" title='审核调拨单'>
+                        <span class="glyphicon glyphicon-comment"></span>
+                        
+                    </a>
+                @endif
+                @if($overseaAllotment->check_status == 'pass')
+                    <a href="{{route('overseaAllotment.pick', ['id'=>$overseaAllotment->id])}}" class="btn btn-success btn-xs" title='打印拣货单'>
+                        <span class="glyphicon glyphicon-print"></span>
+                    </a>
+                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $overseaAllotment->id }}"
                    data-url="{{ route('overseaAllotment.destroy', ['id' => $overseaAllotment->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                    <span class="glyphicon glyphicon-trash"></span>
                 </a>
             </td>
         </tr>
     @endforeach
+    <iframe src='' id='iframe_print' style='display:none'></iframe>
+@stop
+@section('childJs')
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $(document).on('click', '.print', function () {
+                id = $(this).parent().parent().find('td:eq(0)').text();
+                src = "{{ route('overseaAllotment.pick', ['id'=>'']) }}/" + id;
+                $('#iframe_print').attr('src', src);
+                $('#iframe_print').load(function () {
+                    $('#iframe_print')[0].contentWindow.focus();
+                    $('#iframe_print')[0].contentWindow.print();
+                });
+            });
+        });
+    </script>
 @stop

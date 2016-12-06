@@ -56,4 +56,9 @@ class AllotmentModel extends BaseModel
     {
         return $this->hasMany('App\Models\Oversea\Allotment\AllotmentFormModel', 'parent_id', 'id');
     }
+
+    public function getStatusNameAttribute()
+    {
+        return config('oversea.allotmentStatus')[$this->status];
+    }
 }

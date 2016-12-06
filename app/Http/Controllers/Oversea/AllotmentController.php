@@ -76,6 +76,45 @@ class AllotmentController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
+    public function check($id)
+    {
+        $model = $this->model->find($id);
+        $allotmentform = $model->allotmentForms;
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'allotments' => $allotmentform,
+        ];
+
+        return view($this->viewPath.'allotmentcheck', $response);
+    }
+
+    /**
+     * 调拨单审核处理 
+     *
+     * @param $id 调拨单id
+     * @return mainIndex
+     *
+     */
+    public function checkResult($id)
+    {
+        $model = $this->model->find($id);
+        $arr = request()->all();
+        $time = date('Y-m-d',time());    
+        $name = UserModel::find(request()->user()->id)->name;   
+        if($arr['result'] == 0) {
+            $model->update(['check_status'=>'fail', 'check_by'=>request()->user()->id]);
+            $to = json_encode($model);
+            $this->eventLog($name, '审核未通过', $to, $to);
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核已拒绝...'));
+        }
+        $time = date('Y-m-d',time());       
+        $model->update(['check_status'=>'pass', 'check_by'=>request()->user()->id]); 
+        $to = json_encode($model);
+        $this->eventLog($name, '审核通过', $to, $to);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
+    }
+
     /**
      * 信息详情页 
      *
@@ -110,6 +149,37 @@ class AllotmentController extends Controller
             ];
             return view($this->viewPath.'add', $response);
         }
+    }
+
+    /**
+     * ajax请求函数
+     *  
+     * @param none
+     * @return json
+     *
+     */
+    public function pick($id)
+    {
+        $model = $this->model->find($id);
+        $name = UserModel::find(request()->user()->id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        // if($model->status == 'new') {
+        //     $model->update(['status'=>'pick']);
+        // }
+        $allotmentforms = AllotmentFormModel::where('parent_id', $id)->get()->sortBy(function($query){
+            return $query->position->name;
+        });
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'allotmentforms' => $allotmentforms,
+        ];
+        $to = json_encode($model);
+        $this->eventLog($name, '打印拣货单', $to, $to);
+        
+        return view($this->viewPath.'pick', $response);
     }
 
     /**

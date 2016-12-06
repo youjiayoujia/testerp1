@@ -338,10 +338,15 @@ class StockController extends Controller
     public function ajaxSku()
     {
         $sku = trim(request()->input('sku'));
-        $warehouse = request('warehouse_id');
-        $stocks = StockModel::where('warehouse_id', $warehouse)->whereHas('item', function($query) use ($sku){
-            $query = $query->where('sku', 'like', '%'.$sku.'%');
-        })->distinct()->take('20')->get(['item_id']);
+        $warehouse = request()->has('warehouse_id') ? request('warehouse_id') : '';
+        $stocks = '';
+        if(!empty($warehouse)) {
+            $stocks = StockModel::where('warehouse_id', $warehouse)->whereHas('item', function($query) use ($sku){
+                $query = $query->where('sku', 'like', '%'.$sku.'%');
+            })->distinct()->take('20')->get(['item_id']);
+        } else {
+            $stocks = ItemModel::where('sku', 'like', '%'.$sku.'%')->take('20')->get();
+        }
         $total = $stocks->count();
         $arr = [];
         foreach($stocks as $key => $stock) {

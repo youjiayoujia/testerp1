@@ -1583,7 +1583,7 @@ class PackageModel extends BaseModel
     {
         if ($type == 'UPDATE') {
             //判断订单状态
-            if (!in_array($this->status, ['NEED', 'PROCESSING', 'PICKING', 'PACKED', 'SHIPPED'])) {
+            if (!in_array($this->status, ['NEED', 'ASSIGNED', 'PROCESSING', 'PICKING', 'PACKED', 'SHIPPED'])) {
                 return false;
             }
         } else {

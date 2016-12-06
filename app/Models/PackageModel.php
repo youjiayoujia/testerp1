@@ -91,7 +91,7 @@ class PackageModel extends BaseModel
         }
         return [
             'relatedSearchFields' => [
-                'order' => ['ordernum', 'channel_ordernum'],
+                'order' => ['id', 'channel_ordernum'],
             ],
             'filterFields' => ['tracking_no'],
             'filterSelects' => [
@@ -105,8 +105,10 @@ class PackageModel extends BaseModel
                 'channelAccount' => ['account' => $arr1]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
-            'doubleRelatedSearchFields' => ['logistics' => ['catalog' => ['name']],
-                                            'items' => ['item' => ['sku']]],
+            'doubleRelatedSearchFields' => [
+                'logistics' => ['catalog' => ['name']],
+                'items' => ['item' => ['sku']]
+            ],
         ];
     }
 
@@ -387,7 +389,7 @@ class PackageModel extends BaseModel
                 $color = 'info';
                 break;
         }
-        if($this->order->status == 'REVIEW') {
+        if ($this->order->status == 'REVIEW') {
             $color = 'danger';
         }
 
@@ -1609,7 +1611,7 @@ class PackageModel extends BaseModel
                     ]);
                 } else {
                     $item = $this->items->first();
-                    if(in_array($this->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $this->is_upload) {
+                    if (in_array($this->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $this->is_upload) {
                         $this->is_mark = 0;
                         $this->save();
                     }
@@ -1779,7 +1781,7 @@ class PackageModel extends BaseModel
                         continue;
                     }
                     $package = $this->find($content['package_id']);
-                    if(in_array($package->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $package->is_upload) {
+                    if (in_array($package->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $package->is_upload) {
                         $package->is_mark = 0;
                         $package->save();
                     }

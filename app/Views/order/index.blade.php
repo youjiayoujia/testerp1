@@ -26,17 +26,14 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td>{{ $order->id }}</td>
+            <td><strong>{{ $order->id }}</strong></td>
             <td>
                 {{ $order->channel_ordernum }}
-                @if($order->fulfill_by == 'AFN')
-                    <span class="label label-danger">亚马逊配送</span>
-                @endif
             </td>
             {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
-            <td>{{ $order->logistics }}</td>
+            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
@@ -485,7 +482,7 @@
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="refund_currency" id="refund_currency">
                                         @foreach($currencys as $refund_currency)
-                                            <option value="{{ $refund_currency->code }}" {{ old('refund_currency') }}>
+                                            <option value="{{ $refund_currency->code }}" <?php if ($refund_currency->code == 'USD') echo 'selected'; ?> {{ old('refund_currency') }}>
                                                 {{ $refund_currency->code }}
                                             </option>
                                         @endforeach

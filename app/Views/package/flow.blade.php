@@ -7,6 +7,11 @@
                     Do Package <span class="badge">{{ $ordernum }}</span>
                 </a>
             </div>
+            <div class="col-lg-8">
+                <p type="button" class="btn btn-warning" >
+                    CRM消息回复失败统计 <span class="badge">{{ $message_replies_failed}}</span>
+                </p>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-4">

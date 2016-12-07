@@ -81,9 +81,10 @@
                         @endif
                     @endforeach
                 @endif
-                &nbsp;&nbsp;D
             </p>
-            <p style="text-align:left;font-size:15px;">OrderNo:{{ $model->order_id }}</p>
+            <p style="text-align:left;font-size:15px;">OrderNo:{{ $model->order_id }}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PD</p>
         </div>
     </div>
 </div>
@@ -133,13 +134,14 @@
         <td colspan="4" style="border-bottom:none;">
             <p>Date and sender's signature:SLME &nbsp;&nbsp;
                 @if($model->warehouse)
-                    @if($model->warehouse->name == '深圳仓')
-                        {{ '302035' }}
-                    @elseif($model->warehouse->name == '义乌仓')
-                        {{ '209052' }}
-                    @endif
+                    <?php  $warehouse = config('warehouseSelect'); ?>
+                    @foreach($warehouse as $key => $value)
+                        @if(in_array($model->warehouse->name, explode(',',$value)))
+                            {{ $key }}
+                        @endif
+                    @endforeach
                 @endif
-                &nbsp;&nbsp;{{ date('d-m-Y') }}&nbsp;{{ '编码' }}
+                &nbsp;&nbsp;{{ date('d-m-Y') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $model->logistics ? $model->logistics->logistics_code : '' }}
             </p>
         </td>
     </tr>

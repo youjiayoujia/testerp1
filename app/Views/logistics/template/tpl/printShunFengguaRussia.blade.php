@@ -140,10 +140,10 @@
                             {{ $model->getDeclaredInfo()['declared_en'] }} X {{ $model->items->first()->quantity }}
                         </td>
                         <td class="border_r_b" valign="top">
-                            {{ $model->total_weight }}
+                            {{ $model->getDeclaredInfo()['weight'] }}
                         </td>
                         <td class="border_r_b" valign="top">
-                            {{ $model->total_price }}
+                            {{ sprintf("%.2f", $model->getDeclaredInfo()['declared_value']) }}
                         </td>
                     </tr>
                     <tr style="line-height: 12px;">
@@ -163,7 +163,7 @@
                             {{ $model->total_weight }}
                         </td>
                         <td class="border_r_b">
-                            {{ $model->total_price }}
+                            {{ sprintf("%.2f", $model->total_price) }}
                         </td>
                     </tr>
                     <tr style="line-height: 12px;height:60px;">

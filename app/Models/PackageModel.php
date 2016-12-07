@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\Logistics\ErpEubModel;
 use App\Models\Logistics\ErpRussiaModel;
+use App\Models\Logistics\ErpShunFenModel;
 use Excel;
 use DB;
 use App\Jobs\AssignStocks;
@@ -225,6 +226,19 @@ class PackageModel extends BaseModel
         }
 
         return $code;
+    }
+
+    //顺分荷兰面单分拣码
+    public function getShunFenAttribute()
+    {
+        $fjm = '';
+        if ($this->logistics) {
+            if ($this->logistics->name == '【挂号】SF荷兰挂号') {
+                $fjm = ErpShunFenModel::where('code', $this->shipping_country)->first()->gh;
+            }
+        }
+
+        return $fjm;
     }
 
     //包裹sku信息

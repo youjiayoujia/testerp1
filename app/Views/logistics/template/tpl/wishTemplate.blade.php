@@ -45,8 +45,8 @@
                           'IL' => 29,'IT' => 30,'DE' => 31,'CL' => 32,
                           'SE' => 33,'BY' => 34,'NO' => 35,'NL' => 36,
                           'UA' => 37,'CH' => 38,'MX' => 39,'PL' => 40,] as $key => $value )
-                    @if($value[$key] == $model->country->code)
-                        {{ $key }}
+                    @if($key == $model->country->code)
+                        {{ $value }}
                     @endif
                 @endforeach
             @endif
@@ -62,7 +62,7 @@
             <b style="font-weight:bold;">Phone:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}</b>
             </span>
             <span style="width:140px;line-height:29px;font-size:10px;background:#fff;display:inline-block;border-bottom:1px solid #000;">
-            自编号:{{ $model->order ? $model->order->ordernum : '' }}
+            自编号:{{ $model->id }}
             </span>
         </p>
         <p style="float:left;width:235px;height:99px;border:1px solid #000;border-right:none;font-family:STHeiti;font-size:12px;">
@@ -82,7 +82,7 @@
                           '6' => "阿鲁巴,安圭拉,刚果,巴巴多斯,巴哈马,巴拉圭,百慕大,波多黎各,玻利维亚,伯利兹,多米尼加,法属圭亚那,哥斯达黎加,格林纳达,格陵兰岛,瓜德罗普,圭亚那,海地,荷属安的列斯群岛,洪都拉斯,开曼群岛,马提尼克,尼加拉瓜,萨尔瓦多,圣皮埃尔和密克隆,特立尼达和多巴哥,危地马拉,乌拉圭,牙买加,智利",
                           '7' => "俄罗斯,",
                           '8' => "澳大利亚,英国,瑞典,以色列,德国,挪威,荷兰,克罗地亚,匈牙利"] as $key => $value)
-                    @if(in_array($model->country->cn_name, explode(',',$value[$key])))
+                    @if(in_array($model->country->cn_name, explode(',',$value)))
                         {{ $key }}
                     @endif
                 @endforeach
@@ -116,7 +116,9 @@
                               '7' => '② (USSFOA)',
                               '8' => '② (USSFOA)',
                               '9' => '③ (USLAXA)'] as $key => $value)
-                        {{ $value[substr($model->shipping_zipcode, 0, 1)] }}
+                        @if(substr($model->shipping_zipcode, 0, 1) == $key)
+                            {{ $value }}
+                        @endif
                     @endforeach
                 @else
                     {{ '' }}
@@ -132,9 +134,9 @@
                 <p style="width:86px;text-align:center;font-weight:bold;line-height:50px;height:50px;float:left;">
                     Untracked
                 </p>
-                <p style="width:270px;height:45px;float:left;text-align:center;">
+                <p style="width:270px;float:left;text-align:center;">
                     <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
-                    {{ $model->tracking_no }}
+                    <br/>{{ $model->tracking_no }}
                 </p>
             </td>
         </tr>
@@ -156,13 +158,13 @@
         </tr>
         <tr style="font-size:12px;">
             <td width="70%" style="border-right:none;">
-                {{ $model->declared_en }}
+                {{ $model->getDeclaredInfo()['declared_en'] }}
             </td>
             <td width="15%" style="border-right:none;">
-                {{ $model->signal_weight }}
+                {{ $model->getDeclaredInfo()['weight'] }}
             </td>
             <td width="15%">
-                {{ $model->signal_price }}
+                {{ $model->getDeclaredInfo()['declared_value'] }}
             </td>
         </tr>
         <tr height="15" style="font-size:12px;">
@@ -192,7 +194,7 @@
     <div style="width:382px;height:40px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
         {{ $model->sku_info }}
         <b style="float:right;font-size:11px;">
-            【{{ $model->logistics_id }}】
+            【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】
         </b>
     </div>
 </div>

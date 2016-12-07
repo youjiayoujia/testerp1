@@ -522,7 +522,7 @@ class PurchaseOrderController extends Controller
     */
     public function printpo(){
         $id = request()->input('id');
-        $p_item = PurchaseItemModel::find($id)->first();
+        $p_item = PurchaseItemModel::find($id);
         $po_id = $p_item->purchaseOrder->id;
         $response['id']= $id;
         $response['po_id']= $po_id;

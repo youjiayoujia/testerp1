@@ -1144,6 +1144,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //回复信息
     Route::any('message/{id}/reply',
         ['as' => 'message.reply', 'uses' => 'MessageController@reply']);
+    //工作流回复信息
+    Route::any('workflow/reply','MessageController@workflowReply')->name('workflow.reply');
     //信息模版路由
     Route::any('messageTemplate/ajaxGetTemplate',
         ['as' => 'messageTemplate.ajaxGetTemplate', 'uses' => 'Message\TemplateController@ajaxGetTemplate']);

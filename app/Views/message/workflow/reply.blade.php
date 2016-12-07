@@ -10,8 +10,10 @@
     <div class="panel panel-primary">
         <div class="panel-heading"><strong>回复:</strong></div>
         <div class="panel-body">
-            <form action="{{ route('message.reply', ['id'=>$message->id]) }}" method="POST" id="reply-content" ;>
+            <form action="{{ route('message.reply', ['id'=>$message->id]) }}" method="POST" class="reply-content" ;>
                 {!! csrf_field() !!}
+                <input type="hidden" name="id" value="{{$message->id}}" type="hidden">
+
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="form-group">
@@ -192,3 +194,4 @@
         return true;
     }*/
 </script>
+若ply

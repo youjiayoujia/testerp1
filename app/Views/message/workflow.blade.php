@@ -110,7 +110,12 @@
         });
 
         $(document).on("click", ".from-submit", function (){
-            //验证
+            //验证回复内容不能为空
+            if(!$('textarea').val()){
+                alert('请先回复的内容，再提交！');
+                return;
+            }
+            　var param =  $('.reply-content').first().serialize();
 
             //删除邮件dom
             $('.message-template').first().remove();
@@ -118,6 +123,18 @@
             $('.message-template').first().show();
             //回到顶部
             $('html,body').animate({scrollTop:0},'slow');
+
+            //异步发送
+            $.ajax({
+                url:'{{route('workflow.reply')}}',
+                data: param,
+                type: 'POST',
+                success: function (data) {
+                    console.log(data);
+                }
+
+            });
+
             //继续加载需要回复的邮件池
             $.ajax({
                 url: "{{route('ajaxGetMsgInfo')}}",

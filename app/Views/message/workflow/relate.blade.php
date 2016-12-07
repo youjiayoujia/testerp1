@@ -1,21 +1,3 @@
-{{--<div class="panel panel-success">
-    <div class="panel-heading">订单查询</div>
-    <div class="panel-body">
-        <form action="{{ route('message.process', ['id'=>$message->id]) }}" method="POST">
-            {!! csrf_field() !!}
-            <div class="row form-group">
-                <div class="col-lg-8">
-                    <input type="email" class="form-control" name="email" placeholder="填写用户Email"/>
-                </div>
-                <div class="col-lg-4">
-                    <button type="submit" class="btn btn-success">
-                        <span class="glyphicon glyphicon-search"></span> 查询
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>--}}
 
 <div class="panel panel-danger">
     <div class="panel-heading"><p class="glyphicon glyphicon-tag"></p>手动关联订单

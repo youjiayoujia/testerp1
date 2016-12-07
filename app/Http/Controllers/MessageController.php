@@ -384,6 +384,24 @@ class MessageController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '回复失败.'));
     }
 
+    public function  workflowReply ()
+    {
+        $form = request()->input();
+        $message = $this->model->find($form['id']);
+        if(!empty($message)) {
+            if ($message->reply($form)) {
+                $reply = ReplyModel::where('message_id', $message->id)->get()->first();
+                $job = new SendMessages($reply);
+                $job = $job->onQueue('SendMessages');
+                $this->dispatch($job);
+
+                return 'send';
+            }
+        }
+        return 'fail';
+
+    }
+
     /**
      * 详情
      *

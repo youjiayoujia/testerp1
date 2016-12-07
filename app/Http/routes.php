@@ -1089,7 +1089,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setshipping', 'as' => 'joomonline.setshipping']);
     Route::get('setstatus',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setstatus', 'as' => 'joomonline.setstatus']);
-    Route::get('productBatchEdit',
+    Route::get('JoomproductBatchEdit',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@productBatchEdit', 'as' => 'joomonline.productBatchEdit']);
     Route::any('batchUpdate',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@batchUpdate', 'as' => 'joomonline.batchUpdate']);

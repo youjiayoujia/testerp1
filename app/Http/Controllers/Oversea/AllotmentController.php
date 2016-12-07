@@ -12,7 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Oversea\Allotment\AllotmentModel;
 use App\Models\Oversea\Allotment\AllotmentFormModel;
 use App\Models\WarehouseModel;
-use App\Models\LogisticsModel;
+use App\Models\Oversea\FirstLeg\FirstLegModel;;
 use App\Models\UserModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
@@ -99,6 +99,16 @@ class AllotmentController extends Controller
                 }
             }
         }
+        $flag = 1;
+        foreach($model->allotmentForms as $single) {
+            if($single->quantity != $single->inboxed_quantity) {
+                $flag = 0;
+                break;
+            }
+        }
+        if($flag) {
+            $model->update(['status' => 'inboxed']);
+        }
 
         return redirect($this->mainIndex);
     }
@@ -112,7 +122,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'logisticses' => LogisticsModel::all(),
+            'logisticses' => FirstLegModel::all(),
         ];
 
         return view($this->viewPath.'returnBoxInfo', $response);
@@ -134,8 +144,31 @@ class AllotmentController extends Controller
                 $box->update($single);
             }
         }
+        foreach($model->allotmentForms as $single) {
+            $single->item->holdout($single->warehouse_position_id, $single->inboxed_quantity, 'OVERSEA_ALLOTMENT', $id);
+        }
+        $model->update(['status' => 'out']);
 
         return redirect($this->mainIndex);
+    }
+
+    public function allotmentInStock($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $warehouse_id = $model->in_warehouse_id;
+        foreach($model->allotmentForms as $single) {
+            $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $single->item_id])->first();
+            if($stock) {
+                $single->item->in($stock->warehosue_posietion_id, $single->inboxed_quantity, $single->inboxed_quantity * $single->item->cost,
+                'OVERSEA_IN');
+            }
+        }
+        $model->update(['status' => 'over']);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已入库...'));
     }
 
     public function check($id)
@@ -272,8 +305,10 @@ class AllotmentController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->status = 'inboxed';
-        $model->save();
+        if($model->status = 'pick') {
+            $model->status = 'inboxing';
+            $model->save();
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,

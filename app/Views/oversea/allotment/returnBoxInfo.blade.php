@@ -26,8 +26,9 @@
                     </div>
                     <div class='from-group col-lg-2'>
                         <select name="boxInfo[{{$box->id}}][logistics_id]" class='form-control logistics'>
+                        <option value=''>请选择物流方式</option>
                         @foreach($logisticses as $logistics)
-                            <option value='{{$logistics->id}}'>{{$logistics->code}}</option>
+                            <option value='{{$logistics->id}}'>{{$logistics->name}}</option>
                         @endforeach
                         </select>
                     </div>

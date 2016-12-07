@@ -24,6 +24,7 @@
             'MAKE_ACCOUNT' => '开帐', 
             'PACKAGE' => '发货',
             'ALLOTMENT' => '调拨',
+            'OVERSEA_ALLOTMENT' => '调拨',
             'SHORTAGE' => '盘亏',
             'ADJUSTMENT' => '调整',
             'SCRAP' => '报废',

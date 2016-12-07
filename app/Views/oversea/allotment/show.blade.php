@@ -75,7 +75,7 @@
         </div>
         <div class="form-group col-lg-3">
             <label>物流方式</label>
-            <input type='text' class="form-control" value="{{ $box->logistics ? $box->logistics->code : '' }}">
+            <input type='text' class="form-control" value="{{ $box->logistics ? $box->logistics->name : '' }}">
         </div>
         <div class="form-group col-lg-3">
             <label>体积(m3)</label>

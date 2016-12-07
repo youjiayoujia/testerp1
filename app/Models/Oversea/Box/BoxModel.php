@@ -39,6 +39,6 @@ class BoxModel extends BaseModel
 
     public function logistics()
     {
-        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
+        return $this->belongsTo('App\Models\Oversea\FirstLeg\FirstLegModel', 'logistics_id', 'id');
     }
 }

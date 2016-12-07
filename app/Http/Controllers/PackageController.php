@@ -894,7 +894,7 @@ class PackageController extends Controller
         $items = $package->items();
         foreach ($items as $item) {
             $item->update(['picked_quantity' => $item->quantity]);
-            $item->item->out($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);
+            $item->item->holdout($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);
         }
         $package->update(['status' => 'PACKED']);
         $to = base64_decode(serialize($package));
@@ -1222,8 +1222,7 @@ class PackageController extends Controller
         $package = $this->model->find($id);
         foreach ($package->items as $packageItem) {
             $item = ItemModel::find($packageItem->item_id);
-            $item->unhold($packageItem->warehouse_position_id, $packageItem->picked_quantity);
-            $item->out($packageItem->warehouse_position_id, $packageItem->picked_quantity);
+            $item->holdout($packageItem->warehouse_position_id, $packageItem->picked_quantity);
         }
         $package->status = 'SHIPPED';
         $package->save();

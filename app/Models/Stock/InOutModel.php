@@ -110,6 +110,9 @@ class InOutModel extends BaseModel
             case 'ALLOTMENT':
                 return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
                 break;
+            case 'OVERSEA_ALLOTMENT':
+                return $this->overseaAllotment ? $this->overseaAllotment->id : '';
+                break;
             case 'INVENTORY_PROFIT':
                 return $this->stockTaking ? $this->stockTaking->taking_id : '';
                 break;
@@ -142,6 +145,11 @@ class InOutModel extends BaseModel
     public function stockAllotment()
     {
         return $this->belongsTo('App\Models\Stock\AllotmentModel', 'relation_id', 'id');
+    }
+
+    public function overseaAllotment()
+    {
+        return $this->belongsTo('App\Models\Oversea\Allotment\AllotmentModel', 'relation_id', 'id');
     }
 
     /**

@@ -31,7 +31,7 @@ class FirstLegController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::where(['type' => 'oversea', 'is_available' => '1'])->get(),
+            'warehouses' => WarehouseModel::where(['type' => 'fbaLocal', 'is_available' => '1'])->get(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -51,7 +51,7 @@ class FirstLegController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'warehouses' => WarehouseModel::where(['type' => 'oversea', 'is_available' => '1'])->get(),
+            'warehouses' => WarehouseModel::where(['type' => 'fbaLocal', 'is_available' => '1'])->get(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

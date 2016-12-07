@@ -216,6 +216,7 @@ class PurchaseOrderController extends Controller
             foreach($data['arr'] as $k=>$v){
                 if($v['id']){
                     $purchaseItem=PurchaseItemModel::find($v['id']);
+                    $v['lack_num'] = $v['purchase_num'];
                     $itemPurchasePrice=$purchaseItem->item->purchase_price;
                     $purchase_num=$purchaseItem->purchase_num;
                     foreach($v as $key=>$vo){

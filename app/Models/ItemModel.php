@@ -1194,6 +1194,9 @@ class ItemModel extends BaseModel
                 $crr =[];
                 //多对多供应商转换id
                 $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+                if(substr($data->products_suppliers_ids, 0,1)==','){
+                    $data->products_suppliers_ids = substr($data->products_suppliers_ids, 1);
+                }
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id in('.$data->products_suppliers_ids.')');
                 $supp_name_arr = [];

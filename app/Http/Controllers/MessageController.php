@@ -543,24 +543,26 @@ class MessageController extends Controller
 
     public function ajaxGetMsgInfo ()
     {
-        $message_id  = request()->input('message_id');
+        $entry = request()->input('total');
+        $messages = $this->model->getMyWorkFlowMsg($entry);
+        $template = '';
 
-        if(!empty($message_id)){
-            $message = $this->model->find($message_id);
-            $IsOption = $this->IsAliOptionOrderMsg($message);
+        if(!empty($messages)){
 
-            $response = [
-                'message' => $message,
-                'parents' => TypeModel::where('parent_id', 0)->get(),
-                'is_ali_msg_option' => $IsOption,
-                'driver' => $message->getChannelDiver(),
-                'users' => UserModel::all(),
+            foreach($messages as $message){
+                $IsOption = $this->IsAliOptionOrderMsg($message);
 
-            ];
+                $response = [
+                    'message' => $message,
+                    'parents' => TypeModel::where('parent_id', 0)->get(),
+                    'is_ali_msg_option' => $IsOption,
+                    'driver' => $message->getChannelDiver(),
+                    'users' => UserModel::all(),
+                ];
 
-            return view($this->viewPath.'workflow.template')->with($response);
-            dd($message);
-
+                $template .= view($this->viewPath.'workflow.template')->with($response);
+            }
+            return $template;
         }
     }
 

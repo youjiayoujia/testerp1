@@ -1,4 +1,4 @@
-<div class="row message-template">
+<div class="row message-template" style="display: none;">
     <div class="col-lg-8">
         @include('message.workflow.content')
         @include('message.workflow.reply')

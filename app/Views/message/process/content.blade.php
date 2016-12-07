@@ -40,7 +40,7 @@
     </div>
 </div>
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal123" tabindex="-1" role="dialog"
+{{--<div class="modal fade" id="myModal123" tabindex="-1" role="dialog"
      aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -85,7 +85,7 @@
             </form>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
-</div>
+</div>--}}
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" style="width:1000px;" role="document" style="width:1000px;">
         <div class="modal-content">
@@ -101,7 +101,7 @@
                         <div class="panel-heading">
                             <strong>Message <a href="{{ url('message',$history->id)}}">#{{ $history->id }}</a></strong>
 
-							<br/>
+                            <br/>
                         </div>
                         <div class="panel-body">
                             <div class="panel panel-primary">

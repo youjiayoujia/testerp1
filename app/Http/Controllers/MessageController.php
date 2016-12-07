@@ -62,7 +62,25 @@ class MessageController extends Controller
 
         if (request()->input('id')) {
             $message = $this->model->find(request()->input('id'));
-        } elseif ($this->workflow == 'keeping') {
+        } elseif ($this->workflow == 'keeping') { //工作流
+            //根据登陆的客服id 获取其被分配的账号消息
+            $messages = $this->model->getMyWorkFlowMsg(3);
+
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'parents' => TypeModel::where('parent_id', 0)->get(), //模版分类
+                'users' => UserModel::all(),
+                'messages' => $messages,
+            ];
+
+            return view($this->viewPath . 'workflow')->with($response);
+
+
+
+            //dd($messages);
+
+
+
             $message = $this->model->getOne(request()->user()->id);
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'error.'));
@@ -521,6 +539,29 @@ class MessageController extends Controller
         }
         return redirect(route('order.index'))->with('alert', $this->alert('danger', '操作失败'));
 
+    }
+
+    public function ajaxGetMsgInfo ()
+    {
+        $message_id  = request()->input('message_id');
+
+        if(!empty($message_id)){
+            $message = $this->model->find($message_id);
+            $IsOption = $this->IsAliOptionOrderMsg($message);
+
+            $response = [
+                'message' => $message,
+                'parents' => TypeModel::where('parent_id', 0)->get(),
+                'is_ali_msg_option' => $IsOption,
+                'driver' => $message->getChannelDiver(),
+                'users' => UserModel::all(),
+
+            ];
+
+            return view($this->viewPath.'workflow.template')->with($response);
+            dd($message);
+
+        }
     }
 
 

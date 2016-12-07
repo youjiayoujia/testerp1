@@ -67,6 +67,8 @@
             });
 
             $('#save').click(function () {
+              /*  alert(1231);
+                return false;*/
 /*                if ($('#do-chaeck').val() == 'true'){
                     var status = $('#order-operate').val();
                     if (status) {

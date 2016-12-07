@@ -1165,6 +1165,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['as' => 'doSendAliexpressMessages', 'uses' => 'MessageController@doSendAliexpressMessages']);
     Route::any('SendEbayMessage', ['uses' => 'MessageController@SendEbayMessage', 'as' => 'message.sendEbayMessage']);
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
+    Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);

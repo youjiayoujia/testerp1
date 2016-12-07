@@ -36,7 +36,11 @@ class MessageModel extends BaseModel{
 
     public $rules = [];
 
-    public function account()
+    public $appends = [
+        'channel_diver_name'
+    ];
+
+  public function account()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel');
     }
@@ -444,6 +448,11 @@ class MessageModel extends BaseModel{
         return $this->account->channel->driver;
     }
 
+    public function getChannelDiverNameAttribute ()
+    {
+        return !empty($this->account->channel->driver) ? $this->account->channel->driver : false;
+    }
+
     public function findOrderWithMessage(){
         $order_id = $this->getChannelMessageOrderId(); //根据平台参数获取关联订单号
         if(!empty($order_id)){
@@ -531,15 +540,36 @@ class MessageModel extends BaseModel{
         }
     }
 
+    public function getMyWorkFlowMsg ($entry = 5)
+    {
+        return $this->workFlowMsg($entry)->get();
+    }
+
     /**
      *
+     * @param $query
+     * @param $entry
+     * @return mixed
      */
-/*    public function getIsAliOptionMsgAttribute(){
-        if ($this->related == '0'){
-            $messages = $this->where('channel_order_number', $this->channel_order_number)->get();
-            dd($messages);
+    public function scopeWorkFlowMsg ($query,$entry)
+    {
+        return $query->where('status','<>','COMPLETE')->take($entry)->orderBy('id', 'DESC');
+    }
+
+    public function contentTemplate ()
+    {
+        if($this->channel_diver_name){
+            switch ($this->channel_diver_name){
+                case 'aliexpress':
+                    break;
+
+            }
+
         }
-    }*/
+
+
+
+    }
 
 
 }

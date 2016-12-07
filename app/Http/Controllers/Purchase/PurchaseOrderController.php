@@ -216,6 +216,7 @@ class PurchaseOrderController extends Controller
             foreach($data['arr'] as $k=>$v){
                 if($v['id']){
                     $purchaseItem=PurchaseItemModel::find($v['id']);
+                    $v['lack_num'] = $v['purchase_num'];
                     $itemPurchasePrice=$purchaseItem->item->purchase_price;
                     $purchase_num=$purchaseItem->purchase_num;
                     foreach($v as $key=>$vo){
@@ -398,7 +399,7 @@ class PurchaseOrderController extends Controller
         $this->validate(request(), $this->purchaseItem->rules('create'));
         $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
         if (!$item) {
-            return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在.'));
+            return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在或不在售.'));
         }
         $model=$this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
@@ -411,6 +412,7 @@ class PurchaseOrderController extends Controller
         if($model->close_status == 1){
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已结算，不能新增Item.'));
             }
+        $data['item_id'] = $item->id;
         $data['lack_num']=$data['purchase_num'];
         $data['warehouse_id']=$model->warehouse_id ? $model->warehouse_id : 0;
         $data['supplier_id']=$item->supplier_id ? $item->supplier_id : 0;
@@ -522,7 +524,7 @@ class PurchaseOrderController extends Controller
     */
     public function printpo(){
         $id = request()->input('id');
-        $p_item = PurchaseItemModel::find($id)->first();
+        $p_item = PurchaseItemModel::find($id);
         $po_id = $p_item->purchaseOrder->id;
         $response['id']= $id;
         $response['po_id']= $po_id;

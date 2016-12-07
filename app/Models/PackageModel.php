@@ -1554,7 +1554,7 @@ class PackageModel extends BaseModel
                             'logistics_id' => $rule->logistics->id,
                             'tracking_link' => $trackingUrl,
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
-                            'logistics_order_number' = '',
+                            'logistics_order_number' => '',
                             'tracking_no' => '',
                             'is_auto' => $is_auto,
                         ]);
@@ -1564,7 +1564,7 @@ class PackageModel extends BaseModel
                             'logistics_id' => $rule->logistics->id,
                             'tracking_link' => $trackingUrl,
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
-                            'logistics_order_number' = '',
+                            'logistics_order_number' => '',
                             'tracking_no' => '',
                             'is_auto' => $is_auto,
                         ]);

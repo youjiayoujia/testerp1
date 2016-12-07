@@ -19,7 +19,7 @@ class BoxModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['boxnum','parent_id','volumn','logistics_id','tracking_no','weight','created_at'];
+    protected $fillable = ['boxnum','parent_id','length', 'width', 'height','logistics_id','tracking_no', 'fee', 'weight','created_at'];
 
     // 规则验证
     public $rules = [
@@ -31,4 +31,14 @@ class BoxModel extends BaseModel
 
     //查询
     public $searchFields=['boxnum' => '箱号'];
+
+    public function forms()
+    {
+        return $this->hasMany('App\Models\Oversea\Box\BoxFormModel', 'parent_id', 'id');
+    }
+
+    public function logistics()
+    {
+        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
+    }
 }

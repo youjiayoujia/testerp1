@@ -75,6 +75,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('stockIn', 'Stock\InController');
 
     //海外仓调拨  
+    Route::post('overseaAllotment/returnBoxInfoStore/{id}', ['uses' => 'Oversea\AllotmentController@returnBoxInfoStore', 'as' => 'overseaAllotment.returnBoxInfoStore']); 
+    Route::get('overseaAllotment/returnBoxInfo/{id}', ['uses' => 'Oversea\AllotmentController@returnBoxInfo', 'as' => 'overseaAllotment.returnBoxInfo']); 
+    Route::get('overseaAllotment/inboxStore/{str}/{id}', ['uses' => 'Oversea\AllotmentController@inboxStore', 'as' => 'overseaAllotment.inboxStore']); 
     Route::get('overseaAllotment/inboxed/{id}', ['uses' => 'Oversea\AllotmentController@inboxed', 'as' => 'overseaAllotment.inboxed']);   
     Route::get('overseaAllotment/pick/{id}', ['uses' => 'Oversea\AllotmentController@pick', 'as' => 'overseaAllotment.pick']);   
     Route::post('overseaAllotment/checkResult/{id}', ['uses' => 'Oversea\AllotmentController@checkResult', 'as' => 'overseaAllotment.checkResult']);   

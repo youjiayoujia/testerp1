@@ -27,6 +27,9 @@
             <div class='col-lg-2'>
                 <input type='text' class='form-control boxnum' placeholder='箱号'>
             </div>
+            <div class='buf'>
+
+            </div>
         </div>
     </div>
     <div class='row'>
@@ -34,16 +37,12 @@
             <font color='red' size='7px' class='notFindSku'></font>
         </div>
     </div>
-    <div class='row box' data-flag='false'>
-        
-    </div>
     <div class="panel panel-default">
         <div class="panel-heading">已扫描信息</div>
         <div class="panel-body">
             <table class='table table-bordered table-condensed'>
                 <thead>
                     <td class='col-lg-3'>sku</td>
-                    <td class='col-lg-3'>注意事项</td>
                     <td class='col-lg-2'>箱号</td>
                     <td class='col-lg-2'>数量</td>
                     <td class='col-lg-2'>按钮</td>
@@ -61,7 +60,6 @@
                 <thead>
                     <td class='col-lg-2'>ID</td>
                     <td class='col-lg-2'>sku</td>
-                    <td class='col-lg-2'>注意事项</td>
                     <td class='col-lg-1'>应拣数量</td>
                     <td class='col-lg-1'>实拣数量</td>
                     <td class='col-lg-2'>状态</td>
@@ -71,12 +69,11 @@
                     <tr data-id="{{ $form->id }}" data-weight="{{ $form->item ? $form->item->weight : 0}}">
                         <td class='col-lg-2'>{{ $form->id }}</td>
                         <td class='col-lg-2 sku' data-id="{{ $form->item_id}}">{{ $form->item ? $form->item->sku : '' }}</td>
-                        <td class='col-lg-2 remark'>{{ $form->item ? $form->item->remark : '' }}</td>
                         <td class='col-lg-1 quantity'>{{ $form->quantity}}</td>
                         <td class='col-lg-1 inboxed_quantity'>{{ $form->inboxed_quantity }}</td>
                         <td class='col-lg-2 status'>
-                        @if($form->inbox_quantity != $form->quantity)
-                        <font color='red'>包装中</font></td>
+                        @if($form->inboxed_quantity != $form->quantity)
+                        <font color='red'>待装箱</font></td>
                         @else
                         <font>数量已匹配</font>
                         @endif
@@ -113,55 +110,99 @@
     </div>
 @stop
 @section('formButton')
-    <button type="submit" class="btn btn-success">包装完成</button>
-    <button type="reset" class="btn btn-default">取消</button>
+    <button type='button' class="btn btn-success submit">装箱完成</button>
 @stop
 @section('pageJs')
 <script type='text/javascript'>
 $(document).on('keypress', function (event) {
     if(event.keyCode == '13') {
-        $('.search').click(); 
+        $('.search').click();
         return false;
     }
 });
 
 $(document).ready(function(){
-    $(document).on('click', '.box_sub', function(){
-        volumn = $('.box_volumn').val();
-        weight = $('.box_actWeight').val();
-        boxId = $('.boxId').val();
-        $.get(
-            "{{ route('test2')}}",
-            {volumn:volumn,weight:weight,boxId:boxId},
-            function(result){
-                $('.box_volumn').val('');
-                $('.box_actWeight').val('');
-            });
-        $('.box_info').click();
-    });
+    $(document).on('click', '.submit', function(){
+        modelid = $('.modelId').val();
+        str = '|';
+        $.each($('.new tr'), function(){
+            boxnum = $(this).find('.new_boxnum').text();
+            str += boxnum + '.' + $(this).find('.new_sku').data('id') + '.' + $(this).find('.new_sku').text() + '.'+ $(this).find('.new_quantity').text() + '|';
+        });
+        location.href="{{ route('overseaAllotment.inboxStore', ['str' => ''])}}/" + str + '/' + modelid;
+    })
 
-    $(document).on('click', '.cz', function(){
-        block = $(this).parent().parent();
-        id = block.data('id');
-        boxId = $('.boxId').val();
-        itemId = block.data('itemid');
-        sku = block.find('.sku').text();
-        weight = block.data('weight');
-        $.get("{{route('test2')}}",
-          {id:id, boxId:boxId, itemId:itemId},
-          function(result){
-            if(result) {
-                $('.box_quantity').val(parseInt($('.box_quantity').val()) - 1);
-                $('.box_weight').val(parseFloat($('.box_weight').val()) - parseFloat(weight));
-                $.each($('.old tr'), function(){
-                    tmp = $(this);
-                    if(tmp.find('.sku').text() == sku) {
-                        tmp.find('.inbox_quantity').text(parseInt(tmp.find('.inbox_quantity').text()) - 1);
-                    }
-                });
+    $(document).on('click', '.search', function(){
+        $('.notFindSku').text('');
+        $('.buf').html('');
+        searchsku = $('.searchsku').val();
+        boxnum = $('.boxnum').val();
+        itemid = 0;
+        if(!boxnum) {
+            alert('请新建装箱信息');
+            $('.searchsku').val('');
+            return false;
+        }
+        flag = 0;
+        $.each($('.old tr'), function(){
+            tmp = $(this);
+            inboxed_quantity = parseInt(tmp.find('.inboxed_quantity').text());
+            quantity = parseInt(tmp.find('.quantity').text());
+            if(tmp.find('.sku').text() == searchsku && quantity >  inboxed_quantity) {
+                flag = 1;
+                itemid = tmp.find('.sku').data('id');
+                tmp.find('.inboxed_quantity').text(parseInt(tmp.find('.inboxed_quantity').text()) + 1);
+                if(parseInt(tmp.find('.inboxed_quantity').text()) == quantity) {
+                    tmp.find('.status').text('数量已匹配')
+                }
+                return false;
             }
         });
-        block.remove();
+        if(!flag) {
+            $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
+            $('.searchsku').val('');
+            $('.searchsku').focus();
+            return false;
+        }
+        if(searchsku && boxnum) {
+            flag = 0;
+            $.each($('.new tr'),function(){
+                if(searchsku == $(this).find('.new_sku').text() && boxnum == $(this).find('.new_boxnum').text()) {
+                    flag = 1;
+                    $(this).find('.new_quantity').text((parseInt($(this).find('.new_quantity').text()) + 1));
+                    return false;
+                }
+            })
+            if(flag == 1) {
+                $('.searchsku').val('');
+                $('.searchsku').focus();
+                return false;
+            }
+            str = "<tr><td class='new_sku' data-id='"+itemid+"'>"+searchsku+"</td><td class='new_boxnum'>"+boxnum+"</td><td class='new_quantity'>1</td><td><button type='button' class='new_del_item btn btn-info'>撤销</button>";
+            $('.new').append(str);
+            $('.searchsku').val('');
+            $('.searchsku').focus();
+            return false;
+        } else {
+            return false;
+        }
+    });
+
+    $(document).on('click', '.new_del_item', function(){
+        block = $(this).parent().parent();
+        new_quantity = block.find('.new_quantity').text();
+        searchsku = block.find('.new_sku').text();
+        $.each($('.old tr'), function(){
+            tmp = $(this);
+            inboxed_quantity = parseInt(tmp.find('.inboxed_quantity').text());
+            quantity = parseInt(tmp.find('.quantity').text());
+            if(tmp.find('.sku').text() == searchsku && (parseInt(inboxed_quantity) >= parseInt(new_quantity))) {
+                tmp.find('.inboxed_quantity').text(parseInt(inboxed_quantity) - parseInt(new_quantity));
+                tmp.find('.status').html("<font color='red'>待装箱</font>");
+                return false;
+            }
+        });
+        $(this).parent().parent().remove();
     });
 
     $(document).on('click', '.createbox', function(){
@@ -173,6 +214,7 @@ $(document).ready(function(){
                 function(result){
                     if(result) {
                         $('.boxnum').val(result);
+                        $('.buf').html("<font color='green' size='5px'>箱子创建成功</font>");
                     } else {
                         alert('箱子创建失败');
                     }
@@ -184,59 +226,12 @@ $(document).ready(function(){
                     function(result){
                         if(result) {
                             $('.boxnum').val(result);
+                            $('.buf').html("<font color='green' size='5px'>箱子创建成功</font>");
                         } else {
                             alert('箱子创建失败');
                         }
                     });
             }
-        }
-    });
-
-    $(document).on('click', '.search', function(){
-        val = $('.searchsku').val();
-        $('.notFindSku').text('');
-        $('.searchsku').val('');
-        extern_flag = 0;
-        $('.searchsku').focus();
-        if(val) {
-            if(!$('.boxnum').val()) {
-                alert('请新建装箱信息');
-                return false;
-            }
-            $.each($('.old tr'), function(){
-                tmp = $(this);
-                inbox_quantity = parseInt(tmp.find('.inbox_quantity').text());
-                quantity = parseInt(tmp.find('.quantity').text());
-                if(tmp.find('.sku').text() == val && quantity >  inbox_quantity) {
-                    extern_flag = 1;
-                    tmp.find('.inbox_quantity').text(parseInt(tmp.find('.inbox_quantity').text()) + 1);
-                    if(parseInt(tmp.find('.inbox_quantity').text()) == quantity) {
-                        tmp.find('.status').text('数量已匹配')
-                    }
-                    
-                    arr = new Array();
-                    i=0;
-                    str = '';
-                    $.each($('.old tr'), function(){
-                        if($(this).data('id') == id) {
-                            arr[i] = "<td class='sku'>"+$(this).find('.sku').text()+"</td><td class='remark'>"+$(this).find('.remark').text()+"</td><td class='quantity'>1</td>";
-                            i++;
-                        }
-                    });
-                    len = arr.length;
-                    for(j=0;j<len;j++) {
-                        str = "<tr data-id='" + tmp.data('id') + "' data-itemId='"+tmp.find('.sku').data('id')+"' data-boxid='"+$('.modelId').val()+"' data-weight='"+tmp.data('weight')+"'>" + arr[j] + "<td class='col-lg-1'><button type='button' class='cz btn btn-info'>撤销</button></td></tr>";
-                    }
-                    $('.new').append(str);
-                    return false;
-                }
-            });
-        }
-        if(out_js) {
-            return false;
-        }
-        if(!extern_flag) {
-            $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
         }
     });
 });

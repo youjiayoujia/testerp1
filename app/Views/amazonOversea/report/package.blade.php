@@ -1,5 +1,4 @@
 @extends('common.form')
-@section('formAction') {{ route('report.packageStore', ['id' => $model->id]) }} @stop
 @section('formBody')
     <div class='row'>
         <div class='form-group col-lg-2'>

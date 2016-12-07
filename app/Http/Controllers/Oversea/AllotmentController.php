@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Oversea\Allotment\AllotmentModel;
 use App\Models\Oversea\Allotment\AllotmentFormModel;
 use App\Models\WarehouseModel;
+use App\Models\LogisticsModel;
 use App\Models\UserModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
@@ -76,6 +77,67 @@ class AllotmentController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
+    public function inboxStore($str, $id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $arr = explode('|', $str);
+        foreach($arr as $key => $single) {
+            if(!empty($single)) {
+                $buf = explode('.', $single);
+                $box = $model->boxes()->where('boxnum', $buf[0])->first();
+                if(!$box) {
+                    continue;
+                }
+                $box->forms()->create(['sku' => $buf[2], 'quantity' => $buf[3]]);
+                $allotmentForm = $model->allotmentForms()->where('item_id', $buf[1])->first();
+                if($allotmentForm) {
+                    $allotmentForm->inboxed_quantity += $buf[3];
+                    $allotmentForm->save();
+                }
+            }
+        }
+
+        return redirect($this->mainIndex);
+    }
+
+    public function returnBoxInfo($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'logisticses' => LogisticsModel::all(),
+        ];
+
+        return view($this->viewPath.'returnBoxInfo', $response);
+    }
+
+    public function returnBoxInfoStore($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $boxInfo = request('boxInfo');
+        if(count($boxInfo)) {
+            foreach($boxInfo as $key => $single) {
+                $box = $model->boxes()->where('id', $key)->first();
+                if(!$box) {
+                    continue;
+                }
+                $box->update($single);
+            }
+        }
+
+        return redirect($this->mainIndex);
+    }
+
     public function check($id)
     {
         $model = $this->model->find($id);
@@ -124,10 +186,32 @@ class AllotmentController extends Controller
      */
     public function show($id)
     {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $all_weight = 0;
+        $volumn = 0;
+        $arr = [];
+        foreach($model->allotmentForms as $form) {
+            $all_weight += $form->inboxed_quantity * $form->item->cost;
+        }
+        foreach($model->boxes as $box) {
+            $sum = 0;
+            foreach($box->forms as $form) {
+                $sum += $form->item->weight * $form->quantity;
+            }
+            $arr[] = $sum;
+            $volumn += ($box->length * $box->width * $box->height)/5000;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'model' => $this->model->find($id),
+            'model' => $model,
             'allotments' =>$this->model->find($id)->allotmentForms,
+            'boxes' => $this->model->find($id)->boxes,
+            'all_weight' => $all_weight,
+            'arr' => $arr,
+            'volumn' => $volumn
         ];
 
         return view($this->viewPath.'show', $response);

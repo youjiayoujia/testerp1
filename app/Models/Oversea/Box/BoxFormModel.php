@@ -31,4 +31,9 @@ class BoxFormModel extends BaseModel
 
     //查询
     public $searchFields=[];
+
+    public function item()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'sku', 'sku');
+    }
 }

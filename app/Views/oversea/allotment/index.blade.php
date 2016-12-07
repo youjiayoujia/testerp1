@@ -47,6 +47,11 @@
                         <span class="glyphicon glyphicon-gift"></span>
                     </a>
                 @endif
+                @if(in_array($overseaAllotment->status, ['inboxed']))
+                    <a href="{{route('overseaAllotment.returnBoxInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回天箱子信息'>
+                        <span class="glyphicon glyphicon-folder-close"></span>
+                    </a>
+                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $overseaAllotment->id }}"
                    data-url="{{ route('overseaAllotment.destroy', ['id' => $overseaAllotment->id]) }}">

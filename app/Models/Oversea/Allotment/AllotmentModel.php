@@ -42,6 +42,11 @@ class AllotmentModel extends BaseModel
         return $this->belongsTo('App\Models\WarehouseModel', 'in_warehouse_id', 'id');
     }
 
+    public function boxes()
+    {
+        return $this->hasMany('App\Models\Oversea\Box\BoxModel', 'parent_id', 'id');
+    }
+
     public function allotmentBy()
     {
         return $this->belongsTo('App\Models\UserModel', 'allotment_by', 'id');

@@ -12,59 +12,59 @@
     <message class="row message-group">
     </message>
 
-    <div class="panel panel-primary">
-        <div class="panel-heading"><strong>操作</strong></div>
-        <div class="panel-body">
-            <div class="row form-group">
-                <div class="col-lg-6">
-                    <form action="" method="POST">
-                        {!! csrf_field() !!}
-                        <div class="input-group">
-                            <select class="form-control customer-id" name="assign_id" >
-                                <option>请选择</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">
-                                    </option>
-                                @endforeach
-                            </select>
-                            <span class="input-group-btn">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><strong>操作</strong></div>
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <div class="col-lg-6">
+                            <form action="" method="POST">
+                                {!! csrf_field() !!}
+                                <div class="input-group">
+                                    <select class="form-control customer-id" name="assign_id">
+                                        <option>请选择</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="input-group-btn">
                             <button class="btn btn-success" type="submit">
                                 <span class="glyphicon glyphicon-random"></span> 转交
                             </button>
                         </span>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
-                <div class="col-lg-6 text-right">
-                    @if($driver == 'wish')
-                        <a class="btn btn-primary " href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}">Apeal To Wish Support</a>
+                        <div class="col-lg-6 text-right">
+                            {{--                    @if($driver == 'wish')
+                                                    <a class="btn btn-primary " href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}">Apeal To Wish Support</a>
+                                                @endif--}}
+                            <button class="btn btn-warning" type="button">
+                                <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
+                            </button>
+                            <button class="btn btn-warning" type="button">
+                                <span class="glyphicon glyphicon-minus-sign"></span> 稍后处理
+                            </button>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function setImg(id) {
+                            var value = $('#textcontent').val();
+                            $('#textcontent').val(value + " /:" + id.replace('ali_', ''));
+                        }
+                    </script>
+                    @if(request()->session()->get('workflow')=='keeping')
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <button class="btn btn-danger" type="button">
+                                    <span class="glyphicon glyphicon-minus-sign"></span> 终止工作流
+                                </button>
+                            </div>
+                        </div>
                     @endif
-                    <button class="btn btn-warning" type="button"
-                            onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply', ['id'=>$message->id]) }}'}">
-                        <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
-                    </button>
-                    <button class="btn btn-warning" type="button"
-                            onclick="if(confirm('确认稍后处理?')){location.href='{{ route('message.dontRequireReply', ['id'=>$message->id]) }}'}">
-                        <span class="glyphicon glyphicon-minus-sign"></span> 稍后处理
-                    </button>
                 </div>
             </div>
-            <script type="text/javascript">
-                function setImg(id) {
-                    var value = $('#textcontent').val();
-                    $('#textcontent').val(value + " /:" + id.replace('ali_', ''));
-                }
-            </script>
-            @if(request()->session()->get('workflow')=='keeping')
-                <div class="row">
-                    <div class="col-lg-12">
-                        <button class="btn btn-danger" type="button"
-                                onclick="if(confirm('确认终止工作流?')){location.href='{{ route('message.endWorkflow', ['id'=>$message->id]) }}'}">
-                            <span class="glyphicon glyphicon-minus-sign"></span> 终止工作流
-                        </button>
-                    </div>
-                </div>
-            @endif
         </div>
     </div>
 @stop
@@ -75,7 +75,7 @@
         }
 
         $(document).ready(function () {
-
+            $('.customer-id').select2();
 
             $.ajax({
                 url: "{{route('ajaxGetMsgInfo')}}",
@@ -154,6 +154,70 @@
             }
 
             return text;
+        }
+
+        function changeChildren(parent) {
+            $('#children').html('');
+            $('#children').append('<option>请选择类型</option>');
+            $('#templates').html('');
+            $('#templates').append('<option>请选择</option>');
+            if (parent.val() != "") {
+                $.post(
+                    '{{ route('messageTemplateType.ajaxGetChildren') }}',
+                    {id: parent.val()},
+                    function (response) {
+                        if (response != 'error') {
+                            $.each(response, function (n, child) {
+                                $('#children').append('<option value="' + child.id + '">' + child.name + '</option>');
+                            });
+                        }
+                    }, 'json'
+                );
+            }
+        }
+
+
+        function changeTemplateType(type) {
+            $('#templates').html('');
+            $('#templates').append('<option>请选择</option>');
+            $.post(
+                '{{ route('messageTemplateType.ajaxGetTemplates') }}',
+                {id: type.val()},
+                function (response) {
+                    if (response != 'error') {
+                        $.each(response, function (n, template) {
+                            $('#templates').append('<option value="' + template.id + '">' + template.name + '</option>');
+                        });
+                    }
+                }, 'json'
+            );
+        }
+
+        /**
+         * type mail邮件 或者 text文本
+         */
+        function changeTemplate(template,type) {
+            $.post(
+                '{{ route('messageTemplate.ajaxGetTemplate') }}',
+                {id: template.val()},
+                function (response) {
+                    if (response != 'error') {
+                        //替换字符串
+                        //response['content']=response['content'].replace("署名", assign_name);
+
+                        if(type == 'email'){
+                            editor.setContent(response['content']);
+                        }else if(type == 'text'){
+                            $('#textcontent').val(response['content']);
+                        }
+                        /*
+                         $('#templateContent').html('<div class="form-group"><textarea rows="16" name="content" style="width:100%;height:400px;">'+response['content']+'</textarea></div>');
+                         */
+                        //记录回复邮件的类型
+                        $('#tem_type').val(response.type_id);
+                    }
+                }, 'json'
+            );
         }
 
 

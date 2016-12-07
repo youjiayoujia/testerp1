@@ -550,6 +550,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Picklist\ErrorListController@exportException', 'as' => 'errorList.exportException']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::post('pickList/createNewPickStore',
+        ['uses' => 'PickListController@createNewPickStore', 'as' => 'pickList.createNewPickStore']);
+    Route::get('pickList/createNewPick',
+        ['uses' => 'PickListController@createNewPick', 'as' => 'pickList.createNewPick']);
     Route::get('pickList/printInfo',
         ['uses' => 'PickListController@printInfo', 'as' => 'pickList.printInfo']);
     Route::get('pickList/changePickBy',

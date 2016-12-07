@@ -143,11 +143,6 @@
                     出库复检 <span class="badge">{{ $packageShipping }}</span>
                 </a>
             </div>
-            <div class="col-lg-2 text-left">
-                <a type="button" class="btn btn-default" href="{{ route('errorList.index') }}">
-                    异常拣货单处理 <span class="badge">{{ $packageException }}</span>
-                </a>
-            </div>
         </div>
     </div>
 @stop

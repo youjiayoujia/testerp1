@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('pickList.createPickStore') }} @stop
+@section('formAction') {{ $url }} @stop
 @section('formBody')
     <table class='table table-bordered'>
         <tbody>

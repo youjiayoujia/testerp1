@@ -71,7 +71,8 @@ class ItemModel extends BaseModel
         'package_weight',
         'competition_url',
         'products_history_values',
-        'new_status'
+        'new_status',
+        'html_mod'
     ];
 
     public function product()
@@ -1155,6 +1156,8 @@ class ItemModel extends BaseModel
                 $old_data['purchase_price'] = $data->products_value;
                 $old_data['weight'] = $data->products_weight;
                 $old_data['package_weight'] = $data->weightWithPacket;
+                //公共描述
+                $old_data['html_mod'] = $data->products_html_mod;
                 //供应商
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id = "'.$data->products_suppliers_id.'"');
@@ -1335,6 +1338,8 @@ class ItemModel extends BaseModel
                 $skuData['package_height'] = $productData['package_height'];
                 $skuData['package_width'] = $productData['package_width'];
                 $skuData['package_length'] =$productData['package_length'];
+                //
+                $skuData['html_mod'] =$data->products_html_mod;
                 //采购历史
                 $skuData['sku_history_values'] = $data->products_history_values;  
                 $skuData['status'] =$data->products_status_2;

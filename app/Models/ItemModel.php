@@ -1055,9 +1055,11 @@ class ItemModel extends BaseModel
         //$model = $this->where('id','<','3333')->get();
         foreach ($model as $key => $itemModel) {
             $old_data = [];
-            $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
+            $old_data['warehouse_id'] = $itemModel->purchaseAdminer?$itemModel->purchaseAdminer->warehouse_id:'3';
+            $itemModel->update($old_data);
+            /*$erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
-            //print_r(count($erp_products_data));exit;
+            
             if(count($erp_products_data)){
                 if($erp_products_data[0]->product_warehouse_id==1025){
                     $warehouse_id = 2;
@@ -1068,7 +1070,7 @@ class ItemModel extends BaseModel
                 $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
                 //print_r($old_data);exit;
                 $itemModel->update($old_data);
-            }
+            }*/
 
         }
     }

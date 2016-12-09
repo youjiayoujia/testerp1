@@ -74,7 +74,8 @@ class PackageModel extends BaseModel
         'created_at',
         'is_tonanjing',
         'is_over',
-        'lazada_package_id'
+        'lazada_package_id',
+        'is_oversea',
     ];
 
     public function getMixedSearchAttribute()
@@ -797,6 +798,86 @@ class PackageModel extends BaseModel
         }
 
         return $sum;
+    }
+
+    public function oversea_createPackageItems()
+    {
+        $arr = [];
+        foreach($this->items as $key => $single) {
+            $arr[$single->code][$key]['item_id'] = $single->item_id;
+            $arr[$single->code][$key]['quantity'] = $single->quantity;
+            $arr[$single->code][$key]['order_item_id'] = $single->order_item_id;
+            $arr[$single->code][$key]['remark'] = $single->remark;
+            $arr[$single->code][$key]['is_oversea'] = $single->is_oversea;
+            $arr[$single->code][$key]['code'] = $single->code;
+        }
+        if(count($arr) > 1) {
+            $flag = false;
+            foreach($arr as $code => $value) {
+                if(!$flag) {
+                    $warehouse = WarehouseModel::where('code', $code)->first();
+                    if(!$warehouse) {
+                        return false;
+                    }
+                    $this->update(['warehouse_id' => $warehouse->id]);
+                    foreach($this->items as $single) {
+                        $single->forceDelete();
+                    }
+                    foreach($value as $k => $v) {
+                        $this->items()->create($v);
+                    }
+                    if($this->oversea_assignStock()) {
+                        $this->update(['status' => 'WAITASSIGN']);
+                        $job = new AssignLogistics($this);
+                        Queue::pushOn('assignLogistics', $job);
+                    } else {
+                        $this->update(['status' => 'NEED']);
+                    }
+                    $flag = true;
+                } else {
+                    $newPackage = $this->model->create($this);
+                    $warehouse = WarehouseModel::where('code', $code)->first();
+                    if(!$warehouse) {
+                        return false;
+                    }
+                    $newPackage->update(['warehouse_id' => $warehouse->id]);
+                    foreach($value as $k => $v) {
+                        $newPackage->items()->create($v);
+                    }
+                    if($newPackage->oversea_assignStock()) {
+                        $newPackage->update(['status' => 'WAITASSIGN']);
+                        $job = new AssignLogistics($newPackage);
+                        Queue::pushOn('assignLogistics', $job);
+                    } else {
+                        $newPackage->update(['status' => 'NEED']);
+                    }
+                }
+            }
+        }
+
+        var_dump($arr);exit;
+    }
+
+    public function oversea_assignStock()
+    {
+        $flag = false;
+        $arr = [];
+        foreach($this->items as $key => $single) {
+            $stock = StockModel::where(['warehouse_id' => $this->warehouse_id, 'item_id' => $single->item_id])->first();
+            if(!$stock) {
+                return false;
+            }
+            if($stock->available_quantity < $single->quantity) {
+                return false;
+            }
+            $arr[] = $stock->warehouse_position_id;
+        }
+        foreach($this->items as $key => $single) {
+            $single->update(['warehouse_position_id', $arr[$key]]);
+            $single->item->hold($arr[$key], $single->quantity, 'PACKAGE', $this->id);
+        }
+
+        return true;
     }
 
     public function explodePackage()

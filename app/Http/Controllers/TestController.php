@@ -87,11 +87,18 @@ class TestController extends Controller
 
     public function test2()
     {
+        // $data['ordernum'] = '123';
+        // $data['currency'] = 'USD';
+        // $data['items'][] = ['sku' => 'oversea.B041'];
+        // $data['items'][] = ['sku' => 'oversea2.B053_Pink'];
+        // $order = new OrderModel();
+        // $order->createOrder($data);
+        // var_dump('ok');
         
-    $data = Excel::load('d:/456.xls', function($reader){
-        return $reader->all();
-    });
-    var_dump($data->toarray());
+        // $order = OrderModel::find('2257');
+        // $order->createVirtualPackage();
+        $package = PackageModel::with('items')->find(2445);
+        $package->oversea_createPackageItems();
     }
 //    public function test2()
 //    {

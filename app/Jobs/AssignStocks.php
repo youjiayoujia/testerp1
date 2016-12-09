@@ -42,7 +42,13 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if ($this->package->createPackageItems()) {
+        if($this->package->is_oversea) {
+            $flag = $this->package->oversea_createPackageItems();
+        } else {
+            $flag = $this->package->createPackageItems();
+        }
+        
+        if ($flag) {
             if ($this->package->status == 'WAITASSIGN') {
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success to assign stock.';

@@ -26,6 +26,8 @@ class ItemModel extends BaseModel
         'item_status',
         'ship_status',
         'is_refund',
+        'is_oversea',
+        'code',
     ];
 
     public function item()

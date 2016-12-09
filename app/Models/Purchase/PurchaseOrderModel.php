@@ -18,7 +18,7 @@ class PurchaseOrderModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'purchase_orders';
+    public $table = 'purchase_orders';
     public $rules = [
         'create' => [
             'supplier_id' => 'required',

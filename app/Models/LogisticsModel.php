@@ -152,6 +152,16 @@ class LogisticsModel extends BaseModel
         return $config;
     }
 
+    public function belongsToWarehouse($id, $code)
+    {
+        $logistics = $this->where(['code' => $code, 'warehouse_id' => $id])->first();
+        if($logistics) {
+            return true;
+        }
+        
+        return false;
+    }
+
     //物流方式停用启用颜色
     public function getEnableColorAttribute()
     {

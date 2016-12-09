@@ -140,7 +140,7 @@
             </table>
             <table height="60px;" style="font-size:12px;border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-top: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;border-collapse:collapse;BORDER-right: rgb(0,0,0) 1px;">
                 <tr>
-                    <td align="center" style="font-size:12px;">
+                    <td align="center" style="font-size:12px;text-align: center">
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">

@@ -13,6 +13,7 @@ use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\EmailTemplateModel;
 use App\Models\Logistics\LimitsModel;
+use App\Models\Logistics\RuleModel;
 use App\Models\Logistics\TemplateModel;
 use App\Models\Logistics\Zone\CountriesModel;
 use App\Models\Logistics\Zone\SectionPriceModel;
@@ -133,8 +134,9 @@ class LogisticsController extends Controller
             foreach($model->logisticsRules as $logisticsRule) {
                 $data = $logisticsRule->toArray();
                 $data['name'] = $logisticsRule->name . '[复制]';
+                $data['type_id'] = $logistics->id;
                 unset($logisticsRule->id);
-                $rule = $this->model->create($data);
+                $rule = RuleModel::create($data);
                 if($logisticsRule->catalog_section) {
                     $ruleCatalog = ruleCatalog::where('logistics_rule_id', $logisticsRule->id)->get();
                     if($ruleCatalog->count() > 0) {

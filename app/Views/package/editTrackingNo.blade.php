@@ -60,6 +60,10 @@
                 <input type='text' class='form-control' name='shipping_address' value="{{ $model->shipping_address }}">
             </div>
             <div class="col-lg-2">
+                <label>发货地址1</label>
+                <input type='text' class='form-control' name='shipping_address1' value="{{ $model->shipping_address1 }}">
+            </div>
+            <div class="col-lg-2">
                 <label>收货人</label>
                 <input type='text' class='form-control' name='shipping_firstname' value="{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}">
             </div>

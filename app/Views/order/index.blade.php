@@ -107,7 +107,7 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">
+                            <div class="col-lg-3">
                                 ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
                                 <br>
                                 @if($order->channel)
@@ -134,15 +134,15 @@
                                 {{ $orderItem->item->warehouse?$orderItem->item->warehouse->name:'' }}
                             </div>
                             @if($orderItem->item)
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
-                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-2">{{ $orderItem->item->c_name }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
                                 </div>
-                                <div class="col-lg-2"></div>
+                                <div class="col-lg-1"></div>
                             @endif
                             <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}

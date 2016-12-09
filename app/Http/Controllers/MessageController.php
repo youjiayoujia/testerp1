@@ -242,6 +242,16 @@ class MessageController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '处理失败.'));
     }
 
+    public function workflowNoReply($id)
+    {
+        $message = $this->model->find($id);
+        if(!empty($message)){
+            $result = $message->notRequireReply();
+            if($result){}
+        }
+        return false;
+    }
+
     /**
      * 新增单个无需回复处理
      * @param $id
@@ -347,11 +357,11 @@ class MessageController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function endWorkflow($id)
+    public function endWorkflow()
     {
         request()->session()->pull('workflow');
-        return redirect(route('message.process', ['id' => $id]))
-            ->with('alert', $this->alert('danger', '工作流已终止.'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '工作流已经终止'));
+
     }
 
     public function reply($id, ReplyModel $reply)
@@ -562,10 +572,10 @@ class MessageController extends Controller
     public function ajaxGetMsgInfo ()
     {
         $entry = request()->input('total');
-        $messages = $this->model->getMyWorkFlowMsg($entry);
+        $messages = $this->model->getMyWorkFlowMsg(intval($entry));
         $template = '';
 
-        if(!empty($messages)){
+        if(!$messages->isEmpty()){
 
             foreach($messages as $message){
                 $IsOption = $this->IsAliOptionOrderMsg($message);
@@ -581,6 +591,8 @@ class MessageController extends Controller
                 $template .= view($this->viewPath.'workflow.template')->with($response);
             }
             return $template;
+        } else {
+            return config('status.ajax')['fail'];
         }
     }
 

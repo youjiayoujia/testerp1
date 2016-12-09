@@ -1094,7 +1094,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
     //关闭工作流
-    Route::any('message/{id}/endWorkflow',
+    Route::any('message/endWorkflow',
         ['as' => 'message.endWorkflow', 'uses' => 'MessageController@endWorkflow']);
     //稍后处理
     Route::any('message/{id}/dontRequireReply',
@@ -1106,6 +1106,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //无需回复
     Route::any('message/{id}/notRequireReply',
         ['as' => 'message.notRequireReply', 'uses' => 'MessageController@notRequireReply']);
+    //workfole无需回复
+    Route::any('message/{id}/workflowNoReply',
+        ['as' => 'message.workflowNoReply', 'uses' => 'MessageController@workflowNoReply']);
     //处理信息
     Route::any('message/process',
         ['as' => 'message.process', 'uses' => 'MessageController@process']);

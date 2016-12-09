@@ -546,15 +546,18 @@ class MessageModel extends BaseModel{
     }
 
     /**
-     *
+     * 工作流消息
      * @param $query
      * @param $entry
      * @return mixed
      */
     public function scopeWorkFlowMsg ($query,$entry)
     {
-        return $query->where('status','<>','COMPLETE')->take($entry)->orderBy('id', 'DESC');
+        return $query->where('status','!=','COMPLETE')
+            ->take($entry)
+            ->orderBy('id', 'DESC');
     }
+
 
     public function contentTemplate ()
     {

@@ -29,7 +29,7 @@
                                         @endforeach
                                     </select>
                                     <span class="input-group-btn">
-                            <button class="btn btn-success" type="submit">
+                            <button class="btn btn-success option-group" do="other-customer" type="button">
                                 <span class="glyphicon glyphicon-random"></span> 转交
                             </button>
                         </span>
@@ -40,10 +40,10 @@
                             {{--                    @if($driver == 'wish')
                                                     <a class="btn btn-primary " href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}">Apeal To Wish Support</a>
                                                 @endif--}}
-                            <button class="btn btn-warning" type="button">
+                            <button class="btn btn-warning option-group" do="no-reply" type="button">
                                 <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
                             </button>
-                            <button class="btn btn-warning" type="button">
+                            <button class="btn btn-warning option-group" do="next-time" type="button">
                                 <span class="glyphicon glyphicon-minus-sign"></span> 稍后处理
                             </button>
                         </div>
@@ -57,7 +57,7 @@
                     @if(request()->session()->get('workflow')=='keeping')
                         <div class="row">
                             <div class="col-lg-12">
-                                <button class="btn btn-danger" type="button">
+                                <button class="btn btn-danger option-group" do="workflow-stop" type="button">
                                     <span class="glyphicon glyphicon-minus-sign"></span> 终止工作流
                                 </button>
                             </div>
@@ -73,20 +73,70 @@
         var message = {
             entry : 3, //配置初始化消息数量
         }
+        message.workflowStop = function (){
+            if(confirm('确认终止工作流？')){
+                location.href='{{ route('message.endWorkflow') }}'
+            }
+        }
+        message.noReply = function (id){
+            if(confirm('确定无需回复？')){
+                $.ajax({
+                    url: '{{route('message.endWorkflow',['id' => '＋id＋'])}}',
+                    data:{},
+                    type: 'POST',
+                    success:function (data) {
+                        console.log(data);
+                    }
+
+                });
+            }
+
+        }
+        message.nextTime = function (id){
+            if(confirm('确定稍后回复？')){
+
+            }
+        }
 
         $(document).ready(function () {
             $('.customer-id').select2();
 
+            //初始化工作流数据
             $.ajax({
                 url: "{{route('ajaxGetMsgInfo')}}",
                 data: 'total=' + message.entry,
                 type: 'POST',
                 success: function (data) {
+                    if(data == {{config('status.ajax')['fail']}} ){
+                        alert('没有发现需要处理的消息，请点击按钮，结束工作流。');
+                        return;
+                    }
                     $('.message-group').append(data);
                     $('.message-template').first().show();
                 }
             });
 
+            //信息处理选项
+            $('.option-group').click(function () {
+                var option = $(this).attr('do');
+                var id = $('input[name="id"]').val();
+                switch (option) {
+                    case 'workflow-stop':
+                        message.workflowStop();
+                        break;
+                    case 'no-reply':
+                        message.noReply(id);
+                        break;
+                    case 'next-time':
+                        message.nextTime(id);
+                        break;
+                    default:
+                        return false;
+
+                }
+
+
+            });
         });
 
         $(document).on("click", '.btn-translation', function () {
@@ -236,6 +286,7 @@
                 }, 'json'
             );
         }
+
 
 
     </script>

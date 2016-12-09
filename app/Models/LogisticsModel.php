@@ -123,6 +123,11 @@ class LogisticsModel extends BaseModel
         return $this->hasMany('App\Models\Logistics\ZoneModel', 'logistics_id');
     }
 
+    public function logisticsRules()
+    {
+        return $this->hasMany('App\Models\Logistics\RuleModel', 'type_id', 'id');
+    }
+
     public function getApiConfigAttribute()
     {
         $config = [];

@@ -41,7 +41,7 @@ class FailMessageReplyAgain extends Command
      */
     public function handle()
     {
-        $reply_id =  $this->argument('reply_id');  //渠道名称
+        $reply_id =  $this->argument('reply_id'); //reply表 id
 
         if($reply_id == 'all'){
             $replys = ReplyModel::where('status','FAIL')->get();

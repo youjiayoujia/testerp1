@@ -6,10 +6,13 @@ use Illuminate\Console\Command;
 use App\Jobs\Job;
 use App\Jobs\SendMessages as queueSendMessage;
 use App\Models\Message\ReplyModel;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 
 class FailMessageReplyAgain extends Command
 {
+    use DispatchesJobs;
+
     /**
      * The name and signature of the console command.
      *

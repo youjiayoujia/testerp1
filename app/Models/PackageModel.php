@@ -779,16 +779,21 @@ class PackageModel extends BaseModel
                 $item = $items->where('item_id', $info['item_id'])->first();
                 if ($item->quantity <= $info['quantity']) {
                     $item->delete();
-                    continue;
+                } else {
+                    $weight += $item->item->weight * $info['quantity'];
+                    $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 }
-                $weight += $item->item->weight * $info['quantity'];
-                $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 $newPackage->items()->create($info);
+            }
+            foreach($newPackage->items as $single) {
+                $single->item->hold($single->warehouse_position_id, $single->quantity, 'PACKAGE', $newPackage->id);
             }
             $newPackage->update([
                 'status' => 'WAITASSIGN',
                 'warehouse_id' => $info['warehouse_id'],
-                'weight' => $weight
+                'weight' => $weight,
+                'logistics_id' => '',
+                'tracking_no' => '',
             ]);
             //加入订单状态部分发货
         }
@@ -796,7 +801,8 @@ class PackageModel extends BaseModel
         foreach ($this->items as $item) {
             $oldWeight += $item->item->weight * $item->quantity;
         }
-        $this->update(['weight' => $oldWeight]);
+        $this->update(['weight' => $oldWeight, 'logistics_id' => '', 'tracking_no' => '']);
+        $this->eventLog(UserModel::find(request()->user()->id)->name, '自动拆分订单', json_encode($this));
     }
 
     public function atLeastTimes($arr)
@@ -833,7 +839,7 @@ class PackageModel extends BaseModel
                     $defaultStocks = ItemModel::find($k)->assignDefaultStock($v['allocateQuantity'],
                         $v['order_item_id']);
                     if (array_key_exists($key, $stocks)) {
-                        $stocks[$key] = $stocks[$key] + $defaultStocks[$key];
+                        $stocks[$key] += $defaultStocks[$key];
                     } else {
                         $stocks += $defaultStocks;
                     }
@@ -875,7 +881,6 @@ class PackageModel extends BaseModel
                 }
             }
         }
-
         return $arr;
     }
 
@@ -1393,6 +1398,7 @@ class PackageModel extends BaseModel
                     continue;
                 }
             }
+
             //是否有物流限制
             if ($rule->limit_section && $this->shipping_limits) {
                 $shipping_limits = $this->shipping_limits->toArray();
@@ -1400,6 +1406,10 @@ class PackageModel extends BaseModel
                 foreach ($limits as $limit) {
                     if (in_array($limit->id, $shipping_limits)) {
                         if ($limit->pivot->type == '1') {
+                            continue 2;
+                        }
+                    } else {
+                        if($limit->pivot->type == '0') {
                             continue 2;
                         }
                     }
@@ -1532,6 +1542,10 @@ class PackageModel extends BaseModel
                     foreach ($limits as $limit) {
                         if (in_array($limit->id, $shipping_limits)) {
                             if ($limit->pivot->type == '1') {
+                                continue 2;
+                            }
+                        } else {
+                            if($limit->pivot->type == '0') {
                                 continue 2;
                             }
                         }

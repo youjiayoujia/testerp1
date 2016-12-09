@@ -87,11 +87,9 @@ class TestController extends Controller
 
     public function test2()
     {
-        
-    $data = Excel::load('d:/456.xls', function($reader){
-        return $reader->all();
-    });
-    var_dump($data->toarray());
+        $package = PackageModel::find(2650);
+        $package->createChildPackage($package->explodePackage());
+        exit;
     }
 //    public function test2()
 //    {

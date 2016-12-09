@@ -1215,6 +1215,7 @@ class ItemModel extends BaseModel
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id in('.$data->products_suppliers_ids.')');
                 if(count($supp_name)){
+                    $my_suppliers_id_arr = [];
                     $supp_name_arr = [];
                     foreach ($supp_name as $_supp_name) {
                         $supp_name_arr[] = trim($_supp_name->suppliers_company);
@@ -1232,7 +1233,7 @@ class ItemModel extends BaseModel
                 //print_r($my_suppliers_id_arr);exit;
                 $itemModel->update($old_data);
                 $itemModel->product->update($old_data);
-                $itemModel->skuPrepareSupplier()->sync($my_suppliers_id_arr);
+                //$itemModel->skuPrepareSupplier()->sync($my_suppliers_id_arr);
             }else{
                 //新增
                 //添加库位
@@ -1374,7 +1375,8 @@ class ItemModel extends BaseModel
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id in('.$data->products_suppliers_ids.')');
                 if(count($supp_name)){
-                   $supp_name_arr = [];
+                    $my_suppliers_id_arr = [];
+                    $supp_name_arr = [];
                     foreach ($supp_name as $_supp_name) {
                         $supp_name_arr[] = trim($_supp_name->suppliers_company);
                     }

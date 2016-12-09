@@ -20,7 +20,7 @@ use Exception;
 
 class ItemModel extends BaseModel
 {
-    protected $table = 'items';
+    public $table = 'items';
 
     protected $stock;
 
@@ -1114,7 +1114,7 @@ class ItemModel extends BaseModel
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1 and products_id >20000 and spu!="" order by products_id asc');
+                                        from erp_products_data where productsIsActive = 1 and products_id = 22641 and spu!="" order by products_id asc');
 
         foreach($erp_products_data as $data){
             $itemModel = $this->where('sku',$data->products_sku)->get()->first();

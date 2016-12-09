@@ -751,7 +751,7 @@ class OrderModel extends BaseModel
     {
         $rate = CurrencyModel::where('code', $this->currency)->first()->rate;
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
-        $orderAmount = ($this->amount + $this->amount_shipping) * $rate;
+        $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
         $orderChannelFee = $this->calculateOrderChannelFee();

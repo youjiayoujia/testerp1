@@ -2,30 +2,70 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>打印4px新加坡平邮小包面单</title>
+    <title>打印4px新加坡挂号小包面单</title>
 </head>
 <body>
 <style>
-    *{margin:0;padding:0;}
-    body{ font-family:Tahoma,Arial,"Times New Roman","微软雅黑","Arial Unicode MS"; font-size:14px; line-height: 1.3;}
-    #main_frame_box{width:300px;height:370px;margin:0 auto;position: relative; overflow:hidden;}
-    .top{width:354px;height:70px;margin:10px auto;}
-    table{border-collapse:collapse;border:none;width:354px;height:270px;margin:15px auto;}
-    td{border:1px solid #000;}
-    div, span {word-wrap: break-word;}
-</style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
 
+    body {
+        font-family: Tahoma, Arial, "Times New Roman", "微软雅黑", "Arial Unicode MS";
+        font-size: 14px;
+        line-height: 1.3;
+    }
+
+    #main_frame_box {
+        width: 300px;
+        height: 370px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .top {
+        width: 354px;
+        height: 70px;
+        margin: 10px auto;
+    }
+
+    table {
+        border-collapse: collapse;
+        border: none;
+        width: 354px;
+        height: 270px;
+        margin: 15px auto;
+    }
+
+    td {
+        border: 1px solid #000;
+    }
+
+    div, span {
+        word-wrap: break-word;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    td {
+        white-space: normal;
+        border: 1px solid black;
+    }
+</style>
 <div id="main_frame_box" style="width:300px;height:370px;margin:0 auto;position: relative; overflow:hidden;">
     <div>
         <div style="width: 100%; overflow: hidden;">
             <div style="float: left; height: auto; width: auto;">
                 <div style="font-size:10px; width:120px; font-style:normal; line-height:12px;">
                     CHANGI AIRFREIGHT
-                    CENTRE PO BOX 1192
+                    CENTRE PO BOX 1191
                     SINGAPORE 918118
                 </div>
             </div>
-
             <div style="float: left; height: auto; width: auto;">
                 <div style="font-size:16px;font-weight:bold; width:25px; height:83px; line-height:80px; text-align:center; vertical-align:middle;">
                     {{ $model->Fourcode ? $model->Fourcode->partition : '' }}
@@ -34,7 +74,8 @@
         </div>
         <div style="width: 45%;border:2px solid #000;float: center; position:absolute;left:142px;top:0px;width:153px;height:72px;z-index:2;">
             <div style="padding-center: 50px; font-size: 17px;" align="center">
-                <b>PP</b> 60108<br><br></div>
+                <b>PP</b> 60077<br><br>
+            </div>
             <div style="font-family:STFangsong;font-size: 13px;color: #112" align="center">SINGAPORE</div>
         </div>
         <div style="overflow: hidden; width: 100%;">
@@ -43,101 +84,87 @@
                     <div style="font-size: 13px; line-height: 13px; word-break: break-all;">
                         <b>TO: {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}</b>
                     </div>
-
                     <div style="word-wrap: break-word;">
                         <b>Tel: </b>{{ $model->shipping_phone }}
                     </div>
-
                     <div style="word-wrap: break-word;">
-										<span>
-										{{ $model->shipping_address . ' ' . $model->shipping_address1 }}
-                                            {{ $model->shipping_city }}
-                                            {{ $model->shipping_state }}
-										</span>
-
+                        <span>
+                            {{ $model->shipping_address . ' ' . $model->shipping_address1 }}
+                            {{ $model->shipping_city }}
+                            {{ $model->shipping_state }}
+                        </span>
                         <span>{{ $model->shipping_zipcode }}</span>
                     </div>
-
                     <div style="word-wrap: break-word;">
-                        <b>{{ $model->country ? $model->country->cn_name : '' }}</b>
+                        <b>{{ $model->country ? $model->country->name : '' }}</b>
                     </div>
-
                 </div>
             </div>
-
             <div style="float: right; height: auto; width: auto;">
                 <div style="border: 1px solid black; font-weight: bold; text-align: center; width: 54px; word-wrap: break-word;">
                     <div style="border-bottom: 1px solid black; font-size: 6px; padding: 2px;">
                         <div>AIR MAIL</div>
                         <div>航PAR AVION空</div>
                     </div>
-
                     <div style="border-bottom: 1px solid black; font-size: 10px;">zone</div>
-
-                    <div style="font-size: 18px; font-weight: bold;">{{$model->country ? $model->country->code : ''}}</div>
-
+                    <div style="font-size: 18px; font-weight: bold;">{{ $model->country ? $model->country->code : '' }}</div>
                     <div style="clear:both;"></div>
                 </div>
                 <div style="clear:none;"> &nbsp;&nbsp;&nbsp;{{ $model->fourpx ? $model->fourpx->fourpx_num : '' }}</div>
             </div>
         </div>
-
-        <div style="height: 5mm; width: 100%;">
-        </div>
-
+        <div style="height: 5mm; width: 100%;"></div>
         <div style="width: 100%;">
             <div>
                 <div style="overflow: hidden; width: 100%;">
                     <div style="text-align: center; width: 100%; float: left; height: auto;">
-                        <div><b>{{$model->tracking_no}}</b></div>
+                        <div>
+                            <span style="font-size:20px;font-weight:bold;">R&nbsp;&nbsp;&nbsp;</span>
+                            <b>{{ $model->tracking_no }}</b>
+                        </div>
                         <div style="padding-top: 3px; text-align: center; ">
-                            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}"> </div>
-                    </div>
-                </div>
-                <br>
-
-                <div style="border: 1px solid black; margin-bottom: 2px; overflow: hidden; width: 100%;">
-                    <div style="float: left; height: auto; width: auto;">
-                        <div style="padding-right: 5px; font-size: 9px;">
-                            4PSGOM+
-                        </div>
-                    </div>
-
-                    <div style="float: left; height: auto; width: auto;">
-                        <div style="padding-right: 5px; font-size: 9px;">
-                            【21268260】
-                        </div>
-                    </div>
-
-                    <div style="float: left; height: auto; width: auto;">
-                        <div style="padding-right: 5px; font-size: 9px;">
-                            <span style="word-wrap: break-word;">Ref No: </span>
-                            LME{{$model->id}}
+                            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                         </div>
                     </div>
                 </div>
-
-                <div style="border: 1px solid black; margin-bottom: 2px; overflow: hidden; width: 100%;">
-                    <div style="float: left; height: auto; width: auto;">
-                        <div style="padding-right: 5px; font-size: 9px;">
-                            CS: S4305
-                        </div>
-                    </div>
-
-                    <div style="float: left; height: auto; width: auto;">
-                        <div style="padding-right: 5px; font-size: 9px;">
-                            SD: S0365
-                            (X011)
-                        </div>
+            </div>
+            <br>
+            <div style="border: 1px solid black; margin-bottom: 2px; overflow: hidden; width: 100%;">
+                <div style="float: left; height: auto; width: auto;">
+                    <div style="padding-right: 5px; font-size: 9px;">
+                        SGGH
                     </div>
                 </div>
-
-                <div style="overflow: hidden; width: 100%; height: 20mm;">
-                    <div style="float: left; height: auto; width: auto;">
-                        <div style="font-size: 9px;">
-                            <b>【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</b>
-                            {{ $model->sku_info }}
-                        </div>
+                <div style="float: left; height: auto; width: auto;">
+                    <div style="padding-right: 5px; font-size: 9px;">
+                        【21268260】
+                    </div>
+                </div>
+                <div style="float: left; height: auto; width: auto;">
+                    <div style="padding-right: 5px; font-size: 9px;">
+                        <span style="word-wrap: break-word;">Ref No: </span>
+                        LME{{ $model->id }}
+                    </div>
+                </div>
+            </div>
+            <div style="border: 1px solid black; margin-bottom: 2px; overflow: hidden; width: 100%;">
+                <div style="float: left; height: auto; width: auto;">
+                    <div style="padding-right: 5px; font-size: 9px;">
+                        CS: S1575
+                    </div>
+                </div>
+                <div style="float: left; height: auto; width: auto;">
+                    <div style="padding-right: 5px; font-size: 9px;">
+                        SD: S2408
+                        (X208)
+                    </div>
+                </div>
+            </div>
+            <div style="overflow: hidden; width: 100%; height: 20mm;">
+                <div style="float: left; height: auto; width: auto;">
+                    <div style="font-size: 9px;">
+                        <b>【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</b>
+                        {{ $model->sku_info }}
                     </div>
                 </div>
             </div>

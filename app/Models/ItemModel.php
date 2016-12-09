@@ -1114,7 +1114,7 @@ class ItemModel extends BaseModel
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1 and products_id > 22630 and spu!="" order by products_id asc');
+                                        from erp_products_data where productsIsActive = 1 and products_id = 22816 and spu!="" order by products_id asc');
 
         foreach($erp_products_data as $data){
             $itemModel = $this->where('sku',$data->products_sku)->get()->first();
@@ -1158,7 +1158,11 @@ class ItemModel extends BaseModel
 
                 if(count($supp_name)){
                     $my_supplier_id = SupplierModel::where('company',trim($supp_name[0]->suppliers_company))->get()->first();
-                    $old_data['supplier_id'] = $my_supplier_id->id;
+                    if(count($my_supplier_id)){
+                        $old_data['supplier_id'] = $my_supplier_id->id;
+                    }else{
+                        $old_data['supplier_id'] = 0;
+                    }   
                 }else{
                     $old_data['supplier_id'] = 0;
                 }
@@ -1216,10 +1220,12 @@ class ItemModel extends BaseModel
                         $supp_name_arr[] = trim($_supp_name->suppliers_company);
                     }
                     $my_suppliers_id_two = SupplierModel::whereIn('company',$supp_name_arr)->get(['id'])->toArray();
-                    foreach($my_suppliers_id_two as $_my_suppliers_id_two){
-                        $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
-                    }
-                    $itemModel->skuPrepareSupplier()->sync($my_suppliers_id_arr); 
+                    if(count($my_suppliers_id_two)){
+                        foreach($my_suppliers_id_two as $_my_suppliers_id_two){
+                            $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
+                        } 
+                        $itemModel->skuPrepareSupplier()->sync($my_suppliers_id_arr);
+                    } 
                 }
                 
                 //echo '<pre>';
@@ -1243,8 +1249,14 @@ class ItemModel extends BaseModel
                                         from erp_suppliers where suppliers_id = "'.$data->products_suppliers_id.'"');
                 if(count($supp_name)){
                     $my_supplier_id = SupplierModel::where('company',trim($supp_name[0]->suppliers_company))->get()->first();
-                    $productData['supplier_id'] = $my_supplier_id->id;
-                    $skuData['supplier_id'] = $my_supplier_id->id;
+                    if(count($my_supplier_id)){
+                        $productData['supplier_id'] = $my_supplier_id->id;
+                        $skuData['supplier_id'] = $my_supplier_id->id;
+                    }else{
+                        $productData['supplier_id'] = 0;
+                        $skuData['supplier_id'] = 0;
+                    }
+                    
                 }else{
                     $productData['supplier_id'] = 0;
                     $skuData['supplier_id'] = 0;
@@ -1367,14 +1379,16 @@ class ItemModel extends BaseModel
                         $supp_name_arr[] = trim($_supp_name->suppliers_company);
                     }
                     $my_suppliers_id_two = SupplierModel::whereIn('company',$supp_name_arr)->get(['id'])->toArray();
-                    foreach($my_suppliers_id_two as $_my_suppliers_id_two){
-                        $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
-                    }
+                    if(count($my_suppliers_id_two)){
+                        foreach($my_suppliers_id_two as $_my_suppliers_id_two){
+                            $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
+                        }
 
-                    foreach(explode(',',$data->products_suppliers_ids) as $_supplier_id){
-                        $arr['supplier_id'] = $_supplier_id;
-                        $itemModel->skuPrepareSupplier()->attach($my_suppliers_id_arr);
-                    } 
+                        foreach(explode(',',$data->products_suppliers_ids) as $_supplier_id){
+                            $arr['supplier_id'] = $_supplier_id;
+                            $itemModel->skuPrepareSupplier()->attach($my_suppliers_id_arr);
+                        }
+                    }   
                 }
                 
             }    

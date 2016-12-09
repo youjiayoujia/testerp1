@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\Logistics\ErpEubModel;
 use App\Models\Logistics\ErpRussiaModel;
+use App\Models\Logistics\ErpShunFenModel;
 use Excel;
 use DB;
 use App\Jobs\AssignStocks;
@@ -225,6 +226,19 @@ class PackageModel extends BaseModel
         }
 
         return $code;
+    }
+
+    //顺分荷兰面单分拣码
+    public function getShunFenAttribute()
+    {
+        $fjm = '';
+        if ($this->logistics) {
+            if ($this->logistics->name == '【挂号】SF荷兰挂号') {
+                $fjm = ErpShunFenModel::where('code', $this->shipping_country)->first()->gh;
+            }
+        }
+
+        return $fjm;
     }
 
     //包裹sku信息
@@ -1079,6 +1093,7 @@ class PackageModel extends BaseModel
                             'status' => 'WAITASSIGN',
                             'weight' => $weight,
                             'logistics_id' => '',
+                            'logistics_order_number' => '',
                             'tracking_no' => ''
                         ]);
                         $job = new AssignLogistics($this);
@@ -1103,6 +1118,7 @@ class PackageModel extends BaseModel
                                 'status' => 'WAITASSIGN',
                                 'weight' => $weight,
                                 'logistics_id' => '',
+                                'logistics_order_number' => '',
                                 'tracking_no' => ''
                             ]);
                             $job = new AssignLogistics($this);
@@ -1140,8 +1156,9 @@ class PackageModel extends BaseModel
                                 'warehouse_id' => $warehouseId,
                                 'status' => 'WAITASSIGN',
                                 'weight' => $weight,
-                                'logistics_id' => '0',
-                                'tracking_no' => '0'
+                                'logistics_id' => '',
+                                'tracking_no' => '',
+                                'logistics_order_number' => '',
                             ]);
                             $job = new AssignLogistics($newPackage);
                             Queue::pushOn('assignLogistics', $job);
@@ -1222,7 +1239,15 @@ class PackageModel extends BaseModel
 
     public function calculateLogisticsFee()
     {
-        $logisticsId = !empty($this->logistics_id) ? $this->logistics_id : $this->realTimeLogistics()->id;
+        if (!empty($this->logistics_id)) {
+            $logisticsId = $this->logistics_id;
+        } else {
+            if ($this->realTimeLogistics()) {
+                $logisticsId = $this->realTimeLogistics()->id;
+            } else {
+                return false;
+            }
+        }
         $zones = ZoneModel::where('logistics_id', $logisticsId)->get();
         foreach ($zones as $zone) {
             $country = CountriesModel::where('code', $this->shipping_country)->first();
@@ -1393,7 +1418,7 @@ class PackageModel extends BaseModel
             return $rule->logistics;
         }
 
-        return '虚拟匹配未匹配到';
+        return false;
     }
 
     public function assignLogistics()
@@ -1551,6 +1576,8 @@ class PackageModel extends BaseModel
                             'logistics_id' => $rule->logistics->id,
                             'tracking_link' => $trackingUrl,
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                            'logistics_order_number' => '',
+                            'tracking_no' => '',
                             'is_auto' => $is_auto,
                         ]);
                     } else {
@@ -1559,6 +1586,8 @@ class PackageModel extends BaseModel
                             'logistics_id' => $rule->logistics->id,
                             'tracking_link' => $trackingUrl,
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                            'logistics_order_number' => '',
+                            'tracking_no' => '',
                             'is_auto' => $is_auto,
                         ]);
                     }

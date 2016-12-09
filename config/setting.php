@@ -69,7 +69,7 @@ return [
         'ordernum' => '订单号',
         'channel_ordernum' => '渠道订单号',
         'channelAccount.alias' => '渠道账号',
-        'userService.name' => '客服人员',
+        'userOperator.name' => '运营人员',
         'email' => '邮箱',
         'currency' => '币种',
         'name' => '名称',

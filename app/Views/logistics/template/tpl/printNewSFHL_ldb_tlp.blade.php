@@ -52,13 +52,13 @@
                     <div style="width:73mm;float:left;font-size:12px;line-height:14px;margin-left:5px;">
                         <p>SF No:{{ $model->tracking_no }}</p>
                         <p>TEL:{{ $model->shipping_phone }}</p>
-                        <p>【7550001183】 Ref No:{{ $model->order ? $model->order->ordernum : '' }}【{{ $model->logistics ? $model->logistics->code : '' }}】'.'</p>
+                        <p>【7550001183】 Ref No:{{ $model->id }}【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</p>
                         <p>{{ date('Y-m-d H:i:s') }}</p>
-                        <p>{{ $model->package_info }}</p>
+                        <p>{{ $model->sku_info }}</p>
                     </div>
                     <div style="width:22mm;float:right;font-size:18px;font-weight:bold;line-height:30px;text-align:center;">
                         <p>{{ $model->shipping_country ? $model->shipping_country : ($model->country ? $model->country->name : '') }}</p>
-                        <p>gjfjm</p>
+                        <p>{{ $model->shun_fen }}</p>
                     </div>
                 </td>
             </tr>
@@ -91,17 +91,17 @@
             </tr>
             <tr style="text-align:center;height:5mm;">
                 @if($model->items)
-                    <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->item->name }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->getDeclaredInfo()['declared_en'] }}</td>
                     <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->quantity }}</td>
-                    <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->item->weight }}</td>
-                    <td style="border-bottom:1px solid black;">{{ $model->items->first()->item->cost }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->getDeclaredInfo()['weight'] }}</td>
+                    <td style="border-bottom:1px solid black;">{{ $model->getDeclaredInfo()['declared_value'] }}</td>
                 @endif
             </tr>
             <tr style="text-align:center;height:5mm;">
                 <td style="border-right:1px solid black;border-bottom:1px solid black;">Totals of contents</td>
                 <td style="border-right:1px solid black;border-bottom:1px solid black;">Pcs</td>
-                <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->weight }}Kg</td>
-                <td style="border-bottom:1px solid black;">${{ $model->self_value < 20 ? $model->selft_value : 20 }}</td>
+                <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->total_weight }}Kg</td>
+                <td style="border-bottom:1px solid black;">${{ $model->total_price < 20 ? $model->total_price : 20 }}</td>
             </tr>
             <tr>
                 <td colspan="4" style="height:7mm;line-height:17px;">

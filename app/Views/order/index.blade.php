@@ -3,7 +3,7 @@
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuanOrder()">全选</th>
     <th class="sort" data-field="id">内单号</th>
     <th class="sort" data-field="channel_ordernum">平台订单号</th>
-    {{--<th class="sort" data-field="channel">渠道</th>--}}
+    <th class="sort" data-field="channel_id">渠道</th>
     <th class="sort" data-field="channel_account_id">销售账号</th>
     <th>买家ID</th>
     <th>物流</th>
@@ -13,7 +13,7 @@
     <th class="sort" data-field="amount_shipping"><strong class="text-danger">运费</strong></th>
     <th class="sort" data-field="profit_rate"><strong class="text-success">预测毛利率</strong></th>
     <th>订单状态</th>
-    <th>客服人员</th>
+    <th>运营人员</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>详情</th>
 @stop
@@ -30,10 +30,10 @@
             <td>
                 {{ $order->channel_ordernum }}
             </td>
-            {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
+            <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
-            <td>{{ $order->logistics }}</td>
+            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
@@ -48,7 +48,7 @@
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
-            <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
+            <td>{{ $order->userOperator ? $order->userOperator->name : '未分配' }}</td>
             <td>{{ $order->created_at }}</td>
             <td>
                 <a class="btn btn-primary btn-xs"

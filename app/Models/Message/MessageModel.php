@@ -272,7 +272,7 @@ class MessageModel extends BaseModel{
         $data['status'] = 'NEW';
         if ($this->replies()->create($data)) {
             //记录回复邮件类型
-            $this->type_id = $data['type_id']?$data['type_id']:"";
+            $this->type_id = 0;
             $this->status = 'COMPLETE';
             $this->end_at = date('Y-m-d H:i:s', time());
             return $this->save();

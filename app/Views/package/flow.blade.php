@@ -7,6 +7,11 @@
                     Do Package <span class="badge">{{ $ordernum }}</span>
                 </a>
             </div>
+            <div class="col-lg-8">
+                <p type="button" class="btn btn-warning" >
+                    CRM消息回复失败统计 <span class="badge">{{ $message_replies_failed}}</span>
+                </p>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-4">
@@ -136,11 +141,6 @@
             <div class="col-lg-4">
                 <a type="button" class="btn btn-success" href="{{ route('package.shipping') }}">
                     出库复检 <span class="badge">{{ $packageShipping }}</span>
-                </a>
-            </div>
-            <div class="col-lg-2 text-left">
-                <a type="button" class="btn btn-default" href="{{ route('errorList.index') }}">
-                    异常拣货单处理 <span class="badge">{{ $packageException }}</span>
                 </a>
             </div>
         </div>

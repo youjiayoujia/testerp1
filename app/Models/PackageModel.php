@@ -1239,7 +1239,15 @@ class PackageModel extends BaseModel
 
     public function calculateLogisticsFee()
     {
-        $logisticsId = !empty($this->logistics_id) ? $this->logistics_id : $this->realTimeLogistics()->id;
+        if (!empty($this->logistics_id)) {
+            $logisticsId = $this->logistics_id;
+        } else {
+            if ($this->realTimeLogistics()) {
+                $logisticsId = $this->realTimeLogistics()->id;
+            } else {
+                return false;
+            }
+        }
         $zones = ZoneModel::where('logistics_id', $logisticsId)->get();
         foreach ($zones as $zone) {
             $country = CountriesModel::where('code', $this->shipping_country)->first();
@@ -1410,7 +1418,7 @@ class PackageModel extends BaseModel
             return $rule->logistics;
         }
 
-        return '虚拟匹配未匹配到';
+        return false;
     }
 
     public function assignLogistics()

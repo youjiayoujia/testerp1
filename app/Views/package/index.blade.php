@@ -65,8 +65,14 @@
             <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
                 @if($key == 0)
                     <td colspan='2' rowspan="{{$package->items->count()}}">
-                        <p>{{ $package->shipping_firstname . $package->shipping_lastname }}</p>
-                        <p>{{ $package->shipping_shipping_address . ' ' .$package->shipping_city . ' ' . $package->shiping_state . ' ' . $package->shipping_country }}
+                        <address>
+                            <strong>{{ $package->shipping_firstname . ' ' . $package->shipping_lastname }}</strong><br>
+                            {{ $package->shipping_address }} {{ $package->shipping_address1 }}<br>
+                            {{ $package->shipping_city . ', ' . $package->shipping_state.' '.$package->shipping_zipcode }}<br>
+                            {{ $package->country ? $package->country->name.' '.$package->country->cn_name : '' }}<br>
+                            <abbr title="ZipCode">Z:</abbr> {{ $package->shipping_zipcode }}
+                            <abbr title="Phone">P:</abbr> {{ $package->shipping_phone }}
+                        </address>
                     </td>
                     <td colspan='3' rowspan="{{$package->items->count()}}">包裹item信息</td>
                 @endif

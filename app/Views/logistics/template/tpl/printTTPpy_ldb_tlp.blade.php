@@ -29,21 +29,19 @@
 <div class="main">
     <div style="border:1px solid black;border-top:none;border-right:none;width:96.5mm;height:22mm;float:right;">
         <div style="width:14mm;height:22mm;float:left;text-align: center;">
-            <p><img src="{{ asset('picture/ttp1.png') }}" style="width:60px;height:55px;"/></p>
-            <p><img src="{{ asset('picture/ttp2.png') }}" style="width:25px;height:24px;"/></p>
         </div>
         <div style="width:57mm;height:22mm;float:left;text-align: center;font-size:12px;line-height: 11px;">
             <p>
                 <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             </p>
             <p style="font-size:13px;font-weight: bold;margin-top: 1px;">
-                {{ $model->tracking_no }}</p>
-            <p style="margin-top: 2px;"> Return if undeliverable PO box 5001 istanbul-TURKEY</p>
+                {{ $model->tracking_no }}
+            </p>
         </div>
         <div style="width:92px;height:22mm;float:right;text-align: center;">
             <p style="font-size:10px;width:35px;height:35px;float:left;margin-top:20px;">UNTRACK</p>
             <p style="font-size:10px;border:1px solid black;border-right:none;width:35px;height:35px;float:right;margin-top:15px;line-height:10px;">
-                Port Payé<br/>Turkey
+                PP<br/><br/>TR
             </p>
         </div>
     </div>
@@ -99,13 +97,13 @@
                 </tr>
                 <tr style="height:4mm;font-size: 11px;text-align:center;">
                     <td style="border-right:1px solid black;border-bottom:1px solid black;">
-                        {{ $model->sku_info }}
+                        {{ $model->getDeclaredInfo()['declared_en'] . '  x1' }}
                     </td>
                     <td style="border-right:1px solid black;border-bottom:1px solid black;">
-                        {{ $model->signal_weight }}
+                        {{ $model->getDeclaredInfo()['weight'] }}
                     </td>
                     <td style="border-bottom:1px solid black;">
-                        {{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}
+                        {{ sprintf("%.2f", $model->getDeclaredInfo()['declared_value'] > 20 ? 20 : $model->getDeclaredInfo()['declared_value']) }}
                     </td>
                 </tr>
                 <tr style="height:4mm;font-size: 11px;text-align:center;">
@@ -160,6 +158,11 @@
             </table>
         </div>
         <div style="border-left:1px solid black;border-bottom:1px solid black;width:31.5mm;height:70mm;float:right;font-size: 12px;">
+            <p style="float:right;margin:10px 10px 0 0">
+                <span style="font-weight:bold;">
+                    {{ $model->shipping_country }}
+                </span>
+            </p>
             <div style="font-weight: bold;margin-top:25px;"><p style="width:116px;float:left;">TO:</p></div>
             <p style="margin-right: 2px;">
                 <b>
@@ -177,9 +180,9 @@
         </div>
     </div>
     <div style="border-top:1px solid black;height: 4mm;font-size: 12px;clear:both;">
-        <p style="margin-left: 6px;width:50mm;float:left">RefNo:<b>{{ $model->order_id }}</b></p>
+        <p style="margin-left: 6px;width:50mm;float:left">RefNo:<b>{{ $model->id }}</b></p>
         <p style="margin-left: 6px;width:10mm;float:right">
-            {{ $model->logistics_id }}
+            {{ $model->logistics ? $model->logistics->logistics_code : '' }}
         </p>
     </div>
 </div>

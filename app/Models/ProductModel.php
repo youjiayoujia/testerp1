@@ -22,7 +22,7 @@ class ProductModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'products';
+    public $table = 'products';
 
     public $rules = [
         'create' => [

@@ -361,7 +361,7 @@ class OrderModel extends BaseModel
                 'country' => ['code'],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
-                'userService' => ['name'],
+                'userOperator' => ['name'],
                 'packages' => ['tracking_no'],
             ],
             'selectRelatedSearchs' => [

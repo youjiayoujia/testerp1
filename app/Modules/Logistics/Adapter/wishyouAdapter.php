@@ -10,6 +10,8 @@ namespace App\Modules\Logistics\Adapter;
 header("Content-type:text/html;charset=utf-8");
 use App\Models\Order\ItemModel;
 
+use App\Models\AccounttokenModel;
+
 use App\Models\Publish\Wish\WishSellerCodeModel;
 
 use Illuminate\Support\Facades\DB;
@@ -98,12 +100,7 @@ Class WishyouAdapter extends BasicAdapter
     );
 
 	private $channel_info = array('370'=>'wish邮,yw,sh,0','469'=>'wish邮,yw,yw,0','481'=>'wish邮,sz,sz,0','487'=>'wish邮,sz,sz,11-0','512'=>'wish邮,sz,gz,0','549'=>'wish邮,yw,nj,0');
-	private $tokenArr = array(
-		1 => '3bc42b75cc634613816582fef3268063',
-		2 => '46ade8fea61d449897f07e9dc50bfb35',
-		3 => '3bc42b75cc634613816582fef3268063',
-		4 => '46ade8fea61d449897f07e9dc50bfb35'
-	);
+
 
 	public function __construct($config)
     {
@@ -124,6 +121,21 @@ Class WishyouAdapter extends BasicAdapter
 				'result' => 'empty data!'
 			];
 	    }
+		$token_arr = AccounttokenModel::where('type','wish_you')->get();//wish_you账号token
+		$this->tokenArr = array();
+		if(!empty($token_arr)){
+            foreach($token_arr as $token){
+				if($token->account == 'slme'){
+					$this->tokenArr['1'] = $token->account_token;
+					$this->tokenArr['3'] = $token->account_token;
+				}else{
+					$this->tokenArr['2'] = $token->account_token;
+					$this->tokenArr['4'] = $token->account_token;
+				}
+			}
+		}
+		$this->API_key = $this->tokenArr[$orderInfo->warehouse_id];  //根据仓库选择对应
+
 		$result_arr['status'] = 0;
 	 	$result_arr['msg'] = '';
 		$otype = '0';
@@ -165,7 +177,9 @@ Class WishyouAdapter extends BasicAdapter
 			];
 		}
 
-		$this->API_key = $this->tokenArr[$orderInfo->warehouse_id];  //根据仓库选择对应
+
+
+
 
 		$order_xml=$this->createRequestXmlFile($orderInfo,$shipInfo);  //xml
 		print_r($order_xml);

@@ -71,7 +71,7 @@
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>
                 <!-- 400条sql -->
-                @foreach($warehouses as $warehouse)
+                <!-- @foreach($warehouses as $warehouse)
                     {{$warehouse->name}}
                     <br>
                     <div>虚：{{$item->getStockQuantity($warehouse->id)}}</div>
@@ -79,7 +79,7 @@
                     <div>途：{{$item->transit_quantity[$warehouse->id]['normal']}}</div>
                     <div>特：{{$item->transit_quantity[$warehouse->id]['special']}}</div>
                     <div>缺：{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</div>
-                @endforeach
+                @endforeach -->
                 所有仓库
                 <br>
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>
@@ -257,6 +257,24 @@
                 </button>
             </td>
         </tr>
+        <tr>  
+            <th colspan='3'>仓库</th>
+            <th colspan='3'>虚库存</th>
+            <th colspan='2'>实库存</th>
+            <th colspan='2'>在途</th>
+            <th colspan='2'>特采在途</th>
+            <th colspan='2'>缺货</th>    
+        </tr>
+        @foreach($warehouses as $warehouse)
+            <tr>
+                <td colspan='3'>{{$warehouse->name}}</td>
+                <td colspan='3'>{{$item->getStockQuantity($warehouse->id)}}</td>
+                <td colspan='2'>{{$item->getStockQuantity($warehouse->id,1)}}</td>
+                <td colspan='2'>{{$item->transit_quantity[$warehouse->id]['normal']}}</td>
+                <td colspan='2'>{{$item->transit_quantity[$warehouse->id]['special']}}</td>
+                <td colspan='2'>{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</td>
+            </tr>
+        @endforeach
 
         <!-- 图片模态框（Modal -->
         <div class="modal fade" id="imgModal_{{$item->id}}" role="dialog"

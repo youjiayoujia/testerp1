@@ -6,7 +6,6 @@
  * Time: 上午9:19
  */
 namespace App\Http\Controllers;
-
 header('Content-type: text/html; charset=UTF-8');
 use Session;
 use App\Models\ChannelModel;
@@ -66,7 +65,6 @@ class TestController extends Controller
 {
     private $itemModel;
     private $orderModel;
-
     public function __construct(OrderModel $orderModel, ItemModel $itemModel)
     {
         $this->itemModel = $itemModel;
@@ -76,8 +74,7 @@ class TestController extends Controller
     //进行物流下单
 
 
-    public function tryGetLogtisticsNo($id)
-    {
+    public function tryGetLogtisticsNo($id){
 
         $package = PackageModel::where('id', $id)->first();
         if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
@@ -91,10 +88,10 @@ class TestController extends Controller
     public function test2()
     {
 
-        $data = Excel::load('d:/456.xls', function ($reader) {
-            return $reader->all();
-        });
-        var_dump($data->toarray());
+    $data = Excel::load('d:/456.xls', function($reader){
+        return $reader->all();
+    });
+    var_dump($data->toarray());
     }
 //    public function test2()
 //    {
@@ -131,7 +128,6 @@ class TestController extends Controller
             }
         }
     }
-
     public function valueEqual($c, $d)
     {
         if (getType($c) == getType($d)) {
@@ -157,7 +153,6 @@ class TestController extends Controller
             return false;
         }
     }
-
     public function test3()
     {
         var_dump('123');
@@ -237,11 +232,8 @@ class TestController extends Controller
         var_dump('123');
         exit;
     }
-
     public function index()
     {
-        $order = factory(App\Models\OrderModel::class)->make();
-        dd($order);
         echo "<pre>";
         $package = PackageModel::find(62);
         var_dump($package->placeLogistics());
@@ -288,7 +280,6 @@ class TestController extends Controller
             echo 'Account is not exist.';
         }
     }
-
     public function testChinaPost()
     {
         $package = PackageModel::findOrFail(2);
@@ -296,7 +287,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function testWinit()
     {
         $package = PackageModel::findOrFail(2);
@@ -304,7 +294,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function test4px()
     {
         $package = PackageModel::findOrFail(2);
@@ -312,7 +301,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function testSmt()
     {
         $package = PackageModel::findOrFail(2);
@@ -320,7 +308,6 @@ class TestController extends Controller
             ->createWarehouseOrder($package);
         exit;
     }
-
     public function testYw()
     {
         $id = request()->get('id');
@@ -329,7 +316,6 @@ class TestController extends Controller
             ->getTracking($package);
         exit;
     }
-
     public function aliexpressOrdersList()
     {
         $begin = microtime(true);
@@ -378,7 +364,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function lazadaOrdersList()
     {
         $begin = microtime(true);
@@ -401,7 +386,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function cdiscountOrdersList()
     {
         $begin = microtime(true);
@@ -424,7 +408,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function test()
     {
         $datas = DB::table('test')->get();
@@ -468,7 +451,6 @@ class TestController extends Controller
             );
         }
     }
-
     public function getWishProduct()
     {
         $accountID = request()->get('id');
@@ -530,7 +512,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     public function getEbayInfo()
     {
         $accountID = request()->get('id');
@@ -539,7 +520,6 @@ class TestController extends Controller
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbaySite();
     }
-
     public function testLazada()
     {
         $accountId = 201;
@@ -604,7 +584,6 @@ class TestController extends Controller
         }
         exit;
     }
-
     public function testPaypal()
     {
         $orders = OrderModel::where('id', 12851)->get();
@@ -672,7 +651,6 @@ class TestController extends Controller
             }
         }
     }
-
     public function jdtestCrm()
     {
         foreach (AccountModel::all() as $account) {
@@ -682,7 +660,7 @@ class TestController extends Controller
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
 
                 $data = $channel->getMessages();
-                dd(json_decode($data, true));
+                dd(json_decode($data,true));
                 exit;
                 $messageList = $channel->getMessages();
                 print_r($messageList);
@@ -691,24 +669,25 @@ class TestController extends Controller
         }
 
 
+
         dd('exit');
         $groups = SupplierModel::all()->groupBy('company');
 
-        foreach ($groups as $group_key => $group) {
-            if ($group->count() > 1) {   //如果有多个相同的供货商
-                foreach ($group as $key => $supplier) {
-                    if ($key == 0) { //保留id最小的供货商，然后把其他的 sku 关联到 最小的供货商id  其余的全删除
+        foreach ($groups as $group_key => $group){
+            if($group->count() > 1){   //如果有多个相同的供货商
+                foreach($group as $key => $supplier){
+                    if($key == 0){ //保留id最小的供货商，然后把其他的 sku 关联到 最小的供货商id  其余的全删除
 
                         $correct_supplier_id = $supplier->id;
 
-                    } else {
+                    }else{
 
-                        $sql = 'update items set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id;
-                        DB::update($sql);
-                        //更换备选
-                        DB::update('update item_prepare_suppliers set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id);
+                         $sql = 'update items set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id;
+                         DB::update($sql);
+                         //更换备选
+                         DB::update('update item_prepare_suppliers set supplier_id = ' . $correct_supplier_id . ' where supplier_id = ' . $supplier->id);
 
-                        $supplier->delete(); //删除多余
+                         $supplier->delete(); //删除多余
                     }
                 }
 
@@ -719,8 +698,8 @@ class TestController extends Controller
         /*
          * 写入队列
          */
-        $replys = ReplyModel::where('status', 'FAIL')->get();
-        foreach ($replys as $reply) {
+       $replys = ReplyModel::where('status','FAIL')->get();
+        foreach($replys as $reply){
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
@@ -743,30 +722,29 @@ class TestController extends Controller
         dd('end');
         $ali = new Alibaba(); //初始化阿里账号
         $ali_accounts = AlibabaSupliersAccountModel::all();
-        $purchase_orders = PurchaseOrderModel::whereIn('status', [1, 2, 3])->whereNotNull('post_coding')->get();
-        foreach ($purchase_orders as $purchase_order) {
-            if (!empty($purchase_order->post_coding)) {
-                foreach ($ali_accounts as $account) {
-                    if (empty($account->access_token)) {
+        $purchase_orders =  PurchaseOrderModel::whereIn('status',[1,2,3])->whereNotNull('post_coding')->get();
+        foreach ($purchase_orders as $purchase_order){
+            if(!empty($purchase_order->post_coding)){
+                foreach ($ali_accounts as $account){
+                    if(empty($account->access_token)){
                         continue;
                     }
-                    if ($account->resource_owner != 'slme18') {
+                    if($account->resource_owner != 'slme18'){
                         continue;
                     }
                     //根据采购人 获取对应的阿里账号
-                    $curl_params['access_token'] = $account->access_token;
+                    $curl_params['access_token']  =$account->access_token;
                     //$curl_params['buyerMemberId'] =$account->memberId;
-                    $curl_params['id'] = $purchase_order->post_coding;
+                    $curl_params['id']    = $purchase_order->post_coding;
                     //$param['buyerMemberId'] = $curl_params['buyerMemberId'];
-                    $param['access_token'] = $curl_params['access_token'];
-                    $param['id'] = $curl_params['id'];
-                    $curl_params['_aop_signature'] = $ali->getSignature($param,
-                        $ali->order_list_api_url . '/' . $ali->app_key);
-                    $crul_url = $ali->ali_url . '/openapi/' . $ali->order_list_api_url . '/' . $ali->app_key;
-                    $order_detail = json_decode($ali->get($crul_url, $curl_params), true);
-                    if (!empty($order_detail['orderModel']['logisticsOrderList'])) {
-                        foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics) {
-                            if (!empty($item_logistics['logisticsBillNo'])) {
+                    $param['access_token']  = $curl_params['access_token'];
+                    $param['id']    = $curl_params['id'];
+                    $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
+                    $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
+                    $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
+                    if(!empty($order_detail['orderModel']['logisticsOrderList'])){
+                        foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
+                            if(!empty($item_logistics['logisticsBillNo'])) {
                             }
                         }
                     }
@@ -780,48 +758,47 @@ class TestController extends Controller
          * 获取所有缺失物流单号的采购单中的单号
          *
          */
-        $purchasePostages = PurchasePostageModel::where('post_coding', null)->get();
-        if (!$purchasePostages->isEmpty()) {
-            foreach ($purchasePostages as $purchasePostage) {
-                if (!empty($purchasePostage->purchaseOrder->post_coding)) { //外部单号不为空
+        $purchasePostages = PurchasePostageModel::where('post_coding',Null)->get();
+        if(!$purchasePostages->isEmpty()){
+            foreach ($purchasePostages as $purchasePostage){
+                if(!empty($purchasePostage->purchaseOrder->post_coding)){ //外部单号不为空
                     $orderids_ary[$purchasePostage->purchaseOrder->post_coding] = $purchasePostage->purchaseOrder->post_coding;
                 }
             }
         }
         //dd($orderids_ary);
         $ali_accounts = AlibabaSupliersAccountModel::all();
-        foreach ($orderids_ary as $ali_order_id) {
-            foreach ($ali_accounts as $account) {
-                if (empty($account->access_token)) {
+        foreach($orderids_ary as $ali_order_id){
+            foreach ($ali_accounts as $account){
+                if(empty($account->access_token)){
                     continue;
                 }
-                if ($account->resource_owner != 'slme18') {
+                if($account->resource_owner != 'slme18'){
                     continue;
                 }
                 //根据采购人 获取对应的阿里账号
-                $curl_params['access_token'] = $account->access_token;
+                $curl_params['access_token']  =$account->access_token;
                 //$curl_params['buyerMemberId'] =$account->memberId;
-                $curl_params['id'] = $ali_order_id;
+                $curl_params['id']    = $ali_order_id;
                 //$param['buyerMemberId'] = $curl_params['buyerMemberId'];
-                $param['access_token'] = $curl_params['access_token'];
-                $param['id'] = $curl_params['id'];
-                $curl_params['_aop_signature'] = $ali->getSignature($param,
-                    $ali->order_list_api_url . '/' . $ali->app_key);
-                $crul_url = $ali->ali_url . '/openapi/' . $ali->order_list_api_url . '/' . $ali->app_key;
-                $order_detail = json_decode($ali->get($crul_url, $curl_params), true);
-                if (!empty($order_detail['orderModel']['logisticsOrderList'])) {
-                    foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics) {
-                        if (!empty($item_logistics['logisticsBillNo'])) {
+                $param['access_token']  = $curl_params['access_token'];
+                $param['id']    = $curl_params['id'];
+                $curl_params['_aop_signature'] = $ali->getSignature($param, $ali->order_list_api_url.'/'.$ali->app_key);
+                $crul_url = $ali->ali_url .'/openapi/'.$ali->order_list_api_url.'/'.$ali->app_key;
+                $order_detail = json_decode($ali->get($crul_url,$curl_params),true);
+                if(!empty($order_detail['orderModel']['logisticsOrderList'])){
+                    foreach ($order_detail['orderModel']['logisticsOrderList'] as $item_logistics){
+                        if(!empty($item_logistics['logisticsBillNo'])) {
                         }
                     }
                 }
                 //dd($orderList);
-                if (isset($orderList['orderListResult']['modelList'])) {
-                    if (count($orderList['orderListResult']['modelList']) != 0) {
-                        foreach ($orderList['orderListResult']['modelList'] as $modellist) {
-                            if (!empty($modellist['logisticsOrderList']) && is_array($modellist['logisticsOrderList'])) { //如果存在物流列表
-                                foreach ($modellist['logisticsOrderList'] as $logistic) {
-                                    if (!empty($logistic['logisticsBillNo'])) {
+                if(isset($orderList['orderListResult']['modelList'])){
+                    if(count($orderList['orderListResult']['modelList']) != 0){
+                        foreach ($orderList['orderListResult']['modelList'] as $modellist){
+                            if(!empty($modellist['logisticsOrderList']) && is_array($modellist['logisticsOrderList'])){ //如果存在物流列表
+                                foreach ($modellist['logisticsOrderList'] as $logistic){
+                                    if(!empty($logistic['logisticsBillNo'])){
                                         dd($logistic['logisticsOrderNo']);
                                         /*                                    $postage = PurchasePostageModel::where('post_coding','=',$logistic['logisticsOrderNo'])->first();
                                                                             if(empty($postage)){
@@ -881,36 +858,34 @@ class TestController extends Controller
                 exit;*/
     }
 
-    public function testReply($id)
-    {
+    public function testReply($id){
 
 
         //测试单个塞入队列
         /*
  * 写入队列
  */
-        /*        $reply = ReplyModel::find($id);
-                    $job = new SendMessages($reply);
-                    $job = $job->onQueue('SendMessages');
-                    $this->dispatch($job);
-                dd($reply);*/
+/*        $reply = ReplyModel::find($id);
+            $job = new SendMessages($reply);
+            $job = $job->onQueue('SendMessages');
+            $this->dispatch($job);
+        dd($reply);*/
 
 
-        /*        foreach (AccountModel::all() as $account) {
-                    if ($account->account == 'Coolcoola04@126.com') { //测试diver
-                        $replys = ReplyModel::where('status','FAIL')->get();
-                        foreach ($replys as $reply){
-                            $channel = Channel::driver($account->channel->driver, $account->api_config);
-                            $channel->sendMessages($reply);
-                        }
+/*        foreach (AccountModel::all() as $account) {
+            if ($account->account == 'Coolcoola04@126.com') { //测试diver
+                $replys = ReplyModel::where('status','FAIL')->get();
+                foreach ($replys as $reply){
+                    $channel = Channel::driver($account->channel->driver, $account->api_config);
+                    $channel->sendMessages($reply);
+                }
 
-                        dd('已经操作233');
+                dd('已经操作233');
 
-                    }
-                }*/
+            }
+        }*/
 
     }
-
     /**
      * Curl Post JSON 数据
      */
@@ -940,7 +915,6 @@ class TestController extends Controller
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-
     public function testEbayCases()
     {
         $url = 'jiangdi.zserp.com/api/SyncSellmoreData';
@@ -984,7 +958,6 @@ class TestController extends Controller
             }
         }
     }
-
     /*
      * 同步ebay信息
      * 测试自动补货功能
@@ -994,7 +967,7 @@ class TestController extends Controller
         //$package = PackageModel::findOrFail(3113);
         $id = request()->get('id');
         $package = PackageModel::where('id', $id)->first();
-        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED', 'SHIPPED'])) {
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED','SHIPPED'])) {
             $result = $package->placeLogistics('UPDATE');
         } else {
             $result = $package->placeLogistics();
@@ -1081,7 +1054,6 @@ class TestController extends Controller
 //            }
         //}
     }
-
     public function getCurlData($remote_server)
     {
         $ch = curl_init();
@@ -1098,7 +1070,6 @@ class TestController extends Controller
         curl_close($ch);
         return $output;
     }
-
     public function getSmtIssue()
     {
         //  $refund = RefundModel::find(2);
@@ -1186,7 +1157,6 @@ class TestController extends Controller
             }
         }
     }
-
     public function oneSku()
     {
         ini_set('memory_limit', '2048M');
@@ -1209,7 +1179,6 @@ class TestController extends Controller
             }
         }
     }
-
     /*Synchronize joom platform data
      *@model:joom
      *@param $account_ids
@@ -1280,7 +1249,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     /*Time:2016-10-7
      *get joom order
      *@param $account_ids
@@ -1315,7 +1283,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     /*Time:2016-10-14
          *joom_OrdersToShipping 标记发货
          *@param $order_id $id
@@ -1362,7 +1329,6 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
-
     /*
      * Time:2016-10-17
      * joomordersshelves  refure token

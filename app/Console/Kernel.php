@@ -73,6 +73,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SyncImportApi::class,
         \App\Console\Commands\AutoEbayAdd::class, //Ebay 自动补货
         \App\Console\Commands\ReduceUnuseSuppliers::class, //处理多余供货商
+        \App\Console\Commands\FailMessageReplyAgain::class,
 
     ];
 

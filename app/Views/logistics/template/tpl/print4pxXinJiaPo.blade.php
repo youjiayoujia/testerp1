@@ -135,7 +135,7 @@
                 <div style="overflow: hidden; width: 100%; height: 20mm;">
                     <div style="float: left; height: auto; width: auto;">
                         <div style="font-size: 9px;">
-                            <b>【{{ $model->logistics_id }}】</b>
+                            <b>【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</b>
                             {{ $model->sku_info }}
                         </div>
                     </div>

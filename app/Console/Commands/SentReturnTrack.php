@@ -54,10 +54,12 @@ class SentReturnTrack extends Command
         $result =  OrderMarkLogicModel::where('channel_id',$channel_id)->where('is_use',1)->orderBy('priority','desc')->get();
         if(!empty($result)){
             foreach($result as $re){
-                $list = $packages->where('channel_id', $channel_id)->where('tracking_no','!=','' );
+
                 if($re->wish_upload_tracking_num==1){
+                    $list = $packages->where('channel_id', $channel_id)->where('tracking_no','!=','' );
                     $list->where(['is_mark'=>1,'is_upload'=>0,]); //已标 未上传
                 }else{
+                    $list = $packages->where('channel_id', $channel_id);
                     $list->where('is_mark',0); //未标记
                 }
 

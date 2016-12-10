@@ -267,12 +267,12 @@ class PackageController extends Controller
             if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            $model->update(['logistics_id' => $id, 'tracking_no' => '0']);
+            $model->update(['logistics_id' => $id, 'tracking_no' => '']);
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
         }
 
-        return redirect($this->mainIndex);
+        return redirect($_SERVER['HTTP_REFERER']);
     }
 
     /**
@@ -299,7 +299,7 @@ class PackageController extends Controller
             $model->cancelPackage();
         }
 
-        return redirect($this->mainIndex);
+        return redirect($_SERVER['HTTP_REFERER']);
     }
 
     /**
@@ -327,7 +327,7 @@ class PackageController extends Controller
             $this->eventLog($name, '清空物流方式', $to, $from);
         }
 
-        return redirect($this->mainIndex);
+        return redirect($_SERVER['HTTP_REFERER']);
     }
 
     /**
@@ -425,7 +425,7 @@ class PackageController extends Controller
         $job = $job->onQueue('assignLogistics');
         $this->dispatch($job);
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹已重新匹配物流'));
+        return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '包裹已重新匹配物流'));
     }
 
     public function retrack()
@@ -681,7 +681,7 @@ class PackageController extends Controller
             }
         }
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '已重新匹配.'));
+        return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', $this->mainTitle . '已重新匹配.'));
     }
 
     public function implodePackage($tmp)
@@ -738,7 +738,7 @@ class PackageController extends Controller
         $to = json_encode($newPackage);
         $this->eventLog($name, '合并包裹', $to, $from);
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));
+        return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));
     }
 
     public function editTrackStore($id)

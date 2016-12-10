@@ -17,6 +17,7 @@ use App\Models\Purchase\PurchasePostageModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\Warehouse\PositionModel;
+use Excel;
 
 class PurchaseListController extends Controller
 {
@@ -151,6 +152,29 @@ class PurchaseListController extends Controller
 				$model->update(['bar_code'=>$model->sku,'stock_id'=>$stockId]);
 		}
 	}
+
+    public function export($str)
+    {
+        $arr = explode('|', $str);
+        $rows = [];
+        foreach($arr as $key => $single) {
+            if($single) {
+                $buf = explode('.', $single);
+                $rows[] = [
+                    '运单号' => $buf[0],
+                    '扫描人' => $buf[1],
+                    '扫描时间' => $buf[2],
+                ];
+            }
+        }
+        $name = 'export';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
 	/**
      * 查看条码
      *

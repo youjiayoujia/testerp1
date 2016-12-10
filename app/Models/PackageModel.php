@@ -700,7 +700,7 @@ class PackageModel extends BaseModel
                                 }
                             }
                             if (count($arr) > 1 || count($arr) == 0) {
-                                $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                                $warehouse_id = $this->items->first()->item->warehouse_id ? $this->items->first()->item->warehouse_id : '3';
                             } else {
                                 foreach ($arr as $key => $value) {
                                     $warehouse_id = $key;
@@ -738,7 +738,7 @@ class PackageModel extends BaseModel
                             }
                         }
                         if (count($arr) > 1 || count($arr) == 0) {
-                            $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                            $warehouse_id = $this->items->first()->item->warehouse_id ? $this->items->first()->item->warehouse_id : '3';
                         } else {
                             foreach ($arr as $key => $value) {
                                 $warehouse_id = $key;

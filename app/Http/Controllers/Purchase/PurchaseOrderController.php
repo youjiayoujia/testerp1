@@ -646,10 +646,10 @@ class PurchaseOrderController extends Controller
                 $result = $result->where("post_coding",$data["trackingNo"]);
             }
             if($data['date_from']!=''){
-                $result = $result->where("created_at",'>=',$data["date_from"]);
+                $result = $result->where("created_at",'>=',str_replace('/', '-', $data["date_from"]));
             }
             if($data['date_to']!=''){
-                $result = $result->where("created_at",'<=',$data["date_to"]);
+                $result = $result->where("created_at",'<=',str_replace('/', '-', $data["date_to"]));
             }
             $result = $result->get();
         }

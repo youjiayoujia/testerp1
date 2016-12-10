@@ -55,7 +55,9 @@ class SzPostXBAdapter extends BasicAdapter
         $postD = http_build_query($postD);
         
         $result = $this->postCurlHttpsData($url,$url1);
-        $result = json_decode($result,true);
+        $result = json_decode($result,true);  
+        echo "<pre>";
+        print_r($result);
         if($result['return_success'] == 'true'){
             $barCodeList = $result['barCodeList'];
             foreach($barCodeList as $v){
@@ -252,8 +254,10 @@ class SzPostXBAdapter extends BasicAdapter
 </order>
 </eventBody>
 </logisticsEvent>
-</logisticsEventsRequest>";
-        $data=preg_replace('/&/',' ',$str);*/
+</logisticsEventsRequest>"; */
+        $obj = simplexml_load_string($str);
+        print_r($obj);
+        $data=preg_replace('/&/',' ',$str);
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;
         $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';
@@ -265,7 +269,6 @@ class SzPostXBAdapter extends BasicAdapter
         $postD['version']             = '2.0';*/
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
-        echo '<pre>';
         print_r($result);
         if($result['responseItems']['response']['success'] == 'true'){
             return true;        

@@ -99,6 +99,7 @@ class SmtController extends Controller{
            'token_id' => $this->model->getAccountNumber('App\Models\Channel\AccountModel','account'),
            'productStatusType' => config('smt_product.productStatusType'),
        ];
+      
        return view($this->viewPath . 'onlinIndex', $response);
    }
       

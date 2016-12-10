@@ -43,7 +43,8 @@ class SupplierModel extends BaseModel
         'qualifications',
         'examine_status',
         'qq',
-        'wangwang'
+        'wangwang',
+        'founder'
     ];
 
     //查询
@@ -116,6 +117,11 @@ class SupplierModel extends BaseModel
     public function levelByName()
     {
         return $this->belongsTo('App\Models\Product\SupplierLevelModel', 'level_id', 'id');
+    }
+
+    public function getCreatedNameAttribute(){
+        $user = $this->createdByName;
+        return $user ? $user->name : '无';
     }
 
     /**

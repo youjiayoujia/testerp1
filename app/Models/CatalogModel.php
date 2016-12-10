@@ -96,7 +96,7 @@ class CatalogModel extends BaseModel
                             foreach($valueModel as $valueModelValue){
                                 if($valueModelValue['name']!=''){
                                     $modelObj->values()->create($valueModelValue);
-                                }                             
+                                }
                             }
                         }
                     }
@@ -106,7 +106,7 @@ class CatalogModel extends BaseModel
             }
         }
         DB::commit();
-        return $catalog;        
+        return $catalog;
     }
 
     public function updateCatalog($data,$extra=[])
@@ -119,11 +119,11 @@ class CatalogModel extends BaseModel
             foreach($data['channel']['name'] as $channel_id=>$rate){
                 $brr['rate'] = $rate;
                 $brr['flat_rate'] = $data['channel']['flat'][$channel_id];
-                $arr[$channel_id] = $brr;         
+                $arr[$channel_id] = $brr;
             }
             $this->channels()->sync($arr);
         }
-        
+
         //更新分类属性
         if($extra){
             try {
@@ -135,12 +135,12 @@ class CatalogModel extends BaseModel
                                 $modelObj =  $this->$model()->find($valueModel['id']);
                                 $modelObj->update($valueModel);
                                 foreach($valueModel['value'] as $valueModelValue){
-                                    if(array_key_exists("id",$valueModelValue)){                                        
+                                    if(array_key_exists("id",$valueModelValue)){
                                         $modelObj->values()->find($valueModelValue['id'])->update($valueModelValue);
                                     }else{
                                         if($valueModelValue['name']!=''){
                                             $modelObj->values()->create($valueModelValue);
-                                        }                                        
+                                        }
                                     }
                                 }
                             }else{//新增属性名属性值
@@ -233,7 +233,7 @@ class CatalogModel extends BaseModel
             }
         }
         $data['models'] = $modelSet;
-        
+
         return $data;
     }
 

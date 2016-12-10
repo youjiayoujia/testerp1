@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\Logistics\ErpEubModel;
 use App\Models\Logistics\ErpRussiaModel;
+use App\Models\Logistics\ErpShunFenModel;
 use Excel;
 use DB;
 use App\Jobs\AssignStocks;
@@ -91,7 +92,7 @@ class PackageModel extends BaseModel
         }
         return [
             'relatedSearchFields' => [
-                'order' => ['ordernum', 'channel_ordernum'],
+                'order' => ['id', 'channel_ordernum'],
             ],
             'filterFields' => ['tracking_no'],
             'filterSelects' => [
@@ -105,7 +106,10 @@ class PackageModel extends BaseModel
                 'channelAccount' => ['account' => $arr1]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
-            'doubleRelatedSearchFields' => ['logistics' => ['catalog' => ['name']]],
+            'doubleRelatedSearchFields' => [
+                'logistics' => ['catalog' => ['name']],
+                'items' => ['item' => ['sku']]
+            ],
         ];
     }
 
@@ -222,6 +226,19 @@ class PackageModel extends BaseModel
         }
 
         return $code;
+    }
+
+    //顺分荷兰面单分拣码
+    public function getShunFenAttribute()
+    {
+        $fjm = '';
+        if ($this->logistics) {
+            if ($this->logistics->name == '【挂号】SF荷兰挂号') {
+                $fjm = ErpShunFenModel::where('code', $this->shipping_country)->first()->gh;
+            }
+        }
+
+        return $fjm;
     }
 
     //包裹sku信息
@@ -386,7 +403,7 @@ class PackageModel extends BaseModel
                 $color = 'info';
                 break;
         }
-        if($this->order->status == 'REVIEW') {
+        if ($this->order->status == 'REVIEW') {
             $color = 'danger';
         }
 
@@ -762,16 +779,21 @@ class PackageModel extends BaseModel
                 $item = $items->where('item_id', $info['item_id'])->first();
                 if ($item->quantity <= $info['quantity']) {
                     $item->delete();
-                    continue;
+                } else {
+                    $weight += $item->item->weight * $info['quantity'];
+                    $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 }
-                $weight += $item->item->weight * $info['quantity'];
-                $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 $newPackage->items()->create($info);
+            }
+            foreach($newPackage->items as $single) {
+                $single->item->hold($single->warehouse_position_id, $single->quantity, 'PACKAGE', $newPackage->id);
             }
             $newPackage->update([
                 'status' => 'WAITASSIGN',
                 'warehouse_id' => $info['warehouse_id'],
-                'weight' => $weight
+                'weight' => $weight,
+                'logistics_id' => '',
+                'tracking_no' => '',
             ]);
             //加入订单状态部分发货
         }
@@ -779,7 +801,8 @@ class PackageModel extends BaseModel
         foreach ($this->items as $item) {
             $oldWeight += $item->item->weight * $item->quantity;
         }
-        $this->update(['weight' => $oldWeight]);
+        $this->update(['weight' => $oldWeight, 'logistics_id' => '', 'tracking_no' => '']);
+        $this->eventLog(UserModel::find(request()->user()->id)->name, '自动拆分订单', json_encode($this));
     }
 
     public function atLeastTimes($arr)
@@ -816,7 +839,7 @@ class PackageModel extends BaseModel
                     $defaultStocks = ItemModel::find($k)->assignDefaultStock($v['allocateQuantity'],
                         $v['order_item_id']);
                     if (array_key_exists($key, $stocks)) {
-                        $stocks[$key] = $stocks[$key] + $defaultStocks[$key];
+                        $stocks[$key] += $defaultStocks[$key];
                     } else {
                         $stocks += $defaultStocks;
                     }
@@ -858,7 +881,6 @@ class PackageModel extends BaseModel
                 }
             }
         }
-
         return $arr;
     }
 
@@ -1076,6 +1098,7 @@ class PackageModel extends BaseModel
                             'status' => 'WAITASSIGN',
                             'weight' => $weight,
                             'logistics_id' => '',
+                            'logistics_order_number' => '',
                             'tracking_no' => ''
                         ]);
                         $job = new AssignLogistics($this);
@@ -1100,6 +1123,7 @@ class PackageModel extends BaseModel
                                 'status' => 'WAITASSIGN',
                                 'weight' => $weight,
                                 'logistics_id' => '',
+                                'logistics_order_number' => '',
                                 'tracking_no' => ''
                             ]);
                             $job = new AssignLogistics($this);
@@ -1137,8 +1161,9 @@ class PackageModel extends BaseModel
                                 'warehouse_id' => $warehouseId,
                                 'status' => 'WAITASSIGN',
                                 'weight' => $weight,
-                                'logistics_id' => '0',
-                                'tracking_no' => '0'
+                                'logistics_id' => '',
+                                'tracking_no' => '',
+                                'logistics_order_number' => '',
                             ]);
                             $job = new AssignLogistics($newPackage);
                             Queue::pushOn('assignLogistics', $job);
@@ -1219,14 +1244,27 @@ class PackageModel extends BaseModel
 
     public function calculateLogisticsFee()
     {
-        $logisticsId = !empty($this->logistics_id) ? $this->logistics_id : $this->realTimeLogistics()->id;
+        if (!empty($this->logistics_id)) {
+            $logisticsId = $this->logistics_id;
+        } else {
+            if ($this->realTimeLogistics()) {
+                $logisticsId = $this->realTimeLogistics()->id;
+            } else {
+                return false;
+            }
+        }
         $zones = ZoneModel::where('logistics_id', $logisticsId)->get();
         foreach ($zones as $zone) {
             $country = CountriesModel::where('code', $this->shipping_country)->first();
             if ($country) {
                 $code = $this->shipping_country;
             } else {
-                $code = CountriesChangeModel::where('country_from', $this->shipping_country)->first()->country_to;
+                $countryChange = CountriesChangeModel::where('country_from', $this->shipping_country)->first();
+                if ($countryChange) {
+                    $code = $countryChange->country_to;
+                } else {
+                    $code = '';
+                }
             }
             if ($zone->inZone($code)) {
                 if ($zone->type == 'first') {
@@ -1360,6 +1398,7 @@ class PackageModel extends BaseModel
                     continue;
                 }
             }
+
             //是否有物流限制
             if ($rule->limit_section && $this->shipping_limits) {
                 $shipping_limits = $this->shipping_limits->toArray();
@@ -1367,6 +1406,10 @@ class PackageModel extends BaseModel
                 foreach ($limits as $limit) {
                     if (in_array($limit->id, $shipping_limits)) {
                         if ($limit->pivot->type == '1') {
+                            continue 2;
+                        }
+                    } else {
+                        if($limit->pivot->type == '0') {
                             continue 2;
                         }
                     }
@@ -1385,7 +1428,7 @@ class PackageModel extends BaseModel
             return $rule->logistics;
         }
 
-        return '虚拟匹配未匹配到';
+        return false;
     }
 
     public function assignLogistics()
@@ -1501,6 +1544,10 @@ class PackageModel extends BaseModel
                             if ($limit->pivot->type == '1') {
                                 continue 2;
                             }
+                        } else {
+                            if($limit->pivot->type == '0') {
+                                continue 2;
+                            }
                         }
                     }
                 }
@@ -1543,6 +1590,8 @@ class PackageModel extends BaseModel
                             'logistics_id' => $rule->logistics->id,
                             'tracking_link' => $trackingUrl,
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                            'logistics_order_number' => '',
+                            'tracking_no' => '',
                             'is_auto' => $is_auto,
                         ]);
                     } else {
@@ -1551,6 +1600,8 @@ class PackageModel extends BaseModel
                             'logistics_id' => $rule->logistics->id,
                             'tracking_link' => $trackingUrl,
                             'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                            'logistics_order_number' => '',
+                            'tracking_no' => '',
                             'is_auto' => $is_auto,
                         ]);
                     }
@@ -1603,6 +1654,10 @@ class PackageModel extends BaseModel
                     ]);
                 } else {
                     $item = $this->items->first();
+                    if (in_array($this->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $this->is_upload) {
+                        $this->is_mark = 0;
+                        $this->save();
+                    }
                     if (empty($item->warehouse_position_id)) {
                         $this->update([
                             'status' => 'NEED',
@@ -1768,7 +1823,12 @@ class PackageModel extends BaseModel
                         $error[] = $key;
                         continue;
                     }
-                    $this->find($content['package_id'])->update([
+                    $package = $this->find($content['package_id']);
+                    if (in_array($package->channel->name, ['Wish', 'Ebay', 'Aliexpress']) && $package->is_upload) {
+                        $package->is_mark = 0;
+                        $package->save();
+                    }
+                    $package->update([
                         'tracking_no' => $content['tracking_no'],
                         'logistics_id' => $content['logistics_id']
                     ]);

@@ -22,6 +22,7 @@ class RemarkModel extends BaseModel
         'order_id',
         'user_id',
         'remark',
+        'type',
     ];
 
     public $rules = [

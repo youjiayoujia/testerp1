@@ -17,6 +17,7 @@ class ExportItemModel extends BaseModel
 
     protected $fillable = [
     	'parent_id',
+        'defaultName',
         'name',
         'level'
     ];

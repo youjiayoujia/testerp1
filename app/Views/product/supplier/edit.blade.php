@@ -122,7 +122,8 @@
             <label name='created_by' class='control-group'>
                 创建人
             </label>
-            <input class='form-control' type='text' value='1' name='created_by' id = 'created_by' readonly/>
+            <input class='form-control' type='text' value='{{$model->CreatedName}}' readonly/>
+            <input class='form-control' type='text' value='{{$model->created_by}}' name='created_by' id = 'created_by' style="display: none"/>
         </div>
     </div>
     <div class="row">

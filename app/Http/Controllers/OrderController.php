@@ -191,7 +191,7 @@ class OrderController extends Controller
     {
         $startDate = request()->input('start_date');
         $endDate = request()->input('end_date');
-        $orders = $this->model->where('create_time', '<=', $endDate)->where('create_time', '>=', $startDate);
+        $orders = $this->model->where('created_at', '<=', $endDate)->where('created_at', '>=', $startDate);
         $data['totalAmount'] = '';
         $data['averageProfit'] = '';
         $data['totalPlatform'] = '';
@@ -375,10 +375,7 @@ class OrderController extends Controller
         }
         if ($this->model->find($id)->packages) {
             foreach ($this->model->find($id)->packages as $package) {
-                foreach ($package->items as $item) {
-                    $item->delete();
-                }
-                $package->delete();
+                $package->cancelPackage();
             }
         }
         $job = new DoPackages($this->model->find($id));
@@ -596,16 +593,13 @@ class OrderController extends Controller
             }
             if ($this->model->find($id)->packages) {
                 foreach ($this->model->find($id)->packages as $package) {
-                    foreach ($package->items as $item) {
-                        $item->delete();
-                    }
-                    $package->delete();
+                    $package->cancelPackage();
                 }
             }
         }
         return 1;
     }
-
+    //撤单
     public function withdrawUpdate($id)
     {
         $userName = UserModel::find(request()->user()->id);
@@ -614,10 +608,32 @@ class OrderController extends Controller
         $data = request()->all();
         $order = $this->model->find($id);
         $order->cancelOrder($data['withdraw']);
+        if ($order->packages) {
+            foreach ($order->packages as $package) {
+                $package->cancelPackage();
+            }
+        }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
 
         return redirect($this->mainIndex);
+    }
+    //ajax撤单
+    public function ajaxWithdraw()
+    {
+        $id = request()->input('id');
+        if (!empty($id)) {
+            $userName = UserModel::find(request()->user()->id);
+            $from = json_encode($this->model->find($id));
+            request()->flash();
+            $data = request()->all();
+            $order = $this->model->find($id);
+            $order->cancelOrder($data['withdraw']);
+            $to = json_encode($this->model->find($id));
+            $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
+        }
+
+        return 1;
     }
 
     public function withdraw($id)

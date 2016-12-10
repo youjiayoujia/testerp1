@@ -223,10 +223,10 @@
                                     <strong>追踪号</strong> :
                                     <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
                                 </div>
-                                <div class="col-lg-1">
+                                <div class="col-lg-2">
                                     <strong>包裹状态</strong> : {{ $package->status_name }}
                                 </div>
                                 <div class="col-lg-1">

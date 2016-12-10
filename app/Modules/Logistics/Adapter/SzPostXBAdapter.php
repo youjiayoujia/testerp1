@@ -55,15 +55,15 @@ class SzPostXBAdapter extends BasicAdapter
         $postD = http_build_query($postD);
         
         $result = $this->postCurlHttpsData($url,$url1);
-        $result = json_decode($result,true);      
+        $result = json_decode($result,true);  
+        echo "<pre>";
+        print_r($result);
         if($result['return_success'] == 'true'){
             $barCodeList = $result['barCodeList'];
             foreach($barCodeList as $v){
                 $shipcode = $v['bar_code'];
                 $orderId = $v['logisticsOrderId'];
                 $res = $this->sendOrder($package, $shipcode);
-                echo "<pre>";
-                print_r($res);
                 if($res === true){
                     return array('code' => 'success', 'result' => $shipcode);
                 }else{
@@ -267,6 +267,7 @@ class SzPostXBAdapter extends BasicAdapter
         $postD['version']             = '2.0';*/
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
+        print_r($result);
         if($result['responseItems']['response']['success'] == 'true'){
             return true;        
         }else{

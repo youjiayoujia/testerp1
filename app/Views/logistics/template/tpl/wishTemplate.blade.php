@@ -55,13 +55,13 @@
             wish郵
         </p>
         <p style="float:left;width:140px;">
-            <span style="word-wrap: break-word;width:130px;height:71px;font-family:STHeiti;display:inline-block;border-bottom:1px solid #000;font-size:8px;padding-left:4px;">
+            <span style="word-wrap: break-word;width:130px;height:84px;font-family:STHeiti;display:inline-block;border-bottom:1px solid #000;font-size:8px;padding-left:4px;">
             From:<br/>
             SLME<br/>
                 {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}<br/>
             <b style="font-weight:bold;">Phone:{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}</b>
             </span>
-            <span style="width:140px;line-height:29px;font-size:10px;background:#fff;display:inline-block;border-bottom:1px solid #000;">
+            <span style="width:140px;font-size:10px;background:#fff;display:inline-block;border-bottom:1px solid #000;">
             自编号:{{ $model->id }}
             </span>
         </p>

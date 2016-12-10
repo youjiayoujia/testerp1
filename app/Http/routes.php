@@ -511,6 +511,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
     Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);
+    Route::get('logisticsZone/createData', ['uses' => 'Logistics\ZoneController@createData', 'as' => 'logisticsZone.createData']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCollectionInfo', 'Logistics\CollectionInfoController');

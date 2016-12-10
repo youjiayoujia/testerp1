@@ -14,8 +14,9 @@ use App\Http\Controllers\Controller;
 use App\Models\CountriesModel;
 use App\Models\Logistics\PartitionModel;
 use App\Models\Logistics\ZoneModel;
-use App\Models\CountriesSortModel;
 use App\Models\LogisticsModel;
+use App\Models\Logistics\Zone\SectionPriceModel;
+use App\Models\Logistics\Zone\CountriesModel as zoneCountry;
 
 class ZoneController extends Controller
 {
@@ -45,6 +46,41 @@ class ZoneController extends Controller
             'logistics_name' => $logistics_name,
         ];
         return view($this->viewPath . 'create', $response);
+    }
+
+    /**
+     * 复制信息
+     */
+    public function createData()
+    {
+        $zoneId = request()->input('zone_id');
+        $model = $this->model->find($zoneId);
+        $data = $model->toArray();
+        $data['zone'] = $model->zone . '[复制]';
+        unset($data['id']);
+        $logisticsZone = $this->model->create($data);
+        if($model->type == 'second') {
+            if($model->zone_section_prices) {
+                foreach($model->zone_section_prices as $price) {
+                    unset($price->id);
+                    $price->logistics_zone_id = $logisticsZone->id;
+                    $sectionPrice = new SectionPriceModel();
+                    $sectionPrice->create($price->toArray());
+                }
+            }
+        }
+        if($model->zone_countries) {
+            foreach($model->zone_countries as $zoneCountry) {
+                unset($zoneCountry->id);
+                $zoneCountry->logistics_zone_id = $logisticsZone->id;
+                $zoneCountry->created_at = date("Y-m-d H:i:s");
+                $zoneCountry->updated_at = date("Y-m-d H:i:s");
+                $country = new zoneCountry();
+                $country->create($zoneCountry->toArray());
+            }
+        }
+
+        return 1;
     }
 
     public function sectionAdd()

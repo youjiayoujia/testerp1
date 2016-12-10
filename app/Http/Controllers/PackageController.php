@@ -293,13 +293,10 @@ class PackageController extends Controller
             if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            foreach ($model->items as $packageItem) {
-                $packageItem->delete();
-            }
-            if ($model->order->packages->count() == 1) {
+            if ($model->order->packages->count() == 0) {
                 $model->order->update(['status' => 'CANCEL']);
             }
-            $model->delete();
+            $model->cancelPackage();
         }
 
         return redirect($this->mainIndex);
@@ -711,7 +708,7 @@ class PackageController extends Controller
             foreach ($model->items as $packageItem) {
                 if (!array_key_exists($packageItem->item_id, $arr)) {
                     $arr[$packageItem->item_id]['quantity'] = $packageItem->quantity;
-                    $arr[$packageItem->item_id]['warehouse_position_id'] = $packageItem->warehouse_position_id;
+                    $arr[$packageItem->item_id]['warehouse_position_id'] = '';
                     $arr[$packageItem->item_id]['order_item_id'] = $packageItem->order_item_id;
                     $arr[$packageItem->item_id]['remark'] = $packageItem->remark;
                     $arr[$packageItem->item_id]['is_mark'] = $packageItem->is_mark;
@@ -719,10 +716,9 @@ class PackageController extends Controller
                 } else {
                     $arr[$packageItem->item_id]['quantity'] += $packageItem->quantity;
                 }
-                $packageItem->forceDelete();
             }
             if ($key) {
-                $model->forceDelete();
+                $model->cancelPackage();
             }
         }
         $model = $this->model->with('items')->find($buf[0]);
@@ -736,12 +732,9 @@ class PackageController extends Controller
                 $weight += ItemModel::find($itemId)->weight * $info['quantity'];
             }
         }
-        $newPackage->update(['status' => 'NEW', 'weight' => $weight]);
+        $newPackage->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '', 'tracking_no' => '']);
         $newPackage->order->update(['status' => 'REVIEW']);
-        foreach ($model->items as $item) {
-            $item->forceDelete();
-        }
-        $model->forceDelete();
+        $model->cancelPackage();
         $to = json_encode($newPackage);
         $this->eventLog($name, '合并包裹', $to, $from);
 
@@ -775,9 +768,6 @@ class PackageController extends Controller
         if (count($tmp) == 1) {
             return redirect($this->mainIndex)->with('alert', $this->alert('warning', $this->mainTitle . '拆后包裹个数还是1.'));
         } else {
-            foreach ($model->items as $item) {
-                $item->forceDelete();
-            }
             foreach ($tmp as $packageId => $info) {
                 $newPackage = $this->model->create($model->toArray());
                 $to = json_encode($newPackage);
@@ -787,26 +777,16 @@ class PackageController extends Controller
                     $newPackage->items()->create($packageItem);
                     $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
                 }
-                $position = $newPackage->items->first()->warehouse_position_id;
-                if ($position) {
-                    $newPackage->update([
-                        'weight' => $weight,
-                        'status' => 'WAITASSIGN',
-                        'logistics_id' => '0',
-                        'tracking_no' => '0'
-                    ]);
-                } else {
-                    $newPackage->update([
-                        'weight' => $weight,
-                        'status' => 'NEW',
-                        'logistics_id' => '0',
-                        'tracking_no' => '0'
-                    ]);
-                }
+                $newPackage->update([
+                    'weight' => $weight,
+                    'status' => 'NEW',
+                    'logistics_id' => '',
+                    'tracking_no' => ''
+                ]);
                 $this->eventLog($name, '拆分包裹', $to);
                 $newPackage->order->update(['status' => 'REVIEW']);
             }
-            $model->forceDelete();
+            $model->cancelPackage();
         }
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '包裹拆分成功.'));
@@ -825,7 +805,7 @@ class PackageController extends Controller
                 $tmp[$buf[0]][$buf[1]]['quantity'] = 0;
                 $item = $model->items()->where('item_id', $buf[1])->first();
                 if ($item) {
-                    $tmp[$buf[0]][$buf[1]]['warehouse_position_id'] = $item->warehouse_position_id;
+                    $tmp[$buf[0]][$buf[1]]['warehouse_position_id'] = '';
                     $tmp[$buf[0]][$buf[1]]['order_item_id'] = $item->order_item_id;
                     $tmp[$buf[0]][$buf[1]]['remark'] = $item->remark;
                     $tmp[$buf[0]][$buf[1]]['is_remark'] = $item->is_remark;
@@ -1105,14 +1085,7 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        foreach ($model->items as $packageItem) {
-            $stockout = $packageItem->stockout;
-            $stock = StockModel::find($stockout->stock_id);
-            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCEL');
-            $packageItem->delete();
-            $stockout->delete();
-        }
-        $model->destroy($id);
+        $model->cancelPackage();
         return redirect($this->mainIndex);
     }
 

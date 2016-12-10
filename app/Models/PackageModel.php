@@ -541,15 +541,15 @@ class PackageModel extends BaseModel
         $item = $this->items()->first();
         if ($item->warehouse_position_id) {
             foreach ($this->items as $packageItem) {
-                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity);
-                $packageItem->delete();
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $this->id);
+                $packageItem->forceDelete();
             }
         } else {
             foreach ($this->items as $packageItem) {
-                $packageItem->delete();
+                $packageItem->forceDelete();
             }
         }
-        return $this->delete();
+        return $this->forceDelete();
     }
 
     public function reCreatePackage()
@@ -823,19 +823,22 @@ class PackageModel extends BaseModel
                     foreach($this->items as $single) {
                         $single->forceDelete();
                     }
+                    $model = $this->find($this->id);
                     foreach($value as $k => $v) {
-                        $this->items()->create($v);
+                        $model->items()->create($v);
                     }
-                    if($this->oversea_assignStock()) {
-                        $this->update(['status' => 'WAITASSIGN']);
-                        $job = new AssignLogistics($this);
+                    if($model->oversea_assignStock()) {
+                        $model->update(['status' => 'WAITASSIGN']);
+                        $job = new AssignLogistics($model);
                         Queue::pushOn('assignLogistics', $job);
+                        $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
                     } else {
-                        $this->update(['status' => 'NEED']);
+                        $model->update(['status' => 'NEED']);
+                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
                     }
                     $flag = true;
                 } else {
-                    $newPackage = $this->model->create($this);
+                    $newPackage = $this->create($this->toarray());
                     $warehouse = WarehouseModel::where('code', $code)->first();
                     if(!$warehouse) {
                         return false;
@@ -848,14 +851,34 @@ class PackageModel extends BaseModel
                         $newPackage->update(['status' => 'WAITASSIGN']);
                         $job = new AssignLogistics($newPackage);
                         Queue::pushOn('assignLogistics', $job);
+                        $this->eventLog('队列', '海外仓包裹已匹配到库存', json_encode($newPackage));
                     } else {
                         $newPackage->update(['status' => 'NEED']);
+                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($newPackage));
                     }
+                }
+            }
+        } else {
+            foreach($arr as $code => $value) {
+                $warehouse = WarehouseModel::where('code', $code)->first();
+                if(!$warehouse) {
+                    return false;
+                }
+                $this->update(['warehouse_id' => $warehouse->id]);
+                $model = $this->find($this->id);
+                if($model->oversea_assignStock()) {
+                    $model->update(['status' => 'WAITASSIGN']);
+                    $job = new AssignLogistics($model);
+                    Queue::pushOn('assignLogistics', $job);
+                    $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
+                } else {
+                    $model->update(['status' => 'NEED']);
+                    $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
                 }
             }
         }
 
-        var_dump($arr);exit;
+        return true;
     }
 
     public function oversea_assignStock()
@@ -873,7 +896,7 @@ class PackageModel extends BaseModel
             $arr[] = $stock->warehouse_position_id;
         }
         foreach($this->items as $key => $single) {
-            $single->update(['warehouse_position_id', $arr[$key]]);
+            $single->update(['warehouse_position_id' => $arr[$key]]);
             $single->item->hold($arr[$key], $single->quantity, 'PACKAGE', $this->id);
         }
 
@@ -1846,14 +1869,23 @@ class PackageModel extends BaseModel
                     }
                     break;
                 case '3':
-                    $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                     $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
                     $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
                     $tmp_package = $this->where('id', $content['package_id'])->first();
                     if (!$tmp_package) {
                         $error[] = $key;
                         continue;
                     }
-                    $this->find($content['package_id'])->update(['tracking_no' => $content['tracking_no']]);
+                    $model = $this->find($content['package_id']);
+                    if($model->is_oversea) {
+                        $model->update(['tracking_no' => $content['tracking_no'], 'status' => 'SHIPPED']);
+                        $demo->order->update(['status' => 'SHIPPED']);
+                        foreach($model->items as $packageItem) {
+                            $packageItem->item->holdout($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $model->id);
+                        }
+                    } else {
+                        $model->update(['tracking_no' => $content['tracking_no']]);
+                    }
                     break;
                 case '4':
                     $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));

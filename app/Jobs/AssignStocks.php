@@ -47,7 +47,6 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
         } else {
             $flag = $this->package->createPackageItems();
         }
-        
         if ($flag) {
             if ($this->package->status == 'WAITASSIGN') {
                 $this->result['status'] = 'success';

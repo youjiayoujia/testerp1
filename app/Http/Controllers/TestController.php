@@ -89,15 +89,16 @@ class TestController extends Controller
     {
         // $data['ordernum'] = '123';
         // $data['currency'] = 'USD';
-        // $data['items'][] = ['sku' => 'oversea.B041'];
-        // $data['items'][] = ['sku' => 'oversea2.B053_Pink'];
+        // $data['items'][] = ['sku' => 'oversea.B041', 'quantity' => '3'];
+        // $data['items'][] = ['sku' => 'oversea2.B053_Pink', 'quantity' => '4'];
         // $order = new OrderModel();
         // $order->createOrder($data);
         // var_dump('ok');
         
-        // $order = OrderModel::find('2257');
+        // $order = OrderModel::find('2398');
         // $order->createVirtualPackage();
-        $package = PackageModel::with('items')->find(2445);
+        // var_dump('ok');
+        $package = PackageModel::with('items')->find(2648);
         $package->oversea_createPackageItems();
     }
 //    public function test2()

@@ -56,6 +56,8 @@ class SzPostXBAdapter extends BasicAdapter
         
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);
+        echo "echo";
+        print_r($result);
         if($result['return_success'] == 'true'){
             $barCodeList = $result['barCodeList'];
             foreach($barCodeList as $v){

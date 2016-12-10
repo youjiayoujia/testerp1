@@ -309,7 +309,7 @@ class ItemModel extends BaseModel
     {
         $item_id = $this->id;
         $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "'.$item_id.'" and 
-                packages.id = package_items.package_id group by packages.warehouse_id');
+                packages.id = package_items.package_id and packages.deleted_at is null group by packages.warehouse_id');
         $data = [];
 
         $warehouses = WarehouseModel::all();

@@ -211,7 +211,7 @@
                     @if($order->packages->count() > 0)
                         @foreach($order->packages as $package)
                             <div class="row">
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>包裹ID</strong> :
                                     <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                                 </div>
@@ -223,7 +223,7 @@
                                     <strong>追踪号</strong> :
                                     <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                                 </div>
-                                <div class="col-lg-1">
+                                <div class="col-lg-2">
                                     <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
                                 </div>
                                 <div class="col-lg-2">

@@ -394,7 +394,7 @@ class ItemModel extends BaseModel
             ->where('order_items.quantity', '<', 5)
             ->where('order_items.item_id', $this->id)
             ->sum('order_items.quantity');
-        print_r($sellNum);exit;
+        
         return $sellNum;
     }
 

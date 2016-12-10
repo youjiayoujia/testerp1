@@ -272,10 +272,10 @@
                         <div class="col-lg-3">
                             收款方式 : {{ $order->payment }}
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-5">
                             交易号 : {{ $order->transaction_number }}
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             物流方式 : {{ $order->shipping }}
                         </div>
                     </div>

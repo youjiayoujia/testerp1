@@ -592,6 +592,7 @@ class OrderModel extends BaseModel
     //退款
     public function refundCreate($data, $file = null)
     {
+        $data['process_status'] = 'PENDING';
         $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
         if ($file != '' && $file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
@@ -751,7 +752,7 @@ class OrderModel extends BaseModel
     {
         $rate = CurrencyModel::where('code', $this->currency)->first()->rate;
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
-        $orderAmount = ($this->amount + $this->amount_shipping) * $rate;
+        $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
         $orderChannelFee = $this->calculateOrderChannelFee();
@@ -765,14 +766,21 @@ class OrderModel extends BaseModel
     public function calculateOrderChannelFee()
     {
         $sum = 0;
-        foreach ($this->items as $item) {
-            if ($item->item and $item->item->catalog) {
-                $channelRate = $item->item->catalog->channels->where('id',
-                    $this->channelAccount->catalog_rates_channel_id)->first();
-                if ($channelRate) {
-                    $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
+        switch ($this->channel->driver) {
+            case 'wish':
+                $sum = $this->amount * 0.15;
+                break;
+            default:
+                foreach ($this->items as $item) {
+                    if ($item->item and $item->item->catalog) {
+                        $channelRate = $item->item->catalog->channels->where('id',
+                            $this->channelAccount->catalog_rates_channel_id)->first();
+                        if ($channelRate) {
+                            $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
+                        }
+                    }
                 }
-            }
+                break;
         }
 
         return $sum * $this->rate;

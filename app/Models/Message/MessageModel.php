@@ -553,11 +553,16 @@ class MessageModel extends BaseModel{
      */
     public function scopeWorkFlowMsg ($query,$entry)
     {
-        return $query->where('status','!=','COMPLETE')
+        $user_id = request()->user()->id;
+
+        return $query->where('status','=','UNREAD')
+            ->orWhere(function($query,$user_id){
+                $query->where('status','=','PROCESS')
+                    ->where('assign_id','=',$user_id);
+            })
             ->take($entry)
             ->orderBy('id', 'DESC');
     }
-
 
     public function contentTemplate ()
     {

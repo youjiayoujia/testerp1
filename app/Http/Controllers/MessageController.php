@@ -65,6 +65,7 @@ class MessageController extends Controller
         } elseif ($this->workflow == 'keeping') { //工作流
             //根据登陆的客服id 获取其被分配的账号消息
             $messages = $this->model->getMyWorkFlowMsg(3);
+            dd($messages);
 
             $response = [
                 'metas' => $this->metas(__FUNCTION__),

@@ -298,7 +298,7 @@ class ItemModel extends BaseModel
     public function getOutOfStockAttribute()
     {
         $item_id = $this->id;
-        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
+        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "'.$item_id.'" and 
                 packages.id = package_items.package_id and packages.deleted_at is null')[0]->num;
 
         return $num;
@@ -308,7 +308,7 @@ class ItemModel extends BaseModel
     public function getWarehouseOutOfStockAttribute()
     {
         $item_id = $this->id;
-        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
+        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "'.$item_id.'" and 
                 packages.id = package_items.package_id group by packages.warehouse_id');
         $data = [];
 

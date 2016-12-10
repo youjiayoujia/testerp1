@@ -375,10 +375,7 @@ class OrderController extends Controller
         }
         if ($this->model->find($id)->packages) {
             foreach ($this->model->find($id)->packages as $package) {
-                foreach ($package->items as $item) {
-                    $item->delete();
-                }
-                $package->delete();
+                $package->cancelPackage();
             }
         }
         $job = new DoPackages($this->model->find($id));

@@ -368,7 +368,7 @@ class OrderModel extends BaseModel
                 'channel' => ['name' => $arr],
                 'items' => ['item_status' => config('item.status')],
                 'remarks' => ['type' => config('order.review_type')],
-                'packages' => ['is_mark' => config('order.is_mark')],
+                'packages' => ['is_mark' => config('order.is_mark'), 'status' => config('package')],
             ],
             'doubleRelatedSearchFields' => [
                 'packages' => ['logistics' => ['code']],
@@ -592,6 +592,7 @@ class OrderModel extends BaseModel
     //退款
     public function refundCreate($data, $file = null)
     {
+        $data['process_status'] = 'PENDING';
         $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
         if ($file != '' && $file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
@@ -751,7 +752,7 @@ class OrderModel extends BaseModel
     {
         $rate = CurrencyModel::where('code', $this->currency)->first()->rate;
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
-        $orderAmount = ($this->amount + $this->amount_shipping) * $rate;
+        $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
         $orderChannelFee = $this->calculateOrderChannelFee();

@@ -156,6 +156,7 @@ return [
         'packages.logistics.code' => '物流方式简码',
         'packages.tracking_no' => '追踪号',
         'price.profit_rate' => '利润率',
+        'packages.status' => '包裹状态',
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',
@@ -175,6 +176,7 @@ return [
         'order.channel_ordernum' => '渠道订单号',
         'purchaseItem.productItem.sku' => 'sku',
         'new_status' => '是否为新品',
+        'html_mod'=>'英文描述',
         'items.item.sku' => 'sku',
         'check_status' => '审核状态',
     ],

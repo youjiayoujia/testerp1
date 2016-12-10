@@ -45,7 +45,7 @@
                     <span class="glyphicon glyphicon-picture"></span> 编辑图片
                 </a>
                 <a href="{{ route('spu.MultiEdit', ['id'=>$spu->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 小语言
+                    <span class="glyphicon glyphicon-pencil"></span> 英文资料
                 </a>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-warning btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-envelope"></span>备注

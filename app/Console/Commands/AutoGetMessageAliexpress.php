@@ -75,7 +75,7 @@ class AutoGetMessageAliexpress extends Command
                             $messageNew->related  = 0;
                             $messageNew->required  = 1;
                             $messageNew->read  = 0;
-                            
+
                             $messageNew->list_id = !empty($message['list_id']) ? $message['list_id'] : '';
 
                             !empty($message['channel_order_number']) ? $messageNew->channel_order_number=$message['channel_order_number'] : '';

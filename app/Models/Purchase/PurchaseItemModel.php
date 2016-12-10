@@ -59,6 +59,13 @@ class PurchaseItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\StockModel', 'stock_id');
     }
+
+    public function getWarehousePositionNameAttribute()
+    {
+        $stock = StockModel::where('item_id',$this->item_id)->where('warehouse_id',$this->warehouse_id)->get()->first();
+        return $stock->position->name;
+    }
+
     public function arrivalLog()
     {
         return $this->hasMany('App\Models\Purchase\PurchaseItemArrivalLogModel', 'purchase_item_id');

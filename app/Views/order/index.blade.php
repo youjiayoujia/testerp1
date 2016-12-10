@@ -39,12 +39,12 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->profit_rate,4)*100 }}%</div>
+                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
                 <div>
-                    毛利润: {{ $order->profit }} USD
+                    毛利润: {{ round($order->amount*$order->calculateProfitProcess(),2) }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
@@ -107,7 +107,7 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">
+                            <div class="col-lg-3">
                                 ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
                                 <br>
                                 @if($order->channel)
@@ -134,15 +134,15 @@
                                 {{ $orderItem->item->warehouse?$orderItem->item->warehouse->name:'' }}
                             </div>
                             @if($orderItem->item)
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
-                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-2">{{ $orderItem->item->c_name }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
                                 </div>
-                                <div class="col-lg-2"></div>
+                                <div class="col-lg-1"></div>
                             @endif
                             <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}

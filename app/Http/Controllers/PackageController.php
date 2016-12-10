@@ -267,7 +267,10 @@ class PackageController extends Controller
             if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            $model->update(['logistics_id' => $id, 'tracking_no' => '0']);
+            $logistics = LogisticsModel::find($id);
+            if($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
+                $model->update(['logistics_id' => $id, 'tracking_no' => '']);
+            }
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
         }

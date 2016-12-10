@@ -592,6 +592,7 @@ class OrderModel extends BaseModel
     //退款
     public function refundCreate($data, $file = null)
     {
+        $data['process_status'] = 'PENDING';
         $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
         if ($file != '' && $file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();

@@ -69,7 +69,7 @@ return [
         'ordernum' => '订单号',
         'channel_ordernum' => '渠道订单号',
         'channelAccount.alias' => '渠道账号',
-        'userService.name' => '客服人员',
+        'userOperator.name' => '运营人员',
         'email' => '邮箱',
         'currency' => '币种',
         'name' => '名称',
@@ -86,7 +86,7 @@ return [
         'stock.item.sku' => 'sku',
         'time.created_at' => '创建时间',
         'time.get_time' => '创建时间',
-        'order.ordernum' => '订单号',
+        'order.id' => '内单号',
         'productID' => 'Wish产品ID',
         'details.erp_sku' => 'erpSKU',
         'details.wish_sku' => 'WISH-SKU',
@@ -156,6 +156,7 @@ return [
         'packages.logistics.code' => '物流方式简码',
         'packages.tracking_no' => '追踪号',
         'price.profit_rate' => '利润率',
+        'packages.status' => '包裹状态',
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',
@@ -176,5 +177,6 @@ return [
         'purchaseItem.productItem.sku' => 'sku',
         'new_status' => '是否为新品',
         'items.item.sku' => 'sku',
+        'check_status' => '审核状态',
     ],
 ];

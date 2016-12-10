@@ -86,9 +86,8 @@ class MessageController extends Controller
             }
 
             $emailarr=config('user.email');
-           //dd($message->MessageInfo);
-            //dd($message->ChannelParams);
 
+            $IsOption = $this->IsAliOptionOrderMsg($message);
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
                 'message' => $message,
@@ -100,12 +99,31 @@ class MessageController extends Controller
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
+                'is_ali_msg_option' => $IsOption
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
 
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '该信息已被他人处理.'));
 
+    }
+
+    /**
+     * 验证是否为订单未回复消息
+     * @param $messageObj
+     * @return bool
+     */
+    public function IsAliOptionOrderMsg($messageObj)
+    {
+        if (!empty($messageObj->channel_order_number) && $messageObj->getChannelDiver() == 'aliexpress') {
+
+            $count = $this->model->where('channel_order_number', $messageObj->channel_order_number)->count();
+            $order = $messageObj->Order;
+            if ($count == 1 && !empty($order)) {
+                return $order->id;
+            }
+        }
+        return false;
     }
 
     public function content($id)
@@ -328,6 +346,7 @@ class MessageController extends Controller
         $this->validate(request(), $reply->rules('create')); //
 
         if ($message->reply(request()->all())) {
+
             /*
              * 写入队列
              */
@@ -336,10 +355,6 @@ class MessageController extends Controller
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);
-/*            $account = $message->account;
-            $reply = ReplyModel::where('message_id',$id)->get()->first();
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $channel->sendMessages($reply);*/
 
             if ($this->workflow == 'keeping') {
                 return redirect(route('message.process'))

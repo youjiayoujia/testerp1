@@ -66,6 +66,13 @@
                 <a href="javascript:" class='btn btn-info tracking_no'>模板</a>
             </div>
         </div>
+        <div class="form-group col-lg-2">
+            <label for="name" class='control-label'>根据包裹id导出</label>
+            <div class='input-group'>
+                <input type='file' name='accordingPackageId'>
+                <a href="javascript:" class='btn btn-info packageId'>模板</a>
+            </div>
+        </div>
     </div>
 @stop
 @section('pageJs')
@@ -80,6 +87,10 @@
 
             $('.tracking_no').click(function () {
                 location.href = "{{ route('exportPackage.getTnoExcel')}}";
+            })
+
+            $('.packageId').click(function () {
+                location.href = "{{ route('exportPackage.getTnoExcelById')}}";
             })
         })
     </script>

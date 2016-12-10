@@ -51,6 +51,11 @@ class RequireModel extends BaseModel
         ];
     }
 
+    public function catalog()
+    {
+        return $this->belongsTo('App\Models\CatalogModel', 'catalog_id');
+    }
+
     //查询
     public $searchFields = ['name'=>'名称'];
     

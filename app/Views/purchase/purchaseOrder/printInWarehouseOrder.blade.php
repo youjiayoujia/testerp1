@@ -48,7 +48,7 @@ table{ font-family:Arial, Helvetica, sans-serif; border:1px solid #000;}
               <td align="center">{{$key+1}}</td>
               <td align="center">{{$model->id}}</td>
               <td align="center">{{$purchase_item->sku}}</td>
-              <td align="center">{{$purchase_item->productItem->warehousePosition?$purchase_item->productItem->warehousePosition->name:''}}</td>
+              <td align="center">{{$purchase_item->warehouse_position_name}}</td>
               <td align="center" style="font-size:12px">{{$purchase_item->productItem?$purchase_item->productItem->c_name:''}}</td>
               <td align="center">{{$purchase_item->purchase_num}}</td>
               <td align="center">&nbsp;</td>

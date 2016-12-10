@@ -34,6 +34,7 @@
 		    	</select>
 		    	扫单时间<input type="text" id='date_from' class='datetimepicker_dark'>--<input type="text" id='date_to' class='datetimepicker_dark'>
 		    	<button class="search">查询</button>
+                <button class="export">导出</button>
 		    </div>
 
 		    <br>
@@ -41,10 +42,8 @@
 				
 		    </div>
         </div>
-    </div>
-       
+    </div>  
 @stop
-
 @section('pageJs')
 <script src="{{ asset('js/jquery.datetimepicker.full.js') }}"></script>
 <script type='text/javascript'>

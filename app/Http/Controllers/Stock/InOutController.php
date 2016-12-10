@@ -55,11 +55,20 @@ class InOutController extends Controller
      */
     public function exportResult()
     {
+        ini_set('memory_limit', '2G');
         $query = $this->model;
         if(request()->has('start_time') && request()->has('end_time')) {
-            $start_time = request('start_time');
-            $end_time = request('end_time');
+            $start_time = date('Y-m-d H:i:s', strtotime(request('start_time')));
+            $end_time = date('Y-m-d H:i:s', strtotime(request('end_time')));
             $query = $query->whereBetween('created_at', [$start_time, $end_time]);
+        }
+        if(request()->has('start_time') && !request()->has('end_time')) {
+            $start_time = date('Y-m-d H:i:s', strtotime(request('start_time')));
+            $query = $query->where('created_at', '>', $start_time);
+        }
+        if(!request()->has('start_time') && request()->has('end_time')) {
+            $end_time = date('Y-m-d H:i:s', strtotime(request('end_time')));
+            $query = $query->where('created_at', '<', $end_time);
         }
         $arr = [];
         if(request()->has('types')) {
@@ -94,7 +103,10 @@ class InOutController extends Controller
         $inouts = $query->skip($start)->take($len)->get();
         while($inouts->count()) {
             foreach($inouts as $key => $inout) {
-                $item = $inout->stock->item;
+                $item = $inout->stock ? $inout->stock->item : '';
+                if(!$item) {
+                    continue;
+                }
                 $rows[] = [
                     '单据号' => $inout->relation_name,
                     '产品中文名' => $item->c_name,
@@ -105,6 +117,8 @@ class InOutController extends Controller
                     '时间' => $inout->created_at,
                     '备注' => $inout->remark,
                     '类型' => $inout->type_name,
+                    '当前库存价' => $item->cost,
+                    '出入库后库存价' => $inout->outer_type == 'IN' ? round(((($item->cost ? $item->cost : $item->purchase_price) * $item->stocks->sum('all_quantity') + $inout->amount)/($item->stocks->sum('all_quantity') + $inout->quantity)), 2) : $item->cost,
                 ];
             }
             $start += $len;

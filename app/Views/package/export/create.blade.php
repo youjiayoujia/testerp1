@@ -17,7 +17,10 @@
                         <input type='checkbox' name='fieldNames[]' value="{{ $key }}">{{ $field }}
                     </div>
                     <div class='form-group col-lg-2'>
-                        <input type='text' class="form-control col-lg-2" placeholder="A-Z 决定导出顺序" name='{{$key}},level' value="{{ old('$key'+',level') }}">
+                        <input type='text' class="form-control col-lg-2" placeholder="默认字段名,可不填" name='{{$key}},name' value="{{ old('$key'+',name') }}">
+                    </div>
+                    <div class='form-group col-lg-2'>
+                        <input type='text' class="form-control col-lg-2" placeholder="字母或数字用来排序" name='{{$key}},level' value="{{ old('$key'+',level') }}">
                     </div>
                 </div>
             @endforeach

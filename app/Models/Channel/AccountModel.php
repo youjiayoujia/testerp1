@@ -105,7 +105,7 @@ class AccountModel extends BaseModel
                 $status = ['pending'];
                 break;
             case 'wish':
-                $status = [];
+                $status = ['All'];
                 break;
             case 'ebay':
                 $status = ['All'];

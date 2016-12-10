@@ -1,8 +1,9 @@
 @extends('common.table')
 @section('tableHeader')
     <th><input type='checkbox' name='select_all' class='select_all'></th>
-    <th class="sort" data-field="id">ID</th>
-    <th>订单号</th>
+    <th class="sort" data-field="id">包裹号</th>
+    <th>内单号</th>
+    <th>平台订单号</th>
     <th>订单金额</th>
     <th>仓库</th>
     <th>收货人</th>
@@ -14,7 +15,7 @@
     <th>物流方式</th>
     <th>物流单号</th>
     <th>发货类型</th>
-    <th class="sort" data-field="updated_at">更新时间</th>
+    <th class="sort" data-field="updated_at">创建时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -26,8 +27,9 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td class='packageId' data-id="{{ $package->id }}">{{ $package->id }}</td>
-            <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}<br/>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
+            <td class='packageId' data-id="{{ $package->id }}"><strong>{{ $package->id }}</strong></td>
+            <td>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
+            <td>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
             <td>{{ $package->order ? $package->order->amount . $package->order->currency : '订单金额有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->shipping_firstname . $package->shipping_lastname }}</td>
@@ -35,9 +37,10 @@
             <td>
                 <button class="btn btn-{{ $package->status_color }} btn-xs">
                     {{ $package->status_name }}
-                </button><br/>
+                </button>
+                <br/>
                 @if($package->order->status == 'REVIEW')
-                <small>订单待审核</small>
+                    <small>订单待审核</small>
                 @endif
             </td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
@@ -46,7 +49,7 @@
             <td class='logisticsReal'>{{ $package->logistics ? $package->logistics->code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
-            <td>{{ $package->updated_at }}</td>
+            <td>{{ $package->created_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
                     <span class="glyphicon glyphicon-eye-open"></span>
@@ -62,8 +65,14 @@
             <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
                 @if($key == 0)
                     <td colspan='2' rowspan="{{$package->items->count()}}">
-                        <p>{{ $package->shipping_firstname . $package->shipping_lastname }}</p>
-                        <p>{{ $package->shipping_shipping_address . ' ' .$package->shipping_city . ' ' . $package->shiping_state . ' ' . $package->shipping_country }}
+                        <address>
+                            <strong>{{ $package->shipping_firstname . ' ' . $package->shipping_lastname }}</strong><br>
+                            {{ $package->shipping_address }} {{ $package->shipping_address1 }}<br>
+                            {{ $package->shipping_city . ', ' . $package->shipping_state.' '.$package->shipping_zipcode }}<br>
+                            {{ $package->country ? $package->country->name.' '.$package->country->cn_name : '' }}<br>
+                            <abbr title="ZipCode">Z:</abbr> {{ $package->shipping_zipcode }}
+                            <abbr title="Phone">P:</abbr> {{ $package->shipping_phone }}
+                        </address>
                     </td>
                     <td colspan='3' rowspan="{{$package->items->count()}}">包裹item信息</td>
                 @endif
@@ -74,18 +83,27 @@
                             data-target="#sku_search">
                         {{ $packageItem->item ? $packageItem->item->sku : '' }}
                     </button>
+                    <br/>
+                    @foreach($packageItem->item->product->logisticsLimit as $logistics)
+                        @if($logistics->ico)
+                            <img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}"/>@else
+                            {{$logistics->name}}
+                        @endif
+                    @endforeach
+
                 </td>
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
                 <td colspan='2'>{{ $packageItem->quantity }}</td>
-                <td colspan='2'>单件重量:{{ $packageItem->item->weight }}</td>
+                <td colspan='3'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
-            <td colspan='4'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
-            <td colspan='4'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
-            <td colspan='2'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
+            <td colspan='3'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
+            <td colspan='3'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
+            <td colspan='2'>是否标记: {{ $package->is_mark == '1' ? '是' : '否' }}</td>
+            <td colspan='3'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
             <td colspan='6'>
                 @if($package->order->status != 'REVIEW')
                     <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
@@ -101,10 +119,10 @@
                             <span class="glyphicon glyphicon-check"></span>
                         </a>
                     @endif
-    {{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
-                        <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
-                            <span class="glyphicon glyphicon-refresh"></span>
-                        </a>
+                    {{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
+                    <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
+                        <span class="glyphicon glyphicon-refresh"></span>
+                    </a>
                     {{--@endif--}}
                     <a href="{{ route('package.editTrackingNo', ['id'=>$package->id]) }}" class="btn btn-primary btn-xs" title='修改追踪号'>
                         <span class="glyphicon glyphicon-pencil"></span>
@@ -188,11 +206,6 @@
             合并包裹
         </a>
     </div>
-    <div class="btn-group">
-        <a class="btn btn-success multiPlace" href="javascript:">
-            批量下单
-        </a>
-    </div>
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             展示类型
@@ -209,17 +222,20 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class='returnTrackno' data-status='1'>回传运单号</a></li>
-            <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
-            <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
-            <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
+            <li><a href="javascript:" class='btn btn-info returnTrackno' data-status='1'>回传运单号</a></li>
+            <li><a href="javascript:" class='btn btn-info returnFee' data-type='1'>回传一次运费</a></li>
+            <li><a href="javascript:" class='btn btn-info returnFee' data-type='2'>回传二次运费</a></li>
+            <li><a href="javascript:" class='btn btn-info multiEditTracking' data-type='3'>批量修改追踪号</a></li>
             <li><a data-toggle="modal"
-                   data-target="#change_logistics">
+                   data-target="#change_logistics" class='btn btn-info'>
                     批量修改物流方式
                 </a></li>
-            <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
-            <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
-            <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
+            <li><a href="javascript:" class='btn btn-info changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
+            <li><a href="javascript:" class='btn btn-info remove_logistics'>批量清除追踪号</a></li>
+            <li><a href="javascript:" class='btn btn-info remove_packages'>批量取消包裹</a></li>
+            <li><a class="btn btn-info multiPlace" href="javascript:">
+                    批量下单
+                </a></li>
         </ul>
     </div>
     <div class="btn-group">
@@ -256,16 +272,16 @@
             sku = $.trim($(this).text());
             if (sku) {
                 $.get(
-                        "{{ route('stock.getSingleSku')}}",
-                        {sku: sku, type: '1'},
-                        function (result) {
-                            if (result == 'false') {
-                                alert('sku不存在');
-                                return false;
-                            }
-                            $('.buf').html('');
-                            $('.buf').html(result);
+                    "{{ route('stock.getSingleSku')}}",
+                    {sku: sku, type: '1'},
+                    function (result) {
+                        if (result == 'false') {
+                            alert('sku不存在');
+                            return false;
                         }
+                        $('.buf').html('');
+                        $('.buf').html(result);
+                    }
                 );
             }
         });
@@ -278,17 +294,17 @@
                 i++;
             })
             $.get(
-                    "{{ route('package.ajaxRealTime')}}",
-                    {'arr': arr},
-                    function (result) {
-                        j = 0;
-                        $.each($('.packageId'), function () {
-                            block = $(this).parent();
-                            block.children('.logisticsReal').html(block.children('.logisticsReal').text() + "   <font color='gray'>" + result[j][0] + "</font>");
-                            block.children('.logisticsFee').text(result[j][1]);
-                            j++;
-                        })
-                    }
+                "{{ route('package.ajaxRealTime')}}",
+                {'arr': arr},
+                function (result) {
+                    j = 0;
+                    $.each($('.packageId'), function () {
+                        block = $(this).parent();
+                        block.children('.logisticsReal').html(block.children('.logisticsReal').text() + "   <font color='gray'>" + result[j][0] + "</font>");
+                        block.children('.logisticsFee').text(result[j][1]);
+                        j++;
+                    })
+                }
             )
 
             $('.returnTrackno').click(function () {
@@ -405,12 +421,12 @@
                 id = $(this).attr('name');
                 if (quantity > 1) {
                     $.get(
-                            "{{ route('package.returnSplitPackage')}}",
-                            {quantity: quantity, id: id},
-                            function (result) {
-                                $('.split_package').html('');
-                                $('.split_package').html(result);
-                            }, 'html'
+                        "{{ route('package.returnSplitPackage')}}",
+                        {quantity: quantity, id: id},
+                        function (result) {
+                            $('.split_package').html('');
+                            $('.split_package').html(result);
+                        }, 'html'
                     );
                 } else {
                     alert('数量不能小于1');

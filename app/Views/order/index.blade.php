@@ -1,22 +1,19 @@
 @extends('common.table')
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuanOrder()">全选</th>
-    <th class="sort" data-field="id">ID</th>
-    <th class="sort" data-field="ordernum">订单号</th>
-    <th class="sort" data-field="channel_ordernum">渠道订单号</th>
-    {{--<th class="sort" data-field="channel">渠道</th>--}}
-    <th class="sort" data-field="channel_account_id">渠道账号</th>
-    <th>邮箱</th>
+    <th class="sort" data-field="id">内单号</th>
+    <th class="sort" data-field="channel_ordernum">平台订单号</th>
+    <th class="sort" data-field="channel_id">渠道</th>
+    <th class="sort" data-field="channel_account_id">销售账号</th>
     <th>买家ID</th>
     <th>物流</th>
-    <th>追踪号</th>
     <th>收货人</th>
     <th>国家</th>
     <th class="sort" data-field="amount"><strong class="text-success">总金额</strong></th>
     <th class="sort" data-field="amount_shipping"><strong class="text-danger">运费</strong></th>
     <th class="sort" data-field="profit_rate"><strong class="text-success">预测毛利率</strong></th>
     <th>订单状态</th>
-    <th>客服人员</th>
+    <th>运营人员</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>详情</th>
 @stop
@@ -29,35 +26,29 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td>{{ $order->id }}</td>
-            <td>{{ $order->ordernum }}</td>
+            <td><strong>{{ $order->id }}</strong></td>
             <td>
                 {{ $order->channel_ordernum }}
-                @if($order->fulfill_by == 'AFN')
-                    <span class="label label-danger">亚马逊配送</span>
-                @endif
             </td>
-            {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
+            <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
-            <td>{{ $order->email }}</td>
-            <td>{{ $order->by_id }}</td>
-            <td>{{ $order->logistics }}<br>{{ $order->shipping }}</td>
-            <td>{{ $order->code }}</td>
+            <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
+            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->profit_rate,4)*100 }}%</div>
+                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
                 <div>
-                    毛利润: {{ $order->profit }} USD
+                    毛利润: {{ round($order->amount*$order->calculateProfitProcess(),2) }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
-            <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
+            <td>{{ $order->userOperator ? $order->userOperator->name : '未分配' }}</td>
             <td>{{ $order->created_at }}</td>
             <td>
                 <a class="btn btn-primary btn-xs"
@@ -83,7 +74,7 @@
                 @if($order->customer_remark)
                     <div class="divider"></div>
                     <div class="text-danger">
-                        {{ $order->customer_remark }}
+                        {!! $order->customer_remark !!}
                     </div>
                 @endif
                 @if($order->remarks)
@@ -116,7 +107,7 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">
+                            <div class="col-lg-3">
                                 ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
                                 <br>
                                 @if($order->channel)
@@ -140,18 +131,18 @@
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>
-                                {{ $orderItem->item->warehouse->name }}
+                                {{ $orderItem->item->warehouse?$orderItem->item->warehouse->name:'' }}
                             </div>
                             @if($orderItem->item)
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
-                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-2">{{ $orderItem->item->c_name }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
                                 </div>
-                                <div class="col-lg-2"></div>
+                                <div class="col-lg-1"></div>
                             @endif
                             <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}
@@ -311,11 +302,11 @@
                         </button>
                     @endif
                     {{--@if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')--}}
-                        {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
-                           {{--data-id="{{ $order->id }}"--}}
-                           {{--data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">--}}
-                            {{--<span class="glyphicon glyphicon-pencil"></span> 删除--}}
-                        {{--</a>--}}
+                    {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
+                    {{--data-id="{{ $order->id }}"--}}
+                    {{--data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">--}}
+                    {{--<span class="glyphicon glyphicon-pencil"></span> 删除--}}
+                    {{--</a>--}}
                     {{--@endif--}}
                     @foreach($order->items as $item)
                         @if($item->is_refund == 0)
@@ -467,7 +458,6 @@
                             <div class='row'>
                                 <div class="form-group col-lg-4">
                                     <label for="ordernum" class='control-label'>订单号</label>
-                                    <label class="text-danger">(已付款时长: {{ '' }} 天)</label>
                                     <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') ? old('ordernum') : $order->ordernum }}" readonly>
                                 </div>
                                 <div class="form-group col-lg-2">
@@ -492,7 +482,7 @@
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="refund_currency" id="refund_currency">
                                         @foreach($currencys as $refund_currency)
-                                            <option value="{{ $refund_currency->code }}" {{ old('refund_currency') }}>
+                                            <option value="{{ $refund_currency->code }}" <?php if ($refund_currency->code == 'USD') echo 'selected'; ?> {{ old('refund_currency') }}>
                                                 {{ $refund_currency->code }}
                                             </option>
                                         @endforeach
@@ -602,7 +592,6 @@
                                 <div class="form-group col-lg-12">
                                     <label for="image">上传截图：</label>
                                     <label class="text-danger">(图片最大支持上传40Kb)</label>
-                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <input name='image' type='file'/>
                                 </div>
                             </div>
@@ -883,20 +872,20 @@
 @stop
 @section('tableToolButtons')
     {{--<div class="btn-group" role="group">--}}
-        {{--<input class="form-control lr" id="lr" placeholder="利润" name="lr">--}}
+    {{--<input class="form-control lr" id="lr" placeholder="利润" name="lr">--}}
     {{--</div>--}}
     {{--<div class="btn-group" role="group">--}}
-        {{--<select class="form-control sx" name="sx" id="sx">--}}
-            {{--<option value="null">利润筛选</option>--}}
-            {{--<option value="high">高于</option>--}}
-            {{--<option value="low">低于</option>--}}
-        {{--</select>--}}
+    {{--<select class="form-control sx" name="sx" id="sx">--}}
+    {{--<option value="null">利润筛选</option>--}}
+    {{--<option value="high">高于</option>--}}
+    {{--<option value="low">低于</option>--}}
+    {{--</select>--}}
     {{--</div>--}}
     {{--<div class="btn-group" role="group">--}}
-        {{--<select class="form-control special" name="special" id="special">--}}
-            {{--<option value="null">特殊要求</option>--}}
-            {{--<option value="yes">有特殊要求</option>--}}
-        {{--</select>--}}
+    {{--<select class="form-control special" name="special" id="special">--}}
+    {{--<option value="null">特殊要求</option>--}}
+    {{--<option value="yes">有特殊要求</option>--}}
+    {{--</select>--}}
     {{--</div>--}}
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1113,12 +1102,12 @@
                 id = $(this).attr('name');
                 if (quantity > 1) {
                     $.get(
-                            "{{ route('package.returnSplitPackage')}}",
-                            {quantity: quantity, id: id},
-                            function (result) {
-                                $('.split_package').html('');
-                                $('.split_package').html(result);
-                            }, 'html'
+                        "{{ route('package.returnSplitPackage')}}",
+                        {quantity: quantity, id: id},
+                        function (result) {
+                            $('.split_package').html('');
+                            $('.split_package').html(result);
+                        }, 'html'
                     );
                 } else {
                     alert('数量不能小于1');
@@ -1145,9 +1134,9 @@
                     type: 'get',
                     success: function (result) {
                         $("#statistics").text(
-                                '总计金额:$' + result['totalAmount'] + ' ' +
-                                '平均利润率:' + result['averageProfit'] + '%' + ' ' +
-                                '总平台费:$' + result['totalPlatform']
+                            '总计金额:$' + result['totalAmount'] + ' ' +
+                            '平均利润率:' + result['averageProfit'] + '%' + ' ' +
+                            '总平台费:$' + result['totalPlatform']
                         );
                     }
                 });

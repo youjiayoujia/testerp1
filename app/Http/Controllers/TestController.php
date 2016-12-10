@@ -91,7 +91,7 @@ class TestController extends Controller
     }
     public function test2()
     {
-        
+
     $data = Excel::load('d:/456.xls', function($reader){
         return $reader->all();
     });
@@ -876,7 +876,7 @@ class TestController extends Controller
         dd($reply);*/
 
 
-        foreach (AccountModel::all() as $account) {
+/*        foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
                 $replys = ReplyModel::where('status','FAIL')->get();
                 foreach ($replys as $reply){
@@ -887,7 +887,7 @@ class TestController extends Controller
                 dd('已经操作233');
 
             }
-        }
+        }*/
 
     }
     /**

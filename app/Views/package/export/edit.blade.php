@@ -17,7 +17,10 @@
                     <input type='checkbox' name='fieldNames[]' value="{{ $key }}" {{ $model->inFields($key) ? 'checked' : ''}}>{{ $field }}
                 </div>
                 <div class='form-group col-lg-2'>
-                    <input type='text' class="form-control col-lg-2" name='{{$key}},level' value="{{ old('$key'+',level') ? old('$key'+',level') : $model->inFields($key)}}">
+                    <input type='text' class="form-control col-lg-2" name='{{$key}},name' value="{{ old('$key'+',name') ? old('$key'+',name') : ($model->inFields($key) ? $model->inFields($key)->defaultName : '') }}" placeholder='默认字段名，可不填'>
+                </div>
+                <div class='form-group col-lg-2'>
+                    <input type='text' class="form-control col-lg-2" name='{{$key}},level' value="{{ old('$key'+',level') ? old('$key'+',level') : ($model->inFields($key) ? $model->inFields($key)->level : '') }}" placeholder='字母或数字用来排序'>
                 </div>
             </div>
             @endforeach

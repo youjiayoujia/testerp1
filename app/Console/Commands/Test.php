@@ -42,8 +42,8 @@ class Test extends Command
         $begin = microtime(true);
         $itemModel = new ItemModel();
         $itemModel->oneKeyUpdateSku();
-        // $itemModel->updateWarehouse();
-        $itemModel->updateUser();
+        //$itemModel->updateWarehouse();
+        //$itemModel->updateUser();
         // $itemModel->updateOldData();
         // $itemModel->updateBasicData();
         $end = microtime(true);

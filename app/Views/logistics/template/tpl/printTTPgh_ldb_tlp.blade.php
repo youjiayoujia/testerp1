@@ -33,7 +33,7 @@
 			<p><img src="{{ asset('picture/ttp2.png') }}" style="width:30px;height:30px;margin-top:10mm;"/></p>
 		</div>
 		<div style="width:60mm;height:22mm;float:left;text-align: center;font-size:12px;line-height: 11px;">
-			<p><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="margin-top:5px;"/></p>
+			<p><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="margin-top:5px;height: 10mm"/></p>
 			<p style="font-size:13px;font-weight: bold;margin-top: 1px;"> {{ $model->tracking_no }}</p>
 			<p style="margin-top: 2px;"> Return if undeliverable PO box 5001 istanbul-TURKEY</p>
 		</div>
@@ -76,13 +76,13 @@
 				</tr>
 				<tr style="height:4mm;font-size: 11px;text-align:center;">
 					<td style="border-right:1px solid black;border-bottom:1px solid black;">
-						 {{ $model->decleared_ename }}&nbsp;&nbsp;&nbsp;&nbsp;x1
+						{{ $model->getDeclaredInfo()['declared_en'] }}&nbsp;&nbsp;&nbsp;&nbsp;x1
 					</td>
 					<td style="border-right:1px solid black;border-bottom:1px solid black;">
-						{{ $model->signal_weight }}
+						{{ $model->getDeclaredInfo()['weight'] }}
 					</td>
 					<td style="border-bottom:1px solid black;">
-						{{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}		
+						{{ sprintf("%.2f", $model->getDeclaredInfo()['declared_value'] > 20 ? 20 : $model->signal_price) }}
 					</td>
 				</tr>
 				<tr style="height:4mm;font-size: 11px;text-align:center;">
@@ -149,8 +149,8 @@
 		</div>
 	</div>
 	<div style="border-top:1px solid black;height: 4mm;font-size: 12px;clear:both;">
-		<p style="margin-left: 6px;width:50mm;float:left">RefNo:<b>{{ $model->order_id }}</b></p>
-		<p style="margin-left: 6px;width:10mm;float:right">{{ $model->logistics_id }}</p>
+		<p style="margin-left: 6px;width:50mm;float:left">RefNo:<b>{{ $model->id }}</b></p>
+		<p style="margin-left: 6px;width:10mm;float:right">{{ $model->logistics ? $model->logistics->logistics_code : '' }}</p>
 	</div>
 </div>
     

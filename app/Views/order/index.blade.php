@@ -6,7 +6,6 @@
     <th class="sort" data-field="channel_id">渠道</th>
     <th class="sort" data-field="channel_account_id">销售账号</th>
     <th>买家ID</th>
-    <th>物流</th>
     <th>收货人</th>
     <th>国家</th>
     <th class="sort" data-field="amount"><strong class="text-success">总金额</strong></th>
@@ -33,7 +32,6 @@
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
-            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
@@ -211,7 +209,7 @@
                     @if($order->packages->count() > 0)
                         @foreach($order->packages as $package)
                             <div class="row">
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>包裹ID</strong> :
                                     <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                                 </div>
@@ -226,7 +224,7 @@
                                 <div class="col-lg-2">
                                     <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
                                 </div>
-                                <div class="col-lg-1">
+                                <div class="col-lg-2">
                                     <strong>包裹状态</strong> : {{ $package->status_name }}
                                 </div>
                                 <div class="col-lg-1">
@@ -274,8 +272,11 @@
                         <div class="col-lg-3">
                             收款方式 : {{ $order->payment }}
                         </div>
-                        <div class="col-lg-9">
+                        <div class="col-lg-5">
                             交易号 : {{ $order->transaction_number }}
+                        </div>
+                        <div class="col-lg-4">
+                            物流方式 : {{ $order->shipping }}
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@
 @section('formAction') {{ route('logisticsChannelName.update', ['id' => $model->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="form-group col-lg-2">
             <label for="channel" class="control-label">渠道</label>

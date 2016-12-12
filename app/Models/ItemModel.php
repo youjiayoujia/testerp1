@@ -1405,14 +1405,10 @@ class ItemModel extends BaseModel
         $last_id = SpuMultiOptionModel::all()->last()->spu_id;
         $spus = SpuModel::where('id','>',$last_id)->get();
         foreach ($spus as $spu) {
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>1]);
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>2]);
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>3]);
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>4]);
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>5]);
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>6]);
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>7]);
-            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>8]);
+            $channels = ChannelModel::all();
+            foreach($channels as $channel){
+                SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>$channel->id]);
+            }
         }
 
     }

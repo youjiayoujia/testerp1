@@ -1221,6 +1221,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Message\Dispute\AliexpressIssueController@doRefuseIssues', 'as' => 'aliexpress.doRefuseIssues']);
     //spu
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
+    Route::get('spu/checkPrivacy', ['uses' => 'SpuController@checkPrivacy', 'as' => 'spu.checkPrivacy']);
     Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
     Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
     Route::get('spu/spuTemp', ['uses' => 'SpuController@spuTemp', 'as' => 'spuTemp']);

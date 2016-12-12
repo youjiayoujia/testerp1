@@ -63,7 +63,7 @@
             </td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->weight }}kg</td>
-            <td>{{ isset($item->purchaseAdminer)?$item->purchaseAdminer->warehouse_id:'' }}</td>
+            <td>{{ isset($item->warehouse)?$item->warehouse->name:'' }}</td>
             <td>{{ $item->product?$item->product->declared_en:'' }}
                 <br>{{ $item->product?$item->product->declared_cn:'' }}<br>
                 ${{$item->declared_value}}

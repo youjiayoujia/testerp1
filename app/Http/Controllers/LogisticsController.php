@@ -135,7 +135,6 @@ class LogisticsController extends Controller
                 $data = $logisticsRule->toArray();
                 $data['name'] = $logisticsRule->name . '[复制]';
                 $data['type_id'] = $logistics->id;
-                unset($logisticsRule->id);
                 $rule = RuleModel::create($data);
                 if($logisticsRule->catalog_section) {
                     $ruleCatalog = ruleCatalog::where('logistics_rule_id', $logisticsRule->id)->get();

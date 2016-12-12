@@ -176,6 +176,7 @@ return [
         'order.channel_ordernum' => '渠道订单号',
         'purchaseItem.productItem.sku' => 'sku',
         'new_status' => '是否为新品',
+        'html_mod'=>'英文描述',
         'items.item.sku' => 'sku',
         'check_status' => '审核状态',
     ],

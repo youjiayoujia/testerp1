@@ -298,7 +298,7 @@ class ItemModel extends BaseModel
     public function getOutOfStockAttribute()
     {
         $item_id = $this->id;
-        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
+        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "'.$item_id.'" and 
                 packages.id = package_items.package_id and packages.deleted_at is null')[0]->num;
 
         return $num;
@@ -308,8 +308,8 @@ class ItemModel extends BaseModel
     public function getWarehouseOutOfStockAttribute()
     {
         $item_id = $this->id;
-        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
-                packages.id = package_items.package_id group by packages.warehouse_id');
+        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "'.$item_id.'" and 
+                packages.id = package_items.package_id and packages.deleted_at is null group by packages.warehouse_id');
         $data = [];
 
         $warehouses = WarehouseModel::all();
@@ -364,7 +364,7 @@ class ItemModel extends BaseModel
         }
         return [
             'relatedSearchFields' => ['supplier' => ['name'] ],
-            'filterFields' => [],
+            'filterFields' => ['html_mod'],
             'filterSelects' => ['status' => config('item.status'),
                                 'new_status' => config('item.new_status'),
                                 'warehouse_id' =>$this->getArray('App\Models\WarehouseModel', 'name'),
@@ -389,11 +389,12 @@ class ItemModel extends BaseModel
     {
         //销量
         $sellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-            ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-            ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime($period)))
+            ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime($period)))
             ->where('order_items.quantity', '<', 5)
             ->where('order_items.item_id', $this->id)
             ->sum('order_items.quantity');
+        
         return $sellNum;
     }
 
@@ -741,7 +742,7 @@ class ItemModel extends BaseModel
             $xu_kucun = $item->available_quantity-$data['need_total_num'];
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
@@ -749,7 +750,7 @@ class ItemModel extends BaseModel
             if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
             //7天批发订单销量
             $pifaSeven = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
                 ->where('order_items.quantity', '>=', 5)
                 ->where('order_items.item_id', $item['id'])
@@ -758,7 +759,7 @@ class ItemModel extends BaseModel
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
@@ -766,7 +767,7 @@ class ItemModel extends BaseModel
             if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
             //14天批发订单销量
             $pifaFourteen = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '>=', 5)
                 ->where('order_items.item_id', $item['id'])
@@ -775,7 +776,7 @@ class ItemModel extends BaseModel
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
@@ -783,7 +784,7 @@ class ItemModel extends BaseModel
             if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
             //30天批发订单销量
             $pifaThirty = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
                 ->where('order_items.quantity', '>=', 5)
                 ->where('order_items.item_id', $item['id'])
@@ -845,7 +846,7 @@ class ItemModel extends BaseModel
                         $total_profit_num++;
                     }
                     if (in_array($o_item->order->status,
-                        array('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'))) {
+                        array('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'))) {
                         $all_order_num++;
                     }
                 }

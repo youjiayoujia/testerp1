@@ -99,7 +99,7 @@ class OrderModel extends BaseModel
     private $canPackageStatus = ['PREPARED'];
     private $canCancelStatus = ['SHIPPED', 'COMPLETE'];
 
-    public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
+    public $searchFields = ['id' => '内单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
 
     //退款rules
     public $rules = [
@@ -342,7 +342,6 @@ class OrderModel extends BaseModel
         }
         return [
             'filterFields' => [
-                'ordernum',
                 'channel_ordernum',
                 'email',
                 'by_id',
@@ -362,13 +361,14 @@ class OrderModel extends BaseModel
                 'country' => ['code'],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
-                'userService' => ['name'],
+                'userOperator' => ['name'],
                 'packages' => ['tracking_no'],
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => $arr],
                 'items' => ['item_status' => config('item.status')],
                 'remarks' => ['type' => config('order.review_type')],
+                'packages' => ['is_mark' => config('order.is_mark'), 'status' => config('package')],
             ],
             'doubleRelatedSearchFields' => [
                 'packages' => ['logistics' => ['code']],
@@ -592,42 +592,45 @@ class OrderModel extends BaseModel
     //退款
     public function refundCreate($data, $file = null)
     {
+        $data['process_status'] = 'PENDING';
         $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
         if ($file != '' && $file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
             Storage::disk('product')->put($data['image'], file_get_contents($file->getRealPath()));
-            if ($data['type'] == 'FULL') {
-                $total = 0;
-                foreach ($data['arr']['id'] as $id) {
-                    $orderItem = $this->items->find($id);
-                    $orderItem->update(['is_refund' => 1]);
-                    $total = $orderItem['price'] * $orderItem['quantity'] + $total;
-                }
-                $data['refund_amount'] = $total;
-                $data['price'] = $total;
-            }
-            if ($data['type'] == 'PARTIAL') {
-                foreach ($data['tribute_id'] as $id) {
-                    $orderItem = $this->items->find($id);
-                    $orderItem->update(['is_refund' => 1]);
-                }
-            }
-            $data['customer_id'] = request()->user()->id;
-            $refund = new RefundModel;
-            $refund_new = $refund->create($data);
-            if ($data['type'] == 'FULL') {
-                foreach ($data['arr']['id'] as $fullid) {
-                    $orderItem = $this->items->find($fullid);
-                    $orderItem->update(['refund_id' => $refund_new->id]);
-                }
-            } else {
-                foreach ($data['tribute_id'] as $partid) {
-                    $orderItem = $this->items->find($partid);
-                    $orderItem->update(['refund_id' => $refund_new->id]);
-                }
-            }
-            return;
+        } else {
+            $data['image'] = '';
         }
+        if ($data['type'] == 'FULL') {
+            $total = 0;
+            foreach ($data['arr']['id'] as $id) {
+                $orderItem = $this->items->find($id);
+                $orderItem->update(['is_refund' => 1]);
+                $total = $orderItem['price'] * $orderItem['quantity'] + $total;
+            }
+            $data['refund_amount'] = $total;
+            $data['price'] = $total;
+        }
+        if ($data['type'] == 'PARTIAL') {
+            foreach ($data['tribute_id'] as $id) {
+                $orderItem = $this->items->find($id);
+                $orderItem->update(['is_refund' => 1]);
+            }
+        }
+        $data['customer_id'] = request()->user()->id;
+        $refund = new RefundModel();
+        $refund_new = $refund->create($data);
+        if ($data['type'] == 'FULL') {
+            foreach ($data['arr']['id'] as $fullid) {
+                $orderItem = $this->items->find($fullid);
+                $orderItem->update(['refund_id' => $refund_new->id]);
+            }
+        } else {
+            foreach ($data['tribute_id'] as $partid) {
+                $orderItem = $this->items->find($partid);
+                $orderItem->update(['refund_id' => $refund_new->id]);
+            }
+        }
+
         return 1;
     }
 
@@ -687,7 +690,6 @@ class OrderModel extends BaseModel
         if (!in_array($this->status, $this->canPackageStatus)) {
             return false;
         }
-
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
             $this->status = 'REVIEW';
@@ -750,7 +752,7 @@ class OrderModel extends BaseModel
     {
         $rate = CurrencyModel::where('code', $this->currency)->first()->rate;
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
-        $orderAmount = ($this->amount + $this->amount_shipping) * $rate;
+        $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
         $orderChannelFee = $this->calculateOrderChannelFee();
@@ -764,14 +766,21 @@ class OrderModel extends BaseModel
     public function calculateOrderChannelFee()
     {
         $sum = 0;
-        foreach ($this->items as $item) {
-            $channelRate = $item->item->catalog->channels->where('id',
-                $this->channelAccount->catalog_rates_channel_id)->first();
-            if ($channelRate) {
-                $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
-            } else {
-                return 0;
-            }
+        switch ($this->channel->driver) {
+            case 'wish':
+                $sum = $this->amount * 0.15;
+                break;
+            default:
+                foreach ($this->items as $item) {
+                    if ($item->item and $item->item->catalog) {
+                        $channelRate = $item->item->catalog->channels->where('id',
+                            $this->channelAccount->catalog_rates_channel_id)->first();
+                        if ($channelRate) {
+                            $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
+                        }
+                    }
+                }
+                break;
         }
 
         return $sum * $this->rate;

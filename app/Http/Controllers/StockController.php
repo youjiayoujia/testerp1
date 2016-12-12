@@ -337,9 +337,8 @@ class StockController extends Controller
      */
     public function ajaxSku()
     {
-        ini_set('memory_limit', '1G');
         $sku = trim(request()->input('sku'));
-        $items = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+        $items = ItemModel::where('sku', 'like', '%'.$sku.'%')->distinct()->take('20')->get();
         $total = $items->count();
         $arr = [];
         foreach($items as $key => $item) {
@@ -363,11 +362,10 @@ class StockController extends Controller
      */
     public function ajaxGetByPosition()
     {
-        ini_set('memory_limit', '1G');
         $warehouse_id = trim(request()->input('warehouse_id'));
         $item_id = trim(request()->input('sku'));
         $position = trim(request()->input('position'));
-        $obj = PositionModel::where('warehouse_id', $warehouse_id)->where('name', 'like', '%'.$position.'%')->get();
+        $obj = PositionModel::where('warehouse_id', $warehouse_id)->where('name', 'like', '%'.$position.'%')->take('20')->get();
         $total = $obj->count();
         $arr = [];
         foreach($obj as $key => $position) {

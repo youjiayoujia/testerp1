@@ -21,7 +21,7 @@
             <td>{{ $_data->warehouse?$_data->warehouse->name:'' }}</td>
             <td>
                 <a href="" data-toggle="modal" data-target="#wpedit_{{$_data->id}}">
-                    <span class="glyphicon glyphicon-pencil"></span> 选择库位入库
+                    <span class="glyphicon glyphicon-pencil"></span> 入库
                 </a>
             </td>
         </tr>
@@ -44,15 +44,19 @@
                      </div>
 
                      <div class="modal-body">        
-                        @foreach($_data->productItem->all_warehouse_position as $info_key=>$info)
+                        <!-- @foreach($_data->productItem->all_warehouse_position as $info_key=>$info)
 
                         <label>
                             <input type='radio' {{$info_key==0?'checked':''}} name='position' value='{{$info["warehouse_position_id"]}}' >{{$info['warehouse_name']}}{{$info['warehouse_position']}}
                         </label>
                         <br>
                             
-                        @endforeach
+                        @endforeach -->
 
+                        <label>请输入库位：</label>
+                        <br>
+                        <input type='text' value='' name='position'>
+                        <br>
                         <label for="color">入库数量</label>
                         <input class="form-control" id="num" placeholder="入库数量" name='num' value="{{$_data->purchase_num}}">
                      </div>

@@ -27,7 +27,7 @@
     @if(count($data)>0)
     @foreach($data as $purchaseOrder)
         <?php $out_of_stock = 0;$sum_purchase_account = 0;$sum_purchase_storage_account = 0; ?>
-        <tr>
+        <tr class='dark-{{ $purchaseOrder->status_color }}'>
             <td><input type="checkbox" name="tribute_id" value="{{$purchaseOrder->id}}"></td>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>

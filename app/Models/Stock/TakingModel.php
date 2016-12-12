@@ -27,6 +27,20 @@ class TakingModel extends BaseModel
     // 用于查询
     public $searchFields = ['taking_id' => '盘点表id'];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'check_status' => ['0' => '未审核', '1' => '未通过', '2' => '已通过'],
+            ],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+            'doubleRelatedSearchFields' => [],
+        ];
+    }
+
     /**
      * get the relationship between the two module 
      *

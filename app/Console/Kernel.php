@@ -73,6 +73,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SyncImportApi::class,
         \App\Console\Commands\AutoEbayAdd::class, //Ebay 自动补货
         \App\Console\Commands\ReduceUnuseSuppliers::class, //处理多余供货商
+        \App\Console\Commands\FailMessageReplyAgain::class,
+        \App\Console\Commands\AutoChangeAliOderRefund::class,
 
     ];
 
@@ -104,9 +106,10 @@ class Kernel extends ConsoleKernel
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
                     break;
                 case 'wish':
-                    /*foreach ($channel->accounts->where('is_available','1') as $account) {
+                    foreach ($channel->accounts->where('is_available','1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }*/
+                    }
+                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
                     break;
                 case 'ebay':
                     foreach ($channel->accounts as $account) {
@@ -144,6 +147,9 @@ class Kernel extends ConsoleKernel
         //API同步sellmore database
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
         $schedule->command('SyncImportApi:all')->everyFiveMinutes();
+
+        //财务
+        $schedule->command('aliexpressRefundStatus:change')->cron('21 * * *');//速卖通退款小于15美金
 
     }
 }

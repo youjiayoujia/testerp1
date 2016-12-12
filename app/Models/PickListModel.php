@@ -48,6 +48,20 @@ class PickListModel extends BaseModel
         return $sum;
     }
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'type' => ['SINGLE' => '单单', 'SINGLEMULTI' => '单多', 'MULTI' => '多多'],
+            ],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+            'doubleRelatedSearchFields' => [],
+        ];
+    }
+
     //查询
     public $searchFields=['picknum' => '拣货单号'];
 

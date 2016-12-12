@@ -11,7 +11,7 @@ use App\Models\Channel\CatalogRatesModel;
 
 class CatalogModel extends BaseModel
 {
-    protected $table = 'catalogs';
+    public $table = 'catalogs';
     /**
      * The attributes that are mass assignable.
      *

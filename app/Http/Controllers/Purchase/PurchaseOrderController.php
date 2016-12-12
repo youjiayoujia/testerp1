@@ -16,6 +16,7 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
 use App\Models\ItemModel;
 use App\Models\UserModel;
 use App\Models\Stock\InModel;
@@ -215,6 +216,7 @@ class PurchaseOrderController extends Controller
             foreach($data['arr'] as $k=>$v){
                 if($v['id']){
                     $purchaseItem=PurchaseItemModel::find($v['id']);
+                    $v['lack_num'] = $v['purchase_num'];
                     $itemPurchasePrice=$purchaseItem->item->purchase_price;
                     $purchase_num=$purchaseItem->purchase_num;
                     foreach($v as $key=>$vo){
@@ -397,7 +399,7 @@ class PurchaseOrderController extends Controller
         $this->validate(request(), $this->purchaseItem->rules('create'));
         $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
         if (!$item) {
-            return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在.'));
+            return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在或不在售.'));
         }
         $model=$this->model->find($id);
         $userName = UserModel::find(request()->user()->id);
@@ -410,6 +412,7 @@ class PurchaseOrderController extends Controller
         if($model->close_status == 1){
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已结算，不能新增Item.'));
             }
+        $data['item_id'] = $item->id;
         $data['lack_num']=$data['purchase_num'];
         $data['warehouse_id']=$model->warehouse_id ? $model->warehouse_id : 0;
         $data['supplier_id']=$item->supplier_id ? $item->supplier_id : 0;
@@ -521,7 +524,7 @@ class PurchaseOrderController extends Controller
     */
     public function printpo(){
         $id = request()->input('id');
-        $p_item = PurchaseItemModel::find($id)->first();
+        $p_item = PurchaseItemModel::find($id);
         $po_id = $p_item->purchaseOrder->id;
         $response['id']= $id;
         $response['po_id']= $po_id;
@@ -828,12 +831,17 @@ class PurchaseOrderController extends Controller
     public function newProductupdateArriveLog(){
         $global = 1;
         $data = request()->all();
+        $colorinfo = 'success';
+        $tip = "入库成功";
         $arrivel_log = PurchaseItemArrivalLogModel::where('purchase_item_id',$data['purchase_item_id'])->get()->first();
         $purchase_item = $arrivel_log->purchaseItem;
 
         $warehousePosition = StockModel::where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->where('item_id',$purchase_item->item_id)->get()->first();
-                
-        if(!$warehousePosition){ 
+        $warehouse_po_id = PositionModel::where('name',$data['position'])->where('warehouse_id',$purchase_item->purchaseOrder->warehouse_id)->get()->first();
+        //echo '<pre>';print_r(count($warehouse_po_id));exit;
+        if(count($warehouse_po_id)==0){ 
+            $tip = "库位不存在,请重新填写库位入库";
+            $colorinfo = 'danger';
             $purchase_item->update(['status'=>'6']);
             $global = 0;
         }else{
@@ -848,9 +856,10 @@ class PurchaseOrderController extends Controller
             if($datas['storage_qty']>=$purchase_item->purchase_num){
                 $datas['status'] = 4;
             }
+            //
             
             $purchase_item->update($datas);
-            $purchase_item->item->in($warehousePosition->warehouse_position_id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
+            $purchase_item->item->in($warehouse_po_id->id,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id); 
             
         }
         //need包裹分配库存
@@ -883,7 +892,8 @@ class PurchaseOrderController extends Controller
         }
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);
-        return redirect(route('purchaseItemIndex')); 
+
+        return redirect(route('purchaseItemIndex'))->with('alert', $this->alert($colorinfo, $tip)); 
     }
 
     /**
@@ -920,10 +930,10 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * ajax请求  sku
+     * 批量修改采购单状态
      *
      * @param none
-     * @return obj
+     * @return 1
      * 
      */
     public function purchaseExmaine()
@@ -966,7 +976,7 @@ class PurchaseOrderController extends Controller
                     $this->model->find($id)->update(['close_status'=>1]);
 
                     foreach($this->model->find($id)->purchaseItem as $purchaseitemModel){
-                        $purchaseitemModel->update(['status'=>4]);
+                        //$purchaseitemModel->update(['status'=>4]);
                         $temp_arr[] = $purchaseitemModel->item_id;
                     }
 
@@ -1007,7 +1017,8 @@ class PurchaseOrderController extends Controller
 
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+                orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="'.$purchaseItemModel->item_id.'" ')[0]->num;
+
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //虚库存
             $xu_kucun = $itemModel->available_quantity-$data['need_total_num'];

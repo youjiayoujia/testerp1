@@ -18,7 +18,7 @@ class PurchaseOrderModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'purchase_orders';
+    public $table = 'purchase_orders';
     public $rules = [
         'create' => [
             'supplier_id' => 'required',
@@ -114,6 +114,23 @@ class PurchaseOrderModel extends BaseModel
         return UserModel::all();
     }
 
+    //状态颜色
+    public function getStatusColorAttribute()
+    {
+        switch ($this->status) {
+            case '4':
+                $color = 'success';
+                break;
+            case '5':
+                $color = 'active';
+                break;
+            default:
+                $color = 'info';
+                break;
+        }
+        return $color;
+    }
+
     //到货时间
     public function getArrivalDayAttribute()
     {
@@ -138,6 +155,7 @@ class PurchaseOrderModel extends BaseModel
         $purchase_order = PurchaseOrderModel::create($data);
         
         foreach ($data['item'] as $item) {
+            $item['lack_num'] = $item['purchase_num'];
             $item['purchase_order_id'] = $purchase_order->id;
             $item['supplier_id'] = $data['supplier_id'];
             $item['warehouse_id'] = $data['warehouse_id'];

@@ -12,15 +12,15 @@ return [
     'status' => [
         'UNPAID' => '未付款',
         'PAID' => '已付款',
+        'REVIEW' => '需审核',
         'PREPARED' => '准备发货',
+        'PACKED' => '处理中',
+        'NEED' => '缺货',
         'PICKING' => '拣货中',
         'PARTIAL' => '部分发货',
-        'NEED' => '缺货',
-        'PACKED' => '打包完成',
         'SHIPPED' => '发货完成',
         'COMPLETE' => '订单完成',
         'CANCEL' => '取消订单',
-        'REVIEW' => '需审核',
     ],
 
     //售后状态
@@ -146,5 +146,11 @@ return [
         'BLACK' => '黑名单',
         'WEIGHT' => '重量大于2kg',
         'ITEM' => 'SKU异常',
+    ],
+
+    //是否标记
+    'is_mark' => [
+        '1' => '是',
+        '0' => '否',
     ],
 ];

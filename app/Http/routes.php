@@ -511,6 +511,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
     Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);
+    Route::get('logisticsZone/createData', ['uses' => 'Logistics\ZoneController@createData', 'as' => 'logisticsZone.createData']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCollectionInfo', 'Logistics\CollectionInfoController');
@@ -550,6 +551,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Picklist\ErrorListController@exportException', 'as' => 'errorList.exportException']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::post('pickList/createNewPickStore',
+        ['uses' => 'PickListController@createNewPickStore', 'as' => 'pickList.createNewPickStore']);
+    Route::get('pickList/createNewPick',
+        ['uses' => 'PickListController@createNewPick', 'as' => 'pickList.createNewPick']);
     Route::get('pickList/printInfo',
         ['uses' => 'PickListController@printInfo', 'as' => 'pickList.printInfo']);
     Route::get('pickList/changePickBy',
@@ -645,6 +650,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('updateRecover', ['uses' => 'OrderController@updateRecover', 'as' => 'updateRecover']);
     Route::get('withdraw/{id}', ['uses' => 'OrderController@withdraw', 'as' => 'withdraw']);
     Route::post('withdrawUpdate/{id}', ['uses' => 'OrderController@withdrawUpdate', 'as' => 'withdrawUpdate']);
+    Route::any('ajaxWithdraw', ['uses' => 'OrderController@ajaxWithdraw', 'as' => 'ajaxWithdraw']);
     Route::any('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
     Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);
@@ -669,6 +675,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'AllReportController@packageReport', 'as' => 'allReport.report']);
     Route::resource('allReport', 'AllReportController');
     //包裹导出
+    Route::get('exportPackage/getTnoExcelById',
+        ['uses' => 'ExportPackageController@getTnoExcelById', 'as' => 'exportPackage.getTnoExcelById']);
     Route::get('exportPackage/getTnoExcel',
         ['uses' => 'ExportPackageController@getTnoExcel', 'as' => 'exportPackage.getTnoExcel']);
     Route::get('exportPackage/extraField',
@@ -1082,7 +1090,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setshipping', 'as' => 'joomonline.setshipping']);
     Route::get('setstatus',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setstatus', 'as' => 'joomonline.setstatus']);
-    Route::get('productBatchEdit',
+    Route::get('JoomproductBatchEdit',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@productBatchEdit', 'as' => 'joomonline.productBatchEdit']);
     Route::any('batchUpdate',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@batchUpdate', 'as' => 'joomonline.batchUpdate']);

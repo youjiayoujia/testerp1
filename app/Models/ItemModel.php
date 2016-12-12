@@ -15,11 +15,12 @@ use App\Models\UserModel;
 use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
+use App\Models\Product\SupplierModel;
 use Exception;
 
 class ItemModel extends BaseModel
 {
-    protected $table = 'items';
+    public $table = 'items';
 
     protected $stock;
 
@@ -70,7 +71,8 @@ class ItemModel extends BaseModel
         'package_weight',
         'competition_url',
         'products_history_values',
-        'new_status'
+        'new_status',
+        'html_mod'
     ];
 
     public function product()
@@ -296,8 +298,8 @@ class ItemModel extends BaseModel
     public function getOutOfStockAttribute()
     {
         $item_id = $this->id;
-        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
-                packages.id = package_items.package_id')[0]->num;
+        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "'.$item_id.'" and 
+                packages.id = package_items.package_id and packages.deleted_at is null')[0]->num;
 
         return $num;
     }
@@ -306,8 +308,8 @@ class ItemModel extends BaseModel
     public function getWarehouseOutOfStockAttribute()
     {
         $item_id = $this->id;
-        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
-                packages.id = package_items.package_id group by packages.warehouse_id');
+        $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "'.$item_id.'" and 
+                packages.id = package_items.package_id and packages.deleted_at is null group by packages.warehouse_id');
         $data = [];
 
         $warehouses = WarehouseModel::all();
@@ -362,7 +364,7 @@ class ItemModel extends BaseModel
         }
         return [
             'relatedSearchFields' => ['supplier' => ['name'] ],
-            'filterFields' => [],
+            'filterFields' => ['html_mod'],
             'filterSelects' => ['status' => config('item.status'),
                                 'new_status' => config('item.new_status'),
                                 'warehouse_id' =>$this->getArray('App\Models\WarehouseModel', 'name'),
@@ -387,11 +389,12 @@ class ItemModel extends BaseModel
     {
         //销量
         $sellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-            ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-            ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime($period)))
+            ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime($period)))
             ->where('order_items.quantity', '<', 5)
             ->where('order_items.item_id', $this->id)
             ->sum('order_items.quantity');
+        
         return $sellNum;
     }
 
@@ -723,7 +726,7 @@ class ItemModel extends BaseModel
             
             //缺货
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
+                orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="'.$item->id.'" ')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
 
             $data['zaitu_num'] = $zaitu_num;
@@ -739,30 +742,55 @@ class ItemModel extends BaseModel
             $xu_kucun = $item->available_quantity-$data['need_total_num'];
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($sevenDaySellNum==NULL)$sevenDaySellNum = 0;
+            //7天批发订单销量
+            $pifaSeven = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $sevenDaySellNum += $pifaSeven;
 
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($fourteenDaySellNum==NULL)$fourteenDaySellNum = 0;
+            //14天批发订单销量
+            $pifaFourteen = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $fourteenDaySellNum += $pifaFourteen;
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
-                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
             if($thirtyDaySellNum==NULL)$thirtyDaySellNum = 0;
+            //30天批发订单销量
+            $pifaThirty = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'])
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+                ->where('order_items.quantity', '>=', 5)
+                ->where('order_items.item_id', $item['id'])
+                ->count('order_items.id');
+            $thirtyDaySellNum += $pifaThirty;
+
 
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
@@ -800,7 +828,12 @@ class ItemModel extends BaseModel
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
-            $data['need_purchase_num'] = ceil($needPurchaseNum);
+            if($item->status=='cleaning'){
+                $data['need_purchase_num'] = $data['need_total_num'];
+            }else{
+                $data['need_purchase_num'] = ceil($needPurchaseNum);
+            }
+            
             //退款订单数
             $refund_num = $item->orderItem->where('is_refund', '1')->count();
             $all_order_num = 0;
@@ -813,7 +846,7 @@ class ItemModel extends BaseModel
                         $total_profit_num++;
                     }
                     if (in_array($o_item->order->status,
-                        array('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'))) {
+                        array('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE','PICKING','PARTIAL'))) {
                         $all_order_num++;
                     }
                 }
@@ -879,7 +912,7 @@ class ItemModel extends BaseModel
             $data['need_percent'] = $data['fifteenday_total_order_num'] ? round ($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'] ,4):0;
             //缺货总数
             $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id')[0]->num;
+                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.deleted_at is null')[0]->num;
             $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
             //平均缺货天数
             $data['avg_need_day'] = round(DB::select('select avg('.time().'-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "'.$user->user_id.'" and 
@@ -1024,9 +1057,11 @@ class ItemModel extends BaseModel
         //$model = $this->where('id','<','3333')->get();
         foreach ($model as $key => $itemModel) {
             $old_data = [];
-            $erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
+            $old_data['warehouse_id'] = $itemModel->purchaseAdminer?$itemModel->purchaseAdminer->warehouse_id:'3';
+            $itemModel->update($old_data);
+            /*$erp_products_data = DB::select('select product_warehouse_id,products_sku,products_location
                     from erp_products_data where products_sku =  "'.$itemModel->sku.'" ');
-            //print_r(count($erp_products_data));exit;
+            
             if(count($erp_products_data)){
                 if($erp_products_data[0]->product_warehouse_id==1025){
                     $warehouse_id = 2;
@@ -1037,7 +1072,7 @@ class ItemModel extends BaseModel
                 $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
                 //print_r($old_data);exit;
                 $itemModel->update($old_data);
-            }
+            }*/
 
         }
     }
@@ -1086,7 +1121,7 @@ class ItemModel extends BaseModel
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1 and spu!="" order by products_id desc');
+                                        from erp_products_data where productsIsActive = 1 and products_id > 22815 and spu!="" order by products_id asc');
 
         foreach($erp_products_data as $data){
             $itemModel = $this->where('sku',$data->products_sku)->get()->first();
@@ -1122,9 +1157,26 @@ class ItemModel extends BaseModel
                 $old_data['purchase_price'] = $data->products_value;
                 $old_data['weight'] = $data->products_weight;
                 $old_data['package_weight'] = $data->weightWithPacket;
-                $old_data['supplier_id'] = $data->products_suppliers_id;
+                //公共描述
+                $old_data['html_mod'] = $data->products_html_mod;
+                //供应商
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id = "'.$data->products_suppliers_id.'"');
+
+                if(count($supp_name)){
+                    $my_supplier_id = SupplierModel::where('company',trim($supp_name[0]->suppliers_company))->get()->first();
+                    if(count($my_supplier_id)){
+                        $old_data['supplier_id'] = $my_supplier_id->id;
+                    }else{
+                        $old_data['supplier_id'] = 0;
+                    }   
+                }else{
+                    $old_data['supplier_id'] = 0;
+                }
+                
                 $old_data['quality_standard'] = $data->products_check_standard;
-                $old_data['warehouse_id'] = $data->product_warehouse_id==1000?1:2;
+                //$old_data['warehouse_id'] = $data->product_warehouse_id==1000?1:2;
+                $old_data['warehouse_id'] = $itemModel->purchaseAdminer?$itemModel->purchaseAdminer->warehouse_id:'3';
                 $old_data['warehouse_position'] = $data->products_location;
                 $old_data['purchase_url'] = $data->products_more_img;
                 $old_data['competition_url'] = $data->productsPhotoStandard;
@@ -1162,11 +1214,33 @@ class ItemModel extends BaseModel
                 $old_data['sku_history_values'] = $data->products_history_values;
 
                 $crr =[];
+                //多对多供应商转换id
                 $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
-
+                if(substr($data->products_suppliers_ids, 0,1)==','){
+                    $data->products_suppliers_ids = substr($data->products_suppliers_ids, 1);
+                }
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id in('.$data->products_suppliers_ids.')');
+                if(count($supp_name)){
+                    $my_suppliers_id_arr = [];
+                    $supp_name_arr = [];
+                    foreach ($supp_name as $_supp_name) {
+                        $supp_name_arr[] = trim($_supp_name->suppliers_company);
+                    }
+                    $my_suppliers_id_two = SupplierModel::whereIn('company',$supp_name_arr)->get(['id'])->toArray();
+                    if(count($my_suppliers_id_two)){
+                        foreach($my_suppliers_id_two as $_my_suppliers_id_two){
+                            $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
+                        } 
+                        $itemModel->skuPrepareSupplier()->sync($my_suppliers_id_arr);
+                    } 
+                }
+                
+                //echo '<pre>';
+                //print_r($my_suppliers_id_arr);exit;
                 $itemModel->update($old_data);
                 $itemModel->product->update($old_data);
-                $itemModel->skuPrepareSupplier()->sync($crr);
+                //$itemModel->skuPrepareSupplier()->sync($my_suppliers_id_arr);
             }else{
                 //新增
                 //添加库位
@@ -1178,6 +1252,25 @@ class ItemModel extends BaseModel
                         PositionModel::create($position);
                     }
                 }
+                //供应商
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id = "'.$data->products_suppliers_id.'"');
+                if(count($supp_name)){
+                    $my_supplier_id = SupplierModel::where('company',trim($supp_name[0]->suppliers_company))->get()->first();
+                    if(count($my_supplier_id)){
+                        $productData['supplier_id'] = $my_supplier_id->id;
+                        $skuData['supplier_id'] = $my_supplier_id->id;
+                    }else{
+                        $productData['supplier_id'] = 0;
+                        $skuData['supplier_id'] = 0;
+                    }
+                    
+                }else{
+                    $productData['supplier_id'] = 0;
+                    $skuData['supplier_id'] = 0;
+                }
+                
+                
                 //创建spu
                 $spuData['spu'] = $data->spu;
                 if(count(SpuModel::where('spu',$data->spu)->get())){
@@ -1192,12 +1285,13 @@ class ItemModel extends BaseModel
                 $productData['spu_id'] = $spu_id;
                 $productData['name'] = $data->products_name_en;
                 $productData['c_name'] = $data->products_name_cn;
-                $productData['supplier_id'] = $data->products_suppliers_id;
+                
                 $productData['purchase_url'] = $data->products_more_img;
                 $productData['notify'] = $data->products_warring_string;
                 //采购价
                 $productData['purchase_price'] = $data->products_value;
                 $productData['warehouse_id'] = $data->product_warehouse_id==1000?'1':'2';
+                //$productData['warehouse_id'] =$itemModel->purchaseAdminer->warehouse_id;
                 $volume = unserialize($data->products_volume);
                 //长宽高
                 if($volume!=''){
@@ -1261,8 +1355,10 @@ class ItemModel extends BaseModel
                 $skuData['c_name'] = $data->products_name_cn;
                 $skuData['weight'] = $data->products_weight;
                 $skuData['warehouse_id'] = $data->product_warehouse_id==1000?'1':'2';
+                //$skuData['warehouse_id'] = $itemModel->purchaseAdminer->warehouse_id;
                 $skuData['warehouse_position'] = $data->products_location;
-                $skuData['supplier_id'] = $data->products_suppliers_id;
+                
+                
                 $skuData['purchase_url'] = $data->products_more_img;
                 $skuData['purchase_price'] = $data->products_value;
                 $skuData['cost'] = $data->products_value;
@@ -1272,16 +1368,38 @@ class ItemModel extends BaseModel
                 $skuData['package_height'] = $productData['package_height'];
                 $skuData['package_width'] = $productData['package_width'];
                 $skuData['package_length'] =$productData['package_length'];
+                //
+                $skuData['html_mod'] =$data->products_html_mod;
                 //采购历史
                 $skuData['sku_history_values'] = $data->products_history_values;  
                 $skuData['status'] =$data->products_status_2;
                 $skuData['is_available'] = $data->productsIsActive; 
                 //创建sku
                 $itemModel = ItemModel::create($skuData);
-                foreach(explode(',',$data->products_suppliers_ids) as $_supplier_id){
-                    $arr['supplier_id'] = $_supplier_id;
-                    $itemModel->skuPrepareSupplier()->attach($arr);
+
+                //多对多供应商转换id
+                $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+                $supp_name = DB::select('select suppliers_id,suppliers_company
+                                        from erp_suppliers where suppliers_id in('.$data->products_suppliers_ids.')');
+                if(count($supp_name)){
+                    $my_suppliers_id_arr = [];
+                    $supp_name_arr = [];
+                    foreach ($supp_name as $_supp_name) {
+                        $supp_name_arr[] = trim($_supp_name->suppliers_company);
+                    }
+                    $my_suppliers_id_two = SupplierModel::whereIn('company',$supp_name_arr)->get(['id'])->toArray();
+                    if(count($my_suppliers_id_two)){
+                        foreach($my_suppliers_id_two as $_my_suppliers_id_two){
+                            $my_suppliers_id_arr[] = $_my_suppliers_id_two['id'];
+                        }
+
+                        foreach(explode(',',$data->products_suppliers_ids) as $_supplier_id){
+                            $arr['supplier_id'] = $_supplier_id;
+                            $itemModel->skuPrepareSupplier()->attach($my_suppliers_id_arr);
+                        }
+                    }   
                 }
+                
             }    
         }
         $last_id = SpuMultiOptionModel::all()->last()->spu_id;

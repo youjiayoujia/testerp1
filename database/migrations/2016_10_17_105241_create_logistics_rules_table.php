@@ -16,8 +16,8 @@ class CreateLogisticsRulesTable extends Migration
         Schema::create('logistics_rules', function(Blueprint $table) {
             $table->increments('id');
 			$table->integer('type_id');
-			$table->float('weight_from', 15);
-			$table->float('weight_to', 15);
+			$table->float('weight_from', 15, 3);
+			$table->float('weight_to', 15, 3);
 			$table->enum('is_clearance', array('0','1'));
 			$table->timestamps();
 			$table->softDeletes();

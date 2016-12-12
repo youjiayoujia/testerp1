@@ -87,7 +87,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        
+
     $data = Excel::load('d:/456.xls', function($reader){
         return $reader->all();
     });
@@ -653,7 +653,24 @@ class TestController extends Controller
     }
     public function jdtestCrm()
     {
+        foreach (AccountModel::all() as $account) {
+            if ($account->account == 'Coolcoola04@126.com') { //测试diver
 
+                //$reply = ReplyModel::find(13);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $data = $channel->getMessages();
+                dd(json_decode($data,true));
+                exit;
+                $messageList = $channel->getMessages();
+                print_r($messageList);
+                exit;
+            }
+        }
+
+
+
+        dd('exit');
         $groups = SupplierModel::all()->groupBy('company');
 
         foreach ($groups as $group_key => $group){
@@ -855,7 +872,7 @@ class TestController extends Controller
         dd($reply);*/
 
 
-        foreach (AccountModel::all() as $account) {
+/*        foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
                 $replys = ReplyModel::where('status','FAIL')->get();
                 foreach ($replys as $reply){
@@ -866,7 +883,7 @@ class TestController extends Controller
                 dd('已经操作233');
 
             }
-        }
+        }*/
 
     }
     /**

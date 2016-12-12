@@ -174,4 +174,13 @@ class LogisticsModule
     public function createSzPostXBDriver($config){
         return new SzPostXBAdapter($config);
     }
+    /*
+	*DHL驱动
+	*@param $config
+    *@return DhlAdapter
+	*/
+    public function createYuntuDriver($config)
+    {
+        return new DhlAdapter($config);
+    }
 }

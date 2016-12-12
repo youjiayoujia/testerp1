@@ -261,6 +261,7 @@ class SzPostXBAdapter extends BasicAdapter
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;
         $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';
+        print_r($postD);
         /*$postD = array();
         $postD['logistics_interface'] = $str;
         $postD['data_digest']         = $newdata;

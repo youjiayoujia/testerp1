@@ -1273,7 +1273,11 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $zone->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
-                        $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        if ($zone->continued_weight) {
+                            $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        } else {
+                            return false;
+                        }
                     }
                     if ($zone->discount_weather_all) {
                         $fee = ($fee + $zone->other_fixed_price) * $zone->discount;

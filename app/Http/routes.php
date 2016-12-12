@@ -1111,7 +1111,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('message/{id}/notRequireReply',
         ['as' => 'message.notRequireReply', 'uses' => 'MessageController@notRequireReply']);
     //workfole无需回复
-    Route::any('message/{id}/workflowNoReply',
+    Route::any('message/workflowNoReply',
         ['as' => 'message.workflowNoReply', 'uses' => 'MessageController@workflowNoReply']);
     //处理信息
     Route::any('message/process',
@@ -1128,6 +1128,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //转交他人
     Route::any('message/{id}/assignToOther',
         ['as' => 'message.assignToOther', 'uses' => 'MessageController@assignToOther']);
+    //workflow转交他人
+    Route::any('message/workflowAssignToOther',
+        ['as' => 'message.workflowAssignToOther', 'uses' => 'MessageController@workflowAssignToOther']);
     Route::resource('message', 'MessageController');
     //设置关联订单
     Route::any('message/{id}/setRelatedOrders',

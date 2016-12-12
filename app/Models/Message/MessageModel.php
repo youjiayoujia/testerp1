@@ -147,13 +147,12 @@ class MessageModel extends BaseModel{
     public function assignToOther($fromId, $assignId)
     {
 
-        if ($this->assign_id == $fromId) {
-            $assignUser = UserModel::find($assignId);
-            if ($assignUser) {
-                $this->assign_id = $assignId;
-                return $this->save();
-            }
+        $assignUser = UserModel::find($assignId);
+        if ($assignUser) {
+            $this->assign_id = $assignId;
+            return $this->save();
         }
+
         return false;
     }
 
@@ -358,7 +357,7 @@ class MessageModel extends BaseModel{
                                 $product_html .= '<tr>';
                                 $product_html .= '<td><img src ="'.$message_fields_ary['product_img_url'] .'"/></td>';
                                 $product_html .= '<td>'.$message_fields_ary['product_product_name'] .'</td>';
-                                $product_html .= '<td><a href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
+                                $product_html .= '<td><a target="_blank" href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
                                 $product_html .= '</tr>';
                                 $product_html .= '</table>';
                                 $product_html .= '</div>';
@@ -547,16 +546,18 @@ class MessageModel extends BaseModel{
 
     /**
      * 工作流消息
+     * 说明：客服负责的账号，并且没有被别人操作的 未读或者处理中
      * @param $query
      * @param $entry
      * @return mixed
      */
     public function scopeWorkFlowMsg ($query,$entry)
     {
+
         $user_id = request()->user()->id;
 
         return $query->where('status','=','UNREAD')
-            ->orWhere(function($query,$user_id){
+            ->orWhere(function($query) use ($user_id){
                 $query->where('status','=','PROCESS')
                     ->where('assign_id','=',$user_id);
             })

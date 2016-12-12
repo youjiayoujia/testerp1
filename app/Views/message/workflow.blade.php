@@ -23,7 +23,7 @@
                                 {!! csrf_field() !!}
                                 <div class="input-group">
                                     <select class="form-control customer-id" name="assign_id">
-                                        <option>请选择</option>
+                                        <option value="">请选择</option>
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
@@ -44,7 +44,7 @@
                                 <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
                             </button>
                             <button class="btn btn-warning option-group" do="next-time" type="button">
-                                <span class="glyphicon glyphicon-minus-sign"></span> 稍后处理
+                                <span class="glyphicon glyphicon-minus-sign"></span> 跳到下一封
                             </button>
                         </div>
                     </div>
@@ -73,30 +73,57 @@
         var message = {
             entry : 3, //配置初始化消息数量
         }
-        message.workflowStop = function (){
+
+        message.showNextMessage = function () {
+            //删除邮件dom
+            $('.message-template').first().remove();
+            //显示第二封
+            $('.message-template').first().show();
+            //回到顶部
+            $('html,body').animate({scrollTop:0},'slow');
+        }
+
+        message.workflowStop = function () {
             if(confirm('确认终止工作流？')){
                 location.href='{{ route('message.endWorkflow') }}'
             }
         }
-        message.noReply = function (id){
+
+        message.noReply = function (id) {
             if(confirm('确定无需回复？')){
                 $.ajax({
-                    url: '{{route('message.endWorkflow',['id' => '＋id＋'])}}',
-                    data:{},
+                    url: '{{route('message.workflowNoReply')}}',
+                    data:'id='+id,
                     type: 'POST',
                     success:function (data) {
-                        console.log(data);
+                        message.showNextMessage();
                     }
 
                 });
             }
 
         }
-        message.nextTime = function (id){
-            if(confirm('确定稍后回复？')){
 
+        message.nextTime = function (id) {
+            if(confirm('确定跳到下一封？')){
+                message.showNextMessage();
             }
         }
+
+        message.otherCustomer = function (id,assign_id){
+            if(confirm('确定转交给他人？')){
+                $.ajax({
+                    url: '{{route('message.workflowAssignToOther')}}',
+                    data: 'id='+id+'&assign_id='+assign_id,
+                    type:'POST',
+                    success: function (data) {
+                        message.showNextMessage();
+                    }
+                });
+            }
+
+        }
+
 
         $(document).ready(function () {
             $('.customer-id').select2();
@@ -129,6 +156,15 @@
                         break;
                     case 'next-time':
                         message.nextTime(id);
+                        break;
+                    case 'other-customer':
+                       var assign_id = $('.customer-id').val();
+                       if(!assign_id){
+                           alert('请选择用户');
+                       }else{
+                           message.otherCustomer(id,assign_id);
+
+                       }
                         break;
                     default:
                         return false;

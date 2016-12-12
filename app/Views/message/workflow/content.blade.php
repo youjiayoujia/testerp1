@@ -1,6 +1,6 @@
 <div class="panel panel-info">
     <div class="panel-heading">
-        <strong>描述：{{ str_limit($message->subject,150) }}</strong><br/>
+        <strong>#{{$message->id}}描述：{{ str_limit($message->subject,150) }}</strong><br/>
         <small>
             {{ $message->date }} by <i>{{ $message->from_name }}</i> from {{ '<'.$message->from.'>' }}
         </small>

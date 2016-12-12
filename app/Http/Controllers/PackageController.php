@@ -269,7 +269,11 @@ class PackageController extends Controller
             }
             $logistics = LogisticsModel::find($id);
             if($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
-                $model->update(['logistics_id' => $id, 'tracking_no' => '']);
+                if($model->status == 'ASSIGNFAILED') {
+                    $model->update(['logistics_id' => $id, 'tracking_no' => '', 'status' => 'ASSIGNED']);
+                } else {
+                    $model->update(['logistics_id' => $id, 'tracking_no' => '']);
+                }
             }
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);

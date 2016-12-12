@@ -69,6 +69,22 @@
                                             @endforeach
                                         @endforeach
                                     @endif
+                                    @if($type == 'doubleRelatedSelectedFields')
+                                        @foreach($value as $relation_ship1 => $value1)
+                                            @foreach($value1 as $relation_ship2 => $value2)
+                                                @foreach($value2 as $key => $content)
+                                                    <div class="col-lg-2 form-group searchItem">
+                                                        <select name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $key }}]" class='form-control select_select0 col-lg-2'>
+                                                            <option value=''>{{config('setting.transfer_search')[$key]}}</option>
+                                                            @foreach($content as $k => $v)
+                                                                <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.'.$relation_ship1.'.'.$relation_ship2.'.'.$key) ? ($k==request('mixedSearchFields'.'.'.$type.'.'.$relation_ship1.'.'.$relation_ship2.'.'.$key)?'selected':'') : ''}} >{{$v}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                @endforeach
+                                            @endforeach
+                                        @endforeach
+                                    @endif
                                     @if($type == 'relatedSearchFields')
                                         @if(count($value))
                                             @foreach($value as $relation_ship => $name_arr)

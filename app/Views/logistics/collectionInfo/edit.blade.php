@@ -3,6 +3,7 @@
 @section('formAttributes') name='creator'@stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="form-group col-lg-3">
             <label for="bank" class="control-label">收款银行</label>

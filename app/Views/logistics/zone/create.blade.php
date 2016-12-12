@@ -15,12 +15,12 @@
                 </option>
             </select>
         </div>
-        <div class="modal fade" id="countrys" tabindex="-1" role="dialog" 
+        <div class="modal fade" id="countrys" tabindex="-1" role="dialog"
            aria-labelledby="myModalLabel" aria-hidden="true">
            <div class="modal-dialog">
               <div class="modal-content">
                  <div class="modal-header">
-                    <button type="button" class="close" 
+                    <button type="button" class="close"
                        data-dismiss="modal" aria-hidden="true">
                             &times;
                         </button>
@@ -87,7 +87,7 @@
                 <div class="form-group col-lg-3">
                     <label for="other_fixed_price" class="control-label">其它固定费用</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input class="form-control" placeholder="其它固定费用" name="other_fixed_price" value="{{ old('other_fixed_price') }}">
-                </div> 
+                </div>
 
                 <div class="form-group col-lg-3">
                     <label for="discount" class="control-label">折扣</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -170,7 +170,7 @@
                             }
                         }
                     });
-                }        
+                }
             )
         });
 

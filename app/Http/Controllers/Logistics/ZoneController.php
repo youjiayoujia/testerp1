@@ -36,10 +36,9 @@ class ZoneController extends Controller
     {
         $arr = explode('/', $_SERVER['HTTP_REFERER']);
         $logistics_id = $arr[count($arr) - 1];
-        $logistics_name = LogisticsModel::where('id', $logistics_id)->first()->name;
+        $logistics_name = LogisticsModel::find($logistics_id)->first()->name;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logisticses'=>LogisticsModel::all(),
             'partitions' => PartitionModel::with('partitionSorts.country')->get(),
             'model' => $this->model->where('logistics_id', LogisticsModel::first()->id)->first(),
             'logistics_id' => $logistics_id,

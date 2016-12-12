@@ -159,7 +159,7 @@ class SzPostXBAdapter extends BasicAdapter
          
         $dateTime = date('Y-m-d H:i:s');
         $batchNo = date('Ymd');
-        $orderId = $package->order->channel_ordernum;       //订单ID
+        $orderId = $package->order->id;       //内单号
         list($name, $channel) = explode(',',$package->logistics->type);
         $str = '<logisticsEventsRequest>';
         $str .='<logisticsEvent>';

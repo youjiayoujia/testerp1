@@ -53,7 +53,7 @@ class SzPostXBAdapter extends BasicAdapter
         }
         $url1 = trim($url1,'&');
         $postD = http_build_query($postD);
-        echo $postD;
+        echo $url1;
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);  
         echo "<pre>";

@@ -41,7 +41,7 @@
                                     </div>
                                     @foreach($partition->partitionSorts as $partitionSort)
                                         <div class='col-lg-4'>
-                                            <input type='checkbox' class='country' name='countrys[]' value="{{ $partitionSort->country_id }}" {{ $model ? ($model->weatherAvailable($partitionSort->country_id) ? '' : '') : '' }}><font size='3px'>{{ $partitionSort->country->cn_name }}</font>
+                                            <input type='checkbox' class='country' name='countrys[]' value="{{ $partitionSort->country_id }}"><font size='3px'>{{ $partitionSort->country->cn_name }}</font>
                                         </div>
                                     @endforeach
                                 </div>

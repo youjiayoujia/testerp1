@@ -53,7 +53,7 @@ class SzPostXBAdapter extends BasicAdapter
         }
         $url1 = trim($url1,'&');
         $postD = http_build_query($postD);
-        
+        echo $postD;
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);  
         echo "<pre>";
@@ -260,8 +260,7 @@ class SzPostXBAdapter extends BasicAdapter
         $str=preg_replace('/&/',' ',$str);
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;
-        $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';
-        print_r($postD);
+        $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';     
         /*$postD = array();
         $postD['logistics_interface'] = $str;
         $postD['data_digest']         = $newdata;

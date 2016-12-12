@@ -179,5 +179,7 @@ return [
         'html_mod'=>'英文描述',
         'items.item.sku' => 'sku',
         'check_status' => '审核状态',
+        'shipping_firstname' => '发件人姓名',
+        'shipping_country' => '发货国家',
     ],
 ];

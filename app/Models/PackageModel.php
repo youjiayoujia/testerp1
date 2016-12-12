@@ -94,7 +94,7 @@ class PackageModel extends BaseModel
             'relatedSearchFields' => [
                 'order' => ['id', 'channel_ordernum'],
             ],
-            'filterFields' => ['tracking_no'],
+            'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
                 'status' => config('package'),
                 'warehouse_id' => $this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
@@ -110,6 +110,7 @@ class PackageModel extends BaseModel
                 'logistics' => ['catalog' => ['name']],
                 'items' => ['item' => ['sku']]
             ],
+            'doubleRelatedSelectedFields' => [],
         ];
     }
 

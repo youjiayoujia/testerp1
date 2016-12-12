@@ -32,7 +32,7 @@ class SzPostXBAdapter extends BasicAdapter
         $orderStr = '';
         $dateTime = date('Y-m-d H:i:s');
         list($name, $channel) = explode(',',$package->logistics->type);
-        $orderStr .= '{"ecCompanyId":"'.$this->ecCompanyId.'","eventTime":"'.$dateTime.'","logisticsOrderId":"'.$package->order->channel_ordernum.'","LogisticsCompany":"POST","LogisticsBiz":"'.$channel.'","mailType":"'.$this->mailType.'","faceType":"1"},';
+        $orderStr .= '{"ecCompanyId":"'.$this->ecCompanyId.'","eventTime":"'.$dateTime.'","logisticsOrderId":"'.$package->order->id.'","LogisticsCompany":"POST","LogisticsBiz":"'.$channel.'","mailType":"'.$this->mailType.'","faceType":"1"},';
         
         $orderStr = trim($orderStr,',');
         $orderStr = '{"order": ['.$orderStr.']}';

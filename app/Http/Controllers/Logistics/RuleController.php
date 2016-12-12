@@ -242,7 +242,7 @@ class RuleController extends Controller
             'limits' => $model->rule_limits_through,
             'accounts' => $model->rule_accounts_through,
             'transports' => $model->rule_transports_through,
-            'hideUrl' => $hideUrl
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -268,8 +268,9 @@ class RuleController extends Controller
         $model = $this->model->with('rule_transports')->with('rule_limits')->with('rule_countries')->with('rule_accounts')->with('rule_channels')->with('rule_catalogs')->find($id);
         $to = json_encode($model);
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
+
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
-        return redirect($url);
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**

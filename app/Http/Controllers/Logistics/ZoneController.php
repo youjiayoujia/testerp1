@@ -36,10 +36,9 @@ class ZoneController extends Controller
     {
         $arr = explode('/', $_SERVER['HTTP_REFERER']);
         $logistics_id = $arr[count($arr) - 1];
-        $logistics_name = LogisticsModel::where('id', $logistics_id)->first()->name;
+        $logistics_name = LogisticsModel::find($logistics_id)->first()->name;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logisticses'=>LogisticsModel::all(),
             'partitions' => PartitionModel::with('partitionSorts.country')->get(),
             'model' => $this->model->where('logistics_id', LogisticsModel::first()->id)->first(),
             'logistics_id' => $logistics_id,
@@ -190,6 +189,7 @@ class ZoneController extends Controller
      */
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->with('zone_section_prices')->with('logistics_zone_countries')->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -204,6 +204,7 @@ class ZoneController extends Controller
             'sectionPrices' => $model->zone_section_prices,
             'len' =>  $model->zone_section_prices->count(),
             'logistics_name' => $logistics_name,
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -226,7 +227,8 @@ class ZoneController extends Controller
         $this->validate(request(), $this->model->rules('update', $id));
         $model->updateData(request()->all());
 
-        return redirect($this->mainIndex . '/one/' . $logistics_id);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**

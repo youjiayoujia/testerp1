@@ -2,6 +2,7 @@
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('logisticsZone.store') }} @stop
 @section('formBody')
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="changediv form-group col-lg-3">
             <label for="zone" class="control-label">物流分区</label>

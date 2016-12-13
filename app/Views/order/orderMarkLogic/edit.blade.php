@@ -1,15 +1,8 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2016-07-15
- * Time: 16:31
- */
-?>
 @extends('common.form')
 @section('formAction'){{ route('orderMarkLogic.update', ['id' => $model->id]) }}@stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="name" class='control-label'>规则名称</label>

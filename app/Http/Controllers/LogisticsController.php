@@ -306,6 +306,7 @@ class LogisticsController extends Controller
      */
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $logistics = $this->model->find($id);
         $limits = explode(",",$logistics->limit);
         $selectedLimits = LimitsModel::whereIn('id', $limits)->get();
@@ -329,6 +330,7 @@ class LogisticsController extends Controller
             'templates' => TemplateModel::all(),
             'arr' => $arr,
             'channels' => ChannelModel::all(),
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -396,7 +398,8 @@ class LogisticsController extends Controller
         $model = $this->model->with('logisticsChannels')->find($id);
         $to = json_encode($model);
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**

@@ -62,11 +62,12 @@ class CodeController extends Controller
         $this->validate(request(), $this->model->rules('update'));
         $data = request()->all();
         $codes = $this->model->where('code', request('code'))->count();
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         if($codes == 0) {
             $model->update($data);
-            return redirect($this->mainIndex);
+            return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
         }else {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '跟踪号已存在'));
+            return redirect($url)->with('alert', $this->alert('danger', '跟踪号已存在'));
         }
     }
 
@@ -86,11 +87,10 @@ class CodeController extends Controller
 
     /**
      * 编辑
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -99,6 +99,7 @@ class CodeController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'logisticses'=>LogisticsModel::all(),
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'edit', $response);
     }

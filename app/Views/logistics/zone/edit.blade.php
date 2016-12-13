@@ -3,6 +3,7 @@
 @section('formAction') {{ route('logisticsZone.update', ['id' => $model->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="changediv form-group col-lg-3">
             <label for="zone" class="control-label">物流分区</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>

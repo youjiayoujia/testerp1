@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
+ * 标记发货规则
  * User: lilifeng
  * Date: 2016-07-13
  * Time: 15:46
@@ -21,7 +21,6 @@ class OrderMarkLogicController extends Controller
         $this->viewPath = 'order.orderMarkLogic.';
     }
 
-
     public function index()
     {
         request()->flash();
@@ -36,6 +35,7 @@ class OrderMarkLogicController extends Controller
 
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -43,22 +43,19 @@ class OrderMarkLogicController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'order_status'=>config('order.status'),
+            'order_status' => config('order.status'),
             'channels' => ChannelModel::all(),
-
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'edit', $response);
     }
 
-
     public function create()
     {
-
-
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
-            'order_status'=>config('order.status')
+            'order_status' => config('order.status')
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -73,12 +70,10 @@ class OrderMarkLogicController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'channels' => ChannelModel::all(),
-            'order_status'=>config('order.status')
+            'order_status' => config('order.status')
         ];
         return view($this->viewPath . 'show', $response);
     }
-
-    //request()->user()->name
 
     public function store()
     {
@@ -103,18 +98,12 @@ class OrderMarkLogicController extends Controller
         $this->validate(request(), $this->model->rules('update', $id));
         $data = request()->all();
         $data['order_status'] = json_encode($data['order_status']);
-        $data['wish_upload_tracking_num'] = isset($data['wish_upload_tracking_num'])?$data['wish_upload_tracking_num']:0;
+        $data['wish_upload_tracking_num'] = isset($data['wish_upload_tracking_num']) ? $data['wish_upload_tracking_num'] : 0;
         $model->update($data);
         $to = serialize($model);
         $this->eventLog(request()->user()->id, '数据更新', $to, $from);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
-
-
-
-
-
-
 }
-

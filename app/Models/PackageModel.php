@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\ErpEubModel;
 use App\Models\Logistics\ErpRussiaModel;
 use App\Models\Logistics\ErpShunFenModel;
@@ -82,6 +83,7 @@ class PackageModel extends BaseModel
     {
         $arr = [];
         $arr1 = [];
+        $arr2 = [];
         $channels = ChannelModel::all();
         foreach ($channels as $single) {
             $arr[$single->name] = $single->name;
@@ -89,6 +91,10 @@ class PackageModel extends BaseModel
         $accounts = AccountModel::all();
         foreach ($accounts as $account) {
             $arr1[$account->account] = $account->account;
+        }
+        $catalogs = CatalogModel::all();
+        foreach ($catalogs as $catalog) {
+            $arr2[$catalog->name] = $catalog->name;
         }
         return [
             'relatedSearchFields' => [
@@ -107,10 +113,11 @@ class PackageModel extends BaseModel
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
-                'logistics' => ['catalog' => ['name']],
                 'items' => ['item' => ['sku']]
             ],
-            'doubleRelatedSelectedFields' => [],
+            'doubleRelatedSelectedFields' => [
+                'logistics' => ['catalog' => ['name' => $arr2]],
+            ],
         ];
     }
 
@@ -1274,7 +1281,11 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $zone->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
-                        $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        if ($zone->continued_weight) {
+                            $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        } else {
+                            return false;
+                        }
                     }
                     if ($zone->discount_weather_all) {
                         $fee = ($fee + $zone->other_fixed_price) * $zone->discount;

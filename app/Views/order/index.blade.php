@@ -6,7 +6,6 @@
     <th class="sort" data-field="channel_id">渠道</th>
     <th class="sort" data-field="channel_account_id">销售账号</th>
     <th>买家ID</th>
-    <th>物流</th>
     <th>收货人</th>
     <th>国家</th>
     <th class="sort" data-field="amount"><strong class="text-success">总金额</strong></th>
@@ -33,18 +32,17 @@
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
-            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->profit_rate,4)*100 }}%</div>
+                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
                 <div>
-                    毛利润: {{ $order->profit }} USD
+                    毛利润: {{ round($order->amount*$order->calculateProfitProcess(),2) }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
@@ -107,7 +105,7 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">
+                            <div class="col-lg-3">
                                 ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
                                 <br>
                                 @if($order->channel)
@@ -131,18 +129,18 @@
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>
-                                {{ $orderItem->item->warehouse?$orderItem->item->warehouse->name:'' }}
+                                {{ $orderItem->item ? ($orderItem->item->warehouse ? $orderItem->item->warehouse->name : '') : '' }}
                             </div>
                             @if($orderItem->item)
-                                <div class="col-lg-2">
-                                    <strong>{{ $orderItem->item->status_name }}</strong>
+                                <div class="col-lg-1">
+                                    <strong>{{ $orderItem->item ? $orderItem->item->status_name : '' }}</strong>
                                 </div>
-                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-2">{{ $orderItem->item ? $orderItem->item->c_name : '' }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
                                 </div>
-                                <div class="col-lg-2"></div>
+                                <div class="col-lg-1"></div>
                             @endif
                             <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}
@@ -211,7 +209,7 @@
                     @if($order->packages->count() > 0)
                         @foreach($order->packages as $package)
                             <div class="row">
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>包裹ID</strong> :
                                     <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                                 </div>
@@ -226,7 +224,7 @@
                                 <div class="col-lg-2">
                                     <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
                                 </div>
-                                <div class="col-lg-1">
+                                <div class="col-lg-2">
                                     <strong>包裹状态</strong> : {{ $package->status_name }}
                                 </div>
                                 <div class="col-lg-1">
@@ -274,8 +272,11 @@
                         <div class="col-lg-3">
                             收款方式 : {{ $order->payment }}
                         </div>
-                        <div class="col-lg-9">
+                        <div class="col-lg-5">
                             交易号 : {{ $order->transaction_number }}
+                        </div>
+                        <div class="col-lg-4">
+                            物流方式 : {{ $order->shipping }}
                         </div>
                     </div>
                 </div>
@@ -376,6 +377,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('withdrawUpdate', ['id' => $order->id])}}" method="POST">
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -418,7 +421,8 @@
                 <div class="modal-content">
                     <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
-                        <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -608,6 +612,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('remarkUpdate', ['id' => $order->id])}}" method="POST">
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">

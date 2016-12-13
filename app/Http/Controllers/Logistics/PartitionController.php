@@ -94,12 +94,10 @@ class PartitionController extends Controller
 
     /**
      * 编辑
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -113,15 +111,13 @@ class PartitionController extends Controller
             'model' => $model,
             'countries' => CountriesModel::all(),
             'arr' => $arr,
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'edit', $response);
     }
 
     /**
      * 更新
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function update($id)
     {
@@ -147,7 +143,8 @@ class PartitionController extends Controller
         $to = json_encode($model);
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
 
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**

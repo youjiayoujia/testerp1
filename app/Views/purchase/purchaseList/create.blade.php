@@ -96,6 +96,14 @@ $('.datetimepicker_dark').datetimepicker({theme:'dark'})
         });
 	}
 
+    $(document).on('click', '.export', function(){
+        str = '';
+        $.each($('.post_coding'), function(){
+            str += $(this).text() + '.' + $(this).parent().find(".scan_person").text() + '.' + $(this).parent().find(".scan_time").text() + '|';
+        });
+        location.href="{{ route('purchaseList.export', ['str' => ''])}}/" + str;
+    });
+
 	$(document).on('click','.search',function(){
         var trackingNo = $("#trackingNo").val();
         var po_id = $("#po_id").val();

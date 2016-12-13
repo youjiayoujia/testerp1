@@ -20,7 +20,9 @@ class AutoGetMessageAliexpress extends Command
      *
      * @var string
      */
-    protected $description = '获取速卖通消息';
+
+    protected $description = '速卖通消息自动导入';
+
 
     /**
      * Create a new command instance.

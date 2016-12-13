@@ -4,6 +4,7 @@
 @section('formAction') {{ route('order.update', ['id' => $model->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     {{--<div class="panel panel-default">--}}
         {{--<div class="panel-heading">基础信息</div>--}}
         {{--<div class="panel-body">--}}

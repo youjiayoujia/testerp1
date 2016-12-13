@@ -63,7 +63,7 @@
             </td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->weight }}kg</td>
-            <td>{{ isset($item->purchaseAdminer)?$item->purchaseAdminer->warehouse_id:'' }}</td>
+            <td>{{ isset($item->warehouse)?$item->warehouse->name:'' }}</td>
             <td>{{ $item->product?$item->product->declared_en:'' }}
                 <br>{{ $item->product?$item->product->declared_cn:'' }}<br>
                 ${{$item->declared_value}}
@@ -71,7 +71,7 @@
             <td>{{$item->product?$item->product->notify:''}}</td>
             <td>
                 <!-- 400条sql -->
-                @foreach($warehouses as $warehouse)
+                <!-- @foreach($warehouses as $warehouse)
                     {{$warehouse->name}}
                     <br>
                     <div>虚：{{$item->getStockQuantity($warehouse->id)}}</div>
@@ -79,8 +79,8 @@
                     <div>途：{{$item->transit_quantity[$warehouse->id]['normal']}}</div>
                     <div>特：{{$item->transit_quantity[$warehouse->id]['special']}}</div>
                     <div>缺：{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</div>
-                @endforeach
-                所有仓库
+                @endforeach -->
+                
                 <br>
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>
                 <div>14天销量：{{$item->getsales('-14 day')}}</div>
@@ -256,6 +256,33 @@
                     <span class="glyphicon glyphicon-road"></span>
                 </button>
             </td>
+        </tr>
+        <tr>  
+            <th colspan='3'>仓库</th>
+            <th colspan='3'>可用库存</th>
+            <th colspan='2'>实库存</th>
+            <th colspan='2'>在途</th>
+            <th colspan='2'>特采在途</th>
+            <th colspan='2'>缺货</th>    
+        </tr>
+        @foreach($warehouses as $warehouse)
+            <tr>
+                <td colspan='3'>{{$warehouse->name}}</td>
+                <td colspan='3'>{{$item->getStockQuantity($warehouse->id,1)}}</td>
+                <td colspan='2'>{{$item->getStockQuantity($warehouse->id)}}</td>
+                <td colspan='2'>{{$item->transit_quantity[$warehouse->id]['normal']}}</td>
+                <td colspan='2'>{{$item->transit_quantity[$warehouse->id]['special']}}</td>
+                <td colspan='2'>{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</td>
+            </tr>
+        @endforeach
+
+        <tr>
+            <td colspan='3'>总计</td>
+            <td colspan='3'>{{$item->available_quantity}}</td>
+            <td colspan='2'>{{$item->all_quantity}}</td>
+            <td colspan='2'>{{$item->normal_transit_quantity}}</td>
+            <td colspan='2'>{{$item->special_transit_quantity}}</td>
+            <td colspan='2'>{{$item->out_of_stock?$item->out_of_stock:0}}</td>
         </tr>
 
         <!-- 图片模态框（Modal -->

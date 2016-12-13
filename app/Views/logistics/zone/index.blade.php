@@ -55,7 +55,29 @@
                    data-url="{{ route('logisticsZone.destroy', ['id' => $zone->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                <a href="javascript:" class="btn btn-success btn-xs copy" data-id="{{ $zone->id }}">
+                    <span class="glyphicon glyphicon-pencil"></span> 复制
+                </a>
             </td>
         </tr>
     @endforeach
+@stop
+@section('childJs')
+    <script type="text/javascript">
+        //复制
+        $('.copy').click(function () {
+            if (confirm("确认复制?")) {
+                var zone_id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('logisticsZone.createData') }}",
+                    data: {zone_id: zone_id},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+    </script>
 @stop

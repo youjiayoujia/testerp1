@@ -87,7 +87,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        
+
     $data = Excel::load('d:/456.xls', function($reader){
         return $reader->all();
     });

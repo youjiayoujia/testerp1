@@ -534,9 +534,9 @@ Class AliexpressAdapter implements AdapterInterface
         foreach ($msgSourcesArr as $Sources){
             for($i=1; $i>0; $i++){
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
-                $returnJson = $this->getJsonData($method, $para);
+                $returnJson = $this->getJsonData($method,$para);
                 //$message_array = json_decode($returnJson, true);
-                $message_array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $returnJson), true);
+                $message_array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $returnJson), true); //替换特殊字符
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
                         // 或者  跳过

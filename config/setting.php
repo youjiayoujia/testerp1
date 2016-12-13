@@ -117,7 +117,7 @@ return [
         'pay_type' => '付款类型',
         'close_status' => '付款状态',
         'by_id' => '买家ID',
-        'shipping_firstname' => '姓名',
+        'shipping_firstname' => '收货人',
         'items.item_status' => 'SKU状态',
         'outer_type' => '出库/入库',
         'inner_type' => '出入库类型',
@@ -156,6 +156,7 @@ return [
         'packages.logistics.code' => '物流方式简码',
         'packages.tracking_no' => '追踪号',
         'price.profit_rate' => '利润率',
+        'packages.status' => '包裹状态',
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',
@@ -175,7 +176,9 @@ return [
         'order.channel_ordernum' => '渠道订单号',
         'purchaseItem.productItem.sku' => 'sku',
         'new_status' => '是否为新品',
+        'html_mod'=>'英文描述',
         'items.item.sku' => 'sku',
         'check_status' => '审核状态',
+        'shipping_country' => '收货国家',
     ],
 ];

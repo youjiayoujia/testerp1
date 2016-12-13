@@ -1353,7 +1353,6 @@ class PackageModel extends BaseModel
                     }
                 }
             }
-
             if ($rule->channel_section) {
                 $channels = $rule->rule_channels_through;
                 $flag = 0;
@@ -1418,10 +1417,6 @@ class PackageModel extends BaseModel
                 foreach ($limits as $limit) {
                     if (in_array($limit->id, $shipping_limits)) {
                         if ($limit->pivot->type == '1') {
-                            continue 2;
-                        }
-                    } else {
-                        if($limit->pivot->type == '0') {
                             continue 2;
                         }
                     }
@@ -1554,10 +1549,6 @@ class PackageModel extends BaseModel
                     foreach ($limits as $limit) {
                         if (in_array($limit->id, $shipping_limits)) {
                             if ($limit->pivot->type == '1') {
-                                continue 2;
-                            }
-                        } else {
-                            if($limit->pivot->type == '0') {
                                 continue 2;
                             }
                         }

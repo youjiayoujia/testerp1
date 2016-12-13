@@ -129,13 +129,13 @@
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>
-                                {{ $orderItem->item->warehouse?$orderItem->item->warehouse->name:'' }}
+                                {{ $orderItem->item ? ($orderItem->item->warehouse ? $orderItem->item->warehouse->name : '') : '' }}
                             </div>
                             @if($orderItem->item)
                                 <div class="col-lg-1">
-                                    <strong>{{ $orderItem->item->status_name }}</strong>
+                                    <strong>{{ $orderItem->item ? $orderItem->item->status_name : '' }}</strong>
                                 </div>
-                                <div class="col-lg-2">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-2">{{ $orderItem->item ? $orderItem->item->c_name : '' }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>

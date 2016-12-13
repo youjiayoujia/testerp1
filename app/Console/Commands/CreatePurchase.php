@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\ItemModel;
 use App\Models\Purchase\RequireModel;
+use App\Models\Log\CommandModel as CommandLog;
 
 class CreatePurchase extends Command
 {
@@ -39,14 +40,33 @@ class CreatePurchase extends Command
      */
     public function handle()
     {
-        $begin = microtime(true);
+        $start = microtime(true);
+        $commandLog = CommandLog::create([
+            'relation_id' => 0,
+            'signature' => __CLASS__,
+            'description' => '生成采购需求',
+            'lasting' => 0,
+            'total' => 0,
+            'result' => 'init',
+            'remark' => 'init',
+        ]);
         $itemModel = new ItemModel();
-        if(date("H")!=12){
+        if (date("H") != 12) {
             $itemModel->createPurchaseNeedData();
             $end = microtime(true);
-            echo '采购需求数据更新耗时' . round($end - $begin, 3) . '秒,正在自动创建采购单,请稍后......';
+            $lasting = round($end - $start, 3);
+            $result['status'] = 'success';
+            $result['remark'] = 'Success.';
+            $commandLog->update([
+                'data' => '',
+                'lasting' => $lasting,
+                'total' => '',
+                'result' => $result['status'],
+                'remark' => $result['remark'],
+            ]);
+            $this->info('采购需求数据更新耗时' . $lasting . '秒,正在自动创建采购单,请稍后......');
         }
-   
+
         /*$requireModel = new RequireModel();
         $requireModel->createAllPurchaseOrder();
         $endcreate = microtime(true);

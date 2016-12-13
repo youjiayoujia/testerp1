@@ -23,7 +23,7 @@ class BlacklistController extends Controller
     {
         $this->model = $blacklist;
         $this->mainIndex = route('orderBlacklist.index');
-        $this->mainTitle = '黑名单';
+        $this->mainTitle = '风控订单';
         $this->viewPath = 'order.blacklist.';
     }
 

@@ -302,10 +302,11 @@ class OrderController extends Controller
     public function refundUpdate($id)
     {
         $model = $this->model->find($id);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($model);
         if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            return redirect($url)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $data = request()->all();
@@ -315,7 +316,7 @@ class OrderController extends Controller
         $model->refundCreate($data, request()->file('image'));
         $to = json_encode($model);
         $this->eventLog($userName->name, '退款新增,id=' . $id, $to, $from);
-        return redirect($this->mainIndex);
+        return redirect($url)->with('alert', $this->alert('success', '新增成功.'));
     }
 
     /**
@@ -327,7 +328,8 @@ class OrderController extends Controller
         $data = request()->all();
         $data['user_id'] = request()->user()->id;
         $this->model->find($id)->remarks()->create($data);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '新增成功.'));
     }
 
     /**

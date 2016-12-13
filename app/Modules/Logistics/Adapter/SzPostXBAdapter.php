@@ -32,7 +32,7 @@ class SzPostXBAdapter extends BasicAdapter
         $orderStr = '';
         $dateTime = date('Y-m-d H:i:s');
         list($name, $channel) = explode(',',$package->logistics->type);
-        $orderStr .= '{"ecCompanyId":"'.$this->ecCompanyId.'","eventTime":"'.$dateTime.'","logisticsOrderId":"'.$package->order->channel_ordernum.'","LogisticsCompany":"POST","LogisticsBiz":"'.$channel.'","mailType":"'.$this->mailType.'","faceType":"1"},';
+        $orderStr .= '{"ecCompanyId":"'.$this->ecCompanyId.'","eventTime":"'.$dateTime.'","logisticsOrderId":"'.$package->order->id.'","LogisticsCompany":"POST","LogisticsBiz":"'.$channel.'","mailType":"'.$this->mailType.'","faceType":"1"},';
         
         $orderStr = trim($orderStr,',');
         $orderStr = '{"order": ['.$orderStr.']}';
@@ -53,7 +53,7 @@ class SzPostXBAdapter extends BasicAdapter
         }
         $url1 = trim($url1,'&');
         $postD = http_build_query($postD);
-        
+        echo $url1;
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);  
         echo "<pre>";
@@ -159,7 +159,7 @@ class SzPostXBAdapter extends BasicAdapter
          
         $dateTime = date('Y-m-d H:i:s');
         $batchNo = date('Ymd');
-        $orderId = $package->order->channel_ordernum;       //订单ID
+        $orderId = $package->order->id;       //内单号
         list($name, $channel) = explode(',',$package->logistics->type);
         $str = '<logisticsEventsRequest>';
         $str .='<logisticsEvent>';
@@ -255,12 +255,12 @@ class SzPostXBAdapter extends BasicAdapter
 </eventBody>
 </logisticsEvent>
 </logisticsEventsRequest>"; */
-        $obj = simplexml_load_string($str);
-        print_r($obj);
-        $data=preg_replace('/&/',' ',$str);
+//         $obj = simplexml_load_string($str);
+//         print_r($obj);
+        $str=preg_replace('/&/',' ',$str);
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;
-        $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';
+        $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';     
         /*$postD = array();
         $postD['logistics_interface'] = $str;
         $postD['data_digest']         = $newdata;

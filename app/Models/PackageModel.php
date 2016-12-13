@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\ErpEubModel;
 use App\Models\Logistics\ErpRussiaModel;
 use App\Models\Logistics\ErpShunFenModel;
@@ -82,6 +83,7 @@ class PackageModel extends BaseModel
     {
         $arr = [];
         $arr1 = [];
+        $arr2 = [];
         $channels = ChannelModel::all();
         foreach ($channels as $single) {
             $arr[$single->name] = $single->name;
@@ -90,11 +92,15 @@ class PackageModel extends BaseModel
         foreach ($accounts as $account) {
             $arr1[$account->account] = $account->account;
         }
+        $catalogs = CatalogModel::all();
+        foreach ($catalogs as $catalog) {
+            $arr2[$catalog->name] = $catalog->name;
+        }
         return [
             'relatedSearchFields' => [
                 'order' => ['id', 'channel_ordernum'],
             ],
-            'filterFields' => ['tracking_no'],
+            'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
                 'status' => config('package'),
                 'warehouse_id' => $this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
@@ -107,8 +113,10 @@ class PackageModel extends BaseModel
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
-                'logistics' => ['catalog' => ['name']],
                 'items' => ['item' => ['sku']]
+            ],
+            'doubleRelatedSelectedFields' => [
+                'logistics' => ['catalog' => ['name' => $arr2]],
             ],
         ];
     }
@@ -700,7 +708,7 @@ class PackageModel extends BaseModel
                                 }
                             }
                             if (count($arr) > 1 || count($arr) == 0) {
-                                $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                                $warehouse_id = $this->items->first()->item->warehouse_id ? $this->items->first()->item->warehouse_id : '3';
                             } else {
                                 foreach ($arr as $key => $value) {
                                     $warehouse_id = $key;
@@ -738,7 +746,7 @@ class PackageModel extends BaseModel
                             }
                         }
                         if (count($arr) > 1 || count($arr) == 0) {
-                            $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                            $warehouse_id = $this->items->first()->item->warehouse_id ? $this->items->first()->item->warehouse_id : '3';
                         } else {
                             foreach ($arr as $key => $value) {
                                 $warehouse_id = $key;
@@ -1273,7 +1281,11 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $zone->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
-                        $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        if ($zone->continued_weight) {
+                            $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        } else {
+                            return false;
+                        }
                     }
                     if ($zone->discount_weather_all) {
                         $fee = ($fee + $zone->other_fixed_price) * $zone->discount;

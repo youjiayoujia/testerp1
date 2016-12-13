@@ -482,7 +482,9 @@ class OrderModel extends BaseModel
     {
         $total = 0;
         foreach ($this->items as $item) {
-            $total += $item->item->purchase_price * $item->quantity;
+            if ($item->item) {
+                $total += $item->item->purchase_price * $item->quantity;
+            }
         }
         return $total;
     }

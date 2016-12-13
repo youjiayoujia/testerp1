@@ -226,6 +226,7 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         $arr = [];
         foreach ($model->items as $orderItem) {
@@ -249,6 +250,7 @@ class OrderController extends Controller
             'arr' => $arr,
             'rows' => $model->items()->count(),
             'countries' => CountriesModel::all(),
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -385,7 +387,8 @@ class OrderController extends Controller
         $to = json_encode($this->model->with('items')->find($id));
         $this->eventLog($userName->name, '数据更新,id=' . $id, $to, $from);
 
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**

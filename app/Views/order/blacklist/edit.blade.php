@@ -3,6 +3,7 @@
 @section('formAttributes') name='creator'@stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="form-group col-lg-2">
             <label for="channel_id">平台</label>

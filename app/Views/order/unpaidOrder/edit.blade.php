@@ -3,6 +3,7 @@
 @section('formAttributes') name='creator'@stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="form-group col-lg-3">
             <label for="ordernum" class="control-label">买家ID/Email/订单号</label>

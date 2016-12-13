@@ -337,9 +337,6 @@ class OrderModel extends BaseModel
     //多重查询
     public function getMixedSearchAttribute()
     {
-        foreach (ChannelModel::all() as $channel) {
-            $arr[$channel->name] = $channel->name;
-        }
         return [
             'filterFields' => [
                 'channel_ordernum',
@@ -365,13 +362,14 @@ class OrderModel extends BaseModel
                 'packages' => ['tracking_no'],
             ],
             'selectRelatedSearchs' => [
-                'channel' => ['name' => $arr],
+                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
                 'items' => ['item_status' => config('item.status')],
                 'remarks' => ['type' => config('order.review_type')],
                 'packages' => ['is_mark' => config('order.is_mark'), 'status' => config('package')],
             ],
-            'doubleRelatedSearchFields' => [
-                'packages' => ['logistics' => ['code']],
+            'doubleRelatedSearchFields' => [],
+            'doubleRelatedSelectedFields' => [
+                'packages' => ['logistics' => ['code' => LogisticsModel::all()->pluck('code', 'code')]],
             ],
         ];
     }

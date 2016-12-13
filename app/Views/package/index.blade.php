@@ -52,7 +52,7 @@
             <td>{{ $package->created_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
-                    <span class="glyphicon glyphicon-eye-open"></span>
+                    <span class="glyphicon glyphicon-eye-open show_detail"></span>
                 </button>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
@@ -62,7 +62,7 @@
             </td>
         </tr>
         @foreach($package->items as $key => $packageItem)
-            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
+            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb fb1">
                 @if($key == 0)
                     <td colspan='2' rowspan="{{$package->items->count()}}">
                         <address>
@@ -256,13 +256,20 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
-        var flag_type = false;
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {
-                $('.fb').hide();
+                $.each($('.fb1'), function(){
+                    if(!$(this).is(":hidden")) {
+                        $(this).prev().find('.show_detail').click();
+                    }
+                })
             } else {
-                $('.fb').show();
+                $.each($('.fb1'), function(){
+                    if($(this).is(":hidden")) {
+                        $(this).prev().find('.show_detail').click();
+                    }
+                })
             }
         });
 
@@ -308,11 +315,12 @@
                 }
             )
 
-            alert(flag_type);
-
             $('.pagination').click(function(){
-                var flag_type = $('.fb').is(':hidden');
-                alert(flag_type);
+                flag = $('.fb').is(':hidden') ? 'easy' : 'full';
+                $('.fb1').load(function(flag){
+                    alert(flag);
+                    $('.easy[data-type='+flag+']').click();
+                })
             })
 
 

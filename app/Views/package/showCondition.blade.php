@@ -13,7 +13,7 @@
     </div>
 </div>
 </div>
-<div class='buf'>
+<div class='buf form-group'>
 
 </div>
 @stop

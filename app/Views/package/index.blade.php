@@ -317,10 +317,11 @@
 
             $('.pagination').click(function(){
                 flag = $('.fb').is(':hidden') ? 'easy' : 'full';
-                $('.fb1').load(function(flag){
-                    alert(flag);
+                alert(flag);
+                window.onload()=function(){
+                    alert('123');
                     $('.easy[data-type='+flag+']').click();
-                })
+                }
             })
 
 

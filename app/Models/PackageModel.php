@@ -103,20 +103,20 @@ class PackageModel extends BaseModel
             'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
                 'status' => config('package'),
-                'warehouse_id' => $this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
-                'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')
+                'warehouse_id' => WarehouseModel::where('is_available', '1')->get()->pluck('name', 'id'),
+                'logistics_id' => LogisticsModel::all()->pluck('code', 'id')
             ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
-                'channel' => ['name' => $arr],
-                'channelAccount' => ['account' => $arr1]
+                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
+                'channelAccount' => ['account' => AccountModel::all()->pluck('account', 'account')]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
                 'items' => ['item' => ['sku']]
             ],
             'doubleRelatedSelectedFields' => [
-                'logistics' => ['catalog' => ['name' => $arr2]],
+                'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
             ],
         ];
     }
@@ -421,16 +421,6 @@ class PackageModel extends BaseModel
     public function requires()
     {
         return $this->hasMany('App\Models\RequireModel', 'package_id', 'id');
-    }
-
-    public function getArray($model, $name)
-    {
-        $arr = [];
-        $inner_models = $model::all();
-        foreach ($inner_models as $key => $single) {
-            $arr[$single->id] = $single->$name;
-        }
-        return $arr;
     }
 
     public function assigner()

@@ -14,7 +14,6 @@
     <th>运费</th>
     <th>物流方式</th>
     <th>物流单号</th>
-    <th>物流单号</th>
     <th>发货类型</th>
     <th class="sort" data-field="updated_at">创建时间</th>
     <th>操作</th>
@@ -318,10 +317,10 @@
 
             $('.pagination').click(function(){
                 flag = $('.fb').is(':hidden') ? 'easy' : 'full';
-                $('.fb1').load(function(flag){
-                    alert(flag);
+                window.onload()=function(){
+                    alert('123');
                     $('.easy[data-type='+flag+']').click();
-                })
+                }
             })
 
 

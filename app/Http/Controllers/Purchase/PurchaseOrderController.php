@@ -191,7 +191,7 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已取消.'));
         }
         $userName = UserModel::find(request()->user()->id);
-        $from = base64_encode(serialize($model));
+        $from = json_encode($model);
         $data=request()->all();
         if(isset($data['arr'])){
             if(isset($data['post'])){
@@ -264,7 +264,7 @@ class PurchaseOrderController extends Controller
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);  
 
-        $to = base64_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '采购单ID'.$id.'编辑成功.'));

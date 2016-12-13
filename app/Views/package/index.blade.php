@@ -222,18 +222,18 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class='btn btn-info returnTrackno' data-status='1'>回传运单号</a></li>
-            <li><a href="javascript:" class='btn btn-info returnFee' data-type='1'>回传一次运费</a></li>
-            <li><a href="javascript:" class='btn btn-info returnFee' data-type='2'>回传二次运费</a></li>
-            <li><a href="javascript:" class='btn btn-info multiEditTracking' data-type='3'>批量修改追踪号</a></li>
+            <li><a href="javascript:" class='returnTrackno' data-status='1'>回传运单号</a></li>
+            <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
+            <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
+            <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
             <li><a data-toggle="modal"
-                   data-target="#change_logistics" class='btn btn-info'>
+                   data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
-            <li><a href="javascript:" class='btn btn-info changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
-            <li><a href="javascript:" class='btn btn-info remove_logistics'>批量清除追踪号</a></li>
-            <li><a href="javascript:" class='btn btn-info remove_packages'>批量取消包裹</a></li>
-            <li><a class="btn btn-info multiPlace" href="javascript:">
+            <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
+            <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
+            <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
+            <li><a class="multiPlace" href="javascript:">
                     批量下单
                 </a></li>
         </ul>
@@ -256,6 +256,7 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
+        var flag_type = false;
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {
@@ -306,6 +307,14 @@
                     })
                 }
             )
+
+            alert(flag_type);
+
+            $('.pagination').click(function(){
+                var flag_type = $('.fb').is(':hidden');
+                alert(flag_type);
+            })
+
 
             $('.returnTrackno').click(function () {
                 location.href = "{{ route('package.returnTrackno')}}";

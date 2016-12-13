@@ -73,6 +73,7 @@ class CoeAdapter extends BasicAdapter
         }
         $order = $package->order;
         $total_value = round($order->amount, 2);
+
         $content = "
         <logisticsEventsRequest>
         <logisticsEvent>
@@ -128,10 +129,15 @@ class CoeAdapter extends BasicAdapter
             </eventBody>
         </logisticsEvent>
         </logisticsEventsRequest>";print_r($content);
+        $accountDate = array(
+            'UserId'=>'SZE150401',
+            'UserPassword'=> 'SZE150401Mima20150902',
+            'Key'=>'7891524B3896284F496775CCEA10F32C'
+        );
         $content = urlencode($content);
         $headers = array("application/x-www-form-urlencoded; charset=gb2312");
         $postData = array();
-        $url = $this->getLogisticUrl($content);
+        $url="http://112.74.141.18:9000/coeapi/coeSync/saveCoeOrder.do?Content=".$content."&UserId=".$accountDate['UserId']."&UserPassword=".$accountDate['UserPassword']."&Key=".$accountDate['Key'];
         $result = $this->curlPost($url, $postData, $headers);
         return $result;
     }

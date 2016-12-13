@@ -42,12 +42,14 @@ class OrderController extends Controller
      */
     public function create()
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -136,7 +138,8 @@ class OrderController extends Controller
         $model = $this->model->with('items')->find($model->id);
         $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
 
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '新增成功.'));
     }
 
     /**

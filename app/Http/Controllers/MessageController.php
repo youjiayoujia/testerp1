@@ -308,29 +308,25 @@ class MessageController extends Controller
         }
     }
 
-    public function WishSupportReplay($id){
+    public function WishSupportReplay(){
+        return 1;
+        $id = request()->input('id');
         $message = $this->model->find($id);
-        if (!$message) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
-        }
-        $account = Channel_account::find($message->account_id);
+        if($message){
 
-        $adapter = new WishAdapter($account->apiConfig);
+            $account = Channel_account::find($message->account_id);
+            $adapter = new WishAdapter($account->apiConfig);
 
-        if($adapter->ReplayWishSupport($message->message_id)){
-            $message->assign_id=request()->user()->id;
-            $message->required=0;
-            $message->status="COMPLETE";
-            $message->save();
-        }else{
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '处理失败'));
+            if($adapter->ReplayWishSupport($message->message_id)){
+                $message->assign_id=request()->user()->id;
+                $message->required=0;
+                $message->status="COMPLETE";
+                $message->save();
+
+                return config('status.ajax')['success'];;
+            }
         }
-        if ($this->workflow == 'keeping') {
-            return redirect(route('message.process'))
-                ->with('alert', $this->alert('success', '上条信息已成功回复.'));
-        }else{
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功'));
-        }
+        return config('status.ajax')['fail'];;
 
     }
 

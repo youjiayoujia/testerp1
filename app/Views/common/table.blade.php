@@ -155,7 +155,7 @@
                 <div class="col-lg-12">
                     <table class="table table-bordered table-striped table-hover sortable">
                         <thead>
-                        <tr>
+                 z       <tr>
                             @section('tableHeader')@show{{-- 列表字段 --}}
                         </tr>
                         </thead>

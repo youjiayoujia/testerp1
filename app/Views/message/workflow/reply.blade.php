@@ -160,7 +160,10 @@
                                 <button id="save" type="button" class="btn btn-primary from-submit">回复</button>
                             @endif
 
-
+                            @if($driver != 'wish')
+                                <a class="btn btn-warning " onclick="wishSupportReplay({{$message->id}})" >Apeal To Wish Support</a>
+                                    {{--href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}"--}}
+                            @endif
                             @if($driver == 'aliexpress')
                                 <div style="float: right;">
                                 <?php

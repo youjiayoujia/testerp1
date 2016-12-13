@@ -524,7 +524,7 @@ Class AliexpressAdapter implements AdapterInterface
 
     public function getMessages()
     {
-        $msgSourcesArr =array('message_center','order_msg');
+        $msgSourcesArr =array('order_msg','message_center');
         $method = 'api.queryMsgRelationList';
         $filter = 'readStat'; // 标签：未读
         //$filter = 'dealStat';  // 标签：未处理
@@ -534,8 +534,9 @@ Class AliexpressAdapter implements AdapterInterface
         foreach ($msgSourcesArr as $Sources){
             for($i=1; $i>0; $i++){
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
-                $returnJson = $this->getJsonData($method,$para);
-                $message_array = json_decode($returnJson, true);
+                $returnJson = $this->getJsonData($method, $para);
+                //$message_array = json_decode($returnJson, true);
+                $message_array = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $returnJson), true);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
                         // 或者  跳过

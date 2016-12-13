@@ -9,6 +9,8 @@
 
     <script src="{{ asset('plugins/pace/pace.min.js') }}"></script>
     <link href="{{ asset('plugins/pace/dataurl.css') }}" rel="stylesheet" />
+    <div class="tips-content row">
+    </div>
     <message class="row message-group">
     </message>
 
@@ -37,9 +39,6 @@
                             </form>
                         </div>
                         <div class="col-lg-6 text-right">
-                            {{--                    @if($driver == 'wish')
-                                                    <a class="btn btn-primary " href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}">Apeal To Wish Support</a>
-                                                @endif--}}
                             <button class="btn btn-warning option-group" do="no-reply" type="button">
                                 <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
                             </button>
@@ -70,6 +69,7 @@
 @stop
 @section('pageJs')
     <script type="text/javascript">
+
         var message = {
             entry : 3, //配置初始化消息数量
         }
@@ -104,9 +104,11 @@
 
         }
 
-        message.nextTime = function (id) {
+        message.nextTime = function () {
             if(confirm('确定跳到下一封？')){
                 message.showNextMessage();
+                message.loadingNext();
+                message.showTip('已经跳转到下一封');
             }
         }
 
@@ -122,6 +124,27 @@
                 });
             }
 
+        }
+
+        message.showTip =  function (tip){
+            $('.show-tip').remove();
+            var html = '<div class="row alert alert-success show-tip" role="alert" width="1000px"> <a  class="alert-link">'+tip+'</a> </div>';
+            $('.tips-content').show();
+            $('.tips-content').append(html).hide(2000);
+        }
+
+        message.loadingNext = function (){
+            //继续加载需要回复的邮件池
+            $.ajax({
+                url: "{{route('ajaxGetMsgInfo')}}",
+                data: 'total=1',
+                type: 'POST',
+                success: function (data) {
+                    console.log('新邮件肥来了');
+                    $('.message-group').append(data);
+                    // $('.message-template').first().show();
+                }
+            });
         }
 
 
@@ -321,6 +344,20 @@
                     }
                 }, 'json'
             );
+        }
+        /**
+         * wish support
+         * @param id
+         */
+        function wishSupportReplay(id){
+            $ajax({
+                url: "{{route('message.WishSupportReplay')}}",
+                data: 'id=' + id,
+                type: 'POST',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
         }
 
 

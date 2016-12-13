@@ -1104,7 +1104,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('message/{id}/dontRequireReply',
         ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
     //wish support
-    Route::any('message/{id}/WishSupportReplay',
+    Route::any('message/WishSupportReplay',
         ['as' => 'message.WishSupportReplay', 'uses' => 'MessageController@WishSupportReplay']);
 
     //无需回复

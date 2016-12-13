@@ -377,6 +377,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('withdrawUpdate', ['id' => $order->id])}}" method="POST">
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -419,8 +421,8 @@
                 <div class="modal-content">
                     <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
-                        <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
                         <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -611,6 +613,7 @@
                 <div class="modal-content">
                     <form action="{{ route('remarkUpdate', ['id' => $order->id])}}" method="POST">
                         <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">

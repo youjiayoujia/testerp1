@@ -87,7 +87,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
-        $schedule->command('purchase:create')->cron('20 4,12 * * *');
+//        $schedule->command('purchase:create')->cron('20 4,12 * * *');
         //黑名单定时任务
         $schedule->command('blacklists:get')->dailyAt('2:00');
         $schedule->command('blacklists:update')->dailyAt('3:00');
@@ -106,7 +106,7 @@ class Kernel extends ConsoleKernel
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
                     break;
                 case 'wish':
-                    foreach ($channel->accounts->where('is_available','1') as $account) {
+                    foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
@@ -149,7 +149,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('SyncImportApi:all')->everyFiveMinutes();
 
         //财务
-        $schedule->command('aliexpressRefundStatus:change')->cron('21 * * *');//速卖通退款小于15美金
+        $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
 
     }
 }

@@ -14,7 +14,10 @@ class CoeAdapter extends BasicAdapter
 
         $this->config = $package->logistics->api_config;
 
-        $result = [];
+        $result = [
+            'code' => 'error',
+            'result' => 'Sorry, error'
+        ];
 		if($package->tracking_no){
 			$result = [
                     'code' => 'error',
@@ -22,7 +25,7 @@ class CoeAdapter extends BasicAdapter
                 ];
 			return $result;
 		}
-        $response = $this->doUpload($package);
+        $response = $this->doUpload($package);print_r($response);
         if ($response['status'] != 0) {
             preg_match('/<jobNo.*>(.*)<\/jobNo>/isU', $response['msg'], $shippingcode);
             preg_match('/<success.*>(.*)<\/success>/isU', $response['msg'], $restatus);
@@ -124,7 +127,7 @@ class CoeAdapter extends BasicAdapter
                 </orders>
             </eventBody>
         </logisticsEvent>
-        </logisticsEventsRequest>";
+        </logisticsEventsRequest>";print_r($content);
         $content = urlencode($content);
         $headers = array("application/x-www-form-urlencoded; charset=gb2312");
         $postData = array();

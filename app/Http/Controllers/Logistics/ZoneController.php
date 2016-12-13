@@ -34,6 +34,7 @@ class ZoneController extends Controller
      */
     public function create()
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $arr = explode('/', $_SERVER['HTTP_REFERER']);
         $logistics_id = $arr[count($arr) - 1];
         $logistics_name = LogisticsModel::where('id', $logistics_id)->first()->name;
@@ -43,6 +44,7 @@ class ZoneController extends Controller
             'model' => $this->model->where('logistics_id', LogisticsModel::first()->id)->first(),
             'logistics_id' => $logistics_id,
             'logistics_name' => $logistics_name,
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -104,8 +106,9 @@ class ZoneController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $logistics_id = request('logistics_id');
         $this->model->createData(request()->all());
-
-        return redirect($this->mainIndex . '/one/' . $logistics_id);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '新增成功.'));
+//        return redirect($this->mainIndex . '/one/' . $logistics_id);
     }
 
 

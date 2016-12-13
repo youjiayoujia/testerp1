@@ -177,6 +177,7 @@ class OrderController extends Controller
             $order = $this->model->where('id', 0);
             $subtotal = 0;
         }
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
@@ -185,6 +186,7 @@ class OrderController extends Controller
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,
             'rmbRate' => $rmbRate,
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -267,6 +269,7 @@ class OrderController extends Controller
      */
     public function refund($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         $arr = [];
         foreach ($model->items as $orderItem) {
@@ -289,6 +292,7 @@ class OrderController extends Controller
             'aliases' => $model->channel->accounts,
             'arr' => $arr,
             'rows' => $model->items()->count(),
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'refund', $response);
@@ -316,7 +320,7 @@ class OrderController extends Controller
         $model->refundCreate($data, request()->file('image'));
         $to = json_encode($model);
         $this->eventLog($userName->name, '退款新增,id=' . $id, $to, $from);
-        return redirect($url)->with('alert', $this->alert('success', '新增成功.'));
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**
@@ -329,7 +333,7 @@ class OrderController extends Controller
         $data['user_id'] = request()->user()->id;
         $this->model->find($id)->remarks()->create($data);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
-        return redirect($url)->with('alert', $this->alert('success', '新增成功.'));
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**
@@ -623,8 +627,8 @@ class OrderController extends Controller
         }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
-
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
     //ajax撤单
     public function ajaxWithdraw()
@@ -646,11 +650,12 @@ class OrderController extends Controller
 
     public function withdraw($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
-
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'withdraw', $response);

@@ -14,7 +14,6 @@
     <th>运费</th>
     <th>物流方式</th>
     <th>物流单号</th>
-    <th>物流单号</th>
     <th>发货类型</th>
     <th class="sort" data-field="updated_at">创建时间</th>
     <th>操作</th>
@@ -53,7 +52,7 @@
             <td>{{ $package->created_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
-                    <span class="glyphicon glyphicon-eye-open"></span>
+                    <span class="glyphicon glyphicon-eye-open show_detail"></span>
                 </button>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
@@ -63,7 +62,7 @@
             </td>
         </tr>
         @foreach($package->items as $key => $packageItem)
-            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
+            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb fb1">
                 @if($key == 0)
                     <td colspan='2' rowspan="{{$package->items->count()}}">
                         <address>
@@ -223,18 +222,18 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class='btn btn-info returnTrackno' data-status='1'>回传运单号</a></li>
-            <li><a href="javascript:" class='btn btn-info returnFee' data-type='1'>回传一次运费</a></li>
-            <li><a href="javascript:" class='btn btn-info returnFee' data-type='2'>回传二次运费</a></li>
-            <li><a href="javascript:" class='btn btn-info multiEditTracking' data-type='3'>批量修改追踪号</a></li>
+            <li><a href="javascript:" class='returnTrackno' data-status='1'>回传运单号</a></li>
+            <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
+            <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
+            <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
             <li><a data-toggle="modal"
-                   data-target="#change_logistics" class='btn btn-info'>
+                   data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
-            <li><a href="javascript:" class='btn btn-info changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
-            <li><a href="javascript:" class='btn btn-info remove_logistics'>批量清除追踪号</a></li>
-            <li><a href="javascript:" class='btn btn-info remove_packages'>批量取消包裹</a></li>
-            <li><a class="btn btn-info multiPlace" href="javascript:">
+            <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
+            <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
+            <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
+            <li><a class="multiPlace" href="javascript:">
                     批量下单
                 </a></li>
         </ul>
@@ -260,9 +259,17 @@
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {
-                $('.fb').hide();
+                $.each($('.fb1'), function(){
+                    if(!$(this).is(":hidden")) {
+                        $(this).prev().find('.show_detail').click();
+                    }
+                })
             } else {
-                $('.fb').show();
+                $.each($('.fb1'), function(){
+                    if($(this).is(":hidden")) {
+                        $(this).prev().find('.show_detail').click();
+                    }
+                })
             }
         });
 
@@ -307,6 +314,15 @@
                     })
                 }
             )
+
+            $('.pagination').click(function(){
+                flag = $('.fb').is(':hidden') ? 'easy' : 'full';
+                window.onload()=function(){
+                    alert('123');
+                    $('.easy[data-type='+flag+']').click();
+                }
+            })
+
 
             $('.returnTrackno').click(function () {
                 location.href = "{{ route('package.returnTrackno')}}";

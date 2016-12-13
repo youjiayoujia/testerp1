@@ -1,6 +1,9 @@
 <div class="row message-template" style="display: none;">
     <div class="col-lg-8">
         @include('message.workflow.content')
+        @if($driver == 'wish')
+            @include('message.workflow.wish_order_detail')
+        @endif
         @include('message.workflow.reply')
 
     </div>

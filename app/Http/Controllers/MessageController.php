@@ -75,16 +75,8 @@ class MessageController extends Controller
 
             return view($this->viewPath . 'workflow')->with($response);
 
-
-
-            //dd($messages);
-
-
-
-            $message = $this->model->getOne(request()->user()->id);
-        } else {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'error.'));
         }
+
         if (!$message) {
               return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
@@ -94,26 +86,18 @@ class MessageController extends Controller
         }else{
             $count='';
         }
-        
-        if ($message->assign(request()->user()->id)) {
-            //$userarr=config('user.staff');
 
+        if ($message->assign(request()->user()->id)) {
 
             if($message->related == 0){
                 $message->findOrderWithMessage();  //消息中的订单号 与 erp订单匹配
             }
-
-            $emailarr=config('user.email');
-
             $IsOption = $this->IsAliOptionOrderMsg($message);
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
                 'message' => $message,
                 'parents' => TypeModel::where('parent_id', 0)->get(),
                 'users' => UserModel::all(),
-                'emailarr' => $emailarr,
-               // 'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
-                //'ordernum' =>$ordernum,
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
@@ -308,8 +292,18 @@ class MessageController extends Controller
         }
     }
 
+    public function workflowDontRequireReply(){
+        $id = request()->input('id');
+        $message = $this->model->find($id);
+        if($message){
+            if ($message->dontRequireReply(request()->user()->id)) {
+                return config('status.ajax')['success'];
+            }
+        }
+        return config('status.ajax')['fail'];
+    }
+
     public function WishSupportReplay(){
-        return 1;
         $id = request()->input('id');
         $message = $this->model->find($id);
         if($message){
@@ -323,10 +317,10 @@ class MessageController extends Controller
                 $message->status="COMPLETE";
                 $message->save();
 
-                return config('status.ajax')['success'];;
+                return config('status.ajax')['success'];
             }
         }
-        return config('status.ajax')['fail'];;
+        return config('status.ajax')['fail'];
 
     }
 
@@ -420,10 +414,10 @@ class MessageController extends Controller
                 $job = $job->onQueue('SendMessages');
                 $this->dispatch($job);
 
-                return 'send';
+                return config('status.ajax')['success'];
             }
         }
-        return 'fail';
+        return config('status.ajax')['fail'];
 
     }
 
@@ -593,8 +587,13 @@ class MessageController extends Controller
         if(!$messages->isEmpty()){
 
             foreach($messages as $message){
+                //分配消息操作人
+                $message->assign(request()->user()->id);
+                //如果消息没有关联订单，则尝试关联
+                if($message->related == 0){
+                    $message->findOrderWithMessage();
+                }
                 $IsOption = $this->IsAliOptionOrderMsg($message);
-
                 $response = [
                     'message' => $message,
                     'parents' => TypeModel::where('parent_id', 0)->get(),
@@ -609,6 +608,19 @@ class MessageController extends Controller
         } else {
             return config('status.ajax')['fail'];
         }
+    }
+
+    public function doCompleteMsg()
+    {
+        $id = request()->input('id');
+        $messge = $this->model->find($id);
+        if($messge){
+            if($this->model->completeMsg()){
+                return config('status.ajax')['success'];
+            }
+        }
+        return config('status.ajax')['fail'];
+
     }
 
 

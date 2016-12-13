@@ -1097,12 +1097,16 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
+    Route::any('workflow/doCompleteMsg','MessageController@doCompleteMsg')->name('workflow.doCompleteMsg');
     //关闭工作流
     Route::any('message/endWorkflow',
         ['as' => 'message.endWorkflow', 'uses' => 'MessageController@endWorkflow']);
     //稍后处理
     Route::any('message/{id}/dontRequireReply',
         ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
+    //workflow稍后处理
+    Route::any('message/workflowDontRequireReply','MessageController@workflowDontRequireReply')
+        ->name('message.workflowDontRequireReply');
     //wish support
     Route::any('message/WishSupportReplay',
         ['as' => 'message.WishSupportReplay', 'uses' => 'MessageController@WishSupportReplay']);

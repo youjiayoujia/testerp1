@@ -81,88 +81,73 @@
                     <div class="col-lg-12">
                         <div class="form-group">
                             @if($is_ali_msg_option)
-
-
-
-
-
-                                <input type="hidden" id="do-chaeck" value="true">
-                                <input type="hidden" name="order-id" id="order-id" value="{{$is_ali_msg_option}}">
+                                <input type="hidden" id="do-chaeck" class="is-need-operate-order" value="true">
+                                <input type="hidden" name="order-id" id="order-id" class="option-order-id" value="{{$is_ali_msg_option}}">
                                 <div class="col-lg-4">
                                     <div class="row">
 
-                                        @if($message->Order)
-                                            @if($message->Order->status == 'REVIEW')
-                                                <small class="text-danger glyphicon glyphicon-asterisk"></small><label>订单操作</label>
+                                    @if($message->Order)
+                                        @if($message->Order->status == 'REVIEW')
+                                            <small class="text-danger glyphicon glyphicon-asterisk"></small><label>订单操作</label>
 
-                                                <button type="button" id="do-review-order" class="btn btn-success btn-xs">审核</button>
-                                                <button type="button" class="btn btn-danger btn-xs" data-target="#withdrawOrder" data-toggle="modal" >撤单</button>
+                                            <button type="button" id="do-review-order" class="btn btn-success btn-xs">审核</button>
+                                            <button type="button" class="btn btn-danger btn-xs" data-target="#withdrawOrder" data-toggle="modal" >撤单</button>
 
-
-                                         {{--       <button class="btn btn-danger btn-xs"
-                                                        data-toggle="modal"
-                                                        data-target="#withdraw{{ $order->id }}"
-                                                        title="撤单">
-                                                    <span class="glyphicon glyphicon-link"></span> 撤单
-                                                </button>--}}
-
-                                                <div class="modal fade" id="withdrawOrder" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <form action="" method="POST">
-                                                                <div class="modal-header">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                        <span aria-hidden="true">&times;</span>
-                                                                    </button>
-                                                                    <h4 class="modal-title" id="myModalLabel">撤单</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="row">
-                                                                        <div class="form-group col-lg-6">
-                                                                            <label for="withdraw" class='control-label'>撤单原因</label>
-                                                                            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                                                            <select class="form-control" name="withdraw" id="withdraw">
-                                                                                <option value="NULL">==选择原因==</option>
-                                                                                @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
-                                                                                    <option value="{{ $withdraw_key }}">
-                                                                                        {{ $withdraw }}
-                                                                                    </option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="row">
-                                                                        <div class="form-group col-lg-6">
-                                                                            <label for="withdraw_reason" class='control-label'>原因</label>
-                                                                            <textarea class="form-control" rows="3" name='withdraw_reason' id="withdraw_reason"></textarea>
-                                                                        </div>
+                                            <div class="modal fade" id="withdrawOrder" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <form action="" method="POST">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <h4 class="modal-title" id="myModalLabel">撤单</h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="row">
+                                                                    <div class="form-group col-lg-6">
+                                                                        <label for="withdraw" class='control-label'>撤单原因</label>
+                                                                        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                                                        <select class="form-control" name="withdraw" id="withdraw">
+                                                                            <option value="NULL">==选择原因==</option>
+                                                                            @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
+                                                                                <option value="{{ $withdraw_key }}">
+                                                                                    {{ $withdraw }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
                                                                     </div>
                                                                 </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                                                                    <button type="button" class="btn btn-primary" id="do-withdraw-order">提交</button>
+                                                                <div class="row">
+                                                                    <div class="form-group col-lg-6">
+                                                                        <label for="withdraw_reason" class='control-label'>原因</label>
+                                                                        <textarea class="form-control" rows="3" name='withdraw_reason' id="withdraw_reason"></textarea>
+                                                                    </div>
                                                                 </div>
-                                                            </form>
-                                                        </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                                                <button type="button" class="btn btn-primary" id="do-withdraw-order">提交</button>
+                                                            </div>
+                                                        </form>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                            @endif
                                         @endif
+                                    @endif
                                     </div>
                                     <div class="row">
                                         <button id="save" type="button" class="btn btn-primary from-submit">回复</button>
                                     </div>
                                 </div>
                             @else
-                                <input type="hidden" id="do-chaeck" value="false">
-
+                                <input type="hidden" id="do-chaeck" class="is-need-operate-order" value="false">
                                 <button id="save" type="button" class="btn btn-primary from-submit">回复</button>
                             @endif
 
-                            @if($driver != 'wish')
+                            @if($driver == 'wish') <!--wish消息特殊操作-->
                                 <a class="btn btn-warning " onclick="wishSupportReplay({{$message->id}})" >Apeal To Wish Support</a>
-                                    {{--href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}"--}}
                             @endif
                             @if($driver == 'aliexpress')
                                 <div style="float: right;">
@@ -176,24 +161,11 @@
                             @endif
                         </div>
                     </div>
-
-
-
-
                 </div>
                 <input type="hidden" id="tem_type" name="type_id">
             </form>
         </div>
     </div>
 <script>
-/*    function check() {
-        console.log(222);
-        var to_email = $("#to_email").val();
-        //对电子邮件的验证
-        if (!to_email.indexOf("@")) {
-            alert('提示\n\n请输入有效的E_mail！');
-            return false;
-        }
-        return true;
-    }*/
+
 </script>

@@ -71,7 +71,9 @@
     <script type="text/javascript">
 
         var message = {
-            entry : 3, //配置初始化消息数量
+            entry : 2, //配置初始化消息数量
+            smt_order_operate : false, //速卖通订单操作
+            has_workflow_message : true, //
         }
 
         message.showNextMessage = function () {
@@ -96,19 +98,33 @@
                     data:'id='+id,
                     type: 'POST',
                     success:function (data) {
-                        message.showNextMessage();
+                        if(data == 1){
+                            message.showNextMessage();
+                            message.loadingNext();
+                        }else{
+                            alert('操作失败');
+                        }
                     }
-
                 });
             }
-
         }
-
-        message.nextTime = function () {
+        //暂时不处理，此消息跳到下一封
+        message.nextTime = function (id) {
             if(confirm('确定跳到下一封？')){
-                message.showNextMessage();
-                message.loadingNext();
-                message.showTip('已经跳转到下一封');
+               $.ajax({
+                   url : '{{route('message.workflowDontRequireReply')}}',
+                   data : 'id='+id,
+                   type : 'POST',
+                   success:function (data){
+                       console.log(data);
+                       if(data == 1){
+                           message.showNextMessage();
+                           message.loadingNext();
+                           message.showTip('已经跳转到下一封');
+                       }
+
+                   }
+               });
             }
         }
 
@@ -119,11 +135,16 @@
                     data: 'id='+id+'&assign_id='+assign_id,
                     type:'POST',
                     success: function (data) {
-                        message.showNextMessage();
+                        if(data == 1){
+                            message.showNextMessage();
+                            message.loadingNext();
+                            message.showTip('上一封消息转交成功！');
+                        }else{
+                            alert('转交失败');
+                        }
                     }
                 });
             }
-
         }
 
         message.showTip =  function (tip){
@@ -135,16 +156,25 @@
 
         message.loadingNext = function (){
             //继续加载需要回复的邮件池
-            $.ajax({
-                url: "{{route('ajaxGetMsgInfo')}}",
-                data: 'total=1',
-                type: 'POST',
-                success: function (data) {
-                    console.log('新邮件肥来了');
-                    $('.message-group').append(data);
-                    // $('.message-template').first().show();
-                }
-            });
+            if(message.has_workflow_message == true){
+                $.ajax({
+                    url: "{{route('ajaxGetMsgInfo')}}",
+                    data: 'total=1',
+                    type: 'POST',
+                    success: function (data) {
+                        if(data == -1){
+                            message.has_workflow_message = false;
+                            console.log('没有更多消息了');
+                        }else{
+                            $('.message-group').append(data);
+                        }
+                    }
+                });
+
+            }else{
+                console.log('没有更多消息了');
+            }
+
         }
 
 
@@ -193,8 +223,6 @@
                         return false;
 
                 }
-
-
             });
         });
 
@@ -219,44 +247,80 @@
         });
 
         $(document).on("click", ".from-submit", function (){
+            if($('.is-need-operate-order').first().val() == 'true' &&  message.smt_order_operate == false){
+                alert('请先进行操作订单，再提交！');
+                return;
+            }
             //验证回复内容不能为空
             if(!$('textarea').val()){
                 alert('请先回复的内容，再提交！');
                 return;
             }
             　var param =  $('.reply-content').first().serialize();
-
-            //删除邮件dom
-            $('.message-template').first().remove();
-            //显示第二封
-            $('.message-template').first().show();
-            //回到顶部
-            $('html,body').animate({scrollTop:0},'slow');
-
             //异步发送
             $.ajax({
                 url:'{{route('workflow.reply')}}',
                 data: param,
                 type: 'POST',
                 success: function (data) {
-                    console.log(data);
-                }
-
-            });
-
-            //继续加载需要回复的邮件池
-            $.ajax({
-                url: "{{route('ajaxGetMsgInfo')}}",
-                data: 'total=' + message.entry,
-                type: 'POST',
-                success: function (data) {
-                    console.log('新邮件肥来了');
-                    $('.message-group').append(data);
-                    // $('.message-template').first().show();
+                    if(data == 1){
+                        //显示下一封
+                        message.showNextMessage();
+                        //继续加载一封的邮件池
+                        message.loadingNext();
+                        message.showTip('上一封消息已经回复');
+                    }
                 }
             });
         });
 
+        $(document).on("click", "#do-review-order", function (){
+            if(confirm('确定审核？')){
+                var order_id =  $('#order-id').val();
+                $.ajax({
+                    url: "{{route('updateStatus')}}",
+                    data: 'order_id=' + order_id,
+                    type: 'GET',
+                    success: function (data) {
+                        if(data == '1'){
+                            message.smt_order_operate = true;
+                            alert('审核成功');
+                            $('#do-review-order').attr('disabled',true);
+                        }else{
+                            alert('审核失败');
+                        }
+                    }
+                });
+            }
+        });
+
+        $(document).on("click", "#do-withdraw-order", function (){
+            if(confirm('确定撤单？')){
+                var order_id = $('#order-id').val();
+                var withdraw = $('#withdraw').val();
+                var withdraw_reason = $('#withdraw_reason').val();
+
+                if(withdraw == 'NULL' || withdraw_reason == ''){
+                    alert('请编辑撤单原因，选择撤单类型');
+                    return false;
+                }
+
+                $.ajax({
+                    url: "{{route('ajaxWithdraw')}}",
+                    data: 'id=' + order_id+'&withdraw='+withdraw+'&withdraw_reason='+withdraw_reason,
+                    type: 'POST',
+                    success: function (data) {
+                        if(data == '1'){
+                            message.smt_order_operate = true;
+                            alert('撤单成功');
+                            $('#withdrawOrder').modal('hide')
+                        }else{
+                            alert('撤单失败');
+                        }
+                    }
+                });
+            }
+        });
 
         function getTransInfo(content) {
             $.ajax({
@@ -336,9 +400,6 @@
                         }else if(type == 'text'){
                             $('#textcontent').val(response['content']);
                         }
-                        /*
-                         $('#templateContent').html('<div class="form-group"><textarea rows="16" name="content" style="width:100%;height:400px;">'+response['content']+'</textarea></div>');
-                         */
                         //记录回复邮件的类型
                         $('#tem_type').val(response.type_id);
                     }
@@ -350,14 +411,26 @@
          * @param id
          */
         function wishSupportReplay(id){
-            $ajax({
-                url: "{{route('message.WishSupportReplay')}}",
-                data: 'id=' + id,
-                type: 'POST',
-                success: function (data) {
-                    console.log(data);
-                }
-            });
+            if(confirm('确定要进行操作？')){
+                $.ajax({
+                    url: "{{route('message.WishSupportReplay')}}",
+                    data: 'id=' + id,
+                    type: 'POST',
+                    success: function (data) {
+                        if(data == 1){
+                            message.showNextMessage();
+                            message.showTip('请求wish,回复成功');
+                            message.loadingNext();
+
+                        }else if(data == -1){
+                            alert('请求wish,回复失败');
+
+                        }
+                    }
+                });
+
+            }
+
         }
 
 

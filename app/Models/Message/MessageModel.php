@@ -555,11 +555,11 @@ class MessageModel extends BaseModel{
     {
 
         $user_id = request()->user()->id;
-
-        return $query->where('status','=','UNREAD')
+        return $query->where(['status'=> 'UNREAD','required'=> 1])
             ->orWhere(function($query) use ($user_id){
                 $query->where('status','=','PROCESS')
-                    ->where('assign_id','=',$user_id);
+                    ->where('assign_id','=',$user_id)
+                    ->where('required','=',1);
             })
             ->take($entry)
             ->orderBy('id', 'DESC');
@@ -575,9 +575,15 @@ class MessageModel extends BaseModel{
             }
 
         }
+    }
 
-
-
+    public function completeMsg(){
+        $this->status = 'COMPLETE';
+        if($this->save()){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 

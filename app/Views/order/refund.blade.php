@@ -4,6 +4,7 @@
 @section('formAction') {{ route('refundUpdate', ['id' => $model->id]) }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="panel panel-default">
         <div class="panel-heading">退款信息</div>
         <div class="panel-body">

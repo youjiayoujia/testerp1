@@ -3,6 +3,7 @@
 @section('formAction') {{ route('logisticsRule.store') }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="row">
         <div class="form-group col-lg-3">
             <label for="name" class="control-label">名称</label><small class="text-danger glyphicon glyphicon-asterisk"></small>

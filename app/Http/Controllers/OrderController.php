@@ -209,7 +209,9 @@ class OrderController extends Controller
                 $profit += $order->profit_rate;
                 $data['totalPlatform'] += $order->calculateOrderChannelFee();
             }
+            $data['totalAmount'] = sprintf("%.2f", $data['totalAmount']);
             $data['averageProfit'] = sprintf("%.2f", $profit / $orders->count());
+            $data['totalPlatform'] = sprintf("%.2f", $data['totalPlatform']);
         }
 
         return $data;

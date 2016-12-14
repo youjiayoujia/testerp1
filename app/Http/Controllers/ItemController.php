@@ -91,7 +91,7 @@ class ItemController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-
+        
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $data['sku_history_values'] = $model->sku_history_values;

@@ -1,9 +1,13 @@
+
 <div class="row message-template" style="display: none;">
+    @if($driver == 'wish')
+            <div class="col-lg-12">
+
+                @include('message.workflow.wish_order_detail')
+            </div>
+    @endif
     <div class="col-lg-8">
         @include('message.workflow.content')
-        @if($driver == 'wish')
-            @include('message.workflow.wish_order_detail')
-        @endif
         @include('message.workflow.reply')
 
     </div>
@@ -12,7 +16,7 @@
         @if($message->related)
             @include('message.workflow.orders')
         @else
-            <p>ERP系统中没找到此消息关联的订单 /(ㄒoㄒ)/~~</p>
+            @include('message.workflow.relate')
         @endif
     </div>
 </div>

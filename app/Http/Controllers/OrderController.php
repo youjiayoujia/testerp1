@@ -198,18 +198,19 @@ class OrderController extends Controller
     {
         $startDate = request()->input('start_date');
         $endDate = request()->input('end_date');
-        $orders = $this->model->where('created_at', '<=', $endDate)->where('created_at', '>=', $startDate);
-        $data['totalAmount'] = '';
-        $data['averageProfit'] = '';
-        $data['totalPlatform'] = '';
-        $profitAmount = '';
+        $orders = $this->model
+            ->whereBetween('created_at', [date('Y-m-d H:i:s', strtotime($startDate)), date('Y-m-d H:i:s', strtotime('+1 day', strtotime($endDate)))]);
+        $data['totalAmount'] = 0;
+        $data['averageProfit'] = 0;
+        $data['totalPlatform'] = 0;
+        $profit = '';
         if ($orders->count()) {
             foreach ($orders->get() as $order) {
                 $data['totalAmount'] += $order->amount * $order->rate;
-                $profitAmount += $order->calculateProfitProcess() * $order->amount * $order->rate;
+                $profit += $order->profit_rate;
                 $data['totalPlatform'] += $order->calculateOrderChannelFee();
             }
-            $data['averageProfit'] = $profitAmount / $data['totalAmount'];
+            $data['averageProfit'] = sprintf("%.2f", $profit / $orders->count());
         }
 
         return $data;

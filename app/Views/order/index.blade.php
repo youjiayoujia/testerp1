@@ -872,7 +872,7 @@
         <div class="col-lg-1">
             <button class="statistics">统计</button>
         </div>
-        <div class="col-lg-4" id="statistics"></div>
+        <div class="text-danger col-lg-4" id="statistics"></div>
     </div>
 @stop
 @stop
@@ -1146,6 +1146,8 @@
                         );
                     }
                 });
+            } else {
+                $("#statistics").text('请选择正确的日期!!!');
             }
         });
 

@@ -79,7 +79,7 @@ class CoeAdapter extends BasicAdapter
         <logisticsEvent>
         <eventHeader>
             <eventType>LOGISTICS_PACKAGE_SEND</eventType>
-            <eventMessageId><![CDATA[" . $order->ordernum . "-SLME-2016-COT-B76EFD991B19]]> </eventMessageId>
+            <eventMessageId><![CDATA[" . $order->id . "-SLME-2016-COT-B76EFD991B19]]> </eventMessageId>
             <eventTime><![CDATA[" . date("Y-m-d H:i:s") . "]]></eventTime>
             <eventSource><![CDATA[SZE150401]]></eventSource>
             <eventTarget>COE</eventTarget>
@@ -87,12 +87,14 @@ class CoeAdapter extends BasicAdapter
         <eventBody>
             <orders>
                 <order>
-                    <referenceID>" . $order->ordernum . "</referenceID>
+                    <referenceID>" . $order->id . "</referenceID>
                     <paymentType>PP</paymentType>
+
                     <pcs>" . $totalCount . "</pcs>
+
                     <destNo><![CDATA[" . $countryCode . "]]></destNo>
                     <date><![CDATA[" . date("Y-m-d H:i:s") . "]]></date>
-                    <custNo><![CDATA[" . $this->config['userId'] . "]]></custNo>
+                    <custNo><![CDATA[SZE150401]]></custNo>
                     <weight>" . $totalWeight . "</weight>
                     <declaredValue>" . $totalValue . "</declaredValue>
                     <declaredCurrency>USD</declaredCurrency>

@@ -268,11 +268,7 @@ class PurchaseOrderController extends Controller
         $itemModel->createPurchaseNeedData($temp_arr);
 
         $to = json_encode($model);
-<<<<<<< HEAD
-        $this->eventLog($userName->name, '采购单信息更新,id='.$model->id, $to, $from);
-=======
         $this->eventLog($userName->name, '采购单信息更新,id=' . $model->id, $to, $from);
->>>>>>> master
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '采购单ID' . $id . '编辑成功.'));
     }
@@ -321,7 +317,7 @@ class PurchaseOrderController extends Controller
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData($temp_arr);
 
-        $to = json_encode(serialize($model));
+        $to = json_encode($model);
         $this->eventLog($userName->name, '采购单审核,id=' . $model->id, $to, $from);
         return redirect($url)->with('alert', $this->alert('success', '采购单ID' . $id . '审核通过.'));
     }

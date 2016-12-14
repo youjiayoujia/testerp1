@@ -114,11 +114,6 @@
                             <span class="glyphicon glyphicon-random"></span>
                         </a>
                     @endif
-                    @if($package->status == 'ERROR')
-                        <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
-                            <span class="glyphicon glyphicon-check"></span>
-                        </a>
-                    @endif
                     {{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
                     <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs retrack" title='重新物流下单'>
                         <span class="glyphicon glyphicon-refresh"></span>

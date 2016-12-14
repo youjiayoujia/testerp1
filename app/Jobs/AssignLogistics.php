@@ -68,27 +68,25 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                 }
             }
             if ($this->package->status == 'ASSIGNED') {
-                if ($order->status != 'REVIEW') {
-                    $job = new PlaceLogistics($this->package);
-                    $job = $job->onQueue('placeLogistics');
-                    $this->dispatch($job);
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success.';
-                    $this->package->eventLog('队列', '已匹配物流，加入下单队列', json_encode($this->package));
-                } else {
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = '订单需审核.';
-                    $this->package->eventLog('队列', '订单需审核', json_encode($this->package));
-                }
-            } else {
+                $job = new PlaceLogistics($this->package);
+                $job = $job->onQueue('placeLogistics');
+                $this->dispatch($job);
                 $this->result['status'] = 'success';
-                $this->result['remark'] = '订单需审核.';
-                $this->package->eventLog('队列', '订单需审核', json_encode($this->package));
-            }
+                $this->result['remark'] = 'Success.';
+                $this->package->eventLog('队列', '已匹配物流，加入下单队列', json_encode($this->package));
+            } elseif ($this->package->status == 'ASSIGNFAILED') {
+                $this->result['status'] = 'success';
+                $this->result['remark'] = '未匹配到物流.';
+                $this->package->eventLog('队列', '匹配失败,未匹配到物流', json_encode($this->package));
+            } elseif ($this->package->status == 'NEED') {
+                $this->result['status'] = 'success';
+                $this->result['remark'] = '已匹配到物流,缺货中，不需要提前标记发货.';
+                $this->package->eventLog('队列', '已匹配到物流,缺货中,不需要提前标记发货.', json_encode($this->package));
+            } 
         } else {
             $this->result['status'] = 'fail';
-            $this->result['remark'] = 'Fail to assign logistics.';
-            $this->package->eventLog('队列', 'Fail to assign logistics.', json_encode($this->package));
+            $this->result['remark'] = '订单需审核.';
+            $this->package->eventLog('队列', '订单需审核.', json_encode($this->package));
         }
         $this->lasting = round(microtime(true) - $start, 2);
         $this->log('AssignLogistics');

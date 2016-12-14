@@ -8,7 +8,7 @@
                     <strong>ID</strong>: {{ $model->id }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>渠道</strong>: {{ $model->channelAccount ? $model->channelAccount->alias : '' }}
+                    <strong>渠道</strong>: {{ $model->channel ? $model->channel->name : '' }}
                 </div>
                 <div class="col-lg-2">
                     <strong>订单号</strong>: {{ $model->order ? $model->order->ordernum : '' }}

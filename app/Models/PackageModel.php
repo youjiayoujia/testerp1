@@ -563,6 +563,25 @@ class PackageModel extends BaseModel
         return $this->delete();
     }
 
+    public function forceCancelPackage()
+    {
+        if (in_array($this->status, ['PACKED', 'SHIPPED'])) {
+            return false;
+        }
+        $item = $this->items()->first();
+        if ($item->warehouse_position_id) {
+            foreach ($this->items as $packageItem) {
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $packageItem->id);
+                $packageItem->forceDelete();
+            }
+        } else {
+            foreach ($this->items as $packageItem) {
+                $packageItem->forceDelete();
+            }
+        }
+        return $this->forceDelete();
+    }
+
     public function reCreatePackage()
     {
         $arr = [];
@@ -1787,10 +1806,13 @@ class PackageModel extends BaseModel
                         $error[] = $key;
                         continue;
                     }
+                    $model = $this->find($content['package_id']);
                     if ($type == 1) {
-                        $this->find($content['package_id'])->update(['cost' => $content['cost']]);
+                        $model->update(['cost' => $content['cost']]);
+                        $model->eventLog('系统', '回传物流费'.$content['cost'], json_encode($model));
                     } else {
-                        $this->find($content['package_id'])->update(['cost1' => $content['cost']]);
+                        $model->update(['cost1' => $content['cost']]);
+                        $model->eventLog('系统', '回传物流费'.$content['cost'], json_encode($model));
                     }
                     break;
                 case '3':
@@ -1801,7 +1823,9 @@ class PackageModel extends BaseModel
                         $error[] = $key;
                         continue;
                     }
-                    $this->find($content['package_id'])->update(['tracking_no' => $content['tracking_no']]);
+                    $model = $this->find($content['package_id']);
+                    $model->update(['tracking_no' => $content['tracking_no']]);
+                    $model->eventLog('系统', '回传追踪号'.$content['tracking_no'], json_encode($model));
                     break;
                 case '4':
                     $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
@@ -1825,6 +1849,7 @@ class PackageModel extends BaseModel
                         'tracking_no' => $content['tracking_no'],
                         'logistics_id' => $content['logistics_id']
                     ]);
+                    $package->eventLog('系统', '修改物流方式id'.$content['logistics_id'].'+追踪号'.$content['tracking_no'], json_encode($package));
                     break;
             }
         }

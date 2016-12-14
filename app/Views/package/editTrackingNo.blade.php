@@ -80,7 +80,7 @@
                 <input type='text' class='form-control' name='shipping_city' value="{{ $model->shipping_city }}">
             </div>
             <div class="col-lg-2">
-                <label>区</label>
+                <label>省/州</label>
                 <input type='text' class='form-control' name='shipping_state' value="{{ $model->shipping_state }}">
             </div>
             <div class="col-lg-2">

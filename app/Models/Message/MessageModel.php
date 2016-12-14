@@ -36,7 +36,11 @@ class MessageModel extends BaseModel{
 
     public $rules = [];
 
-    public function account()
+    public $appends = [
+        'channel_diver_name'
+    ];
+
+  public function account()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel');
     }
@@ -143,13 +147,12 @@ class MessageModel extends BaseModel{
     public function assignToOther($fromId, $assignId)
     {
 
-        if ($this->assign_id == $fromId) {
-            $assignUser = UserModel::find($assignId);
-            if ($assignUser) {
-                $this->assign_id = $assignId;
-                return $this->save();
-            }
+        $assignUser = UserModel::find($assignId);
+        if ($assignUser) {
+            $this->assign_id = $assignId;
+            return $this->save();
         }
+
         return false;
     }
 
@@ -354,7 +357,7 @@ class MessageModel extends BaseModel{
                                 $product_html .= '<tr>';
                                 $product_html .= '<td><img src ="'.$message_fields_ary['product_img_url'] .'"/></td>';
                                 $product_html .= '<td>'.$message_fields_ary['product_product_name'] .'</td>';
-                                $product_html .= '<td><a href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
+                                $product_html .= '<td><a target="_blank" href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
                                 $product_html .= '</tr>';
                                 $product_html .= '</table>';
                                 $product_html .= '</div>';
@@ -444,6 +447,11 @@ class MessageModel extends BaseModel{
         return $this->account->channel->driver;
     }
 
+    public function getChannelDiverNameAttribute ()
+    {
+        return !empty($this->account->channel->driver) ? $this->account->channel->driver : false;
+    }
+
     public function findOrderWithMessage(){
         $order_id = $this->getChannelMessageOrderId(); //根据平台参数获取关联订单号
         if(!empty($order_id)){
@@ -471,8 +479,10 @@ class MessageModel extends BaseModel{
                 }
                 break;
             case 'wish':
-                $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
-                $order_obj = OrderModel::where('transaction_number','=',$transaction_id)->first();
+                 //wish交易号
+                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)
+                    ->where('channel_account_id',$this->account_id)
+                    ->first();
                 $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
                 break;
             case 'aliexpress':
@@ -531,15 +541,52 @@ class MessageModel extends BaseModel{
         }
     }
 
+    public function getMyWorkFlowMsg ($entry = 5)
+    {
+        return $this->workFlowMsg($entry)->get();
+    }
+
     /**
-     *
+     * 工作流消息
+     * 说明：客服负责的账号，并且没有被别人操作的 未读或者处理中
+     * @param $query
+     * @param $entry
+     * @return mixed
      */
-/*    public function getIsAliOptionMsgAttribute(){
-        if ($this->related == '0'){
-            $messages = $this->where('channel_order_number', $this->channel_order_number)->get();
-            dd($messages);
+    public function scopeWorkFlowMsg ($query,$entry)
+    {
+
+        $user_id = request()->user()->id;
+        return $query->where(['status'=> 'UNREAD','required'=> 1])
+            ->orWhere(function($query) use ($user_id){
+                $query->where('status','=','PROCESS')
+                    ->where('assign_id','=',$user_id)
+                    ->where('required','=',1);
+            })
+            ->take($entry)
+            ->orderBy('id', 'DESC');
+    }
+
+    public function contentTemplate ()
+    {
+        if($this->channel_diver_name){
+            switch ($this->channel_diver_name){
+                case 'aliexpress':
+                    break;
+
+            }
+
         }
-    }*/
+    }
+
+    public function completeMsg(){
+        $this->status = 'COMPLETE';
+        if($this->save()){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
 
 }

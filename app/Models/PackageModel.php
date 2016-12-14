@@ -92,10 +92,6 @@ class PackageModel extends BaseModel
         foreach ($accounts as $account) {
             $arr1[$account->account] = $account->account;
         }
-        $catalogs = CatalogModel::all();
-        foreach ($catalogs as $catalog) {
-            $arr2[$catalog->name] = $catalog->name;
-        }
         return [
             'relatedSearchFields' => [
                 'order' => ['id', 'channel_ordernum'],

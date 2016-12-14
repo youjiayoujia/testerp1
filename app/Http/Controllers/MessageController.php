@@ -62,40 +62,43 @@ class MessageController extends Controller
 
         if (request()->input('id')) {
             $message = $this->model->find(request()->input('id'));
-        } elseif ($this->workflow == 'keeping') {
-            $message = $this->model->getOne(request()->user()->id);
-        } else {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'error.'));
+        } elseif ($this->workflow == 'keeping') { //工作流
+            //根据登陆的客服id 获取其被分配的账号消息
+            $messages = $this->model->getMyWorkFlowMsg(3);
+
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'parents' => TypeModel::where('parent_id', 0)->get(), //模版分类
+                'users' => UserModel::all(),
+                'messages' => $messages,
+            ];
+
+            return view($this->viewPath . 'workflow')->with($response);
+
         }
+
         if (!$message) {
               return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
+
         if(request()->input('id')){
             $model = $this->model->find(request()->input('id'));
             $count = $this->model->where('from','=',$model->from)->where('status','<>','UNREAD')->count();
         }else{
             $count='';
         }
-        
-        if ($message->assign(request()->user()->id)) {
-            //$userarr=config('user.staff');
 
+        if ($message->assign(request()->user()->id)) {
 
             if($message->related == 0){
                 $message->findOrderWithMessage();  //消息中的订单号 与 erp订单匹配
             }
-
-            $emailarr=config('user.email');
-
             $IsOption = $this->IsAliOptionOrderMsg($message);
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
                 'message' => $message,
                 'parents' => TypeModel::where('parent_id', 0)->get(),
                 'users' => UserModel::all(),
-                'emailarr' => $emailarr,
-               // 'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
-                //'ordernum' =>$ordernum,
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
@@ -133,8 +136,9 @@ class MessageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
 
+
         //return $model->message_content;  原来逻辑
-        return $model->MessageInfo;
+        return view($this->viewPath . 'workflow.content')->with('message',$model);
     }
 
     /**
@@ -203,6 +207,17 @@ class MessageController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '转交失败.'));
     }
 
+    public function workflowAssignToOther()
+    {
+        $message = $this->model->find(request()->input('id'));
+
+        if ($message->assignToOther(request()->user()->id ,request()->input('assign_id'))) {
+            return config('status.ajax')['success'];
+        }
+        return config('status.ajax')['fail'];
+
+    }
+
     /**
      * 无需回复
      * @param $id
@@ -222,6 +237,24 @@ class MessageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功.'));
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '处理失败.'));
+    }
+
+    /**
+     * 工作流无需回复消息
+     * @param $id
+     * @return bool
+     */
+    public function workflowNoReply()
+    {
+        $id = request()->input('id');
+        $message = $this->model->find($id);
+        if(!empty($message)){
+            $result = $message->notRequireReply(request()->user()->id);
+            if($result){
+                return config('status.ajax')['success'];
+            }
+        }
+        return config('status.ajax')['fail'];
     }
 
     /**
@@ -261,29 +294,35 @@ class MessageController extends Controller
         }
     }
 
-    public function WishSupportReplay($id){
+    public function workflowDontRequireReply(){
+        $id = request()->input('id');
         $message = $this->model->find($id);
-        if (!$message) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        if($message){
+            if ($message->dontRequireReply(request()->user()->id)) {
+                return config('status.ajax')['success'];
+            }
         }
-        $account = Channel_account::find($message->account_id);
+        return config('status.ajax')['fail'];
+    }
 
-        $adapter = new WishAdapter($account->apiConfig);
+    public function WishSupportReplay(){
+        $id = request()->input('id');
+        $message = $this->model->find($id);
+        if($message){
 
-        if($adapter->ReplayWishSupport($message->message_id)){
-            $message->assign_id=request()->user()->id;
-            $message->required=0;
-            $message->status="COMPLETE";
-            $message->save();
-        }else{
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '处理失败'));
+            $account = Channel_account::find($message->account_id);
+            $adapter = new WishAdapter($account->apiConfig);
+
+            if($adapter->ReplayWishSupport($message->message_id)){
+                $message->assign_id=request()->user()->id;
+                $message->required=0;
+                $message->status="COMPLETE";
+                $message->save();
+
+                return config('status.ajax')['success'];
+            }
         }
-        if ($this->workflow == 'keeping') {
-            return redirect(route('message.process'))
-                ->with('alert', $this->alert('success', '上条信息已成功回复.'));
-        }else{
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功'));
-        }
+        return config('status.ajax')['fail'];
 
     }
 
@@ -329,11 +368,11 @@ class MessageController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function endWorkflow($id)
+    public function endWorkflow()
     {
         request()->session()->pull('workflow');
-        return redirect(route('message.process', ['id' => $id]))
-            ->with('alert', $this->alert('danger', '工作流已终止.'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '工作流已经终止'));
+
     }
 
     public function reply($id, ReplyModel $reply)
@@ -366,6 +405,24 @@ class MessageController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '回复失败.'));
     }
 
+    public function  workflowReply ()
+    {
+        $form = request()->input();
+        $message = $this->model->find($form['id']);
+        if(!empty($message)) {
+            if ($message->reply($form)) {
+                $reply = ReplyModel::where('message_id', $message->id)->get()->first();
+                $job = new SendMessages($reply);
+                $job = $job->onQueue('SendMessages');
+                $this->dispatch($job);
+
+                return config('status.ajax')['success'];
+            }
+        }
+        return config('status.ajax')['fail'];
+
+    }
+
     /**
      * 详情
      *
@@ -384,6 +441,7 @@ class MessageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'count' => $count,
+            'message' => $model
         ];
         return view($this->viewPath . 'show', $response)->with('count',$count);
     }
@@ -520,6 +578,51 @@ class MessageController extends Controller
             }
         }
         return redirect(route('order.index'))->with('alert', $this->alert('danger', '操作失败'));
+
+    }
+
+    public function ajaxGetMsgInfo ()
+    {
+        $entry = request()->input('total');
+        $messages = $this->model->getMyWorkFlowMsg(intval($entry));
+        $template = '';
+
+        if(!$messages->isEmpty()){
+
+            foreach($messages as $message){
+                //分配消息操作人
+                $message->assign(request()->user()->id);
+                //如果消息没有关联订单，则尝试关联
+                if($message->related == 0){
+                    $message->findOrderWithMessage();
+                }
+                $IsOption = $this->IsAliOptionOrderMsg($message);
+                $response = [
+                    'message' => $message,
+                    'parents' => TypeModel::where('parent_id', 0)->get(),
+                    'is_ali_msg_option' => $IsOption,
+                    'driver' => $message->getChannelDiver(),
+                    'users' => UserModel::all(),
+                ];
+
+                $template .= view($this->viewPath.'workflow.template')->with($response);
+            }
+            return $template;
+        } else {
+            return config('status.ajax')['fail'];
+        }
+    }
+
+    public function doCompleteMsg()
+    {
+        $id = request()->input('id');
+        $messge = $this->model->find($id);
+        if($messge){
+            if($this->model->completeMsg()){
+                return config('status.ajax')['success'];
+            }
+        }
+        return config('status.ajax')['fail'];
 
     }
 

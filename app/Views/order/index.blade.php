@@ -37,12 +37,12 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
+                <div>{{ round($order->profit_rate ,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
                 <div>
-                    毛利润: {{ round($order->amount*$order->calculateProfitProcess(),2) }} USD
+                    毛利润: {{ round($order->profit, 2) }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
@@ -377,6 +377,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('withdrawUpdate', ['id' => $order->id])}}" method="POST">
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -419,8 +421,8 @@
                 <div class="modal-content">
                     <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
-                        <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
                         <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -611,6 +613,7 @@
                 <div class="modal-content">
                     <form action="{{ route('remarkUpdate', ['id' => $order->id])}}" method="POST">
                         <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -869,7 +872,7 @@
         <div class="col-lg-1">
             <button class="statistics">统计</button>
         </div>
-        <div class="col-lg-4" id="statistics"></div>
+        <div class="text-danger col-lg-4" id="statistics"></div>
     </div>
 @stop
 @stop
@@ -1143,6 +1146,8 @@
                         );
                     }
                 });
+            } else {
+                $("#statistics").text('请选择正确的日期!!!');
             }
         });
 

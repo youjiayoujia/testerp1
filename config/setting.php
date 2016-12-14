@@ -180,6 +180,5 @@ return [
         'items.item.sku' => 'sku',
         'check_status' => '审核状态',
         'shipping_country' => '收货国家',
-        'logistics.catalog.name' => '物流分类'
     ],
 ];

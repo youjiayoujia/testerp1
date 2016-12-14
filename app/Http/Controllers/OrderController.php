@@ -177,7 +177,7 @@ class OrderController extends Controller
             $order = $this->model->where('id', 0);
             $subtotal = 0;
         }
-        $hideUrl = $_SERVER['HTTP_REFERER'];
+        $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
@@ -186,7 +186,8 @@ class OrderController extends Controller
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,
             'rmbRate' => $rmbRate,
-            'hideUrl' => $hideUrl,
+            'hideUrl' => $url,
+            'page' => $page,
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -196,18 +197,19 @@ class OrderController extends Controller
     {
         $startDate = request()->input('start_date');
         $endDate = request()->input('end_date');
-        $orders = $this->model->where('created_at', '<=', $endDate)->where('created_at', '>=', $startDate);
-        $data['totalAmount'] = '';
-        $data['averageProfit'] = '';
-        $data['totalPlatform'] = '';
-        $profitAmount = '';
+        $orders = $this->model
+            ->whereBetween('created_at', [date('Y-m-d H:i:s', strtotime($startDate)), date('Y-m-d H:i:s', strtotime('+1 day', strtotime($endDate)))]);
+        $data['totalAmount'] = 0;
+        $data['averageProfit'] = 0;
+        $data['totalPlatform'] = 0;
+        $profit = '';
         if ($orders->count()) {
             foreach ($orders->get() as $order) {
                 $data['totalAmount'] += $order->amount * $order->rate;
-                $profitAmount += $order->calculateProfitProcess() * $order->amount * $order->rate;
+                $profit += $order->profit_rate;
                 $data['totalPlatform'] += $order->calculateOrderChannelFee();
             }
-            $data['averageProfit'] = $profitAmount / $data['totalAmount'];
+            $data['averageProfit'] = sprintf("%.2f", $profit / $orders->count());
         }
 
         return $data;
@@ -306,7 +308,8 @@ class OrderController extends Controller
     public function refundUpdate($id)
     {
         $model = $this->model->find($id);
-        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        $page = request()->input('page');
+        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($model);
         if (!$model) {
@@ -329,10 +332,11 @@ class OrderController extends Controller
     public function remarkUpdate($id)
     {
         request()->flash();
+        $page = request()->input('page');
         $data = request()->all();
         $data['user_id'] = request()->user()->id;
         $this->model->find($id)->remarks()->create($data);
-        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
@@ -614,6 +618,7 @@ class OrderController extends Controller
     //撤单
     public function withdrawUpdate($id)
     {
+        $page = request()->input('page');
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($id));
         request()->flash();
@@ -627,7 +632,7 @@ class OrderController extends Controller
         }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
-        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
     //ajax撤单

@@ -1099,19 +1099,26 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
+    Route::any('workflow/doCompleteMsg','MessageController@doCompleteMsg')->name('workflow.doCompleteMsg');
     //关闭工作流
-    Route::any('message/{id}/endWorkflow',
+    Route::any('message/endWorkflow',
         ['as' => 'message.endWorkflow', 'uses' => 'MessageController@endWorkflow']);
     //稍后处理
     Route::any('message/{id}/dontRequireReply',
         ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
+    //workflow稍后处理
+    Route::any('message/workflowDontRequireReply','MessageController@workflowDontRequireReply')
+        ->name('message.workflowDontRequireReply');
     //wish support
-    Route::any('message/{id}/WishSupportReplay',
+    Route::any('message/WishSupportReplay',
         ['as' => 'message.WishSupportReplay', 'uses' => 'MessageController@WishSupportReplay']);
 
     //无需回复
     Route::any('message/{id}/notRequireReply',
         ['as' => 'message.notRequireReply', 'uses' => 'MessageController@notRequireReply']);
+    //workfole无需回复
+    Route::any('message/workflowNoReply',
+        ['as' => 'message.workflowNoReply', 'uses' => 'MessageController@workflowNoReply']);
     //处理信息
     Route::any('message/process',
         ['as' => 'message.process', 'uses' => 'MessageController@process']);
@@ -1127,6 +1134,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //转交他人
     Route::any('message/{id}/assignToOther',
         ['as' => 'message.assignToOther', 'uses' => 'MessageController@assignToOther']);
+    //workflow转交他人
+    Route::any('message/workflowAssignToOther',
+        ['as' => 'message.workflowAssignToOther', 'uses' => 'MessageController@workflowAssignToOther']);
     Route::resource('message', 'MessageController');
     //设置关联订单
     Route::any('message/{id}/setRelatedOrders',
@@ -1150,6 +1160,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //回复信息
     Route::any('message/{id}/reply',
         ['as' => 'message.reply', 'uses' => 'MessageController@reply']);
+    //工作流回复信息
+    Route::any('workflow/reply','MessageController@workflowReply')->name('workflow.reply');
     //信息模版路由
     Route::any('messageTemplate/ajaxGetTemplate',
         ['as' => 'messageTemplate.ajaxGetTemplate', 'uses' => 'Message\TemplateController@ajaxGetTemplate']);
@@ -1171,6 +1183,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['as' => 'doSendAliexpressMessages', 'uses' => 'MessageController@doSendAliexpressMessages']);
     Route::any('SendEbayMessage', ['uses' => 'MessageController@SendEbayMessage', 'as' => 'message.sendEbayMessage']);
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
+    Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);

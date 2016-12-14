@@ -72,7 +72,10 @@ class ItemModel extends BaseModel
         'competition_url',
         'products_history_values',
         'new_status',
-        'html_mod'
+        'html_mod',
+        'default_keywords',
+        'default_name',
+        'recieve_wrap_id'
     ];
 
     public function product()

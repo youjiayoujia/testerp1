@@ -4,6 +4,11 @@
         entry : 2, //配置初始化消息数量
         smt_order_operate : false, //速卖通订单操作
         has_workflow_message : true, //
+        @if(request()->session()->get('workflow')=='keeping')
+            is_workflow : true,
+        @else
+            is_workflow : false,
+        @endif
     }
 
     message.showNextMessage = function () {
@@ -29,6 +34,10 @@
                 type: 'POST',
                 success:function (data) {
                     if(data == 1){
+                        if(message.is_workflow == false){
+                            window.location.href = document.referrer;
+                            return;
+                        }
                         message.showNextMessage();
                         message.loadingNext();
                         message.showTip('删一条操作成功');
@@ -68,6 +77,10 @@
                 type:'POST',
                 success: function (data) {
                     if(data == 1){
+                        if(message.is_workflow == false){
+                            window.location.href = document.referrer;
+                            return;
+                        }
                         message.showNextMessage();
                         message.loadingNext();
                         message.showTip('上一封消息转交成功！');
@@ -196,6 +209,10 @@
             type: 'POST',
             success: function (data) {
                 if(data == 1){
+                    if(message.is_workflow == false){
+                        window.location.href = document.referrer;
+                        return;
+                    }
                     //显示下一封
                     message.showNextMessage();
                     //继续加载一封的邮件池
@@ -349,7 +366,12 @@
                 data: 'id=' + id,
                 type: 'POST',
                 success: function (data) {
+
                     if(data == 1){
+                        if(message.is_workflow == false){
+                            window.location.href = document.referrer;
+                            return;
+                        }
                         message.showNextMessage();
                         message.showTip('请求wish,回复成功');
                         message.loadingNext();

@@ -479,8 +479,10 @@ class MessageModel extends BaseModel{
                 }
                 break;
             case 'wish':
-                $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
-                $order_obj = OrderModel::where('transaction_number','=',$transaction_id)->first();
+                 //wish交易号
+                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)
+                    ->where('channel_account_id',$this->account_id)
+                    ->first();
                 $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
                 break;
             case 'aliexpress':

@@ -6,12 +6,17 @@
     <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
     <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
     <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+        @if($driver == 'wish')
+            <div class="row">
+                <div class="col-lg-12">
 
+                @include('message.workflow.wish_order_detail')
+                </div>
+            </div>
+        @endif
     <div class="col-lg-8">
         @include('message.workflow.content')
-        @if($driver == 'wish')
-            @include('message.workflow.wish_order_detail')
-        @endif
+
         @include('message.workflow.reply')
 
     </div>
@@ -25,27 +30,6 @@
         @endif
     </div>
     @include('message.workflow.more')
-
-    {{--    <div class="row">
-            <div class="col-lg-8">
-                @include('message.process.content')
-
-                @if($driver == 'wish')
-                    @include('message.process.wish_order_detail')
-                @endif
-
-                @include('message.process.reply')
-            </div>
-            <div class="col-lg-4">
-                @include('message.process.operate')
-                @if($message->related)
-                    @include('message.process.orders')
-                @else
-                    @include('message.process.relate')
-                @endif
-            </div>
-        </div>
-        --}}
         <div class="row">
             <div class="col-lg-12">
                 <div class="panel panel-default">

@@ -26,9 +26,11 @@
                         <button class="btn btn-warning option-group" do="no-reply" type="button">
                             <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
                         </button>
-                        <button class="btn btn-warning option-group" do="next-time" type="button">
-                            <span class="glyphicon glyphicon-minus-sign"></span> 跳到下一封
-                        </button>
+                        @if(request()->session()->get('workflow')=='keeping')
+                            <button class="btn btn-warning option-group" do="next-time" type="button">
+                                <span class="glyphicon glyphicon-minus-sign"></span> 跳到下一封
+                            </button>
+                        @endif
                     </div>
                 </div>
                 <script type="text/javascript">

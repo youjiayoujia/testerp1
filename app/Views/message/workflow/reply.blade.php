@@ -81,14 +81,15 @@
                     <div class="col-lg-12">
                         <div class="form-group">
                             @if($is_ali_msg_option)
-                                <input type="hidden" id="do-chaeck" class="is-need-operate-order" value="true">
-                                <input type="hidden" name="order-id" id="order-id" class="option-order-id" value="{{$is_ali_msg_option}}">
                                 <div class="col-lg-4">
                                     <div class="row">
 
                                     @if($message->Order)
                                         @if($message->Order->status == 'REVIEW')
-                                            <small class="text-danger glyphicon glyphicon-asterisk"></small><label>订单操作</label>
+                                                <input type="hidden" id="do-chaeck" class="is-need-operate-order" value="true">
+                                                <input type="hidden" name="order-id" id="order-id" class="option-order-id" value="{{$is_ali_msg_option}}">
+
+                                                <small class="text-danger glyphicon glyphicon-asterisk"></small><label>订单操作</label>
 
                                             <button type="button" id="do-review-order" class="btn btn-success btn-xs">审核</button>
                                             <button type="button" class="btn btn-danger btn-xs" data-target="#withdrawOrder" data-toggle="modal" >撤单</button>

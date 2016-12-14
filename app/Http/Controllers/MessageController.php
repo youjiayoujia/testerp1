@@ -80,6 +80,7 @@ class MessageController extends Controller
         if (!$message) {
               return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
+
         if(request()->input('id')){
             $model = $this->model->find(request()->input('id'));
             $count = $this->model->where('from','=',$model->from)->where('status','<>','UNREAD')->count();
@@ -135,8 +136,9 @@ class MessageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
 
+
         //return $model->message_content;  原来逻辑
-        return $model->MessageInfo;
+        return view($this->viewPath . 'workflow.content')->with('message',$model);
     }
 
     /**
@@ -439,6 +441,7 @@ class MessageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'count' => $count,
+            'message' => $model
         ];
         return view($this->viewPath . 'show', $response)->with('count',$count);
     }

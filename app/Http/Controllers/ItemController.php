@@ -17,6 +17,7 @@ use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
+use App\Models\RecieveWrapsModel;
 use App\Models\CatalogModel;
 use App\Models\UserModel;
 use App\Models\Warehouse\PositionModel;
@@ -72,6 +73,8 @@ class ItemController extends Controller
             'logisticsLimit' => $this->logisticsLimit->all(),
             'wrapLimit_arr' => $wrapLimit_arr,
             'logisticsLimit_arr' => $logisticsLimit_arr,
+            'recieveWraps' => RecieveWrapsModel::all(),
+
         ];
         return view($this->viewPath . 'edit', $response);
     }

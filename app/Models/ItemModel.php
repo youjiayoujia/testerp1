@@ -101,6 +101,11 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\CatalogModel', 'catalog_id');
     }
 
+    public function recieveWrap()
+    {
+        return $this->belongsTo('App\Models\RecieveWrapsModel', 'recieve_wrap_id');
+    }
+
     public function product()
     {
         return $this->belongsTo('App\Models\ProductModel', 'product_id');

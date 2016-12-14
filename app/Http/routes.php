@@ -62,6 +62,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('reportedMissing', 'Product\ReportedMissingController');
     //包装限制
     Route::resource('wrapLimits', 'WrapLimitsController');
+    //收货包装
+    Route::resource('recieveWraps', 'RecieveWrapsController');
     Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as' => 'checkName']);
     //汇率
     Route::resource('currency', 'CurrencyController');

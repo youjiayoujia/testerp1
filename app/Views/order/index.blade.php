@@ -638,13 +638,13 @@
                             <div class="row">
                                 <div class="form-group col-lg-12">
                                     <label for="remark" class='control-label'>订单备注</label>
-                                    <textarea class="form-control" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
+                                    <textarea class="form-control myRemark" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                            <button type="submit" class="btn btn-primary">提交</button>
+                            <button type="submit" class="btn btn-primary confirm_remark">提交</button>
                         </div>
                     </form>
                 </div>
@@ -967,6 +967,15 @@
                     $('.fb').hide();
                 } else {
                     $('.fb').show();
+                }
+            });
+
+            //备注是否为空
+            $(document).on('click', '.confirm_remark', function () {
+                var remark = $(this).parent().prev().find('.myRemark').val();
+                if (!remark) {
+                    alert('请输入备注!!!');
+                    return false;
                 }
             });
 

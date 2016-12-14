@@ -833,7 +833,8 @@ Class WishAdapter implements AdapterInterface
                // $return_array[$j]['orderInfo']	  	     = serialize($gd['Ticket']['items']);//wish订单信息
                //$return_array[$j]['last_update_date']    = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
                 $return_array[$j]['photo_proof']		 = $gd['Ticket']['photo_proof'];//邮件是否包含图片
-
+                $return_array[$j]['channel_order_number']=
+                    !empty($gd['Ticket']['items'][0]['Order']['transaction_id']) ? $gd['Ticket']['items'][0]['Order']['transaction_id'] : '';//邮件是否包含图片
                 /**
                  *订单信息 结构
                  * [Order] => Array

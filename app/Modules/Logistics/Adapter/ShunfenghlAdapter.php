@@ -37,13 +37,16 @@ class ShunfenghlAdapter extends BasicAdapter
     {
         $response = $this->doUpload($package);
         if ($response['status'] != 0) {
+            $shiping_code=isset($response['msg']->Body->OrderResponse['mailno'])?$response['msg']->Body->OrderResponse['mailno']:'';//顺丰运单号
+            $agent_code=isset($response['msg']->Body->OrderResponse['agent_mailno'])?$response['msg']->Body->OrderResponse['agent_mailno']:'';//服务商号
+            if(empty($agent_code)){
+                $agent_code = $shiping_code;
+            }
             $result = [
                 'code' => 'success',
-                'result' =>$response['msg']->Body->OrderResponse['mailno'] //跟踪号
+                'result' =>$agent_code, //跟踪号
+                'result_other' => $shiping_code
             ];
-            if(!empty($result->Body->OrderResponse['agent_mailno'])){
-                $result['result_other'] =  $result->Body->OrderResponse['agent_mailno'];
-            }
         }else{
             $result =[
                 'code' => 'error',
@@ -75,7 +78,7 @@ class ShunfenghlAdapter extends BasicAdapter
         $xmlStr .=' <Head>'.$this->_input_code.'</Head>';
         $xmlStr .= '<Body>
 			       <Order
-			        orderid="LME'.$package->id.'" express_type="'.$this->_express_type.'"
+			        orderid="V3LME'.$package->id.'" express_type="'.$this->_express_type.'"
 			        j_company="'.$this->sendInfo['j_company'].'" j_contact="'.$this->sendInfo['j_contact'].'" j_tel="'.$this->sendInfo['j_tel'].'" j_mobile="'.$this->sendInfo['j_tel'].'" j_address="'.$this->sendInfo['j_address'].'"
 			        d_contact="'.htmlspecialchars($package->shipping_firstname.' '.$package->shipping_lastname).'" d_tel="'.$package->shipping_phone.'" d_mobile="'.$package->shipping_phone.'" d_address="'.htmlspecialchars($package->shipping_address).($package->shipping_address1 ? ' '.htmlspecialchars($package->shipping_address1) : '').'"
 			        parcel_quantity="1" j_province="'.$this->sendInfo['j_province'].'" j_city="'.$this->sendInfo['j_city'].'" d_province="'.$package->shipping_state.'" d_city="'.$package->shipping_city.'"

@@ -117,7 +117,7 @@ return [
         'pay_type' => '付款类型',
         'close_status' => '付款状态',
         'by_id' => '买家ID',
-        'shipping_firstname' => '姓名',
+        'shipping_firstname' => '收货人',
         'items.item_status' => 'SKU状态',
         'outer_type' => '出库/入库',
         'inner_type' => '出入库类型',
@@ -179,5 +179,6 @@ return [
         'html_mod'=>'英文描述',
         'items.item.sku' => 'sku',
         'check_status' => '审核状态',
+        'shipping_country' => '收货国家',
     ],
 ];

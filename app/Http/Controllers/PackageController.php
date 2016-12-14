@@ -121,11 +121,11 @@ class PackageController extends Controller
 
     public function getAllInfo()
     {
-        $packageId = request('packageid');
-        $trackingNo = request('trackingno');
+        $packageId = request()->has('packageid') ? request('packageid') : '';
+        $trackingNo = request()->has('trackingno') ? request('trackingno') : '';
         $model = $this->model->onlyTrashed()->find($packageId);
         if (!$model) {
-            $model = $this->model->onlyTrashed()->where('tracking_no', $tracking_no)->first();
+            $model = $this->model->onlyTrashed()->where('tracking_no', $trackingNo)->first();
             if (!$model) {
                 return 'no infomation';
             }
@@ -269,7 +269,11 @@ class PackageController extends Controller
             }
             $logistics = LogisticsModel::find($id);
             if($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
-                $model->update(['logistics_id' => $id, 'tracking_no' => '']);
+                if($model->status == 'ASSIGNFAILED') {
+                    $model->update(['logistics_id' => $id, 'tracking_no' => '', 'status' => 'ASSIGNED']);
+                } else {
+                    $model->update(['logistics_id' => $id, 'tracking_no' => '']);
+                }
             }
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
@@ -441,6 +445,7 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
         }
+        $model->update(['tracking_no' => '']);
         $job = new PlaceLogistics($model, 'UPDATE');
         $job = $job->onQueue('placeLogistics');
         $this->dispatch($job);
@@ -890,7 +895,7 @@ class PackageController extends Controller
         $package_id = trim(request('package_id'));
         $name = UserModel::find(request()->user()->id)->name;
         $package = $this->model->with('items')->find($package_id);
-        $from = base64_decode(serialize($package));
+        $from = json_decode($package);
         if (!$package) {
             return json_encode(false);
         }
@@ -900,7 +905,7 @@ class PackageController extends Controller
             $item->item->out($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);
         }
         $package->update(['status' => 'PACKED']);
-        $to = base64_decode(serialize($package));
+        $to = json_decode($package);
         $this->eventLog($name, '强制出库', $to, $from);
 
         return json_encode(true);

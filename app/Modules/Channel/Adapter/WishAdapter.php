@@ -168,9 +168,15 @@ Class WishAdapter implements AdapterInterface
             $orderInfo['shipping_zipcode'] = isset($orderSingle['ShippingDetail']['zipcode']) ? $orderSingle['ShippingDetail']['zipcode'] : '';
             $orderInfo['shipping_phone'] = isset($orderSingle['ShippingDetail']['phone_number']) ? $orderSingle['ShippingDetail']['phone_number'] : '';
             $orderInfo['payment_date'] = $this->getPayTime($orderSingle['order_time']);
-            if(date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)<'2016-12-08 15:00:00'){
+            if(($this->client_id=='57e9ceaec9727a1331cd81dd')&&(date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)<'2016-12-08 15:00:00')){
                 continue;
             }
+
+
+            /*if(($this->client_id=='56274645b9096a0fd6eae3e5')&&date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)<'2016-12-14 13:00:00'){
+                continue;
+            }*/
+
             $orderInfo['status'] = 'PAID';
 
             //处理一下 SKU的前后缀问题
@@ -827,7 +833,8 @@ Class WishAdapter implements AdapterInterface
                // $return_array[$j]['orderInfo']	  	     = serialize($gd['Ticket']['items']);//wish订单信息
                //$return_array[$j]['last_update_date']    = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
                 $return_array[$j]['photo_proof']		 = $gd['Ticket']['photo_proof'];//邮件是否包含图片
-
+                $return_array[$j]['channel_order_number']=
+                    !empty($gd['Ticket']['items'][0]['Order']['transaction_id']) ? $gd['Ticket']['items'][0]['Order']['transaction_id'] : '';//邮件是否包含图片
                 /**
                  *订单信息 结构
                  * [Order] => Array

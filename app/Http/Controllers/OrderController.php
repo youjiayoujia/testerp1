@@ -42,12 +42,14 @@ class OrderController extends Controller
      */
     public function create()
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -136,7 +138,8 @@ class OrderController extends Controller
         $model = $this->model->with('items')->find($model->id);
         $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
 
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '新增成功.'));
     }
 
     /**
@@ -174,6 +177,7 @@ class OrderController extends Controller
             $order = $this->model->where('id', 0);
             $subtotal = 0;
         }
+        $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
@@ -182,6 +186,8 @@ class OrderController extends Controller
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,
             'rmbRate' => $rmbRate,
+            'hideUrl' => $url,
+            'page' => $page,
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -191,18 +197,19 @@ class OrderController extends Controller
     {
         $startDate = request()->input('start_date');
         $endDate = request()->input('end_date');
-        $orders = $this->model->where('created_at', '<=', $endDate)->where('created_at', '>=', $startDate);
-        $data['totalAmount'] = '';
-        $data['averageProfit'] = '';
-        $data['totalPlatform'] = '';
-        $profitAmount = '';
+        $orders = $this->model
+            ->whereBetween('created_at', [date('Y-m-d H:i:s', strtotime($startDate)), date('Y-m-d H:i:s', strtotime('+1 day', strtotime($endDate)))]);
+        $data['totalAmount'] = 0;
+        $data['averageProfit'] = 0;
+        $data['totalPlatform'] = 0;
+        $profit = '';
         if ($orders->count()) {
             foreach ($orders->get() as $order) {
                 $data['totalAmount'] += $order->amount * $order->rate;
-                $profitAmount += $order->calculateProfitProcess() * $order->amount * $order->rate;
+                $profit += $order->profit_rate;
                 $data['totalPlatform'] += $order->calculateOrderChannelFee();
             }
-            $data['averageProfit'] = $profitAmount / $data['totalAmount'];
+            $data['averageProfit'] = sprintf("%.2f", $profit / $orders->count());
         }
 
         return $data;
@@ -226,6 +233,7 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         $arr = [];
         foreach ($model->items as $orderItem) {
@@ -249,6 +257,7 @@ class OrderController extends Controller
             'arr' => $arr,
             'rows' => $model->items()->count(),
             'countries' => CountriesModel::all(),
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -262,6 +271,7 @@ class OrderController extends Controller
      */
     public function refund($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         $arr = [];
         foreach ($model->items as $orderItem) {
@@ -284,6 +294,7 @@ class OrderController extends Controller
             'aliases' => $model->channel->accounts,
             'arr' => $arr,
             'rows' => $model->items()->count(),
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'refund', $response);
@@ -297,10 +308,12 @@ class OrderController extends Controller
     public function refundUpdate($id)
     {
         $model = $this->model->find($id);
+        $page = request()->input('page');
+        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($model);
         if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            return redirect($url)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $data = request()->all();
@@ -310,7 +323,7 @@ class OrderController extends Controller
         $model->refundCreate($data, request()->file('image'));
         $to = json_encode($model);
         $this->eventLog($userName->name, '退款新增,id=' . $id, $to, $from);
-        return redirect($this->mainIndex);
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**
@@ -319,10 +332,12 @@ class OrderController extends Controller
     public function remarkUpdate($id)
     {
         request()->flash();
+        $page = request()->input('page');
         $data = request()->all();
         $data['user_id'] = request()->user()->id;
         $this->model->find($id)->remarks()->create($data);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**
@@ -385,7 +400,8 @@ class OrderController extends Controller
         $to = json_encode($this->model->with('items')->find($id));
         $this->eventLog($userName->name, '数据更新,id=' . $id, $to, $from);
 
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
     /**
@@ -602,6 +618,7 @@ class OrderController extends Controller
     //撤单
     public function withdrawUpdate($id)
     {
+        $page = request()->input('page');
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($id));
         request()->flash();
@@ -615,8 +632,8 @@ class OrderController extends Controller
         }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
-
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
     //ajax撤单
     public function ajaxWithdraw()
@@ -638,11 +655,12 @@ class OrderController extends Controller
 
     public function withdraw($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
-
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'hideUrl' => $hideUrl,
         ];
 
         return view($this->viewPath . 'withdraw', $response);

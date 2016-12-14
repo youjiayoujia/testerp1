@@ -11,6 +11,7 @@
 namespace App\Models\Order;
 
 use App\Base\BaseModel;
+use App\Models\ChannelModel;
 
 class RefundModel extends BaseModel
 {
@@ -42,6 +43,17 @@ class RefundModel extends BaseModel
         'update' => [
         ]
     ];
+
+    //状态为待审核 小于 15 USD 的速卖通订单
+    public function scopeAliexpress15Usd($query){
+        $channel_id = ChannelModel::where('name','Aliexpress')->first();
+
+        return $query->where('channel_id',$channel_id->id)
+            ->where('refund_amount','<',15)
+            ->where('refund_currency','=','USD')
+            ->where('type','FULL');
+
+    }
 
     public function getReasonNameAttribute()
     {
@@ -182,6 +194,10 @@ class RefundModel extends BaseModel
             }
         }
         return $weight;
+    }
+
+    public function getAliexpressrefunds(){
+        return $this->Aliexpress15Usd()->get();
     }
 
 

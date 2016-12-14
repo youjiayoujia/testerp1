@@ -14,7 +14,10 @@ class CoeAdapter extends BasicAdapter
 
         $this->config = $package->logistics->api_config;
 
-        $result = [];
+        $result = [
+            'code' => 'error',
+            'result' => 'Sorry, error'
+        ];
 		if($package->tracking_no){
 			$result = [
                     'code' => 'error',
@@ -22,7 +25,7 @@ class CoeAdapter extends BasicAdapter
                 ];
 			return $result;
 		}
-        $response = $this->doUpload($package);
+        $response = $this->doUpload($package);print_r($response);
         if ($response['status'] != 0) {
             preg_match('/<jobNo.*>(.*)<\/jobNo>/isU', $response['msg'], $shippingcode);
             preg_match('/<success.*>(.*)<\/success>/isU', $response['msg'], $restatus);
@@ -70,12 +73,13 @@ class CoeAdapter extends BasicAdapter
         }
         $order = $package->order;
         $total_value = round($order->amount, 2);
+
         $content = "
         <logisticsEventsRequest>
         <logisticsEvent>
         <eventHeader>
             <eventType>LOGISTICS_PACKAGE_SEND</eventType>
-            <eventMessageId><![CDATA[" . $order->ordernum . "-SLME-2016-COT-B76EFD991B19]]> </eventMessageId>
+            <eventMessageId><![CDATA[" . $order->id . "-SLME-2016-COT-B76EFD991B19]]> </eventMessageId>
             <eventTime><![CDATA[" . date("Y-m-d H:i:s") . "]]></eventTime>
             <eventSource><![CDATA[SZE150401]]></eventSource>
             <eventTarget>COE</eventTarget>
@@ -83,12 +87,14 @@ class CoeAdapter extends BasicAdapter
         <eventBody>
             <orders>
                 <order>
-                    <referenceID>" . $order->ordernum . "</referenceID>
+                    <referenceID>" . $order->id . "</referenceID>
                     <paymentType>PP</paymentType>
+
                     <pcs>" . $totalCount . "</pcs>
+
                     <destNo><![CDATA[" . $countryCode . "]]></destNo>
                     <date><![CDATA[" . date("Y-m-d H:i:s") . "]]></date>
-                    <custNo><![CDATA[" . $this->config['userId'] . "]]></custNo>
+                    <custNo><![CDATA[SZE150401]]></custNo>
                     <weight>" . $totalWeight . "</weight>
                     <declaredValue>" . $totalValue . "</declaredValue>
                     <declaredCurrency>USD</declaredCurrency>
@@ -124,11 +130,16 @@ class CoeAdapter extends BasicAdapter
                 </orders>
             </eventBody>
         </logisticsEvent>
-        </logisticsEventsRequest>";
+        </logisticsEventsRequest>";print_r($content);
+        $accountDate = array(
+            'UserId'=>'SZE150401',
+            'UserPassword'=> 'SZE150401Mima20150902',
+            'Key'=>'7891524B3896284F496775CCEA10F32C'
+        );
         $content = urlencode($content);
         $headers = array("application/x-www-form-urlencoded; charset=gb2312");
         $postData = array();
-        $url = $this->getLogisticUrl($content);
+        $url="http://112.74.141.18:9000/coeapi/coeSync/saveCoeOrder.do?Content=".$content."&UserId=".$accountDate['UserId']."&UserPassword=".$accountDate['UserPassword']."&Key=".$accountDate['Key'];
         $result = $this->curlPost($url, $postData, $headers);
         return $result;
     }

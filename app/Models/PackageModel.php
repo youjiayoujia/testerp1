@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\ErpEubModel;
 use App\Models\Logistics\ErpRussiaModel;
 use App\Models\Logistics\ErpShunFenModel;
@@ -82,6 +83,7 @@ class PackageModel extends BaseModel
     {
         $arr = [];
         $arr1 = [];
+        $arr2 = [];
         $channels = ChannelModel::all();
         foreach ($channels as $single) {
             $arr[$single->name] = $single->name;
@@ -94,21 +96,23 @@ class PackageModel extends BaseModel
             'relatedSearchFields' => [
                 'order' => ['id', 'channel_ordernum'],
             ],
-            'filterFields' => ['tracking_no'],
+            'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
                 'status' => config('package'),
-                'warehouse_id' => $this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
-                'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')
+                'warehouse_id' => WarehouseModel::where('is_available', '1')->get()->pluck('name', 'id'),
+                'logistics_id' => LogisticsModel::all()->pluck('code', 'id')
             ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
-                'channel' => ['name' => $arr],
-                'channelAccount' => ['account' => $arr1]
+                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
+                'channelAccount' => ['account' => AccountModel::all()->pluck('account', 'account')]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
-                'logistics' => ['catalog' => ['name']],
                 'items' => ['item' => ['sku']]
+            ],
+            'doubleRelatedSelectedFields' => [
+                'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
             ],
         ];
     }
@@ -415,16 +419,6 @@ class PackageModel extends BaseModel
         return $this->hasMany('App\Models\RequireModel', 'package_id', 'id');
     }
 
-    public function getArray($model, $name)
-    {
-        $arr = [];
-        $inner_models = $model::all();
-        foreach ($inner_models as $key => $single) {
-            $arr[$single->id] = $single->$name;
-        }
-        return $arr;
-    }
-
     public function assigner()
     {
         return $this->belongsTo('App\Models\UserModel', 'assigner_id');
@@ -700,7 +694,7 @@ class PackageModel extends BaseModel
                                 }
                             }
                             if (count($arr) > 1 || count($arr) == 0) {
-                                $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                                $warehouse_id = $this->items->first()->item->warehouse_id ? $this->items->first()->item->warehouse_id : '3';
                             } else {
                                 foreach ($arr as $key => $value) {
                                     $warehouse_id = $key;
@@ -738,7 +732,7 @@ class PackageModel extends BaseModel
                             }
                         }
                         if (count($arr) > 1 || count($arr) == 0) {
-                            $warehouse_id = $this->items->first()->item->purchaseAdminer->warehouse_id ? $this->items->first()->item->purchaseAdminer->warehouse_id : '3';
+                            $warehouse_id = $this->items->first()->item->warehouse_id ? $this->items->first()->item->warehouse_id : '3';
                         } else {
                             foreach ($arr as $key => $value) {
                                 $warehouse_id = $key;
@@ -1273,7 +1267,11 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $zone->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
-                        $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        if ($zone->continued_weight) {
+                            $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                        } else {
+                            return false;
+                        }
                     }
                     if ($zone->discount_weather_all) {
                         $fee = ($fee + $zone->other_fixed_price) * $zone->discount;
@@ -1341,7 +1339,6 @@ class PackageModel extends BaseModel
                     }
                 }
             }
-
             if ($rule->channel_section) {
                 $channels = $rule->rule_channels_through;
                 $flag = 0;
@@ -1406,10 +1403,6 @@ class PackageModel extends BaseModel
                 foreach ($limits as $limit) {
                     if (in_array($limit->id, $shipping_limits)) {
                         if ($limit->pivot->type == '1') {
-                            continue 2;
-                        }
-                    } else {
-                        if($limit->pivot->type == '0') {
                             continue 2;
                         }
                     }
@@ -1542,10 +1535,6 @@ class PackageModel extends BaseModel
                     foreach ($limits as $limit) {
                         if (in_array($limit->id, $shipping_limits)) {
                             if ($limit->pivot->type == '1') {
-                                continue 2;
-                            }
-                        } else {
-                            if($limit->pivot->type == '0') {
                                 continue 2;
                             }
                         }

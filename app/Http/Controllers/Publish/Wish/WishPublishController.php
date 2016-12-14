@@ -69,7 +69,8 @@ class WishPublishController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'account' => AccountModel::where('channel_id', $this->channel_id)->get()->lists('account', 'id'),
+            'account' => AccountModel::where(['channel_id'=>$this->channel_id,'is_available'=>1])->get()->lists('account', 'id'),
+
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -374,8 +375,18 @@ class WishPublishController extends Controller
 
                         }
                     }
-                    if ($key == (count($productInfoDetail) - 1))
+                    if ($key == (count($productInfoDetail) - 1)){
                         $data[$data_key]['info'] = $data[$data_key]['info'] . ' ' . $hasPublishSku . '/' . $needPublishSku;
+                        $disable =array();
+                        $disable['sku'] =  $detail->sku;
+                        $url = 'https://china-merchant.wish.com/api/v2/variant/disable';
+                        $result = $wishApi->updateProductVariation($disable, $url);
+                        if ($result['status']) {
+                            $updata = array();
+                            $updata['enabled'] = 0;
+                            $this->wishProductDetail->where('id',$detail->id)->update($updata);
+                        }
+                    }
                 }
             } else {
                 $data[$data_key]['info'] = '已经上架了';

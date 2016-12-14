@@ -37,12 +37,12 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->calculateProfitProcess(),4)*100 }}%</div>
+                <div>{{ round($order->profit_rate ,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
                 <div>
-                    毛利润: {{ round($order->amount*$order->calculateProfitProcess(),2) }} USD
+                    毛利润: {{ round($order->profit, 2) }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>

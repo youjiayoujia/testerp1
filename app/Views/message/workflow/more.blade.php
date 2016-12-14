@@ -1,4 +1,8 @@
-<div class="row">
+<div class="row"
+     @if(request()->session()->get('workflow')=='keeping')
+     style="display: none;"
+     @endif
+     id="more">
     <div class="col-lg-8">
         <div class="panel panel-primary">
             <div class="panel-heading"><strong>操作</strong></div>
@@ -8,8 +12,8 @@
                         <form action="" method="POST">
                             {!! csrf_field() !!}
                             <div class="input-group">
-                                <select class="form-control customer-id" name="assign_id">
-                                    <option value="">请选择</option>
+                                <select class="form-control customer-id" name="assign_id" style="width: 160px;">
+                                    <option value="">请选择客服</option>
                                     @foreach($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                     @endforeach

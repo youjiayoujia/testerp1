@@ -43,7 +43,7 @@
                             </select>
                         </div>
                     </div>
-{{--                    <div class="col-lg-2" id="loadingDiv">
+{{--                   <div class="col-lg-2" class="loadingDiv">
                         <img src="{{ asset('loading.gif') }}" width="30" />
                     </div>--}}
                 </div>

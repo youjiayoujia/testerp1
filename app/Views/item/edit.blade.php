@@ -1,6 +1,10 @@
 @extends('common.form')
 @section('formAction') {{ route('item.update', ['id' => $model->id]) }} @stop
 @section('formBody')
+<script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
+<script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
+<script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+<link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
     <input type='hidden' value='PUT' name="_method">
     <div class="row">
         <div class="form-group col-md-3">
@@ -189,6 +193,25 @@
                 <option value="0" {{ $model->is_available == 0 ? 'selected' : '' }}>非激活</option>
             </select>
         </div>
+
+        
+        <div class="form-group col-lg-12">
+            <input type='text' class="form-control " id="" placeholder="标题" name='default_name' value="{{$model->default_name}}">
+        </div>
+    
+        <div class="form-group  col-lg-12">    
+            <input type='text' class="form-control " id="" placeholder="关键词" name='default_keywords' value="{{$model->default_keywords}}">
+        </div>
+    
+    
+        <div class="col-lg-12" id="templateContent_{{$key}}">
+            <label for="" >描述：</label>
+            <div class="form-group">
+                <textarea class="form-control " id="editor" rows="16" placeholder="标题" name="html_mod" style="width:100%;height:400px;">{{$model->html_mod}}</textarea>
+            </div>
+        </div>
+        
+        <script type="text/javascript" charset="utf-8"> var um_{{$key}} = UM.getEditor('editor'); </script>
     </div>
 @stop
 

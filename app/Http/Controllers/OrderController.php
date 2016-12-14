@@ -177,7 +177,6 @@ class OrderController extends Controller
             $order = $this->model->where('id', 0);
             $subtotal = 0;
         }
-        $hideUrl = $_SERVER['HTTP_REFERER'];
         $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -187,7 +186,7 @@ class OrderController extends Controller
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,
             'rmbRate' => $rmbRate,
-            'hideUrl' => $hideUrl,
+            'hideUrl' => $url,
             'page' => $page,
         ];
         return view($this->viewPath . 'index', $response);

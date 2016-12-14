@@ -207,7 +207,7 @@
         <div class="col-lg-12" id="templateContent_{{$key}}">
             <label for="" >描述：</label>
             <div class="form-group">
-                <textarea class="form-control " id="editor" rows="16" placeholder="标题" name="html_mod" style="width:100%;height:400px;">{{$model->html_mod}}</textarea>
+                <textarea class="form-control privacy" id="editor" rows="16" placeholder="标题" name="html_mod" style="width:100%;height:400px;">{{$model->html_mod}}</textarea>
             </div>
         </div>
         
@@ -301,6 +301,47 @@
             });
 
         });
+
+    var pendingRequests = {};
+        jQuery.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+        var key = options.url;
+        //console.log(key);
+        if (!pendingRequests[key]) {
+        pendingRequests[key] = jqXHR;
+        }else{
+        //jqXHR.abort(); //放弃后触发的提交
+        pendingRequests[key].abort(); // 放弃先触发的提交
+        }
+
+        var complete = options.complete;
+        options.complete = function(jqXHR, textStatus) {
+        pendingRequests[key] = null;
+        if (jQuery.isFunction(complete)) {
+        complete.apply(this, arguments);
+        }
+        };
+    });
+
+    $(".privacy").blur(function(){
+        var text = $(this).children().text();
+        $.ajax({
+            url: "{{ route('spu.checkPrivacy') }}",
+            data: {text:text},
+            dataType: 'json',
+            type: 'get',
+            success: function (result) {
+                if(result){
+                    alert('字符'+result+'侵权');
+                }else{
+                    $(".btn-success").removeAttr('disabled');
+                }
+            }
+        });
+    })
+
+    $(".privacy").focus(function(){
+        $(".btn-success").attr('disabled','disabled');
+    })
 
     </script>
 @stop

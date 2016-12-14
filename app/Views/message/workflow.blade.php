@@ -101,6 +101,8 @@
                         if(data == 1){
                             message.showNextMessage();
                             message.loadingNext();
+                            message.showTip('删一条操作成功');
+
                         }else{
                             alert('操作失败');
                         }

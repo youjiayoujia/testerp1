@@ -4,12 +4,6 @@
         <small>
             {{ $message->date }} by <i>{{ $message->from_name }}</i> from {{ '<'.$message->from.'>' }}
         </small>
-        <!--
-        <button class="btn btn-primary" data-toggle="modal"
-                data-target="#myModal123">
-            转发(暂时不要点)
-        </button>
-        -->
         To:{{$message->MessageAccountName}}
         <a href="javascript:" class="close" data-toggle="modal" data-target="#myModal">
             <small class="glyphicon glyphicon-list"></small>
@@ -22,8 +16,6 @@
         <div class="row">
             <div class="col-lg-12">
                     <?php echo $content; ?>
-                    {{--{{$content}}--}}
-                    {{--<iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$message->id]) }}"></iframe>--}}
             </div>
         </div>
         @if(count($message->message_attanchments) > 0)
@@ -39,53 +31,6 @@
         @endif
     </div>
 </div>
-<!-- 模态框（Modal） -->
-{{--<div class="modal fade" id="myModal123" tabindex="-1" role="dialog"
-     aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close"
-                        data-dismiss="modal" aria-hidden="true">
-                    &times;
-                </button>
-                <h4 class="modal-title" id="myModalLabel">
-                    转发邮件
-                </h4>
-            </div>
-            <form class="bs-example bs-example-form" role="form" action="{{ route('message.foremail', ['id'=>$message->id]) }}" method="POST">
-                <label for="name">请选择发件人</label>
-                <select class="form-control" name="to">
-                    @foreach($accounts as $account_id)
-                        <option value="{{ $account_id['account'] }}">{{ $account_id['account'] }}</option>
-                    @endforeach
-                </select>
-                <br>
-                <div class="input-group">
-                    <span class="input-group-addon">收件人邮箱</span>
-                    <input type="email" name="email" class="form-control" placeholder="请输入邮箱">
-                </div>
-                <br>
-
-                <div class="input-group">
-                    <span class="input-group-addon">note转发描述</span>
-                    <input type="text" name="note" class="form-control" placeholder="note转发描述">
-                </div>
-                <br>
-                <input type="hidden" name="content" value="<iframe class='embed-responsive-item' src='{{ route('message.content', ['id'=>$message->id]) }}'></iframe>"/>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default"
-                            data-dismiss="modal">关闭
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        提交更改
-                    </button>
-                </div>
-            </form>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal -->
-</div>--}}
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" style="width:1000px;" role="document" style="width:1000px;">
         <div class="modal-content">

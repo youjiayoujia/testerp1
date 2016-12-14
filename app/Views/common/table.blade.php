@@ -171,7 +171,7 @@
                 <div class="col-lg-12">
                     <table class="table table-bordered table-striped table-hover sortable">
                         <thead>
-                 z       <tr>
+                        <tr>
                             @section('tableHeader')@show{{-- 列表字段 --}}
                         </tr>
                         </thead>

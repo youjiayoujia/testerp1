@@ -13,6 +13,7 @@ use App\Models\OrderModel;
 use App\Models\Message\Issues\EbayCasesListsModel;
 use App\Models\Message\Issues\EbayCasesDetailsModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
+use App\Models\CurrencyModel;
 
 
 class EbayAdapter implements AdapterInterface
@@ -54,6 +55,7 @@ class EbayAdapter implements AdapterInterface
         $requestXmlBody = $this->getListOrdersXml($startDate, $endDate, $OrderStatus, $perPage, $nextToken);
         $result = $this->sendHttpRequest($requestXmlBody);
         $response = simplexml_load_string($result);
+
         if (isset($response->OrderArray->Order) && !empty($response->OrderArray->Order)) {
             $orders = $response->OrderArray->Order;
             foreach ($orders as $order) {
@@ -72,11 +74,7 @@ class EbayAdapter implements AdapterInterface
                     ]
                 ];
             }
-
-
             $nextToken = '';
-
-
         }
         return ['orders' => $returnOrders, 'nextToken' => $nextToken];
     }
@@ -121,6 +119,7 @@ class EbayAdapter implements AdapterInterface
         $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.ShippingDetails.SellingManagerSalesRecordNumber,';
         $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.TransactionID,';
         $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.TransactionPrice,';
+        $returnMustBe .= 'OrderArray.Order.TransactionArray.Transaction.FinalValueFee,';
         $returnMustBe .= 'OrderArray.Order.ShippingServiceSelected.ShippingService,';
         $returnMustBe .= 'OrderArray.Order.ShippingServiceSelected.ShippingServiceCost,';
         $returnMustBe .= 'PageNumber,';
@@ -137,7 +136,7 @@ class EbayAdapter implements AdapterInterface
         $requestXmlBody .= '<OutputSelector>' . $returnMustBe . '</OutputSelector>';
         $requestXmlBody .= '<Version>745</Version>';
         $requestXmlBody .= '<WarningLevel>High</WarningLevel>';
-        $requestXmlBody .= '<IncludeFinalValueFee>false</IncludeFinalValueFee>';
+        $requestXmlBody .= '<IncludeFinalValueFee>true</IncludeFinalValueFee>';
         $requestXmlBody .= '<ModTimeFrom>' . $startDate . '</ModTimeFrom>';
         $requestXmlBody .= '<ModTimeTo>' . $endDate . '</ModTimeTo>';
         $requestXmlBody .= '<OrderRole>Seller</OrderRole>';
@@ -206,7 +205,7 @@ class EbayAdapter implements AdapterInterface
         $requestXmlBody .= '<OutputSelector>' . $returnMustBe . '</OutputSelector>';
         $requestXmlBody .= '<Version>745</Version>';
         $requestXmlBody .= '<WarningLevel>High</WarningLevel>';
-        $requestXmlBody .= '<IncludeFinalValueFee>false</IncludeFinalValueFee>';
+        $requestXmlBody .= '<IncludeFinalValueFee>true</IncludeFinalValueFee>';
         $requestXmlBody .= '<CreateTimeFrom>2016-10-17 0:00:00</CreateTimeFrom>';
         $requestXmlBody .= '<CreateTimeTo>2016-10-17 10:00:00</CreateTimeTo>';
         $requestXmlBody .= '<OrderRole>Seller</OrderRole>';
@@ -383,6 +382,9 @@ class EbayAdapter implements AdapterInterface
         } else {
             $channel_sku = $Transaction->Item->SKU;
         }
+        $attr = $Transaction->FinalValueFee->attributes();
+        $currency = CurrencyModel::where('code', (string)$attr['currencyID'])->first();
+        $finalValueFee = (float)$Transaction->FinalValueFee/$currency->rate; //成交费转化成美元
         $erpSku = Tool::filter_sku((string)$channel_sku, 1); //根据账号的sku解析设定
         $allSkuNum = $erpSku['skuNum'];
         unset($erpSku['skuNum']);
@@ -395,6 +397,7 @@ class EbayAdapter implements AdapterInterface
             $skuArray['orders_item_number'] = (string)$Transaction->Item->ItemID;
             $skuArray['transaction_id'] = (string)$Transaction->TransactionID;
             $skuArray['remark'] = (string)$remark;
+            $skuArray['final_value_fee'] = $finalValueFee*($sku['qty']/ $allSkuNum) ;
             $items[] = $skuArray;
         }
         return $items;

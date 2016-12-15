@@ -638,12 +638,12 @@ class WishPublishController extends Controller
         foreach ($erpSku as $key=> $e_sku) {
             if($key==0){
                 //$description =  $e_sku->product->spu->spuMultiOption->first()->en_description;
-                $description = $e_sku->html_mod;
+                $description = htmlspecialchars_decode($e_sku->html_mod);
             }
             $skuArr[] = $e_sku->sku;
             //$pic[] = asset($e_sku->product->Dimage);
         }
-        $skuArr[]=$sku;
+        $skuArr[]=$sku.'TEST';
         $product_sku_pic = [];
         $return['sku'] = $skuArr;
         $return['pic'] = $pic;
@@ -718,13 +718,24 @@ class WishPublishController extends Controller
      */
     function getPictureUrl($url, $host)
     {
-        $n = 0;
-        for ($i = 1; $i <= 3; $i++) {
-            $n = strpos($url, '/', $n);
-            $i != 3 && $n++;
+        $account = new AccountModel();
+        $image_domain = $account->getAllImageDomain();
+        $image_domain[] = 'imgurl.moonarstore.com';
+        $tempu=parse_url($url);
+        $url_host=$tempu['host'];
+        if(in_array($url_host,$image_domain)){
+            $n = 0;
+            for ($i = 1; $i <= 3; $i++) {
+                $n = strpos($url, '/', $n);
+                $i != 3 && $n++;
+            }
+            $url = substr($url, $n);
+            return 'http://' . $host . $url;
+        }else{
+           return $url;
         }
-        $url = substr($url, $n);
-        return 'http://' . $host . $url;
+
+
 
     }
 

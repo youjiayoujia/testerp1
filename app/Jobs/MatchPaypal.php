@@ -37,7 +37,6 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
 
         $start = microtime(true);
         $is_paypals = false;
-        //$erp_country      = trim($order->shipping_country);
         $erp_country_code = trim($this->order->shipping_country);
         $erp_state = trim($this->order->shipping_state);
         $erp_city = trim($this->order->shipping_city);
@@ -70,6 +69,9 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
                 if (strtoupper($erp_country_code) != strtoupper($paypal_country_code)) {
                     $error[] = '国家不一致';
                 }
+
+                $feeAmt  = $tInfo['FEEAMT'];
+                $currencyCode  = $tInfo['CURRENCYCODE'];
                 //把paypal的信息记录
 
                 $is_exist = OrderPaypalDetailModel::where('order_id', $this->order->id)->first();
@@ -80,7 +82,9 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
                         'paypal_account' => $paypal_account,
                         'paypal_buyer_name'=>$paypal_buyer_name,
                         'paypal_address'=>$paypalAddress,
-                        'paypal_country'=>$paypal_country_code
+                        'paypal_country'=>$paypal_country_code,
+                        'feeAmt'=>$feeAmt,
+                        'currencyCode'=>$currencyCode
                     ];
                     OrderPaypalDetailModel::create($add);
 
@@ -89,15 +93,13 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
 
                 if (!empty($error)) { //设置为匹配失败
                     $this->order->update(['order_is_alert'=>2]);
-                    $this->order->remark('paypal匹配失败:'.implode(',',$error));
-
+                    //$this->order->remark('paypal匹配失败:'.implode(',',$error));
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'fail';
                     $this->result['remark'] = 'paypal匹配失败:'.implode(',',$error);
                 } else { //设置为匹配成功
-                    $this->order->update(['order_is_alert'=>3]);
-                    $this->order->remark('paypal匹配失败:'.implode(',',$error));
-                    //remarks
+                    $this->order->update(['order_is_alert'=>1]);
+                    //$this->order->remark('paypal匹配成功:'.implode(',',$error));
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'paypal匹配成功.';

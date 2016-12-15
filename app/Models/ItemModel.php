@@ -382,16 +382,6 @@ class ItemModel extends BaseModel
         return count($stocks) ? ($flag ? $stocks->sum('available_quantity') : $stocks->sum('all_quantity')) : 0;
     }
 
-    public function getArray($model, $name)
-    {
-        $arr = [];
-        $inner_models = $model::all();
-        foreach ($inner_models as $key => $single) {
-            $arr[$single->id] = $single->$name;
-        }
-        return $arr;
-    }
-
     //获得sku销量 period参数格式为 -7 day
     public function getsales($period)
     {
@@ -719,7 +709,6 @@ class ItemModel extends BaseModel
             $items = $this->find($item_id_array);
         }
 
-        $requireModel = new RequireModel();
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
             $data['sku'] = $item->sku;

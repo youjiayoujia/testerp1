@@ -30,7 +30,7 @@
                 </li>
             </ul>
         </div>
-        <div class="btn-group" role="group">
+{{--        <div class="btn-group" role="group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="glyphicon glyphicon-filter"></i> 过滤
                 <span class="caret"></span>
@@ -51,8 +51,8 @@
                     <li><a href="{{ DataList::filtersEncode(['channel_id','=',$channel->id]) }}">{{$channel->name}}</a></li>
                 @endforeach
             </ul>
-        </div>
-        <div class="btn-group" role="group">
+        </div>--}}
+{{--        <div class="btn-group" role="group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="glyphicon glyphicon-filter"></i> 客服
                 <span class="caret"></span>
@@ -62,8 +62,8 @@
                     <li><a href="{{ DataList::filtersEncode(['assign_id','=',$user->id]) }}">{{$user->name}}</a></li>
                 @endforeach
             </ul>
-        </div>
-        <div class="btn-group" role="group">
+        </div>--}}
+{{--        <div class="btn-group" role="group">
             <select class=" btn btn-default dropdown-toggle" style="width: 120px;" name="select-acount-id" id="select-account-id" onchange="getAccountList($(this))" >
                 <option value="none">请选择渠道账号</option>
 
@@ -71,7 +71,7 @@
                     <option value="{{ DataList::filtersEncode(['account_id','=',$account->id])}}">{{$account->account}}</option>
                 @endforeach
             </select>
-        </div>
+        </div>--}}
     </div>
 @stop
 @section('tableHeader')

@@ -714,6 +714,199 @@ class ItemModel extends BaseModel
         return $stockData;
     }
 
+    public function createOnePurchaseNeedData()
+    {
+        $data['item_id'] = $this->id;
+        $data['sku'] = $this->sku;
+        $data['c_name'] = $this->c_name;
+        $zaitu_num = 0;
+        foreach ($this->purchase as $purchaseItem) {
+            if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
+                if ($purchaseItem->purchaseOrder) {
+                    if (!$purchaseItem->purchaseOrder->write_off) {
+                        if ($purchaseItem->purchaseOrder->status >= 0 && $purchaseItem->purchaseOrder->status < 4) {
+                            $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty;
+                        }
+                    }
+                }
+            }
+        }
+        //print_r($zaitu_num);exit;
+
+        //缺货
+        $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
+            orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="' . $this->id . '" ')[0]->num;
+        $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+
+        $data['zaitu_num'] = $zaitu_num;
+        //实库存
+        $data['all_quantity'] = $this->all_quantity;
+        //可用库存
+        $data['available_quantity'] = $this->available_quantity;
+        //虚库存
+        /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
+            $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',
+            $item->id)->sum('quantity') : 0;*/
+        //$xu_kucun = $data['all_quantity'] - $quantity;
+        $xu_kucun = $this->available_quantity - $data['need_total_num'];
+        //7天销量
+        $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereIn('orders.status',
+                ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+            ->where('order_items.quantity', '<', 5)
+            ->where('order_items.item_id', $this->id)
+            ->sum('order_items.quantity');
+        if ($sevenDaySellNum == null) {
+            $sevenDaySellNum = 0;
+        }
+        //7天批发订单销量
+        $pifaSeven = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereIn('orders.status',
+                ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+            ->where('order_items.quantity', '>=', 5)
+            ->where('order_items.item_id', $this->id)
+            ->count('order_items.id');
+        $sevenDaySellNum += $pifaSeven;
+
+        //14天销量
+        $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereIn('orders.status',
+                ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+            ->where('order_items.quantity', '<', 5)
+            ->where('order_items.item_id', $this->id)
+            ->sum('order_items.quantity');
+        if ($fourteenDaySellNum == null) {
+            $fourteenDaySellNum = 0;
+        }
+        //14天批发订单销量
+        $pifaFourteen = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereIn('orders.status',
+                ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+            ->where('order_items.quantity', '>=', 5)
+            ->where('order_items.item_id', $this->id)
+            ->count('order_items.id');
+        $fourteenDaySellNum += $pifaFourteen;
+
+        //30天销量
+        $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereIn('orders.status',
+                ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+            ->where('order_items.quantity', '<', 5)
+            ->where('order_items.item_id', $this->id)
+            ->sum('order_items.quantity');
+        if ($thirtyDaySellNum == null) {
+            $thirtyDaySellNum = 0;
+        }
+        //30天批发订单销量
+        $pifaThirty = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereIn('orders.status',
+                ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL'])
+            ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+            ->where('order_items.quantity', '>=', 5)
+            ->where('order_items.item_id', $this->id)
+            ->count('order_items.id');
+        $thirtyDaySellNum += $pifaThirty;
+
+
+        //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
+        if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
+            $coefficient_status = 3;
+            $coefficient = 1;
+        } else {
+            if (($sevenDaySellNum / 7) / ($fourteenDaySellNum / 14 * 1.1) >= 1) {
+                $coefficient = 1.3;
+                $coefficient_status = 1;
+            } elseif (($fourteenDaySellNum / 14 * 0.9) / ($sevenDaySellNum / 7) >= 1) {
+                $coefficient = 0.6;
+                $coefficient_status = 2;
+            } else {
+                $coefficient = 1;
+                $coefficient_status = 4;
+            }
+        }
+        $data['seven_sales'] = $sevenDaySellNum;
+        $data['fourteen_sales'] = $fourteenDaySellNum;
+        $data['thirty_sales'] = $thirtyDaySellNum;
+        $data['thrend'] = $coefficient_status;
+
+        //预交期
+        $delivery = $this->supplier ? $this->supplier->purchase_time : 7;
+
+        //采购建议数量
+        if ($this->purchase_price > 200 && $fourteenDaySellNum < 3 || $this->status == 4) {
+            $needPurchaseNum = 0 - $xu_kucun - $zaitu_num;
+        } else {
+            if ($this->purchase_price > 3 && $this->purchase_price <= 40) {
+                $needPurchaseNum = ($fourteenDaySellNum / 14) * (7 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+            } elseif ($this->purchase_price <= 3) {
+                $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+            } elseif ($this->purchase_price > 40) {
+                $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+            }
+        }
+        if ($this->status == 'cleaning') {
+            $data['need_purchase_num'] = $data['need_total_num'];
+        } else {
+            $data['need_purchase_num'] = ceil($needPurchaseNum);
+        }
+
+        //退款订单数
+        $refund_num = $this->orderItem->where('is_refund', '1')->count();
+        $all_order_num = 0;
+        $total_profit_rate = 0;
+        $total_profit_num = 0;
+        foreach ($this->orderItem as $o_item) {
+            if ($o_item->order) {
+                if (in_array($o_item->order->status, array('PACKED', 'SHIPPED', 'COMPLETE'))) {
+                    $total_profit_rate += $o_item->order->profit_rate;
+                    $total_profit_num++;
+                }
+                if (in_array($o_item->order->status,
+                    array('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL'))) {
+                    $all_order_num++;
+                }
+            }
+
+        }
+
+
+        $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
+        //退款率
+        $data['refund_rate'] = $refund_rate;
+        //平均利润率
+        $data['profit'] = $total_profit_num ? $total_profit_rate / $total_profit_num : '0';
+
+        $data['status'] = $this->status ? $this->status : 'saleOutStopping';
+        $data['require_create'] = $needPurchaseNum > 0 ? 1 : 0;
+        $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
+        $data['user_id'] = $this->purchase_adminer ? $this->purchase_adminer : 0;
+
+        $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+            ->whereIn('packages.status', ['NEED'])
+            ->where('package_items.item_id', $this->id)
+            ->first(['packages.created_at']);
+
+        if ($firstNeedItem) {
+            $firstNeedItem = $firstNeedItem->toArray();
+            $data['owe_day'] = ceil((time() - strtotime($firstNeedItem['created_at'])) / (3600 * 24));
+        } else {
+            $data['owe_day'] = 0;
+        }
+
+        if ($thisModel) {
+            $thisModel->update($data);
+        } else {
+            PurchasesModel::create($data);
+        }
+        return $data;
+        
+    }
+
     public function createPurchaseNeedData($item_id_array = null)
     {
         ini_set('memory_limit', '2048M');

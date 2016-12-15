@@ -46,7 +46,7 @@ class AutoGetMessageAliexpress extends Command
          * 执行时间： 每天  8:00 ，15:40 执行
          */
         $channel = ChannelModel::where('driver','=','aliexpress')->first();
-        $accounts =  $channel->accounts;
+        $accounts =  $channel->accounts()->where('is_available','=','1')->get();
 
         if(!$accounts->isEmpty()){
             foreach ($accounts as $account){

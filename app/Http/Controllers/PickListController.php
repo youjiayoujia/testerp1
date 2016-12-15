@@ -154,8 +154,7 @@ class PickListController extends Controller
                 continue;
             }
             foreach($model->package as $package) {
-                $to = json_encode($package);
-                $package->eventLog($name, '包裹打印', $to);
+                $package->eventLog($name, '包裹对应拣货单已打印', json_encode($package));
             }
             $model->printRecords()->create(['user_id' => request()->user()->id]);
             if($model->status == 'NONE') {
@@ -461,6 +460,7 @@ class PickListController extends Controller
         {
             $package->status = 'PICKED';
             $package->save();
+            $package->eventLog('系统', '包裹对应拣货单已分拣完成', json_encode($package));
         }
         $this->eventLog($name, '分拣完成,id='.$obj->id, $from);
 
@@ -550,7 +550,7 @@ class PickListController extends Controller
         {
             if(!in_array($package->status, ['PACKED', 'SHIPPED'])) {
                 foreach($package->items as $packageItem) {
-                    $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $package->id);
+                    $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $packageItem->id);
                     $packageItem->update(['warehouse_position_id' => '']);
                 }
                 $package->update(['status' => 'NEED', 'picklist_id' => '']);
@@ -581,12 +581,12 @@ class PickListController extends Controller
             return json_encode(false);
         }
         if($package) {
-            $package->eventLog(UserModel::find(request()->user()->id)->name, '已包装', json_encode($package));
             $item = $package->items->first();
             $item->update(['picked_quantity' => $item->quantity]);
             $order = $package->order;
             $package->status = 'PACKED';
             $package->save();
+            $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装', json_encode($package));
             $picklistItems = $package->picklistItems;
             foreach($picklistItems as $picklistItem) {
                 $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;

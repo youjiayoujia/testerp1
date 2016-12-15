@@ -45,54 +45,52 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                         $job = new DoPackages($order);
                         $job->onQueue('doPackages');
                         $this->dispatch($job);
-                        $order->eventLog('队列', '订单已塞入包裹队列');
+                        $order->eventLog('定时任务', '订单已加入处理队列');
                         $this->relation_id = $order->id;
                         $this->result['status'] = 'success';
                         $this->result['remark'] = 'Success.';
                     } else {
                         $this->relation_id = 0;
                         $this->result['status'] = 'success';
-                        $this->result['remark'] = 'Order status is not PREPARED. Can not create package';
-                        $order->eventLog('队列', 'Order status is not PREPARED. Can not create package');
+                        $this->result['remark'] = '订单状态不是准备发货，无法加入处理队列.';
+                        $order->eventLog('定时任务', '订单状态不是准备发货，无法加入处理队列.');
                     }
                 } else {
                     $this->relation_id = 0;
                     $this->result['status'] = 'fail';
-                    $this->result['remark'] = 'Fail to put order in.';
-                    $order->eventLog('队列', 'Fail to put order in.');
+                    $this->result['remark'] = '插入订单失败.';
+                    $order->eventLog('定时任务', '插入订单失败.');
                 }
             } else { //ebay  以前是UNPAID  现在是PAID 需要更新
                 $channel = ChannelModel::where('name', 'Ebay')->first();
                 if ($oldOrder->channel_id == $channel->id && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {
                     $this->order['id'] = $oldOrder->id;
-                    $order = $orderModel->updateOrder($this->order, $oldOrder);
-                    if ($order) {
-                        if ($order->status == 'PAID') {
-                            $order->update(['status' => 'PREPARED']);
-                        }
+                    $order = $oldOrder->updateOrder($this->order);
+                    if ($order and $order->status == 'PREPARED') {
                         $job = new DoPackages($order);
                         $job->onQueue('doPackages');
                         $this->dispatch($job);
                         $this->relation_id = $oldOrder->id;
                         $this->result['status'] = 'success';
-                        $this->result['remark'] = 'UNPAID to PAID. to PREPARED';
-                        $order->eventLog('队列', 'UNPAID to PAID. to PREPARED');
+                        $this->result['remark'] = '更新为已支付成功, 并加入处理队列.';
+                        $order->eventLog('定时任务', '更新为已支付成功, 并加入处理队列.');
                     } else {
-                        $this->relation_id = 0;
+                        $this->relation_id = $oldOrder->id;
                         $this->result['status'] = 'fail';
-                        $this->result['remark'] = 'Fail to update to PAID.';
-                        $order->eventLog('队列', 'Fail to update to PAID.');
+                        $this->result['remark'] = '内部错误, 无法更新为已支付.';
+                        $order->eventLog('定时任务', '内部错误, 无法更新为已支付.');
                     }
                 } else {
                     $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Order has been exist.';
-                    $oldOrder->eventLog('队列', 'Order has been exist.');
+                    $this->result['remark'] = '订单已存在，无需插入.';
+                    $oldOrder->eventLog('定时任务', '订单已存在，无需插入.');
                 }
             }
         } else { //客户撤单
             $order = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
             if ($order) {
                 $order->cancelOrder(4);//撤单，4为客户撤单类型
+                $order->eventLog('定时任务', '客户撤单.');
             }
         }
         $this->lasting = round(microtime(true) - $start, 3);

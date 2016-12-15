@@ -568,11 +568,12 @@ class MessageModel extends BaseModel{
     {
         $user_id = request()->user()->id;
         $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id'); //客服所属的账号
-        return $query->where(['status'=> 'UNREAD','required'=> 1])
+        return $query->where(['status'=> 'UNREAD','required'=> 1,'dont_reply' => 0])
             ->orWhere(function($query) use ($user_id){
                 $query->where('status','=','PROCESS')
                     ->where('assign_id','=',$user_id)
-                    ->where('required','=',1);
+                    ->where('required','=',1)
+                    ->where('dont_reply','=',0);
             })
             ->whereIn('account_id',$account_ids)
             ->take($entry)

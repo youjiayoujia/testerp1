@@ -863,16 +863,9 @@
         <div class="col-lg-2">
             <strong>当前小计</strong> : {{ '$' . $subtotal }}
         </div>
-        <div class="col-lg-2">
-            <input class="form-control" id="start_date" placeholder="开始日期" name='start_date'>
+        <div class="col-lg-4 text-danger">
+            <strong>统计</strong> : {{ $orderStatistics }}
         </div>
-        <div class="col-lg-2">
-            <input class="form-control" id="end_date" placeholder="结束日期" name='end_date'>
-        </div>
-        <div class="col-lg-1">
-            <button class="statistics">统计</button>
-        </div>
-        <div class="text-danger col-lg-4" id="statistics"></div>
     </div>
 @stop
 @stop

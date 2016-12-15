@@ -17,7 +17,9 @@ class OrderPaypalDetailModel extends BaseModel{
         'paypal_account',
         'paypal_buyer_name',
         'paypal_address',
-        'paypal_country'
+        'paypal_country',
+        'feeAmt',
+        'currencyCode'
     ];
 
     protected $searchFields = [];

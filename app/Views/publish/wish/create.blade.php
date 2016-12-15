@@ -286,7 +286,7 @@
 
                 <div class="form-group col-sm-8">
                     <input type="text" class="form-control" datatype="*" nullmsg="发货时间不能为空" name="shipping_time"
-                           id="shipping_time" value="<?php if (isset($shipping_time)) echo $shipping_time; ?>"/>
+                           id="shipping_time" value="<?php if (isset($shipping_time)){ echo $shipping_time; }else{ echo '20-45';}  ?>"/>
                 </div>
             </div>
 
@@ -691,8 +691,9 @@
 
 
         $(document).on('click', '.bt_right', function () {
-            $(this).parent().next().remove();
-            $(this).parent().remove();
+         //   $(this).parent().next().remove();
+           // $(this).parent().remove();
+            $(this).parent().parent().remove();
 
         });
 
@@ -782,9 +783,9 @@
                         $(".pic-detail").empty();
                         for (var i = 0; i < result.data.sku.length; i++) {
                             if (typeof(result.data.pic[i]) == 'undefined') {
-                                addItem(result.data.sku[i], '', sku_price, sku_num, '', '')
+                                addItem(result.data.sku[i], '',  sku_num,sku_price, '', '')
                             } else {
-                                addItem(result.data.sku[i], result.data.pic[i], sku_price, sku_num, '', '')
+                                addItem(result.data.sku[i], result.data.pic[i], sku_num, sku_price, '', '')
                             }
                         }
                         for (var i = 0; i < result.data.product_sku_pic.length; i++) {

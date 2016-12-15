@@ -49,6 +49,7 @@ class OrderModel extends BaseModel
         'gross_margin',
         'profit',
         'profit_rate',
+        'channel_fee',
         'amount_product',
         'amount_shipping',
         'amount_coupon',
@@ -653,7 +654,9 @@ class OrderModel extends BaseModel
             }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
-                $order->update(['status' => 'REVIEW',]);
+                if ($order->status == 'PAID') {
+                    $order->update(['status' => 'REVIEW']);
+                }
                 $order->remark($orderItem['channel_sku'] . '找不到对应产品.', 'ITEM');
             }
             $order->items()->create($orderItem);
@@ -663,14 +666,25 @@ class OrderModel extends BaseModel
             $order->update(['status' => 'PREPARED']);
         }
 
+        $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
+
         return $order;
     }
 
     //更新订单
-    public function updateOrder($data, $order)
+    public function updateOrder($data)
     {
-        $order = $order->update($data);
-        return $order;
+        $this->update($data);
+        foreach ($this->items as $item) {
+            if ($item->item_id == 0) {
+                $this->update(['status' => 'REVIEW']);
+                $this->remark($item->channel_sku . '找不到对应产品.', 'ITEM');
+            }
+        }
+        if ($this->status == 'PAID') {
+            $this->update(['status' => 'PREPARED']);
+        }
+        return $this;
     }
 
     //添加订单备注

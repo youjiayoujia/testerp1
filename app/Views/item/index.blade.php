@@ -53,13 +53,17 @@
                     @if($logistics->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}" />@else{{$logistics->name}} @endif<br>
                 @endforeach
                 开发时间：{{ $item->created_at }}<br>
-                【包装方式：<br>
+                【包装方式：
                 <?php if($item->product){ ?>
                 @foreach($item->product->wrapLimit as $wrap)
                     {{$wrap->name}}<br>
                 @endforeach
                 】
                 <?php } ?>
+                <br>
+                【收货包装：
+                    {{$item->recieveWrap?$item->recieveWrap->name:''}}
+                】
             </td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->weight }}kg</td>

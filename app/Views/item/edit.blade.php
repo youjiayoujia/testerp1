@@ -173,6 +173,15 @@
                 <br>
             @endforeach
         </div>
+        <div class="form-group col-md-12" style="">
+            <label for="color">收货包装：</label><br>
+            @foreach($recieveWraps as $recieve_wrap)
+                <label>
+                    <input type='checkbox' name='recieve_wrap_id' value='{{$recieve_wrap->id}}' {{ $recieve_wrap->id==$model->recieve_wrap_id? 'checked' : '' }} >{{$recieve_wrap->name}}
+                </label>
+                <br>
+            @endforeach
+        </div>
         
         <div class="form-group col-md-3">
             <label for="color">备注</label>

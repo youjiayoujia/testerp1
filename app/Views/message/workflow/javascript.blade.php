@@ -13,7 +13,7 @@
     message.showNextMessage = function () {
         //删除邮件dom
         $('.message-template').first().remove();
-        //显示第二封
+        //显示第
         $('.message-template').first().show();
         //回到顶部
         $('html,body').animate({scrollTop:0},'slow');
@@ -55,7 +55,6 @@
                 data : 'id='+id,
                 type : 'POST',
                 success:function (data){
-                    console.log(data);
                     if(data == 1){
                         message.showNextMessage();
                         message.loadingNext();
@@ -110,6 +109,7 @@
                     if(data == -1){
                         message.has_workflow_message = false;
                     }else{
+                        console.log('加载一封邮件');
                         $('.message-group').append(data);
                     }
                 }
@@ -120,23 +120,27 @@
     $(document).ready(function () {
         $('.customer-id').select2();
 
-        //初始化工作流数据
-        $.ajax({
-            url: "{{route('ajaxGetMsgInfo')}}",
-            data: 'total=' + message.entry,
-            type: 'POST',
-            success: function (data) {
-                if(data == {{config('status.ajax')['fail']}} ){
-                    alert('没有发现需要处理的消息，请点击按钮，结束工作流。');
-                    return;
-                }
-                $('.message-group').append(data);
-                $('.message-template').first().show();
-                if(message.is_workflow){
+        if(message.is_workflow){
+            //初始化工作流数据
+            $.ajax({
+                url: "{{route('ajaxGetMsgInfo')}}",
+                data: 'total=' + message.entry,
+                type: 'POST',
+                success: function (data) {
+                    if(data == {{config('status.ajax')['fail']}} ){
+                        alert('没有发现需要处理的消息，请点击按钮，结束工作流。');
+                        $('#more').show();
+                        return;
+                    }
+                    console.log('预加载'+message.entry+'封消息');
+                    $('.message-group').append(data);
+                    $('.message-template').first().show();
                     $('#more').show();
+
                 }
-            }
-        });
+            });
+        }
+
 
         //信息处理选项
         $('.option-group').click(function () {

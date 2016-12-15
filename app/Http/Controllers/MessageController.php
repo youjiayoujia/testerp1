@@ -589,7 +589,6 @@ class MessageController extends Controller
         $template = '';
 
         if(!$messages->isEmpty()){
-
             foreach($messages as $message){
                 //分配消息操作人
                 $message->assign(request()->user()->id);
@@ -605,7 +604,6 @@ class MessageController extends Controller
                     'driver' => $message->getChannelDiver(),
                     'users' => UserModel::all(),
                 ];
-
                 $template .= view($this->viewPath.'workflow.template')->with($response);
             }
             return $template;

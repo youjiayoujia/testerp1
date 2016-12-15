@@ -896,12 +896,10 @@ Class WishAdapter implements AdapterInterface
      */
     public function sendMessages($replyMessage)
     {
-
         $message_obj = $replyMessage->message;
         $param['id'] = $message_obj->message_id;
         $param['access_token'] = $this->access_token;
         $param['reply'] = $replyMessage->content;
-        //print_r($param);exit;
 
         $result_json = $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
         $result_ary = json_decode($result_json,true);
@@ -911,9 +909,9 @@ Class WishAdapter implements AdapterInterface
         }else{
             $replyMessage->status = 'FAIL';
         }
+        $replyMessage->save();
         return $replyMessage->status== 'SENT' ? true : false;
     }
-
 
     public function changeMessageState(){
 
@@ -933,43 +931,6 @@ Class WishAdapter implements AdapterInterface
         }else{
             return false;
         }
-        
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

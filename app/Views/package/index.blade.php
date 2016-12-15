@@ -62,7 +62,7 @@
             </td>
         </tr>
         @foreach($package->items as $key => $packageItem)
-            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb fb1">
+            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb fb1 {{ $pagetype == 'true' ? 'collapse' : ''}}">
                 @if($key == 0)
                     <td colspan='2' rowspan="{{$package->items->count()}}">
                         <address>
@@ -90,7 +90,6 @@
                             {{$logistics->name}}
                         @endif
                     @endforeach
-
                 </td>
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
@@ -99,7 +98,7 @@
                 <td colspan='3'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
-        <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
+        <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb {{ $pagetype == 'true' ? 'collapse' : ''}}">
             <td colspan='3'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='3'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>是否标记: {{ $package->is_mark == '1' ? '是' : '否' }}</td>
@@ -271,8 +270,8 @@
 
         $('ul.pagination li').click(function(){
             url = $(this).find('a').prop('href');
-            type = $('.fb1').is('hidden');
-            alert(type);
+            type = $('.fb1').is(':hidden');
+            location.href=url + "&pagetype=" + type;
             return false;
         });
 

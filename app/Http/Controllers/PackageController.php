@@ -98,6 +98,7 @@ class PackageController extends Controller
                 }
             }
         }
+        $pagetype = request()->has('pagetype') ? request('pagetype') : 'false';
         request()->flash();
         $logisticses = LogisticsModel::all();
         $response = [
@@ -105,6 +106,7 @@ class PackageController extends Controller
             'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
+            'pagetype' => $pagetype,
         ];
 
         return view($this->viewPath . 'index', $response);

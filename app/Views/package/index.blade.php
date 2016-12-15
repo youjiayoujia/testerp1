@@ -221,7 +221,7 @@
             <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
             <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
             <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
-            <li><a data-toggle="modal"
+            <li><a href="javascript:" data-toggle="modal"
                    data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
@@ -267,6 +267,13 @@
                     }
                 })
             }
+        });
+
+        $('ul.pagination li').click(function(){
+            url = $(this).find('a').prop('href');
+            type = $('.fb1').is('hidden');
+            alert(type);
+            return false;
         });
 
         $('.change_logistics').select2();

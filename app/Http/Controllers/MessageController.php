@@ -64,13 +64,13 @@ class MessageController extends Controller
             $message = $this->model->find(request()->input('id'));
         } elseif ($this->workflow == 'keeping') { //工作流
             //根据登陆的客服id 获取其被分配的账号消息
-            $messages = $this->model->getMyWorkFlowMsg(3);
+            //$messages = $this->model->getMyWorkFlowMsg(3);
 
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
-                'parents' => TypeModel::where('parent_id', 0)->get(), //模版分类
+                //'parents' => TypeModel::where('parent_id', 0)->get(), //模版分类
                 'users' => UserModel::all(),
-                'messages' => $messages,
+                //'messages' => $messages,
             ];
 
             return view($this->viewPath . 'workflow')->with($response);
@@ -79,6 +79,9 @@ class MessageController extends Controller
 
         if (!$message) {
               return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        if($this->workflow == 'keeping'){
+            request()->session()->pull('workflow'); //关闭
         }
 
         if(request()->input('id')){
@@ -135,8 +138,6 @@ class MessageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-
-
         //return $model->message_content;  原来逻辑
         return view($this->viewPath . 'workflow.content')->with('message',$model);
     }
@@ -588,7 +589,6 @@ class MessageController extends Controller
         $template = '';
 
         if(!$messages->isEmpty()){
-
             foreach($messages as $message){
                 //分配消息操作人
                 $message->assign(request()->user()->id);
@@ -604,7 +604,6 @@ class MessageController extends Controller
                     'driver' => $message->getChannelDiver(),
                     'users' => UserModel::all(),
                 ];
-
                 $template .= view($this->viewPath.'workflow.template')->with($response);
             }
             return $template;

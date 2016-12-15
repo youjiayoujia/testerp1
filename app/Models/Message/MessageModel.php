@@ -11,8 +11,8 @@ use App\Models\OrderModel;
 use App\Models\UserModel;
 use Tool;
 use Translation;
-use App\Models\Channel\AccountModel;
-
+use App\Models\Channel\AccountModel as Channel_Accounts;
+use App\Models\ChannelModel;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -46,7 +46,7 @@ class MessageModel extends BaseModel{
     }
     public function assigner()
     {
-        return $this->belongsTo('App\Models\UserModel', 'assign_id');
+        return $this->belongsTo('App\Models\UserModel', 'assign_id' , 'id');
     }
 
     public function getLabelTextAttribute()
@@ -73,6 +73,19 @@ class MessageModel extends BaseModel{
         return $this->belongsTo('App\Models\OrderModel', 'channel_order_number','channel_ordernum');
 
     }
+    public function replies()
+    {
+        return $this->hasMany('App\Models\Message\ReplyModel', 'message_id');
+    }
+
+    public function parts()
+    {
+        return $this->hasMany('App\Models\Message\PartModel', 'message_id');
+    }
+    public function getAttachment()
+    {
+        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
+    }
 
     public function getChannelNameAttribute(){
         if(!empty($this->channel_id)){
@@ -80,6 +93,28 @@ class MessageModel extends BaseModel{
         }else{
             return '无';
         }
+    }
+
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        //dd(UserModel::all()->pluck('name','name'));
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'messages.status' => config('message.statusText'),
+            ],
+            'selectRelatedSearchs' => [
+                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
+                'account' => ['account' => Channel_Accounts::all()->pluck('account', 'account')],
+                //'assigner' => ['name' => UserModel::all()->pluck('name','name')],
+            ],
+            'sectionSelect' => ['time'=>['created_at']],
+        ];
     }
 
     /**
@@ -165,19 +200,7 @@ class MessageModel extends BaseModel{
             ->get();
     }
 
-    public function replies()
-    {
-        return $this->hasMany('App\Models\Message\ReplyModel', 'message_id');
-    }
 
-    public function parts()
-    {
-        return $this->hasMany('App\Models\Message\PartModel', 'message_id');
-    }
-    public function getAttachment()
-    {
-        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
-    }
     public function getMessageContentAttribute()
     {
         $plainBody = '';
@@ -217,12 +240,14 @@ class MessageModel extends BaseModel{
 
     public function notRequireReply($userId)
     {
-        if ($this->assign_id == $userId) {
             $this->required = 0;
             $this->status = 'COMPLETE';
-            return $this->save();
-        }
-        return false;
+            if($this->save()){
+                return true;
+            }else{
+                return false;
+
+            }
     }
 
     public function dontRequireReply($userId)
@@ -290,21 +315,7 @@ class MessageModel extends BaseModel{
         }
         return $attanchments;
     }
-    /**
-     * 更多搜索
-     * @return array
-     */
-    public function getMixedSearchAttribute()
-    {
-        return [
-            'relatedSearchFields' => [],
-            'filterFields' => [],
-            'filterSelects' => [],
-            'selectRelatedSearchs' => [],
-            'sectionSelect' => ['time'=>['created_at']],
 
-        ];
-    }
 
     public function getMessageInfoAttribute(){
         if($this->ContentDecodeBase64){
@@ -555,14 +566,15 @@ class MessageModel extends BaseModel{
      */
     public function scopeWorkFlowMsg ($query,$entry)
     {
-
         $user_id = request()->user()->id;
+        $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id'); //客服所属的账号
         return $query->where(['status'=> 'UNREAD','required'=> 1])
             ->orWhere(function($query) use ($user_id){
                 $query->where('status','=','PROCESS')
                     ->where('assign_id','=',$user_id)
                     ->where('required','=',1);
             })
+            ->whereIn('account_id',$account_ids)
             ->take($entry)
             ->orderBy('id', 'DESC');
     }

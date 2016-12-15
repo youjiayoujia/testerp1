@@ -1,5 +1,4 @@
 <script type="text/javascript">
-
     var message = {
         entry : 5, //配置初始化消息数量
         smt_order_operate : false, //速卖通订单操作
@@ -40,8 +39,7 @@
                         }
                         message.showNextMessage();
                         message.loadingNext();
-                        message.showTip('删一条操作成功');
-
+                        message.showTip('无需回复操作成功');
                     }else{
                         alert('操作失败');
                     }
@@ -62,6 +60,8 @@
                         message.showNextMessage();
                         message.loadingNext();
                         message.showTip('已经跳转到下一封');
+                    }else{
+                        alert('没有更多的消息可以加载，请关闭工作流。');
                     }
 
                 }
@@ -109,19 +109,13 @@
                 success: function (data) {
                     if(data == -1){
                         message.has_workflow_message = false;
-                        console.log('没有更多消息了');
                     }else{
                         $('.message-group').append(data);
                     }
                 }
             });
-
-        }else{
-            console.log('没有更多消息了');
         }
-
     }
-
 
     $(document).ready(function () {
         $('.customer-id').select2();
@@ -138,6 +132,9 @@
                 }
                 $('.message-group').append(data);
                 $('.message-template').first().show();
+                if(message.is_workflow){
+                    $('#more').show();
+                }
             }
         });
 
@@ -218,6 +215,8 @@
                     //继续加载一封的邮件池
                     message.loadingNext();
                     message.showTip('上一封消息已经回复');
+                }else{
+                    alert('有些异常，请关闭工作流检查邮件是否发送');
                 }
             }
         });

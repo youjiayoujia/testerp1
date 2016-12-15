@@ -245,20 +245,6 @@
         <script type="text/javascript">
             window.onload = function () {
                 $('#loadingDiv').hide();
-
-                // 加载页面时判断是否有数据并加载\localStorage["a"]
-                var kai = $("#editor").val();
-                var content1 = localStorage["http_crm_jinjidexiaoxuesheng_com_message_processeditor-drafts-data"];
-                if (!window.localStorage) {
-                    console.log("error");
-                } else {
-                    if (localStorage["http_crm_jinjidexiaoxuesheng_com_message_processeditor-drafts-data"] != null) {
-                        editor.setContent(content1)
-                        //$("#editor").val(content1)
-                    } else {
-                        $("#editor").val("");
-                    }
-                }
             };
             // 点击发表时删除数据
 /*            document.getElementById("save").onclick = function () {

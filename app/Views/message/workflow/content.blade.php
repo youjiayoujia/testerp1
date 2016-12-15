@@ -1,6 +1,6 @@
 <div class="panel panel-info">
     <div class="panel-heading">
-        <strong>描述：{{ str_limit($message->subject,150) }}</strong><br/>
+        <strong>#{{$message->id}}描述：{{ str_limit($message->subject,150) }}</strong><br/>
         <small>
             {{ $message->date }} by <i>{{ $message->from_name }}</i> from {{ '<'.$message->from.'>' }}
         </small>
@@ -8,14 +8,12 @@
         <a href="javascript:" class="close" data-toggle="modal" data-target="#myModal">
             <small class="glyphicon glyphicon-list"></small>
         </a>
-
-
     </div>
 	
     <div class="panel-body">
         <div class="row">
             <div class="col-lg-12">
-                    <?php echo $content; ?>
+                   {!! $message->MessageInfo !!}
             </div>
         </div>
         @if(count($message->message_attanchments) > 0)
@@ -57,7 +55,7 @@
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="embed-responsive embed-responsive-16by9">
-                                                <iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$history->id]) }}"></iframe>
+                                             {{--   <iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$history->id]) }}"></iframe>--}}
                                             </div>
                                         </div>
                                     </div>

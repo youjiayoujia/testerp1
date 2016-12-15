@@ -106,7 +106,7 @@ class Kernel extends ConsoleKernel
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
                     break;
                 case 'wish':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
+                    foreach ($channel->accounts->where('is_available', '1')->where('id',5) as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');

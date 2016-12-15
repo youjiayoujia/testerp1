@@ -150,23 +150,9 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
-        $sx = request()->input('sx');
-        $lr = request()->input('lr');
-        $special = request()->input('special');
-        if ($sx != null && $lr != '') {
-            if ($sx == 'high') {
-                $order = $this->model->where('profit_rate', '>=', $lr);
-            } else {
-                $order = $this->model->where('profit_rate', '<=', $lr);
-            }
-        } else {
-            $order = $this->model;
-        }
-        if ($special == 'yes') {
-            $order = $this->model->where('customer_remark', '!=', '');
-        }
+        $order = $this->model;
         $subtotal = 0;
-        foreach ($this->autoList($this->model) as $value) {
+        foreach ($this->autoList($order) as $value) {
             $subtotal += $value->amount * $value->rate;
         }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
@@ -182,7 +168,6 @@ class OrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
             'mixedSearchFields' => $this->model->mixed_search,
-            'countries' => CountriesModel::all(),
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,
             'rmbRate' => $rmbRate,
@@ -207,9 +192,11 @@ class OrderController extends Controller
             foreach ($orders->get() as $order) {
                 $data['totalAmount'] += $order->amount * $order->rate;
                 $profit += $order->profit_rate;
-                $data['totalPlatform'] += $order->calculateOrderChannelFee();
+                $data['totalPlatform'] += $order->channel_fee;
             }
+            $data['totalAmount'] = sprintf("%.2f", $data['totalAmount']);
             $data['averageProfit'] = sprintf("%.2f", $profit / $orders->count());
+            $data['totalPlatform'] = sprintf("%.2f", $data['totalPlatform']);
         }
 
         return $data;

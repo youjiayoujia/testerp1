@@ -18,6 +18,9 @@
 Route::get('test1', 'TestController@testYw');
 Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
+Route::get('test_3', 'TestController@test_3');
+//DHL确认发货
+Route::get('sureDHLShip', 'PackageController@sureDHLShip');
 Route::post('api/curlApiChangeWarehousePositon',
     ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
 Route::any('api/skuHandleApi', ['uses' => 'ItemController@skuHandleApi', 'as' => 'item.skuHandleApi']);

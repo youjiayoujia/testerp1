@@ -28,7 +28,7 @@ use App\Models\NumberModel;
 use App\Models\UserModel;
 use App\Models\Message\ReplyModel;
 use Cache;
-
+use Logistics;
 class PackageController extends Controller
 {
     public function __construct(PackageModel $package)
@@ -67,7 +67,15 @@ class PackageController extends Controller
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至assignStocks队列成功'));
     }
-
+    //DHL统一确认发货
+    public function sureDHLShip(){
+        //创建确认订单的发送数据,渠道
+        $DHLlogistics = 412;
+        $package = PackageModel::where('logistics_id','=', $DHLlogistics)->get();
+        $dhl = Logistics::driver('Dhl','');
+        $res=$dhl->SendSureOrderShip($package);
+        echo $res['info'];
+    }
     /**
      * 列表
      *

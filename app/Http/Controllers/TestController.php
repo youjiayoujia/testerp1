@@ -87,11 +87,8 @@ class TestController extends Controller
 
     public function test2()
     {
-
-    $data = Excel::load('d:/456.xls', function($reader){
-        return $reader->all();
-    });
-    var_dump($data->toarray());
+        var_dump(url('dadasdf'));
+    var_dump('123');exit;
     }
 //    public function test2()
 //    {

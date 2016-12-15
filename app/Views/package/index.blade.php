@@ -251,6 +251,7 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {

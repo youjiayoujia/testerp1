@@ -690,6 +690,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/sectionGanged',
+        ['uses' => 'PackageController@sectionGanged', 'as' => 'package.sectionGanged']);
     Route::get('package/multiPlace/{arr}',
         ['uses' => 'PackageController@multiPlace', 'as' => 'package.multiPlace']);
     Route::get('package/downloadLogisticsTno',

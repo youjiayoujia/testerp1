@@ -32,4 +32,9 @@ class CatalogModel extends BaseModel
         ],
     ];
 
+    public function logisticses()
+    {
+        return $this->hasMany('App\Models\LogisticsModel', 'logistics_catalog_id', 'id');
+    }
+
 }

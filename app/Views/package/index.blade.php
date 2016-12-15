@@ -268,6 +268,17 @@
             }
         });
 
+        $(document).on('change', '.sectionganged_first', function(){
+            val = $(this).val();
+            $.get(
+                "{{ route('package.sectionGanged')}}",
+                {val:val},
+                function(result){
+                    $('.sectionganged_second').html(result);
+                }
+                )
+        })
+
         $('ul.pagination li').click(function(){
             url = $(this).find('a').prop('href');
             type = $('.fb1').is(':hidden');

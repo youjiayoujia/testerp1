@@ -677,7 +677,7 @@ class OrderModel extends BaseModel
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
-var_dump($order->toarray());exit;
+
         return $order;
     }
 

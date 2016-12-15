@@ -42,7 +42,7 @@ class AutoGetWishMessage extends Command
     {
         //
         $channel = ChannelModel::where('driver','=','wish')->first();
-        $accounts =  $channel->accounts;
+        $accounts =  $channel->accounts()->where('is_available','=','1')->get();
 
         if(!$accounts->isEmpty()){
             foreach ($accounts as $account){

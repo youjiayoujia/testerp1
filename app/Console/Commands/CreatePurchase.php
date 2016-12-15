@@ -58,7 +58,7 @@ class CreatePurchase extends Command
             $i = 0;
             foreach ($itemModel as $key => $model) {
                 $model->createOnePurchaseNeedData();
-                $++;
+                $i++;
             }
             //$itemModel->createPurchaseNeedData();
             $end = microtime(true);

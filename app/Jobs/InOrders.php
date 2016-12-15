@@ -45,7 +45,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                         $job = new DoPackages($order);
                         $job->onQueue('doPackages');
                         $this->dispatch($job);
-                        $order->eventLog('定时任务', '订单已加入处理队列');
+                        $order->eventLog('队列', '订单已加入处理队列');
                         $this->relation_id = $order->id;
                         $this->result['status'] = 'success';
                         $this->result['remark'] = 'Success.';
@@ -53,13 +53,13 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                         $this->relation_id = 0;
                         $this->result['status'] = 'success';
                         $this->result['remark'] = '订单状态不是准备发货，无法加入处理队列.';
-                        $order->eventLog('定时任务', '订单状态不是准备发货，无法加入处理队列.');
+                        $order->eventLog('队列', '订单状态不是准备发货，无法加入处理队列.');
                     }
                 } else {
                     $this->relation_id = 0;
                     $this->result['status'] = 'fail';
                     $this->result['remark'] = '插入订单失败.';
-                    $order->eventLog('定时任务', '插入订单失败.');
+                    $order->eventLog('队列', '插入订单失败.');
                 }
             } else { //ebay  以前是UNPAID  现在是PAID 需要更新
                 $channel = ChannelModel::where('name', 'Ebay')->first();
@@ -73,24 +73,24 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                         $this->relation_id = $oldOrder->id;
                         $this->result['status'] = 'success';
                         $this->result['remark'] = '更新为已支付成功, 并加入处理队列.';
-                        $order->eventLog('定时任务', '更新为已支付成功, 并加入处理队列.');
+                        $order->eventLog('队列', '更新为已支付成功, 并加入处理队列.');
                     } else {
                         $this->relation_id = $oldOrder->id;
                         $this->result['status'] = 'fail';
                         $this->result['remark'] = '内部错误, 无法更新为已支付.';
-                        $order->eventLog('定时任务', '内部错误, 无法更新为已支付.');
+                        $order->eventLog('队列', '内部错误, 无法更新为已支付.');
                     }
                 } else {
                     $this->result['status'] = 'success';
                     $this->result['remark'] = '订单已存在，无需插入.';
-                    $oldOrder->eventLog('定时任务', '订单已存在，无需插入.');
+                    $oldOrder->eventLog('队列', '订单已存在，无需插入.');
                 }
             }
         } else { //客户撤单
             $order = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
             if ($order) {
                 $order->cancelOrder(4);//撤单，4为客户撤单类型
-                $order->eventLog('定时任务', '客户撤单.');
+                $order->eventLog('队列', '客户撤单.');
             }
         }
         $this->lasting = round(microtime(true) - $start, 3);

@@ -100,7 +100,7 @@ class PackageModel extends BaseModel
             'filterSelects' => [
                 'status' => config('package'),
                 'warehouse_id' => WarehouseModel::where('is_available', '1')->get()->pluck('name', 'id'),
-                'logistics_id' => LogisticsModel::all()->pluck('code', 'id')
+                //'logistics_id' => LogisticsModel::all()->pluck('code', 'id')
             ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
@@ -112,8 +112,10 @@ class PackageModel extends BaseModel
                 'items' => ['item' => ['sku']]
             ],
             'doubleRelatedSelectedFields' => [
-                'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
+                //'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
             ],
+            'sectionGanged' => ['first' => ['logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]]],
+                                 'second' => ['logistics_id' => LogisticsModel::all()->pluck('code', 'id')]],
         ];
     }
 

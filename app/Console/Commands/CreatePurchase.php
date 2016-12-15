@@ -55,8 +55,10 @@ class CreatePurchase extends Command
         $itemModel = ItemModel::where('is_available','1')->get();
         
         if (date("H") != 12) {
+            $i = 0;
             foreach ($itemModel as $key => $model) {
                 $model->createOnePurchaseNeedData();
+                $++;
             }
             //$itemModel->createPurchaseNeedData();
             $end = microtime(true);
@@ -66,7 +68,7 @@ class CreatePurchase extends Command
             $commandLog->update([
                 'data' => '',
                 'lasting' => $lasting,
-                'total' => '',
+                'total' => $i,
                 'result' => $result['status'],
                 'remark' => $result['remark'],
             ]);

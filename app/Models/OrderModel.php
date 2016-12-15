@@ -49,6 +49,7 @@ class OrderModel extends BaseModel
         'gross_margin',
         'profit',
         'profit_rate',
+        'channel_fee',
         'amount_product',
         'amount_shipping',
         'amount_coupon',
@@ -662,6 +663,8 @@ class OrderModel extends BaseModel
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
+
+        $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
 
         return $order;
     }

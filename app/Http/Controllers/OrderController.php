@@ -207,7 +207,7 @@ class OrderController extends Controller
             foreach ($orders->get() as $order) {
                 $data['totalAmount'] += $order->amount * $order->rate;
                 $profit += $order->profit_rate;
-                $data['totalPlatform'] += $order->calculateOrderChannelFee();
+                $data['totalPlatform'] += $order->channel_fee;
             }
             $data['totalAmount'] = sprintf("%.2f", $data['totalAmount']);
             $data['averageProfit'] = sprintf("%.2f", $profit / $orders->count());

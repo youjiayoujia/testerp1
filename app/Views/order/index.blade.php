@@ -40,7 +40,7 @@
                 <div>{{ round($order->profit_rate ,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
-                <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
+                <div>平台费: {{ sprintf("%.2f", $order->channel_fee) }} USD</div>
                 <div>
                     毛利润: {{ round($order->profit, 2) }} USD
                 </div>

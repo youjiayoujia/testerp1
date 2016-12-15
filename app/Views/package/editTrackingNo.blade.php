@@ -47,46 +47,47 @@
             </table>
         </div>
     </div>
-
     <div class="panel panel-info">
         <div class="panel-heading">修改追踪号</div>
         <div class="panel-body">
-            <div class="col-lg-2">
+        <div class='row'>
+            <div class="form-group col-lg-2">
                 <label>修改追踪号</label>
                 <input type='text' class='form-control' name='tracking_no' value="{{ $model->tracking_no }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>发货地址</label>
                 <input type='text' class='form-control' name='shipping_address' value="{{ $model->shipping_address }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>发货地址1</label>
                 <input type='text' class='form-control' name='shipping_address1' value="{{ $model->shipping_address1 }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>收货人</label>
                 <input type='text' class='form-control' name='shipping_firstname' value="{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>电话</label>
                 <input type='text' class='form-control' name='shipping_phone' value="{{ $model->shipping_phone }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>发货邮编</label>
                 <input type='text' class='form-control' name='shipping_zipcode' value="{{ $model->shipping_zipcode }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>城市</label>
                 <input type='text' class='form-control' name='shipping_city' value="{{ $model->shipping_city }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>省/州</label>
                 <input type='text' class='form-control' name='shipping_state' value="{{ $model->shipping_state }}">
             </div>
-            <div class="col-lg-2">
+            <div class="form-group col-lg-2">
                 <label>国家</label>
                 <input type='text' class='form-control' name='shipping_country' value="{{ $model->shipping_country }}">
             </div>
+        </div>
         </div>
     </div>
 @stop

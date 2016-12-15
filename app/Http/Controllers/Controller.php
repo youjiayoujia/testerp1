@@ -300,6 +300,36 @@ abstract class Controller extends BaseController
                             }
                         }
                         break;
+                    case 'sectionGanged':
+                        foreach ($related as $kind => $content) {
+                            if($kind == 'first') {
+                                foreach ($content as $relation_ship1 => $value1) {
+                                    foreach ($value1 as $relation_ship2 => $value2) {
+                                        foreach ($value2 as $key => $name) {
+                                            $name = trim($name);
+                                            if ($name != '') {
+                                                $list = $list->whereHas($relation_ship1,
+                                                    function ($query) use ($relation_ship2, $name, $key) {
+                                                        $query = $query->wherehas($relation_ship2,
+                                                            function ($query1) use ($name, $key) {
+                                                                $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                            });
+                                                    });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if($kind == 'second') {
+                                foreach ($content as $key => $value2) {
+                                    $value2 = trim($value2);
+                                    if ($value2||$value2=='0') {
+                                        $list = $list->where($key, $value2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
                 }
             }
         }

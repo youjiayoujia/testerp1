@@ -27,6 +27,7 @@ use App\Jobs\AssignStocks;
 use App\Models\NumberModel;
 use App\Models\UserModel;
 use App\Models\Message\ReplyModel;
+use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 
 class PackageController extends Controller
@@ -98,6 +99,7 @@ class PackageController extends Controller
                 }
             }
         }
+        $pagetype = request()->has('pagetype') ? request('pagetype') : 'false';
         request()->flash();
         $logisticses = LogisticsModel::all();
         $response = [
@@ -105,6 +107,7 @@ class PackageController extends Controller
             'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
+            'pagetype' => $pagetype,
         ];
 
         return view($this->viewPath . 'index', $response);
@@ -194,6 +197,20 @@ class PackageController extends Controller
         ];
 
         return view('logistics.template.tpl.' . $view, $response);
+    }
+
+    public function sectionGanged()
+    {
+        $val = trim(request('val'));
+        $model = LogisticsCatalogModel::where('name', $val)->first();
+        if(!$model) {
+            return false;
+        }
+        $str = "<option value=''>物流方式</option>";
+        foreach($model->logisticses as $logistics) {
+            $str .= "<option value='".$logistics->id."'>".$logistics->code."</option>";
+        }
+        return $str;
     }
 
     public function logisticsDelivery()

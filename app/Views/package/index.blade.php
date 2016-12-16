@@ -62,7 +62,7 @@
             </td>
         </tr>
         @foreach($package->items as $key => $packageItem)
-            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb fb1">
+            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb fb1 {{ $pagetype == 'true' ? 'collapse' : ''}}">
                 @if($key == 0)
                     <td colspan='2' rowspan="{{$package->items->count()}}">
                         <address>
@@ -90,7 +90,6 @@
                             {{$logistics->name}}
                         @endif
                     @endforeach
-
                 </td>
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
@@ -99,7 +98,7 @@
                 <td colspan='3'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
-        <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
+        <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb {{ $pagetype == 'true' ? 'collapse' : ''}}">
             <td colspan='3'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='3'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>是否标记: {{ $package->is_mark == '1' ? '是' : '否' }}</td>
@@ -221,7 +220,7 @@
             <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
             <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
             <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
-            <li><a data-toggle="modal"
+            <li><a href="javascript:" data-toggle="modal"
                    data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
@@ -251,6 +250,7 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {
@@ -266,6 +266,24 @@
                     }
                 })
             }
+        });
+
+        $(document).on('change', '.sectionganged_first', function(){
+            val = $(this).val();
+            $.get(
+                "{{ route('package.sectionGanged')}}",
+                {val:val},
+                function(result){
+                    $('.sectionganged_second').html(result);
+                }
+                )
+        })
+
+        $('ul.pagination li').click(function(){
+            url = $(this).find('a').prop('href');
+            type = $('.fb1').is(':hidden');
+            location.href=url + "&pagetype=" + type;
+            return false;
         });
 
         $('.change_logistics').select2();

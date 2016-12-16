@@ -605,6 +605,8 @@ class MessageController extends Controller
                     'users' => UserModel::all(),
                 ];
                 $template .= view($this->viewPath.'workflow.template')->with($response);
+                $message->read = 1;
+                $message->save();
             }
             return $template;
         } else {

@@ -97,12 +97,12 @@ class Kernel extends ConsoleKernel
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {
                 case 'amazon':
-                    foreach ($channel->accounts as $account) {
+                    foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
                 case 'aliexpress':
-                    foreach ($channel->accounts as $account) {
+                    foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
                     }
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
@@ -114,22 +114,22 @@ class Kernel extends ConsoleKernel
                     $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
                     break;
                 case 'ebay':
-                    foreach ($channel->accounts as $account) {
+                    foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
                 case 'lazada':
-                    foreach ($channel->accounts as $account) {
+                    foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
                 case 'cdiscount':
-                    foreach ($channel->accounts as $account) {
+                    foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
                 case 'joom':
-                    foreach ($channel->accounts as $account) {
+                    foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;

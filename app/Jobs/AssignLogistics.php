@@ -60,7 +60,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                     $order->update(['status' => 'REVIEW']);
                     $order->remark('包裹重量大于2kg.', 'WEIGHT');
                 }
-                //利润率判断
+                //分渠道判断
                 $profitRate = $order->calculateProfitProcess();
                 switch ($order->channel->driver) {
                     case 'amazon':
@@ -81,6 +81,10 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                         if ($profitRate <= 0.05) {
                             $order->update(['status' => 'REVIEW']);
                             $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
+                        }
+                        if ($order->order_is_alert != 2) { //ebay订单pp未匹配
+                            $order->update(['status' => 'REVIEW']);
+                            $order->remark('EBAY订单PP未匹配.', 'PAYPAL');
                         }
                         break;
                     case 'lazada':

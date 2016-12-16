@@ -2,6 +2,7 @@
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th>sku</th>  
+    <th>海外仓sku</th>
     <th>仓库</th>
     <th>库位</th>
     <th class='sort' data-field='all_quantity'>总数量</th>
@@ -17,6 +18,9 @@
         <tr>
             <td>{{ $stock->id }}</td>
             <td>{{ $stock->item ? $stock->item->sku : '' }}</td>
+            <td>
+                {{ $stock->oversea_sku }}
+            </td>
             <td>{{ $stock->warehouse ? $stock->warehouse->name : '' }}</td>
             <td>{{ $stock->position ? $stock->position->name : '' }}</td>
             <td>{{ $stock->all_quantity}}</td>
@@ -55,6 +59,11 @@
 <div class="btn-group">
     <a class="btn btn-success" href="{{ route('stock.importByExcel') }}">
         excel导入
+    </a>
+</div>
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('stock.overseaImportByExcel') }}">
+        海外仓库存调整导入
     </a>
 </div>
 @stop

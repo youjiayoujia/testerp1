@@ -518,9 +518,12 @@ class MessageModel extends BaseModel{
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;
+
+                $language = ! empty(config('message.wish')['country'][$this->country]) ? config('message.wish')['country'][$this->country] : '未知';
+
                 if($files){
                     $html .= '<p><strong>Transaction id</strong>:'.$files['order_items'][0]['Order']['transaction_id'].'</p>';
-                    $html .= '<p><strong>语言</strong>:'.$files['locale'].'</p>';
+                    $html .= '<p><strong>语言</strong>:'.$language.'</p>';
                 }else{
                     $html .= '<p>暂无</p>';
                 }

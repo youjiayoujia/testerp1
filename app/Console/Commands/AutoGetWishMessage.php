@@ -73,6 +73,7 @@ class AutoGetWishMessage extends Command
                             $messageNew->related  = 0;
                             $messageNew->required  = 1;
                             $messageNew->read  = 0;
+                            $messageNew->country  = ! empty($message['country']) ? $message['country'] : '';
 
                             !empty($message['channel_order_number']) ? $messageNew->channel_order_number=$message['channel_order_number'] : '';
 

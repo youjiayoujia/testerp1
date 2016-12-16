@@ -114,8 +114,10 @@ class PackageModel extends BaseModel
             'doubleRelatedSelectedFields' => [
                 //'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
             ],
-            'sectionGanged' => ['first' => ['logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]]],
-                                 'second' => ['logistics_id' => LogisticsModel::all()->pluck('code', 'id')]],
+            'sectionGanged' => [
+                'first' => ['logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]]],
+                'second' => ['logistics_id' => LogisticsModel::all()->pluck('code', 'id')]
+            ],
         ];
     }
 
@@ -569,7 +571,8 @@ class PackageModel extends BaseModel
         $item = $this->items()->first();
         if ($item->warehouse_position_id) {
             foreach ($this->items as $packageItem) {
-                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $packageItem->id);
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE',
+                    $packageItem->id);
                 $packageItem->forceDelete();
             }
         } else {
@@ -800,7 +803,7 @@ class PackageModel extends BaseModel
                 }
                 $newPackage->items()->create($info);
             }
-            foreach($newPackage->items as $single) {
+            foreach ($newPackage->items as $single) {
                 $single->item->hold($single->warehouse_position_id, $single->quantity, 'PACKAGE', $newPackage->id);
             }
             $newPackage->update([
@@ -1638,7 +1641,7 @@ class PackageModel extends BaseModel
             }
         } else {
             //判断订单状态
-            if ($this->status != 'ASSIGNED') {
+            if (!in_array($this->status, ['ASSIGNED', 'TRACKINGFAILED'])) {
                 return false;
             }
         }
@@ -1690,6 +1693,11 @@ class PackageModel extends BaseModel
                     'tracking_no' => $result['tracking_no'],
                     'logistics_order_number' => $result['logistics_order_number'],
                     'logistics_order_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            if ($result['status'] == 'error') {
+                $this->update([
+                    'status' => 'TRACKINGFAILED',
                 ]);
             }
             return $result;
@@ -1807,10 +1815,10 @@ class PackageModel extends BaseModel
                     $model = $this->find($content['package_id']);
                     if ($type == 1) {
                         $model->update(['cost' => $content['cost']]);
-                        $model->eventLog('系统', '回传物流费'.$content['cost'], json_encode($model));
+                        $model->eventLog('系统', '回传物流费' . $content['cost'], json_encode($model));
                     } else {
                         $model->update(['cost1' => $content['cost']]);
-                        $model->eventLog('系统', '回传物流费'.$content['cost'], json_encode($model));
+                        $model->eventLog('系统', '回传物流费' . $content['cost'], json_encode($model));
                     }
                     break;
                 case '3':
@@ -1823,7 +1831,7 @@ class PackageModel extends BaseModel
                     }
                     $model = $this->find($content['package_id']);
                     $model->update(['tracking_no' => $content['tracking_no']]);
-                    $model->eventLog('系统', '回传追踪号'.$content['tracking_no'], json_encode($model));
+                    $model->eventLog('系统', '回传追踪号' . $content['tracking_no'], json_encode($model));
                     break;
                 case '4':
                     $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
@@ -1847,7 +1855,8 @@ class PackageModel extends BaseModel
                         'tracking_no' => $content['tracking_no'],
                         'logistics_id' => $content['logistics_id']
                     ]);
-                    $package->eventLog('系统', '修改物流方式id'.$content['logistics_id'].'+追踪号'.$content['tracking_no'], json_encode($package));
+                    $package->eventLog('系统', '修改物流方式id' . $content['logistics_id'] . '+追踪号' . $content['tracking_no'],
+                        json_encode($package));
                     break;
             }
         }

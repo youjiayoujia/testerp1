@@ -308,7 +308,7 @@ return [
     ],
 
     //
-    'default_account' => 'powerup2009',
+    'default_account' => 'pandamotos2012',
 
     'init_currency' => [
         0 => 'USD',

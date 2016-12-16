@@ -230,42 +230,6 @@ return [
             ],
         ],
     ],
-    //仓储导航
-    // [
-    //     'name' => '海外仓',
-    //     'icon' => 'home',
-    //     'url' => '',
-    //     'type' => 'group',
-    //     'subnavigations' => [
-    //         '海外仓模块' => [
-    //             [
-    //                 'name' => '海外仓销量',
-    //                 'url' => 'suggestForm.index',
-    //                 'icon' => '',
-    //             ],
-    //             [
-    //                 'name' => '申请表',
-    //                 'url' => 'report.index',
-    //                 'icon' => '',
-    //             ],
-    //             [
-    //                 'name' => '发货',
-    //                 'url' => 'report.shipment',
-    //                 'icon' => '',
-    //             ],
-    //             [
-    //                 'name' => '海外仓箱子',
-    //                 'url' => 'box.index',
-    //                 'icon' => '',
-    //             ],
-    //             [
-    //                 'name' => 'fba库存信息',
-    //                 'url' => 'fbaStock.index',
-    //                 'icon' => '',
-    //             ],
-    //         ],
-    //     ],
-    // ],
     [
         'name' => '海外仓',
         'icon' => 'home',
@@ -279,11 +243,11 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '海外仓调拨单',
+                    'name' => '海外调拨',
                     'url' => 'overseaAllotment.index',
                     'icon' => '',
                 ],
-                
+
             ],
         ],
     ],
@@ -388,32 +352,6 @@ return [
             ],
         ],
     ],
-    //渠道导航
-    [
-        'name' => '渠道',
-        'icon' => 'transfer',
-        'url' => '',
-        'type' => 'group',
-        'subnavigations' => [
-            '渠道管理' => [
-                [
-                    'name' => '渠道',
-                    'url' => 'channel.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '地域渠道名',
-                    'url'  => 'CatalogRatesChannel.index',
-                    'icon' => ''
-                ],
-                [
-                    'name' => '账号',
-                    'url' => 'channelAccount.index',
-                    'icon' => '',
-                ],
-            ],
-        ],
-    ],
     [
         'name' => ' 刊登',
         'icon' => 'glyphicon glyphicon-send',
@@ -437,7 +375,7 @@ return [
                     'icon' => '',
                 ],
             ],
-            'Aliexpress刊登'=>[
+            'Aliexpress刊登' => [
                 [
                     'name' => 'SMT待发布产品列表',
                     'url' => 'smt.waitPost',
@@ -544,7 +482,7 @@ return [
                 ],
 
             ],
-            '数据监控'=>[
+            '数据监控' => [
                 [
                     'name' => 'Ebay数据监控',
                     'url' => 'ebayProduct.index',
@@ -561,11 +499,11 @@ return [
                     'url' => 'lazada.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => 'Joom数量监控',
                     'url' => 'joomonline.index',
                     'icon' => '',
-                 ],
+                ],
                 [
                     'name' => 'wish数量监控',
                     'url' => 'WishQuantityCheck.index',
@@ -624,10 +562,10 @@ return [
                     'icon' => '',
                 ],
             ],
-            '评论列表' =>[
+            '评论列表' => [
                 [
                     'name' => 'Ebay feedBack',
-                    'url'  => 'ebayFeedBack.index',
+                    'url' => 'ebayFeedBack.index',
                     'icon' => '',
                 ]
             ],
@@ -650,7 +588,7 @@ return [
             'CRM报表' => [
                 [
                     'name' => '差评统计',
-                    'url'  => 'feeback.feedBackStatistics',
+                    'url' => 'feeback.feedBackStatistics',
                     'icon' => '',
                 ],
             ],
@@ -750,62 +688,83 @@ return [
         'name' => '系统',
         'icon' => 'cog',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => '用户列表',
-                'url' => 'user.index',
-                'icon' => '',
+            '渠道管理' => [
+                [
+                    'name' => '渠道',
+                    'url' => 'channel.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '地域渠道名',
+                    'url' => 'CatalogRatesChannel.index',
+                    'icon' => ''
+                ],
+                [
+                    'name' => '账号',
+                    'url' => 'channelAccount.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => '角色列表',
-                'url' => 'role.index',
-                'icon' => '',
+            '用户' => [
+                [
+                    'name' => '用户列表',
+                    'url' => 'user.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '角色列表',
+                    'url' => 'role.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '权限列表',
+                    'url' => 'permission.index',
+                    'icon' => '',
+                ]
             ],
-            [
-                'name' => '权限列表',
-                'url' => 'permission.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '汇率',
-                'url' => 'currency.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '物流限制',
-                'url' => 'logisticsLimits.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '包装限制',
-                'url' => 'wrapLimits.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '国家Number信息',
-                'url' => 'countries.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '国家转换',
-                'url' => 'countriesChange.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '国家地区信息',
-                'url' => 'countriesSort.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'paypal列表',
-                'url' => 'paypal.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'paypal固定税率',
-                'url'  => 'paypal.ShowPaypalRate',
-                'icon' => '',
+            '设置' => [
+                [
+                    'name' => '汇率',
+                    'url' => 'currency.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '物流限制',
+                    'url' => 'logisticsLimits.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包装限制',
+                    'url' => 'wrapLimits.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '国家Number信息',
+                    'url' => 'countries.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '国家转换',
+                    'url' => 'countriesChange.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '国家地区信息',
+                    'url' => 'countriesSort.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'paypal列表',
+                    'url' => 'paypal.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'paypal固定税率',
+                    'url' => 'paypal.ShowPaypalRate',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

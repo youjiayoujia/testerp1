@@ -323,6 +323,12 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\Message\SendEbayMessageListModel', 'order_id', 'id');
     }
 
+    //ebay手续费
+    public function orderPaypal()
+    {
+        return $this->belongsTo('App\Models\Order\OrderPaypalDetailModel', 'order_id', 'id');
+    }
+
     //订单重量
     public function getOrderWeightAttribute()
     {
@@ -783,9 +789,22 @@ class OrderModel extends BaseModel
         switch ($this->channel->driver) {
             case 'wish':
                 $sum = $this->amount * 0.15;
+                $sum = $sum * $this->rate;
                 break;
             case 'ebay':
-                $sum = 0;
+                $counterFee = 0;
+                if ($this->orderPaypal) {
+                    $rate = CurrencyModel::where('code', $this->orderPaypal->currencyCode)->first()->rate;
+                    $counterFee = $this->orderPaypal->feeAmt * $rate;
+                }
+                $dealFee = 0;
+                if ($this->items) {
+                    foreach ($this->items as $item) {
+                        $rate = CurrencyModel::where('code', $item->currency)->first()->rate;
+                        $dealFee += $item->final_value_fee * $rate;
+                    }
+                }
+                $sum = $counterFee + $dealFee;
                 break;
             default:
                 foreach ($this->items as $item) {
@@ -794,13 +813,14 @@ class OrderModel extends BaseModel
                             $this->channelAccount->catalog_rates_channel_id)->first();
                         if ($channelRate) {
                             $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
+                            $sum = $sum * $this->rate;
                         }
                     }
                 }
                 break;
         }
 
-        return $sum * $this->rate;
+        return $sum;
     }
 
     //黑名单验证

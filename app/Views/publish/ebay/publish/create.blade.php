@@ -1160,12 +1160,12 @@
                     type: 'get',
                     success: function (result) {
                         if (result) {
-                            $("#ebay_picture").next().empty();
+                            /*$("#ebay_picture").next().empty();
                             $("#description_picture").next().empty();
                             for (var i = 0; i < result.picture.length; i++) {
                                 add_pic_in_detail('auto', result.picture[i]);
                                 add_pic_in_description('auto', result.picture[i]);
-                            }
+                            }*/
                             if (check_value == 3) {
                                 $("#variation_sku").empty();
                                 for (var i = 0; i < result.sku.length; i++) {

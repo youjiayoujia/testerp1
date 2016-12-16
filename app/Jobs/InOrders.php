@@ -49,7 +49,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                             $this->result['remark'] = 'EBAY订单需要匹配PAYPAL.';
                         } else {
                             $job = new DoPackages($order);
-                            $job->onQueue('doPackages');
+                            $job = $job->onQueue('doPackages');
                             $this->dispatch($job);
                             $order->eventLog('队列', '订单已加入处理队列');
                             $this->relation_id = $order->id;
@@ -75,7 +75,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                     $order = $oldOrder->updateOrder($this->order);
                     if ($order and $order->status == 'PREPARED') {
                         $job = new DoPackages($order);
-                        $job->onQueue('doPackages');
+                        $job = $job->onQueue('doPackages');
                         $this->dispatch($job);
                         $this->relation_id = $oldOrder->id;
                         $this->result['status'] = 'success';

@@ -386,6 +386,9 @@ class PackageModel extends BaseModel
             case 'ASSIGNFAILED':
                 $color = 'danger';
                 break;
+            case 'TRACKINGFAILED':
+                $color = 'danger';
+                break;
             case 'NEW':
                 $color = 'info';
                 break;

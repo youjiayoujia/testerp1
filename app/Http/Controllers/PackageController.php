@@ -1063,7 +1063,7 @@ class PackageController extends Controller
             $start += $len;
             unset($packages);
             $packages = $this->model
-                ->where('status', 'ASSIGNED')
+                ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
                 ->where('is_auto', '1')
                 ->skip($start)->take($len)->get();
         }

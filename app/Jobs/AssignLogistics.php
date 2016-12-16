@@ -62,9 +62,33 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                 }
                 //利润率判断
                 $profitRate = $order->calculateProfitProcess();
-                if ($profitRate <= 0 or $profitRate >= 0.4) {
-                    $order->update(['status' => 'REVIEW']);
-                    $order->remark('订单利润率小于0或者大于40%.', 'PROFIT');
+                switch ($order->channel->driver) {
+                    case 'amazon':
+                        break;
+                    case 'aliexpress':
+                        if ($profitRate <= 0 or $profitRate >= 0.4) {
+                            $order->update(['status' => 'REVIEW']);
+                            $order->remark('速卖通订单利润率小于0或大于40%.', 'PROFIT');
+                        }
+                        break;
+                    case 'wish':
+                        if ($profitRate < 0.08) {
+                            $order->update(['status' => 'REVIEW']);
+                            $order->remark('WISH订单利润率小于8%.', 'PROFIT');
+                        }
+                        break;
+                    case 'ebay':
+                        if ($profitRate <= 0.05) {
+                            $order->update(['status' => 'REVIEW']);
+                            $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
+                        }
+                        break;
+                    case 'lazada':
+                        break;
+                    case 'cdiscount':
+                        break;
+                    case 'joom':
+                        break;
                 }
             }
             if ($this->package->status == 'ASSIGNED') {
@@ -82,7 +106,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                 $this->result['status'] = 'success';
                 $this->result['remark'] = '已匹配到物流,缺货中，不需要提前标记发货.';
                 $this->package->eventLog('队列', '已匹配到物流,缺货中,不需要提前标记发货.', json_encode($this->package));
-            } 
+            }
         } else {
             $this->result['status'] = 'fail';
             $this->result['remark'] = '订单需审核.';

@@ -13,6 +13,7 @@ use Tool;
 use Translation;
 use App\Models\Channel\AccountModel as Channel_Accounts;
 use App\Models\ChannelModel;
+use Carbon\Carbon;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -37,7 +38,8 @@ class MessageModel extends BaseModel{
     public $rules = [];
 
     public $appends = [
-        'channel_diver_name'
+        'channel_diver_name',
+        'msg_time'
     ];
 
   public function account()
@@ -136,23 +138,6 @@ class MessageModel extends BaseModel{
         }
     }
 
-    /**
-     * 工作流获取下一个message
-     * 说明：只获取会话客服被分配的账号下的的信息
-     * @param $userId
-     * @return mixed
-     */
-    public function getOne($userId)
-    {
-        $acounts_ary = $this->getUserAccountIDs($userId);
-        return $this
-            ->whereIn('account_id', $acounts_ary) //用户所属账号的信息
-            ->where('status', 'UNREAD')
-            ->orWhere(function ($query) use ($userId) {
-                $query->where('assign_id', $userId)->where('status', 'PROCESS')->where('dont_reply','<>',1);
-            })->first();
-    }
-
     public function getUserAccountIDs($userId){
         if($userId) {
             $accounts = AccountModel::where('customer_service_id', '=', $userId)->get();
@@ -164,19 +149,6 @@ class MessageModel extends BaseModel{
             }
         }
         return false;
-    }
-
-
-    //根据邮件或者 from 关联订单
-    public function guessRelatedOrders($email = null)
-    {
-        $relatedOrders = [];
-        if ($this->last) {
-            $relatedOrders['history'] = $this->last->relatedOrders;
-        }
-        $email = $email ? $email : $this->from;
-        $relatedOrders['email'] = OrderModel::where('email', $email)->get();
-        return $relatedOrders;
     }
 
     public function assignToOther($fromId, $assignId)
@@ -200,6 +172,13 @@ class MessageModel extends BaseModel{
             ->get();
     }
 
+    public function getMsgTimeAttribute(){
+        if(! empty($this->date)){
+            return Carbon::parse($this->date)->diffForHumans();
+        }else{
+            return '';
+        }
+    }
 
     public function getMessageContentAttribute()
     {

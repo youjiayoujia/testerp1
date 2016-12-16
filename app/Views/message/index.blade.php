@@ -81,13 +81,13 @@
     <th>主题</th>
     <th>平台订单号</th>
     <th>状态</th>
-    <th class="sort" data-field="from_name">用户昵称</th>
-    <th class="sort" data-field="from">用户ID</th>
+    <th>用户昵称</th>
+    <th>用户ID</th>
     <th class="sort" data-field="date">发信日期</th>
-    <th class="sort">消息处理客服</th>
-    <th class="sort" data-field="created_at">创建日期</th>
-    <th class="sort" data-field="updated_at">更新日期</th>
-    <th>延时（秒）</th>
+    <th>客服</th>
+{{--    <th class="sort" data-field="created_at">创建日期</th>--}}
+    {{--<th class="sort" data-field="updated_at">更新日期</th>--}}
+    <th>延迟</th>
     <th>操作</th>
     <th>无需回复</th>
 @stop
@@ -106,10 +106,10 @@
             <td>{{ $message->status_text }}</td>
             <td>{{ $message->from_name }}</td>
             <td>{{ str_limit($message->from,15)}}</td>
-            <td>{{ date('Y-m-d H:i:s',strtotime($message->date)) }}</td>
+            <td>{{ $message->msg_time }}</td>
             <td>{{ $message->assign_id ? $message->assigner->name : '未分配' }}</td>
-            <td>{{ $message->created_at }}</td>
-            <td>{{ $message->updated_at }}</td>
+{{--            <td>{{ $message->created_at }}</td>--}}
+{{--            <td>{{ $message->updated_at }}</td>--}}
             <td>
                 <?php
                 if($message->status == 'COMPLETE'){

@@ -70,6 +70,8 @@ class ItemModel extends BaseModel
         'competition_url',
         'products_history_values',
         'new_status',
+        'is_oversea',
+        'volumn_rate',
         'html_mod',
         'default_keywords',
         'default_name',
@@ -893,6 +895,7 @@ class ItemModel extends BaseModel
         } else {
             PurchasesModel::create($data);
         }
+        
         return $data;
         
     }

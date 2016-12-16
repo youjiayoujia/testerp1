@@ -77,7 +77,8 @@ class PackageModel extends BaseModel
         'created_at',
         'is_tonanjing',
         'is_over',
-        'lazada_package_id'
+        'lazada_package_id',
+        'is_oversea',
     ];
 
     public function getMixedSearchAttribute()
@@ -115,8 +116,10 @@ class PackageModel extends BaseModel
             'doubleRelatedSelectedFields' => [
                 //'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
             ],
-            'sectionGanged' => ['first' => ['logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]]],
-                                 'second' => ['logistics_id' => LogisticsModel::all()->pluck('code', 'id')]],
+            'sectionGanged' => [
+                'first' => ['logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]]],
+                'second' => ['logistics_id' => LogisticsModel::all()->pluck('code', 'id')]
+            ],
         ];
     }
 
@@ -385,6 +388,9 @@ class PackageModel extends BaseModel
             case 'ASSIGNFAILED':
                 $color = 'danger';
                 break;
+            case 'TRACKINGFAILED':
+                $color = 'danger';
+                break;
             case 'NEW':
                 $color = 'info';
                 break;
@@ -562,15 +568,15 @@ class PackageModel extends BaseModel
         $item = $this->items()->first();
         if ($item->warehouse_position_id) {
             foreach ($this->items as $packageItem) {
-                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity);
-                $packageItem->delete();
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $this->id);
+                $packageItem->forceDelete();
             }
         } else {
             foreach ($this->items as $packageItem) {
-                $packageItem->delete();
+                $packageItem->forceDelete();
             }
         }
-        return $this->delete();
+        return $this->forceDelete();
     }
 
     public function forceCancelPackage()
@@ -581,7 +587,8 @@ class PackageModel extends BaseModel
         $item = $this->items()->first();
         if ($item->warehouse_position_id) {
             foreach ($this->items as $packageItem) {
-                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $packageItem->id);
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE',
+                    $packageItem->id);
                 $packageItem->forceDelete();
             }
         } else {
@@ -812,7 +819,7 @@ class PackageModel extends BaseModel
                 }
                 $newPackage->items()->create($info);
             }
-            foreach($newPackage->items as $single) {
+            foreach ($newPackage->items as $single) {
                 $single->item->hold($single->warehouse_position_id, $single->quantity, 'PACKAGE', $newPackage->id);
             }
             $newPackage->update([
@@ -844,6 +851,109 @@ class PackageModel extends BaseModel
         }
 
         return $sum;
+    }
+
+    public function oversea_createPackageItems()
+    {
+        $arr = [];
+        foreach($this->items as $key => $single) {
+            $arr[$single->code][$key]['item_id'] = $single->item_id;
+            $arr[$single->code][$key]['quantity'] = $single->quantity;
+            $arr[$single->code][$key]['order_item_id'] = $single->order_item_id;
+            $arr[$single->code][$key]['remark'] = $single->remark;
+            $arr[$single->code][$key]['is_oversea'] = $single->is_oversea;
+            $arr[$single->code][$key]['code'] = $single->code;
+        }
+        if(count($arr) > 1) {
+            $flag = false;
+            foreach($arr as $code => $value) {
+                if(!$flag) {
+                    $warehouse = WarehouseModel::where('code', $code)->first();
+                    if(!$warehouse) {
+                        return false;
+                    }
+                    $this->update(['warehouse_id' => $warehouse->id]);
+                    foreach($this->items as $single) {
+                        $single->forceDelete();
+                    }
+                    $model = $this->find($this->id);
+                    foreach($value as $k => $v) {
+                        $model->items()->create($v);
+                    }
+                    if($model->oversea_assignStock()) {
+                        $model->update(['status' => 'WAITASSIGN']);
+                        $job = new AssignLogistics($model);
+                        Queue::pushOn('assignLogistics', $job);
+                        $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
+                    } else {
+                        $model->update(['status' => 'NEED']);
+                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
+                    }
+                    $flag = true;
+                } else {
+                    $newPackage = $this->create($this->toarray());
+                    $warehouse = WarehouseModel::where('code', $code)->first();
+                    if(!$warehouse) {
+                        return false;
+                    }
+                    $newPackage->update(['warehouse_id' => $warehouse->id]);
+                    foreach($value as $k => $v) {
+                        $newPackage->items()->create($v);
+                    }
+                    if($newPackage->oversea_assignStock()) {
+                        $newPackage->update(['status' => 'WAITASSIGN']);
+                        $job = new AssignLogistics($newPackage);
+                        Queue::pushOn('assignLogistics', $job);
+                        $this->eventLog('队列', '海外仓包裹已匹配到库存', json_encode($newPackage));
+                    } else {
+                        $newPackage->update(['status' => 'NEED']);
+                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($newPackage));
+                    }
+                }
+            }
+        } else {
+            foreach($arr as $code => $value) {
+                $warehouse = WarehouseModel::where('code', $code)->first();
+                if(!$warehouse) {
+                    return false;
+                }
+                $this->update(['warehouse_id' => $warehouse->id]);
+                $model = $this->find($this->id);
+                if($model->oversea_assignStock()) {
+                    $model->update(['status' => 'WAITASSIGN']);
+                    $job = new AssignLogistics($model);
+                    Queue::pushOn('assignLogistics', $job);
+                    $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
+                } else {
+                    $model->update(['status' => 'NEED']);
+                    $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function oversea_assignStock()
+    {
+        $flag = false;
+        $arr = [];
+        foreach($this->items as $key => $single) {
+            $stock = StockModel::where(['warehouse_id' => $this->warehouse_id, 'item_id' => $single->item_id])->first();
+            if(!$stock) {
+                return false;
+            }
+            if($stock->available_quantity < $single->quantity) {
+                return false;
+            }
+            $arr[] = $stock->warehouse_position_id;
+        }
+        foreach($this->items as $key => $single) {
+            $single->update(['warehouse_position_id' => $arr[$key]]);
+            $single->item->hold($arr[$key], $single->quantity, 'PACKAGE', $this->id);
+        }
+
+        return true;
     }
 
     public function explodePackage()
@@ -1350,6 +1460,9 @@ class PackageModel extends BaseModel
             $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
         })->where(['is_clearance' => $isClearance])
+          ->whereHas('logistics', function($single){
+                $single->where('warehouse_id', $this->warehouse_id);
+              })
             ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
             ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
             ->get()
@@ -1471,6 +1584,12 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
+            //查看对应的物流方式是否是所属仓库
+                $warehouse = WarehouseModel::find($this->warehouse_id);
+                if (!$warehouse->logisticsIn($rule->type_id)) {
+                    continue;
+                }
+
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
@@ -1479,6 +1598,9 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
+              ->whereHas('logistics', function($single){
+                $single->where('warehouse_id', $this->warehouse_id);
+              })
                 ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
                 ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
                 ->get()
@@ -1573,11 +1695,6 @@ class PackageModel extends BaseModel
                         }
                     }
                 }
-                //查看对应的物流方式是否是所属仓库
-                $warehouse = WarehouseModel::find($this->warehouse_id);
-                if (!$warehouse->logisticsIn($rule->type_id)) {
-                    continue;
-                }
                 //物流查询链接
                 $logistics = $rule->logistics;
                 $object = $logistics->logisticsChannels()->where('channel_id', $this->channel_id)->first();
@@ -1650,7 +1767,7 @@ class PackageModel extends BaseModel
             }
         } else {
             //判断订单状态
-            if ($this->status != 'ASSIGNED') {
+            if (!in_array($this->status, ['ASSIGNED', 'TRACKINGFAILED'])) {
                 return false;
             }
         }
@@ -1702,6 +1819,11 @@ class PackageModel extends BaseModel
                     'tracking_no' => $result['tracking_no'],
                     'logistics_order_number' => $result['logistics_order_number'],
                     'logistics_order_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            if ($result['status'] == 'error' or $result['status'] == '') {
+                $this->update([
+                    'status' => 'TRACKINGFAILED',
                 ]);
             }
             return $result;
@@ -1819,14 +1941,14 @@ class PackageModel extends BaseModel
                     $model = $this->find($content['package_id']);
                     if ($type == 1) {
                         $model->update(['cost' => $content['cost']]);
-                        $model->eventLog('系统', '回传物流费'.$content['cost'], json_encode($model));
+                        $model->eventLog('系统', '回传物流费' . $content['cost'], json_encode($model));
                     } else {
                         $model->update(['cost1' => $content['cost']]);
-                        $model->eventLog('系统', '回传物流费'.$content['cost'], json_encode($model));
+                        $model->eventLog('系统', '回传物流费' . $content['cost'], json_encode($model));
                     }
                     break;
                 case '3':
-                    $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                     $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
                     $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
                     $tmp_package = $this->where('id', $content['package_id'])->first();
                     if (!$tmp_package) {
@@ -1834,7 +1956,15 @@ class PackageModel extends BaseModel
                         continue;
                     }
                     $model = $this->find($content['package_id']);
-                    $model->update(['tracking_no' => $content['tracking_no']]);
+                    if($model->is_oversea) {
+                        $model->update(['tracking_no' => $content['tracking_no'], 'status' => 'SHIPPED']);
+                        $model->order->update(['status' => 'SHIPPED']);
+                        foreach($model->items as $packageItem) {
+                            $packageItem->item->holdout($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $model->id);
+                        }
+                    } else {
+                        $model->update(['tracking_no' => $content['tracking_no']]);
+                    }
                     $model->eventLog('系统', '回传追踪号'.$content['tracking_no'], json_encode($model));
                     break;
                 case '4':
@@ -1859,7 +1989,8 @@ class PackageModel extends BaseModel
                         'tracking_no' => $content['tracking_no'],
                         'logistics_id' => $content['logistics_id']
                     ]);
-                    $package->eventLog('系统', '修改物流方式id'.$content['logistics_id'].'+追踪号'.$content['tracking_no'], json_encode($package));
+                    $package->eventLog('系统', '修改物流方式id' . $content['logistics_id'] . '+追踪号' . $content['tracking_no'],
+                        json_encode($package));
                     break;
             }
         }

@@ -3,6 +3,7 @@
     <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class="sort" data-field="id">包裹号</th>
     <th>内单号</th>
+    <th>渠道</th>
     <th>平台订单号</th>
     <th>订单金额</th>
     <th>仓库</th>
@@ -23,12 +24,18 @@
         <tr class="dark-{{ $package->status_color }}">
             <td>
                 <input type='checkbox' name='single[]' class='single'>
+            </td>
+            <td class='packageId' data-id="{{ $package->id }}">
+                <strong>{{ $package->id }}</strong>
                 @if(($package->order ? $package->order->packages->count() : 0) > 1)
-                    <span class='glyphicon glyphicon-adjust'></span>
+                    <span class='glyphicon glyphicon-adjust text-danger'></span>
+                @endif
+                @if($package->is_oversea)
+                    <span class='glyphicon glyphicon-plane text-danger'></span>
                 @endif
             </td>
-            <td class='packageId' data-id="{{ $package->id }}"><strong>{{ $package->id }}</strong></td>
             <td>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
+            <td>{{ $package->channel ? $package->channel->name : '' }}</td>
             <td>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
             <td>{{ $package->order ? $package->order->amount . $package->order->currency : '订单金额有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
@@ -68,7 +75,8 @@
                         <address>
                             <strong>{{ $package->shipping_firstname . ' ' . $package->shipping_lastname }}</strong><br>
                             {{ $package->shipping_address }} {{ $package->shipping_address1 }}<br>
-                            {{ $package->shipping_city . ', ' . $package->shipping_state.' '.$package->shipping_zipcode }}<br>
+                            {{ $package->shipping_city . ', ' . $package->shipping_state.' '.$package->shipping_zipcode }}
+                            <br>
                             {{ $package->country ? $package->country->name.' '.$package->country->cn_name : '' }}<br>
                             <abbr title="ZipCode">Z:</abbr> {{ $package->shipping_zipcode }}
                             <abbr title="Phone">P:</abbr> {{ $package->shipping_phone }}
@@ -95,7 +103,7 @@
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
                 <td>数量</td>
                 <td colspan='2'>{{ $packageItem->quantity }}</td>
-                <td colspan='3'>单件重量:{{ $packageItem->item->weight }}</td>
+                <td colspan='4'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
         <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb {{ $pagetype == 'true' ? 'collapse' : ''}}">
@@ -103,7 +111,7 @@
             <td colspan='3'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>是否标记: {{ $package->is_mark == '1' ? '是' : '否' }}</td>
             <td colspan='3'>运输方式: {{ $package->order ? $package->order->shipping : '' }}</td>
-            <td colspan='6'>
+            <td colspan='7'>
                 @if($package->order->status != 'REVIEW')
                     <a href="{{ route('package.show', ['id' => $package->id]) }}" class="btn btn-info btn-xs" title='查看'>
                         <span class="glyphicon glyphicon-eye-open"></span>
@@ -216,12 +224,11 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class='returnTrackno' data-status='1'>回传运单号</a></li>
-            <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
-            <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
-            <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
-            <li><a href="javascript:" data-toggle="modal"
-                   data-target="#change_logistics">
+            <li><a href="javascript:" class='btn btn-info returnFee' data-type='1'>回传一次运费</a></li>
+            <li><a href="javascript:" class='btn btn-info returnFee' data-type='2'>回传二次运费</a></li>
+            <li><a href="javascript:" class='btn btn-info multiEditTracking' data-type='3'>批量修改追踪号</a></li>
+            <li><a data-toggle="modal"
+                   data-target="#change_logistics" class='btn btn-info'>
                     批量修改物流方式
                 </a></li>
             <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
@@ -250,39 +257,40 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
-        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {
+        };
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {
-                $.each($('.fb1'), function(){
-                    if(!$(this).is(":hidden")) {
+                $.each($('.fb1'), function () {
+                    if (!$(this).is(":hidden")) {
                         $(this).prev().find('.show_detail').click();
                     }
                 })
             } else {
-                $.each($('.fb1'), function(){
-                    if($(this).is(":hidden")) {
+                $.each($('.fb1'), function () {
+                    if ($(this).is(":hidden")) {
                         $(this).prev().find('.show_detail').click();
                     }
                 })
             }
         });
 
-        $(document).on('change', '.sectionganged_first', function(){
+        $(document).on('change', '.sectionganged_first', function () {
             val = $(this).val();
             $.get(
                 "{{ route('package.sectionGanged')}}",
-                {val:val},
-                function(result){
+                {val: val},
+                function (result) {
                     $('.sectionganged_second').html(result);
                 }
-                )
+            )
         })
 
-        $('ul.pagination li').click(function(){
+        $('ul.pagination li').click(function () {
             url = $(this).find('a').prop('href');
             type = $('.fb1').is(':hidden');
-            location.href=url + "&pagetype=" + type;
+            location.href = url + "&pagetype=" + type;
             return false;
         });
 
@@ -327,15 +335,6 @@
                     })
                 }
             )
-
-            $('.pagination').click(function(){
-                flag = $('.fb').is(':hidden') ? 'easy' : 'full';
-                window.onload()=function(){
-                    alert('123');
-                    $('.easy[data-type='+flag+']').click();
-                }
-            })
-
 
             $('.returnTrackno').click(function () {
                 location.href = "{{ route('package.returnTrackno')}}";

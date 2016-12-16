@@ -173,7 +173,7 @@
                 <br>
             @endforeach
         </div>
-        <div class="form-group col-md-12" style="">
+        <div class="form-group col-md-12 recieveCheckbox" style="">
             <label for="color">收货包装：</label><br>
             @foreach($recieveWraps as $recieve_wrap)
                 <label>
@@ -226,6 +226,17 @@
 
 @section('pageJs')
     <script type="text/javascript">
+
+        $(function(){
+            $(".recieveCheckbox input[type='checkbox']").each(function(){
+                $(this).click(function(){
+                        $(".recieveCheckbox input[type='checkbox']").attr("checked", false);
+                        $(this).attr("checked", true);
+                    
+                });
+            });
+        });
+
         $('.supplier').select2({
             ajax: {
                 url: "{{ route('ajaxSupplier') }}",

@@ -60,7 +60,7 @@ use App\Models\ProductModel;
 use Cache;
 use Crypt;
 use App\Models\Item\ItemPrepareSupplierModel;
-
+use App\Modules\LogisticsModule;
 class TestController extends Controller
 {
     private $itemModel;
@@ -84,19 +84,39 @@ class TestController extends Controller
         }
         dd($result);
     }
-
+    public function test_3()
+    {
+        $id = request()->get('id');
+        //$package = PackageModel::where('id', $id)->first();
+        //$model = PackageModel::where('logistics_id', '=', 303);
+        //把这渠道的DHL确认发货
+        $package = PackageModel::whereIn('logistics_id', [412, 422])->where('sure_tracking_no',1)->where('tracking_no','!=','')->get();
+        foreach($package as $v){
+            $model = PackageModel::where('id',$v->id);
+            $model->update(['warehouse_id'=>2]);
+        }
+//        if(!is_array($package)){
+//            $package = array($package);
+//        }
+        echo "<pre/>";echo count($package);exit;
+        $dhl = Logistics::driver('Dhl','');
+        $res = $dhl->SendSureOrderShip($package);
+        $package->status = 'PACKED';
+        //echo "<pre/>";var_dump($package->status);exit;
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED','SHIPPED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        echo "<pre/>";var_dump($result);exit;
+    }
     public function test2()
     {
-        $orders = OrderModel::all();
-        foreach ($orders as $order) {
-            $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-        }
-        return 'success';
 
-//        $data = Excel::load('d:/456.xls', function ($reader) {
-//            return $reader->all();
-//        });
-//        var_dump($data->toarray());
+    $data = Excel::load('d:/456.xls', function($reader){
+        return $reader->all();
+    });
+    var_dump($data->toarray());
     }
 //    public function test2()
 //    {

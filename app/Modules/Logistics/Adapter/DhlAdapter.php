@@ -11,6 +11,7 @@ namespace App\Modules\Logistics\Adapter;
 use App\Models\Channel\AccountModel;
 use App\Models\Order\ItemModel;
 use App\Models\Logistics\SupplierModel;
+use App\Models\PackageModel;
 class DhlAdapter extends BasicAdapter
 {
     public function __construct($config)
@@ -400,6 +401,14 @@ class DhlAdapter extends BasicAdapter
         @$shipmentArray = $result->closeOutResponse->bd->shipmentItems;
         if($status == '200'){
             //确认发货成功
+            foreach($shipmentArray as $v){
+                $orderStatus =  $v->responseStatus->code;
+                if($orderStatus == '200'){
+                    $orderId = preg_replace("/".$this->qz."/", "", $v->shipmentID);
+                    $model = PackageModel::where('id',$orderId);
+                    $model->update(['sure_tracking_no'=>1]);
+                }
+            }
             //生成PDF运单文件
             $shipmentImg = $result->closeOutResponse->bd->handoverNote;
             $handoverID = $result->closeOutResponse->bd->handoverID;
@@ -412,27 +421,29 @@ class DhlAdapter extends BasicAdapter
             return $res;
         }else{
             $newOrderArray = array();
-            foreach($shipmentArray as $v){
-                $code = $v->responseStatus->code;
-                $orderId = preg_replace("/".$this->qz."/", "", $v->shipmentID);
+            if($shipmentArray){
+                foreach($shipmentArray as $v){
+                    $code = $v->responseStatus->code;
+                    $orderId = preg_replace("/".$this->qz."/", "", $v->shipmentID);
 
-                if($code == '201'){
-                    $newOrderArray[] = array(
-                        'erp_orders_id'=>$orderId,
-                        'orders_shipping_code'=>$v->shipmentID
-                    );
-                }elseif($code == '202'){
-//                    $susql = "update erp_orders set end_time = ".time()." where erp_orders_id=".$orderId;
-//                    $sqlOp = "INSERT INTO erp_operate_log(operateUser,operateType,operateMod,operateKey,operateText) VALUES('".$_COOKIE[ 'id' ]."','update','ordersManage','". $orderId ."','已被DHL确认发货成功')";
-//                    $this->doSql->query($susql);
-//                    $this->doSql->query($sqlOp);
-                }else{
-//                    $susql = "update erp_orders set end_time = -1 where erp_orders_id=".$orderId;
-//                    $sqlOp = "INSERT INTO erp_operate_log(operateUser,operateType,operateMod,operateKey,operateText) VALUES('".$_COOKIE[ 'id' ]."','update','ordersManage','". $orderId ."','确认DHL发货失败')";
-//                    $this->doSql->query($susql);
-                    //$this->doSql->query($sqlOp);
+                    if($code == '201'){
+                        $newOrderArray[] = array(
+                            'erp_orders_id'=>$orderId,
+                            'orders_shipping_code'=>$v->shipmentID
+                        );
+                    }elseif($code == '202'){
+                        //已被确认发货成功
+                        foreach($shipmentArray as $v){
+                            $orderId = preg_replace("/".$this->qz."/", "", $v->shipmentID);
+                            $model = PackageModel::where('id',$orderId);
+                            $model->update(['sure_tracking_no'=>1]);
+                        }
+                    }else{
+                        //失败
+                    }
                 }
             }
+
             if(count($newOrderArray) > 0){
                 $result = $this->SendSureOrderShip($newOrderArray);
                 exit;

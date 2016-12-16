@@ -690,21 +690,21 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
-            '渠道管理' => [
+            '渠道' => [
                 [
-                    'name' => '渠道',
+                    'name' => '渠道列表',
                     'url' => 'channel.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '地域渠道名',
-                    'url' => 'CatalogRatesChannel.index',
-                    'icon' => ''
-                ],
-                [
-                    'name' => '账号',
+                    'name' => '账号列表',
                     'url' => 'channelAccount.index',
                     'icon' => '',
+                ],
+                [
+                    'name' => '地域渠道',
+                    'url' => 'CatalogRatesChannel.index',
+                    'icon' => ''
                 ],
             ],
             '用户' => [

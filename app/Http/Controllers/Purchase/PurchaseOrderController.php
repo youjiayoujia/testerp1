@@ -280,15 +280,19 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $userName = UserModel::find(request()->user()->id);
+        $remark = '';
         $from = json_encode($model);
         $data['examineStatus'] = $examineStatus;
         if ($examineStatus == 1) {
+            $remark = '审核通过';
             $data['status'] = 1;
         }
         if ($examineStatus == 3) {
+            $remark = '审核不通过';
             $data['status'] = 5;
         }
         if ($examineStatus == 0) {
+            $remark = '撤销审核';
             $data['status'] = 0;
         }
         $model->update($data);
@@ -297,21 +301,21 @@ class PurchaseOrderController extends Controller
         foreach ($model->purchaseItem as $purchaseitemModel) {
             if ($examineStatus == 1) {
                 $purchaseitemModel->update(['status' => 1]);
-                $purchaseItemModel->productItem->createOnePurchaseNeedData();
+                $purchaseitemModel->productItem->createOnePurchaseNeedData();
             }
             if ($examineStatus == 3) {
                 $purchaseitemModel->update(['status' => 5]);
-                $purchaseItemModel->productItem->createOnePurchaseNeedData();
+                $purchaseitemModel->productItem->createOnePurchaseNeedData();
             }
             if ($examineStatus == 0) {
                 $purchaseitemModel->update(['status' => 0]);
-                $purchaseItemModel->productItem->createOnePurchaseNeedData();
+                $purchaseitemModel->productItem->createOnePurchaseNeedData();
             }
         }
 
         $to = json_encode($model);
         $this->eventLog($userName->name, '采购单审核,id=' . $model->id, $to, $from);
-        return redirect($url)->with('alert', $this->alert('success', '采购单ID' . $id . '审核通过.'));
+        return redirect($url)->with('alert', $this->alert('success', '采购单ID' . $id . $remark.'.'));
     }
 
     /**

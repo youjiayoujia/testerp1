@@ -246,6 +246,7 @@ class PurchaseOrderController extends Controller
                     }
                     $data['total_purchase_cost'] += $v['purchase_cost'] * $purchase_num;
                     unset($item);
+                    $purchaseItem->productItem->createOnePurchaseNeedData();
                 }
             }
         }
@@ -257,15 +258,6 @@ class PurchaseOrderController extends Controller
         if ($model->status != 4) {
             $model->update($data);
         }
-
-        //更新采购需求
-
-        $temp_arr = [];
-        foreach ($model->purchaseItem as $p_item) {
-            $temp_arr[] = $p_item->item_id;
-        }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
 
         $to = json_encode($model);
         $this->eventLog($userName->name, '采购单信息更新,id=' . $model->id, $to, $from);
@@ -288,15 +280,19 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $userName = UserModel::find(request()->user()->id);
+        $remark = '';
         $from = json_encode($model);
         $data['examineStatus'] = $examineStatus;
         if ($examineStatus == 1) {
+            $remark = '审核通过';
             $data['status'] = 1;
         }
         if ($examineStatus == 3) {
+            $remark = '审核不通过';
             $data['status'] = 5;
         }
         if ($examineStatus == 0) {
+            $remark = '撤销审核';
             $data['status'] = 0;
         }
         $model->update($data);
@@ -305,21 +301,21 @@ class PurchaseOrderController extends Controller
         foreach ($model->purchaseItem as $purchaseitemModel) {
             if ($examineStatus == 1) {
                 $purchaseitemModel->update(['status' => 1]);
+                $purchaseitemModel->productItem->createOnePurchaseNeedData();
             }
             if ($examineStatus == 3) {
                 $purchaseitemModel->update(['status' => 5]);
+                $purchaseitemModel->productItem->createOnePurchaseNeedData();
             }
             if ($examineStatus == 0) {
                 $purchaseitemModel->update(['status' => 0]);
+                $purchaseitemModel->productItem->createOnePurchaseNeedData();
             }
-            $temp_arr[] = $purchaseitemModel->item_id;
         }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
 
         $to = json_encode($model);
         $this->eventLog($userName->name, '采购单审核,id=' . $model->id, $to, $from);
-        return redirect($url)->with('alert', $this->alert('success', '采购单ID' . $id . '审核通过.'));
+        return redirect($url)->with('alert', $this->alert('success', '采购单ID' . $id . $remark.'.'));
     }
 
     /**
@@ -355,10 +351,8 @@ class PurchaseOrderController extends Controller
         //更新采购需求
         $temp_arr = [];
         foreach ($model->purchaseItem as $p_item) {
-            $temp_arr[] = $p_item->item_id;
+            $p_item->productItem->createOnePurchaseNeedData();
         }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '改采购单已退回'));
     }
@@ -434,13 +428,10 @@ class PurchaseOrderController extends Controller
         }
 
         //更新采购需求
-        $temp_arr = [];
         foreach ($this->model->find($id)->purchaseItem as $p_item) {
-            $temp_arr[] = $p_item->item_id;
+            $p_item->productItem->createOnePurchaseNeedData();
         }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
-
+        
         $to = json_encode($model);
         $this->eventLog($userName->name, '创建采购条目,id=' . $model->id, $to, $from);
         return redirect(route('purchaseOrder.edit', $id));
@@ -608,15 +599,12 @@ class PurchaseOrderController extends Controller
             $remark = "待核销成功";
         }
         //更新采购需求
-        $temp_arr = [];
         foreach ($this->model->find($id)->purchaseItem as $p_item) {
             if ($off == 1) {
-                $p_item->update(['status' => '5']);
+                $p_item->productItem->createOnePurchaseNeedData();
             }
-            $temp_arr[] = $p_item->item_id;
         }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
+        
         return redirect($url)->with('alert', $this->alert('success', $this->mainTitle . $id . $remark));
     }
 
@@ -737,12 +725,9 @@ class PurchaseOrderController extends Controller
         }
 
         //更新采购需求
-        $temp_arr = [];
         foreach ($this->model->find($p_id)->purchaseItem as $p_item) {
-            $temp_arr[] = $p_item->item_id;
+            $p_item->productItem->createOnePurchaseNeedData();
         }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
 
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -852,12 +837,9 @@ class PurchaseOrderController extends Controller
         }
 
         //更新采购需求
-        $temp_arr = [];
         foreach ($this->model->find($p_id)->purchaseItem as $p_item) {
-            $temp_arr[] = $p_item->item_id;
+            $p_item->productItem->createOnePurchaseNeedData();
         }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
 
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -934,12 +916,9 @@ class PurchaseOrderController extends Controller
         }
 
         //更新采购需求
-        $temp_arr = [];
         foreach ($this->model->find($data['purchase_order_id'])->purchaseItem as $p_item) {
-            $temp_arr[] = $p_item->item_id;
+            $p_item->productItem->createOnePurchaseNeedData();
         }
-        $itemModel = new ItemModel();
-        $itemModel->createPurchaseNeedData($temp_arr);
 
         return redirect(route('purchaseItemIndex'))->with('alert', $this->alert($colorinfo, $tip));
     }
@@ -994,42 +973,32 @@ class PurchaseOrderController extends Controller
         switch ($type) {
             case 'examineStatus':
                 foreach ($arr as $id) {
-                    $temp_arr = [];
                     $purchaseOrder = $this->model->find($id);
                     $purchaseOrder->update(['examineStatus' => 1, 'status' => 1]);
                     foreach ($purchaseOrder->purchaseItem as $purchaseitemModel) {
                         $purchaseitemModel->update(['status' => 1]);
-                        $temp_arr[] = $purchaseitemModel->item_id;
+                        $purchaseitemModel->productItem->createOnePurchaseNeedData();
                     }
-
-                    $itemModel->createPurchaseNeedData($temp_arr);
                 }
                 break;
 
             case 'write_off':
                 foreach ($arr as $id) {
-                    $temp_arr = [];
                     $purchaseOrder = $this->model->find($id);
                     $purchaseOrder->update(['write_off' => 2, 'status' => 4]);
                     foreach ($purchaseOrder->purchaseItem as $purchaseitemModel) {
                         $purchaseitemModel->update(['status' => 5]);
-                        $temp_arr[] = $purchaseitemModel->item_id;
+                        $purchaseitemModel->productItem->createOnePurchaseNeedData();
                     }
-
-                    $itemModel->createPurchaseNeedData($temp_arr);
                 }
                 break;
             case 'close_status':
                 foreach ($arr as $id) {
-                    $temp_arr = [];
                     $this->model->find($id)->update(['close_status' => 1]);
-
                     foreach ($this->model->find($id)->purchaseItem as $purchaseitemModel) {
                         //$purchaseitemModel->update(['status'=>4]);
-                        $temp_arr[] = $purchaseitemModel->item_id;
+                        $purchaseitemModel->productItem->createOnePurchaseNeedData();
                     }
-
-                    $itemModel->createPurchaseNeedData($temp_arr);
                 }
                 break;
         }

@@ -26,6 +26,7 @@ class WarehouseModel extends BaseModel
         'telephone',
         'type',
         'volumn',
+        'code',
         'is_available'
     ];
 

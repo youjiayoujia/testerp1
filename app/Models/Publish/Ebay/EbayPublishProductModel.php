@@ -101,7 +101,8 @@ class EbayPublishProductModel extends BaseModel
     public function getChannelAccount(){
         $return=[];
         $channel = ChannelModel::where('name', 'Ebay')->first();
-        $result =  AccountModel::where(['channel_id'=>$channel->id,'is_available'=>'1'])->get();
+       // $result =  AccountModel::where(['channel_id'=>$channel->id,'is_available'=>'1'])->get();
+        $result =  AccountModel::where(['channel_id'=>$channel->id])->get();
         foreach($result as $account){
             $return[$account->id]=$account->account;
         }

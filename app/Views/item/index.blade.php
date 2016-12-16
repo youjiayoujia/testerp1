@@ -53,13 +53,17 @@
                     @if($logistics->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}" />@else{{$logistics->name}} @endif<br>
                 @endforeach
                 开发时间：{{ $item->created_at }}<br>
-                【包装方式：<br>
+                【包装方式：
                 <?php if($item->product){ ?>
                 @foreach($item->product->wrapLimit as $wrap)
                     {{$wrap->name}}<br>
                 @endforeach
                 】
                 <?php } ?>
+                <br>
+                【收货包装：
+                    {{$item->recieveWrap?$item->recieveWrap->name:''}}
+                】
             </td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->weight }}kg</td>
@@ -85,7 +89,7 @@
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>
                 <div>14天销量：{{$item->getsales('-14 day')}}</div>
                 <div>28天销量：{{$item->getsales('-28 day')}}</div>
-                <div>建议采购值：{{$item->createPurchaseNeedData([$item->id])['need_purchase_num']}}</div>
+                <div>建议采购值：{{$item->createOnePurchaseNeedData()['need_purchase_num']}}</div>
                 <div>
                     库存周数：{{$item->getsales('-7 day')==0?0:($item->available_quantity+$item->normal_transit_quantity)/$item->getsales('-7 day')}}</div>
             </td>

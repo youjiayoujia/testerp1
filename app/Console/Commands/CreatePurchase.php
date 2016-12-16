@@ -40,6 +40,7 @@ class CreatePurchase extends Command
      */
     public function handle()
     {
+        ini_set('memory_limit', '2048M');
         $start = microtime(true);
         $commandLog = CommandLog::create([
             'relation_id' => 0,
@@ -50,9 +51,16 @@ class CreatePurchase extends Command
             'result' => 'init',
             'remark' => 'init',
         ]);
-        $itemModel = new ItemModel();
+        
+        $itemModel = ItemModel::where('is_available','1')->get();
+        
         if (date("H") != 12) {
-            $itemModel->createPurchaseNeedData();
+            $i = 0;
+            foreach ($itemModel as $key => $model) {
+                $model->createOnePurchaseNeedData();
+                $i++;
+            }
+            
             $end = microtime(true);
             $lasting = round($end - $start, 3);
             $result['status'] = 'success';
@@ -60,7 +68,7 @@ class CreatePurchase extends Command
             $commandLog->update([
                 'data' => '',
                 'lasting' => $lasting,
-                'total' => '',
+                'total' => $i,
                 'result' => $result['status'],
                 'remark' => $result['remark'],
             ]);

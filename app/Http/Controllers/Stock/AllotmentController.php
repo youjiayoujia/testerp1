@@ -68,7 +68,7 @@ class AllotmentController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'warehouses' => WarehouseModel::where(['is_available' => '1'])->whereIn('type',['local', 'fbaLocal'])->get(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -88,6 +88,7 @@ class AllotmentController extends Controller
         $len = count(array_keys(request()->input('arr.item_id')));
         $name = UserModel::find(request()->user()->id)->name;
         $buf = request()->all();
+        $buf['allotment_by'] = request()->user()->id;
         $obj = $this->model->create($buf);
         for($i=0; $i<$len; $i++)
         {   
@@ -140,7 +141,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $model,
-            'warehouses' => WarehouseModel::where(['is_available'=>'1'])->get(),
+            'warehouses' => WarehouseModel::where(['is_available' => '1'])->whereIn('type',['local', 'fbaLocal'])->get(),
             'skus' => StockModel::where(['warehouse_id'=>$model->out_warehouse_id])->distinct()->with('item')->get(['item_id']),
             'positions' => $arr,
             'allotmentforms' => $allotment, 

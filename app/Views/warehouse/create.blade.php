@@ -7,12 +7,12 @@
             <label for="name" class='control-label'>名称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="name" placeholder="仓库名字" name='name' value="{{ old('name') }}">
         </div>
-        <div class='form-group col-lg-3'> 
-            <label for='city'>详细地址</label> 
+        <div class='form-group col-lg-3'>
+            <label for='city'>详细地址</label>
             <input type='text' class="form-control" name="address" placeholder="详细地址" value="{{ old('address') }}">
         </div>
-        <div class='form-group col-lg-3'> 
-            <label for='city'>联系人</label> 
+        <div class='form-group col-lg-3'>
+            <label for='city'>联系人</label>
             <select name='contact_by' class='form-control contact_by'>
                 <option value=''></option>
                 @foreach($users as $user)
@@ -20,8 +20,8 @@
                 @endforeach
             </select>
         </div>
-        <div class='form-group col-lg-3'> 
-            <label for='city'>联系电话</label> 
+        <div class='form-group col-lg-3'>
+            <label for='city'>联系电话</label>
             <input type='text' class="form-control" name="telephone" placeholder="联系电话" value="{{ old('telephone') }}">
         </div>
     </div>
@@ -31,15 +31,12 @@
             <div class='radio'>
                 <label>
                     <input type='radio' name='type' value='local' {{ old('type') ? (old('type') == 'local' ? 'checked' : '') : 'checked' }}>本地仓库
-                </label>   
+                </label>
                 <label>
                     <input type='radio' name='type' value='oversea' {{ old('type') ? (old('type') == 'oversea' ? 'checked' : '') : '' }}>海外仓库
                 </label>
                 <label>
-                    <input type='radio' name='type' value='third' {{ old('type') ? (old('type') == 'third' ? 'checked' : '') : '' }}>第三方仓库
-                </label>
-                <label>
-                    <input type='radio' name='type' value='fbaLocal' {{ old('type') ? (old('type') == 'fbaLocal' ? 'checked' : '') : '' }}>fba本地仓
+                    <input type='radio' name='type' value='fbaLocal' {{ old('type') ? (old('type') == 'fbaLocal' ? 'checked' : '') : '' }}>海外中转仓
                 </label>
             </div>
         </div>
@@ -56,11 +53,11 @@
             <div class='radio'>
                 <label>
                     <input type='radio' name='is_available' value='1' {{ old('is_available') ? (old('is_available') == '1' ? 'checked' : '') : 'checked' }}>启用
-                </label>   
+                </label>
                 <label>
                     <input type='radio' name='is_available' value='0' {{ old('is_available') ? (old('is_available') == '0' ? 'checked' : '') : '' }}>不启用
                 </label>
-            </div>    
+            </div>
         </div>
     </div>
 @stop

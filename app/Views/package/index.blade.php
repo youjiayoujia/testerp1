@@ -24,11 +24,16 @@
         <tr class="dark-{{ $package->status_color }}">
             <td>
                 <input type='checkbox' name='single[]' class='single'>
+            </td>
+            <td class='packageId' data-id="{{ $package->id }}">
+                <strong>{{ $package->id }}</strong>
                 @if(($package->order ? $package->order->packages->count() : 0) > 1)
-                    <span class='glyphicon glyphicon-adjust'></span>
+                    <span class='glyphicon glyphicon-adjust text-danger'></span>
+                @endif
+                @if($package->is_oversea)
+                    <span class='glyphicon glyphicon-plane text-danger'></span>
                 @endif
             </td>
-            <td class='packageId' data-id="{{ $package->id }}"><strong>{{ $package->id }}</strong></td>
             <td>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
             <td>{{ $package->channel ? $package->channel->name : '' }}</td>
             <td>{{ $package->order ? $package->order->channel_ordernum : '渠道订单号有误'}}</td>
@@ -70,7 +75,8 @@
                         <address>
                             <strong>{{ $package->shipping_firstname . ' ' . $package->shipping_lastname }}</strong><br>
                             {{ $package->shipping_address }} {{ $package->shipping_address1 }}<br>
-                            {{ $package->shipping_city . ', ' . $package->shipping_state.' '.$package->shipping_zipcode }}<br>
+                            {{ $package->shipping_city . ', ' . $package->shipping_state.' '.$package->shipping_zipcode }}
+                            <br>
                             {{ $package->country ? $package->country->name.' '.$package->country->cn_name : '' }}<br>
                             <abbr title="ZipCode">Z:</abbr> {{ $package->shipping_zipcode }}
                             <abbr title="Phone">P:</abbr> {{ $package->shipping_phone }}
@@ -251,39 +257,40 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
-        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {
+        };
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {
-                $.each($('.fb1'), function(){
-                    if(!$(this).is(":hidden")) {
+                $.each($('.fb1'), function () {
+                    if (!$(this).is(":hidden")) {
                         $(this).prev().find('.show_detail').click();
                     }
                 })
             } else {
-                $.each($('.fb1'), function(){
-                    if($(this).is(":hidden")) {
+                $.each($('.fb1'), function () {
+                    if ($(this).is(":hidden")) {
                         $(this).prev().find('.show_detail').click();
                     }
                 })
             }
         });
 
-        $(document).on('change', '.sectionganged_first', function(){
+        $(document).on('change', '.sectionganged_first', function () {
             val = $(this).val();
             $.get(
                 "{{ route('package.sectionGanged')}}",
-                {val:val},
-                function(result){
+                {val: val},
+                function (result) {
                     $('.sectionganged_second').html(result);
                 }
-                )
+            )
         })
 
-        $('ul.pagination li').click(function(){
+        $('ul.pagination li').click(function () {
             url = $(this).find('a').prop('href');
             type = $('.fb1').is(':hidden');
-            location.href=url + "&pagetype=" + type;
+            location.href = url + "&pagetype=" + type;
             return false;
         });
 

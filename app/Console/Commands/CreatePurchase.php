@@ -60,7 +60,7 @@ class CreatePurchase extends Command
                 $model->createOnePurchaseNeedData();
                 $i++;
             }
-            //$itemModel->createPurchaseNeedData();
+            
             $end = microtime(true);
             $lasting = round($end - $start, 3);
             $result['status'] = 'success';

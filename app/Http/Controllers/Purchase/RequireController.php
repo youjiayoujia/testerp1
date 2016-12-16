@@ -121,7 +121,8 @@ class RequireController extends Controller
 				    
 				}
 			}
-			$temp_arr[] = $v->id;
+			//$temp_arr[] = $v->id;
+			$v->createOnePurchaseNeedData();
 			
 			$sumtrend->update(['require_create'=>'0']);
 		}
@@ -151,7 +152,7 @@ class RequireController extends Controller
 			}		
 		}
 
-		$this->productItem->createPurchaseNeedData($temp_arr);
+		//$this->productItem->createPurchaseNeedData($temp_arr);
 		return 1;
 	}
 

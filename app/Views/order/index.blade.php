@@ -3,17 +3,16 @@
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuanOrder()">全选</th>
     <th class="sort" data-field="id">内单号</th>
     <th class="sort" data-field="channel_ordernum">平台订单号</th>
-    {{--<th class="sort" data-field="channel">渠道</th>--}}
+    <th class="sort" data-field="channel_id">渠道</th>
     <th class="sort" data-field="channel_account_id">销售账号</th>
     <th>买家ID</th>
-    <th>物流</th>
     <th>收货人</th>
     <th>国家</th>
     <th class="sort" data-field="amount"><strong class="text-success">总金额</strong></th>
     <th class="sort" data-field="amount_shipping"><strong class="text-danger">运费</strong></th>
     <th class="sort" data-field="profit_rate"><strong class="text-success">预测毛利率</strong></th>
     <th>订单状态</th>
-    <th>客服人员</th>
+    <th>运营人员</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>详情</th>
 @stop
@@ -30,25 +29,24 @@
             <td>
                 {{ $order->channel_ordernum }}
             </td>
-            {{--<td>{{ $order->channel ? $order->channel->name : '' }}</td>--}}
+            <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
-            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                <div>{{ round($order->profit_rate,4)*100 }}%</div>
+                <div>{{ round($order->profit_rate ,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
-                <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
+                <div>平台费: {{ sprintf("%.2f", $order->channel_fee) }} USD</div>
                 <div>
-                    毛利润: {{ $order->profit }} USD
+                    毛利润: {{ round($order->profit, 2) }} USD
                 </div>
             </td>
             <td>{{ $order->status_name }}</td>
-            <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
+            <td>{{ $order->userOperator ? $order->userOperator->name : '未分配' }}</td>
             <td>{{ $order->created_at }}</td>
             <td>
                 <a class="btn btn-primary btn-xs"
@@ -107,7 +105,7 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">
+                            <div class="col-lg-3">
                                 ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
                                 <br>
                                 @if($order->channel)
@@ -131,18 +129,18 @@
                             <div class="col-lg-2 text-primary">
                                 {{ $orderItem->sku }} <br/>
                                 [{{$orderItem->channel_sku}}]<br/>
-                                {{ $orderItem->item->warehouse?$orderItem->item->warehouse->name:'' }}
+                                {{ $orderItem->item ? ($orderItem->item->warehouse ? $orderItem->item->warehouse->name : '') : '' }}
                             </div>
                             @if($orderItem->item)
-                                <div class="col-lg-2">
-                                    <strong>{{ $orderItem->item->status_name }}</strong>
+                                <div class="col-lg-1">
+                                    <strong>{{ $orderItem->item ? $orderItem->item->status_name : '' }}</strong>
                                 </div>
-                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-2">{{ $orderItem->item ? $orderItem->item->c_name : '' }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
                                 </div>
-                                <div class="col-lg-2"></div>
+                                <div class="col-lg-1"></div>
                             @endif
                             <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}
@@ -211,7 +209,7 @@
                     @if($order->packages->count() > 0)
                         @foreach($order->packages as $package)
                             <div class="row">
-                                <div class="col-lg-2">
+                                <div class="col-lg-1">
                                     <strong>包裹ID</strong> :
                                     <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                                 </div>
@@ -226,7 +224,7 @@
                                 <div class="col-lg-2">
                                     <strong>仓库</strong> : {{ $package->warehouse ? $package->warehouse->name : '' }}
                                 </div>
-                                <div class="col-lg-1">
+                                <div class="col-lg-2">
                                     <strong>包裹状态</strong> : {{ $package->status_name }}
                                 </div>
                                 <div class="col-lg-1">
@@ -274,8 +272,11 @@
                         <div class="col-lg-3">
                             收款方式 : {{ $order->payment }}
                         </div>
-                        <div class="col-lg-9">
+                        <div class="col-lg-5">
                             交易号 : {{ $order->transaction_number }}
+                        </div>
+                        <div class="col-lg-4">
+                            物流方式 : {{ $order->shipping }}
                         </div>
                     </div>
                 </div>
@@ -376,6 +377,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('withdrawUpdate', ['id' => $order->id])}}" method="POST">
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -418,7 +421,8 @@
                 <div class="modal-content">
                     <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
-                        <input type="hidden" name="channel_id" value="{{$order->channel_id}}"/>
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -460,7 +464,7 @@
                                     <label for="ordernum" class='control-label'>订单号</label>
                                     <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') ? old('ordernum') : $order->ordernum }}" readonly>
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="channel_account_id">渠道账号</label>
                                     <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : $order->channelAccount->alias }}" readonly>
                                 </div>
@@ -469,15 +473,15 @@
                                 {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
                                 {{--<input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">--}}
                                 {{--</div>--}}
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="refund_amount" class='control-label'>退款金额</label>
                                     <input class="form-control" id="refund_amount{{ $order->id }}" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="price" class='control-label'>确认金额</label>
                                     <input class="form-control" id="price{{ $order->id }}" placeholder="确认金额" name='price' value="{{ old('price') }}">
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="refund_currency" class='control-label'>退款币种</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="refund_currency" id="refund_currency">
@@ -608,6 +612,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('remarkUpdate', ['id' => $order->id])}}" method="POST">
+                        <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
+                        <input type='hidden' name='page' value="{{$page}}">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -632,13 +638,13 @@
                             <div class="row">
                                 <div class="form-group col-lg-12">
                                     <label for="remark" class='control-label'>订单备注</label>
-                                    <textarea class="form-control" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
+                                    <textarea class="form-control myRemark" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                            <button type="submit" class="btn btn-primary">提交</button>
+                            <button type="submit" class="btn btn-primary confirm_remark">提交</button>
                         </div>
                     </form>
                 </div>
@@ -857,16 +863,9 @@
         <div class="col-lg-2">
             <strong>当前小计</strong> : {{ '$' . $subtotal }}
         </div>
-        <div class="col-lg-2">
-            <input class="form-control" id="start_date" placeholder="开始日期" name='start_date'>
+        <div class="col-lg-4 text-danger">
+            <strong>统计</strong> : {{ $orderStatistics }}
         </div>
-        <div class="col-lg-2">
-            <input class="form-control" id="end_date" placeholder="结束日期" name='end_date'>
-        </div>
-        <div class="col-lg-1">
-            <button class="statistics">统计</button>
-        </div>
-        <div class="col-lg-4" id="statistics"></div>
     </div>
 @stop
 @stop
@@ -961,6 +960,15 @@
                     $('.fb').hide();
                 } else {
                     $('.fb').show();
+                }
+            });
+
+            //备注是否为空
+            $(document).on('click', '.confirm_remark', function () {
+                var remark = $(this).parent().prev().find('.myRemark').val();
+                if (!remark) {
+                    alert('请输入备注!!!');
+                    return false;
                 }
             });
 
@@ -1140,6 +1148,8 @@
                         );
                     }
                 });
+            } else {
+                $("#statistics").text('请选择正确的日期!!!');
             }
         });
 

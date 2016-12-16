@@ -24,14 +24,13 @@
             Special Project Unit    <br/>
             POS MALAYSIA INTERATIONAL HUB <br/>
             64000 MALAYSIA<br/>
-
                 <span style="font-size:11px;font-weight:bold;">
                 To:{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
                     {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
-                    {{ $model->shipping_city }}{{ $model->shipping_state }},<br/>'
+                    {{ $model->shipping_city }}{{ $model->shipping_state }}<br/>
                     {{ $model->shipping_zipcode }} ,{{ $model->shipping_phone }}<br/>
-                    {{ $model->country ? $model->country->cn_name : '' }}
-                    {{ $model->country ? $model->country->code : '' }}
+                    {{ $model->country ? $model->country->name : '' }}
+                    ({{ $model->country ? $model->country->cn_name : '' }})
                 </span>
         </p>
         <p style="width:30mm;height:42mm;float:left;overflow:hidden;">
@@ -47,14 +46,12 @@
 		         &nbsp;Z&nbsp;:&nbsp;{{ $model->shunyou ? $model->shunyou->area_code : '' }}
 		        </span>
 		        <span style="width:98%;height:8mm;line-height:8mm;border:1px solid #000;display:inline-block;border-top:none;">
-		        {{$model->id}}<span style="font-size:14px;font-weight:bold;">【{{ $model->logistics_id }}】</span>
+		        {{$model->id}}<span style="font-size:14px;font-weight:bold;">【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</span>
 		        </span>
         </p>
     </div>
-    <div style="width:100%;height:12mm;">
-        <p style="width:30%;height:12mm;float:left;font-weight:bold;font-size:30px;text-align:right;">
-            R
-        </p>
+    <div style="width:100%;height:16mm;">
+        <p style="width:30%;height:12mm;float:left;font-weight:bold;font-size:30px;text-align:right;"></p>
         <p style="width:45%;height:12mm;float:left;text-align:center;">
             <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             <br/><span style="font-size:12px;">{{$model->tracking_no}}</span>
@@ -80,11 +77,12 @@
             </tr>
             <tr>
                 <td style="border:1px solid #000;border-top:none;">
-                    {{ $model->declared_en }}({{ $model->sku_info }}*{{ $model->items ? $model->items->sum('quantity') : 0 }})
+                    {{ $model->getDeclaredInfo()['declared_en'] }}
+                    ({{ $model->sku_info }})
                 </td>
                 <td style="border:1px solid #000;border-left:none;border-top:none;">{{ $model->items ? $model->items->sum('quantity') : 0 }}</td>
-                <td style="border:1px solid #000;border-left:none;border-top:none;">{{ $model->total_weight }}</td>
-                <td style="border:1px solid #000;border-left:none;border-top:none;">{{ $model->items ? $model->items->sum('quantity') : 0 }}* {{ $model->declared_value }}</td>
+                <td style="border:1px solid #000;border-left:none;border-top:none;">{{ $model->getDeclaredInfo()['weight'] }}</td>
+                <td style="border:1px solid #000;border-left:none;border-top:none;">{{ $model->getDeclaredInfo()['declared_value'] }}</td>
             </tr>
             <tr>
                 <td style="border:1px solid #000;border-top:none;" colspan="2">For commercial items only</td>
@@ -122,7 +120,7 @@
             </tr>
             <tr>
                 <td style="border:1px solid #000;border-top:none;" colspan="2">Signature of sender：<?php if($model->warehouse){echo $sign = $model->warehouse->id == 5 ? 'szslm': 'ywslm';}?></td>
-                <td style="border:1px solid #000;border-left:none;border-top:none;" colspan="2">Date:<?php echo date('Y-m-d'); ?></td>
+                <td style="border:1px solid #000;border-left:none;border-top:none;" colspan="2">Date:{{ date('Y-m-d') }}</td>
             </tr>
 
         </table>

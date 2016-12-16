@@ -99,6 +99,11 @@
         @stop
         @section('tableToolButtons')
             <div class="btn-group">
+                <a href="{{ route('pickList.createNewPick') }}" class="btn btn-success">
+                    未发货包裹重新生成拣货单
+                </a>
+            </div>
+            <div class="btn-group">
                 <a href="javascript:" class="btn btn-success multiPrint">
                     批量打印拣货单
                 </a>

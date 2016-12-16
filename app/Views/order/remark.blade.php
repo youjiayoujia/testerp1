@@ -3,6 +3,7 @@
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('remarkUpdate', ['id' => $model->id]) }} @stop
 @section('formBody')
+    <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="panel panel-default">
         <div class="panel-heading">补充备注</div>
         <div class="panel-body">

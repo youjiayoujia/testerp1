@@ -105,7 +105,7 @@ class AccountModel extends BaseModel
                 $status = ['pending'];
                 break;
             case 'wish':
-                $status = [];
+                $status = ['All'];
                 break;
             case 'ebay':
                 $status = ['All'];
@@ -219,4 +219,14 @@ class AccountModel extends BaseModel
             'account_id', 'message_id');
     }
 
+    public function getAllImageDomain(){
+        $image_domain = [];
+        $result = $this->where('is_available',1)->where('image_domain','!=','')->get();
+        if(!empty($result)){
+            foreach($result as $v){
+                $image_domain[] = $v['image_domain'];
+            }
+        }
+        return $image_domain;
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\ItemModel;
 use App\Models\Purchase\RequireModel;
+use App\Models\Log\CommandModel as CommandLog;
 
 class CreatePurchase extends Command
 {
@@ -39,14 +40,41 @@ class CreatePurchase extends Command
      */
     public function handle()
     {
-        $begin = microtime(true);
-        $itemModel = new ItemModel();
-        if(date("H")!=12){
-            $itemModel->createPurchaseNeedData();
+        ini_set('memory_limit', '2048M');
+        $start = microtime(true);
+        $commandLog = CommandLog::create([
+            'relation_id' => 0,
+            'signature' => __CLASS__,
+            'description' => '生成采购需求',
+            'lasting' => 0,
+            'total' => 0,
+            'result' => 'init',
+            'remark' => 'init',
+        ]);
+        
+        $itemModel = ItemModel::where('is_available','1')->get();
+        
+        if (date("H") != 12) {
+            $i = 0;
+            foreach ($itemModel as $key => $model) {
+                $model->createOnePurchaseNeedData();
+                $i++;
+            }
+            //$itemModel->createPurchaseNeedData();
             $end = microtime(true);
-            echo '采购需求数据更新耗时' . round($end - $begin, 3) . '秒,正在自动创建采购单,请稍后......';
+            $lasting = round($end - $start, 3);
+            $result['status'] = 'success';
+            $result['remark'] = 'Success.';
+            $commandLog->update([
+                'data' => '',
+                'lasting' => $lasting,
+                'total' => $i,
+                'result' => $result['status'],
+                'remark' => $result['remark'],
+            ]);
+            $this->info('采购需求数据更新耗时' . $lasting . '秒,正在自动创建采购单,请稍后......');
         }
-   
+
         /*$requireModel = new RequireModel();
         $requireModel->createAllPurchaseOrder();
         $endcreate = microtime(true);

@@ -135,7 +135,7 @@
                 <div style="overflow: hidden; width: 100%; height: 20mm;">
                     <div style="float: left; height: auto; width: auto;">
                         <div style="font-size: 9px;">
-                            <b>【{{ $model->logistics_id }}】</b>
+                            <b>【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</b>
                             {{ $model->sku_info }}
                         </div>
                     </div>
@@ -246,17 +246,17 @@
         <tr height="25">
             <td width="225">
                 <p style="height:25px;font-size:11px;text-align:center;">
-                    {{ $model->declared_en }}*{{ $model->items ? $model->items->sum('quantity') : 0 }}
+                    {{ $model->getDeclaredInfo()['declared_en'] }}*{{ $model->items ? $model->items->first()->quantity : 0 }}
                 </p>
             </td>
             <td width="80">
                 <p style="height:25px;font-size:11px;text-align:center;line-height:25px;">
-                    {{ $model->signal_weight }}
+                    {{ $model->getDeclaredInfo()['weight'] }}
                 </p>
             </td>
             <td width="70">
                 <p style="height:25px;font-size:11px;text-align:center;line-height:25px;">
-                    {{ $model->signal_price > 20 ? 20 : $model->signal_price }}USD
+                    {{ $model->getDeclaredInfo()['declared_value'] > 20 ? 20 : $model->getDeclaredInfo()['declared_value'] }}USD
                 </p>
             </td>
         </tr>
@@ -299,7 +299,7 @@
                     <br/>
                     I the undersigned,certify that the particulars given in this declaration are correct and this item does not contain any dangerous articles prohibited by legislation or by postal or customers regulations.
                     <br/>
-                    <span style="padding-left:80px;">寄件人签字 Sender\'s signature:SLME </span>
+                    <span style="padding-left:80px;">寄件人签字 Sender's signature:SLME </span>
                 </p>
             </td>
         </tr>

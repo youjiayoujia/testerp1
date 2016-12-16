@@ -27,6 +27,7 @@ use App\Jobs\AssignStocks;
 use App\Models\NumberModel;
 use App\Models\UserModel;
 use App\Models\Message\ReplyModel;
+use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 
 class PackageController extends Controller
@@ -98,6 +99,7 @@ class PackageController extends Controller
                 }
             }
         }
+        $pagetype = request()->has('pagetype') ? request('pagetype') : 'false';
         request()->flash();
         $logisticses = LogisticsModel::all();
         $response = [
@@ -105,6 +107,7 @@ class PackageController extends Controller
             'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
+            'pagetype' => $pagetype,
         ];
 
         return view($this->viewPath . 'index', $response);
@@ -121,11 +124,11 @@ class PackageController extends Controller
 
     public function getAllInfo()
     {
-        $packageId = request('packageid');
-        $trackingNo = request('trackingno');
+        $packageId = request()->has('packageid') ? request('packageid') : '';
+        $trackingNo = request()->has('trackingno') ? request('trackingno') : '';
         $model = $this->model->onlyTrashed()->find($packageId);
         if (!$model) {
-            $model = $this->model->onlyTrashed()->where('tracking_no', $tracking_no)->first();
+            $model = $this->model->onlyTrashed()->where('tracking_no', $trackingNo)->first();
             if (!$model) {
                 return 'no infomation';
             }
@@ -171,7 +174,7 @@ class PackageController extends Controller
                 $buf[$key][1] = 0;
                 continue;
             }
-            $buf[$key][0] = !is_string($package->realTimeLogistics()) ? $package->realTimeLogistics()->code : '虚拟匹配未匹配到';
+            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->code : '无匹配';
             $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
         }
 
@@ -194,6 +197,20 @@ class PackageController extends Controller
         ];
 
         return view('logistics.template.tpl.' . $view, $response);
+    }
+
+    public function sectionGanged()
+    {
+        $val = trim(request('val'));
+        $model = LogisticsCatalogModel::where('name', $val)->first();
+        if(!$model) {
+            return false;
+        }
+        $str = "<option value=''>物流方式</option>";
+        foreach($model->logisticses as $logistics) {
+            $str .= "<option value='".$logistics->id."'>".$logistics->code."</option>";
+        }
+        return $str;
     }
 
     public function logisticsDelivery()
@@ -267,7 +284,14 @@ class PackageController extends Controller
             if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            $model->update(['logistics_id' => $id, 'tracking_no' => '']);
+            $logistics = LogisticsModel::find($id);
+            if($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
+                if($model->status == 'ASSIGNFAILED') {
+                    $model->update(['logistics_id' => $id, 'tracking_no' => '', 'status' => 'ASSIGNED']);
+                } else {
+                    $model->update(['logistics_id' => $id, 'tracking_no' => '']);
+                }
+            }
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
         }
@@ -424,6 +448,7 @@ class PackageController extends Controller
         $job = new AssignLogistics($package);
         $job = $job->onQueue('assignLogistics');
         $this->dispatch($job);
+        $package->eventLog(UserModel::find(request()->user()->id)->name, '重新匹配物流', json_encode($package));
 
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '包裹已重新匹配物流'));
     }
@@ -435,9 +460,12 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
         }
+        $model->update(['tracking_no' => '']);
+        $package = $this->model->find($id);
         $job = new PlaceLogistics($model, 'UPDATE');
         $job = $job->onQueue('placeLogistics');
         $this->dispatch($job);
+        $package->eventLog(UserModel::find(request()->user()->id)->name, '重新物流下单', json_encode($package));
 
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '包裹已重新下物流单'));
     }
@@ -699,7 +727,6 @@ class PackageController extends Controller
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', '要合并的包裹不是来自于一个订单'));
             }
         }
-
         foreach ($buf as $key => $packageId) {
             $model = $this->model->find($packageId);
             if (!$model) {
@@ -718,7 +745,7 @@ class PackageController extends Controller
                 }
             }
             if ($key) {
-                $model->cancelPackage();
+                $model->forceCancelPackage();
             }
         }
         $model = $this->model->with('items')->find($buf[0]);
@@ -734,7 +761,7 @@ class PackageController extends Controller
         }
         $newPackage->update(['status' => 'NEW', 'weight' => $weight, 'logistics_id' => '', 'tracking_no' => '']);
         $newPackage->order->update(['status' => 'REVIEW']);
-        $model->cancelPackage();
+        $model->forceCancelPackage();
         $to = json_encode($newPackage);
         $this->eventLog($name, '合并包裹', $to, $from);
 
@@ -751,7 +778,7 @@ class PackageController extends Controller
         }
         $model->update(request()->all());
         $to = json_encode($model);
-        $this->eventLog($name, '修改追踪号', $to, $from);
+        $this->eventLog($name, '手动修改包裹信息', $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url);
     }
@@ -777,12 +804,22 @@ class PackageController extends Controller
                     $newPackage->items()->create($packageItem);
                     $weight += ItemModel::find($itemId)->weight * $packageItem['quantity'];
                 }
-                $newPackage->update([
-                    'weight' => $weight,
-                    'status' => 'NEW',
-                    'logistics_id' => '',
-                    'tracking_no' => ''
-                ]);
+                $position = $newPackage->items->first()->warehouse_position_id;
+                if ($position) {
+                    $newPackage->update([
+                        'weight' => $weight,
+                        'status' => 'WAITASSIGN',
+                        'logistics_id' => '',
+                        'tracking_no' => ''
+                    ]);
+                } else {
+                    $newPackage->update([
+                        'weight' => $weight,
+                        'status' => 'NEW',
+                        'logistics_id' => '',
+                        'tracking_no' => ''
+                    ]);
+                }
                 $this->eventLog($name, '拆分包裹', $to);
                 $newPackage->order->update(['status' => 'REVIEW']);
             }
@@ -867,7 +904,7 @@ class PackageController extends Controller
         $package_id = trim(request('package_id'));
         $name = UserModel::find(request()->user()->id)->name;
         $package = $this->model->with('items')->find($package_id);
-        $from = base64_decode(serialize($package));
+        $from = json_decode($package);
         if (!$package) {
             return json_encode(false);
         }
@@ -877,7 +914,7 @@ class PackageController extends Controller
             $item->item->holdout($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);
         }
         $package->update(['status' => 'PACKED']);
-        $to = base64_decode(serialize($package));
+        $to = json_decode($package);
         $this->eventLog($name, '强制出库', $to, $from);
 
         return json_encode(true);
@@ -900,6 +937,11 @@ class PackageController extends Controller
             $item->update(['picked_quantity' => $item->quantity]);
         }
         $package->update(['status' => 'PACKED']);
+        $picklistItems = $package->picklistItems;
+        foreach($picklistItems as $picklistItem) {
+            $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;
+            $picklistItem->save();
+        }
         DB::beginTransaction();
         try {
             foreach ($package->items as $packageItem) {
@@ -1189,18 +1231,25 @@ class PackageController extends Controller
         return json_encode(true);
     }
 
-    public function ajaxPackageSend()
-    {
-        $id = request()->input('id');
-        $package = $this->model->find($id);
-        foreach ($package->items as $packageItem) {
-            $item = ItemModel::find($packageItem->item_id);
-            $item->holdout($packageItem->warehouse_position_id, $packageItem->picked_quantity);
-        }
-        $package->status = 'SHIPPED';
-        $package->save();
-        echo json_encode('success');
-    }
+    // public function ajaxPackageSend()
+    // {
+    //     $id = request()->input('id');
+    //     $package = $this->model->find($id);
+    //     DB::beginTransaction();
+    //     try {
+    //         foreach ($package->items as $packageItem) {
+    //             $item = ItemModel::find($packageItem->item_id);
+    //             $item->holdout($packageItem->warehouse_position_id, $packageItem->picked_quantity, 'PACKAGE', $packageItem->id);
+    //         }
+    //         $package->status = 'SHIPPED';
+    //         $package->save();
+    //     } catch (Exception $e) {
+    //         DB::rollback();
+    //         return json_encode('unhold');
+    //     }
+    //     DB::commit();
+    //     return json_encode('success');
+    // }
 
     /**
      * 撤销包装的单个package
@@ -1221,7 +1270,7 @@ class PackageController extends Controller
             $item->save();
             $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost,
                 'CANCEL', $item->id);
-            $item->item->hold($item->warehouse_position_id, $item->quantity);
+            $item->item->hold($item->warehouse_position_id, $item->quantity, 'PACKAGE', $item->id);
         }
         return json_encode(true);
     }
@@ -1352,7 +1401,7 @@ class PackageController extends Controller
         }
 
         $to = json_encode($package);
-        $this->eventLog($name, '发货', $to, $from);
+        $this->eventLog($name, '包裹已发货', $to, $from);
         if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');
         }
@@ -1429,26 +1478,26 @@ class PackageController extends Controller
         }
     }
 
-    public function errorToShipped()
-    {
-        $id = request('id');
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
-        }
-        if ($model->status != 'ERROR') {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹状态不是异常.'));
-        }
-        foreach ($model->items as $packageItem) {
-            $packageItem->item->holdout($packageItem->warehouse_position_id,
-                $packageItem->quantity,
-                'PACKAGE',
-                $packageItem->id);
-        }
-        $model->update(['status' => 'PACKED']);
+    // public function errorToShipped()
+    // {
+    //     $id = request('id');
+    //     $model = $this->model->find($id);
+    //     if (!$model) {
+    //         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹不存在.'));
+    //     }
+    //     if ($model->status != 'ERROR') {
+    //         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹状态不是异常.'));
+    //     }
+    //     foreach ($model->items as $packageItem) {
+    //         $packageItem->item->holdout($packageItem->warehouse_position_id,
+    //             $packageItem->quantity,
+    //             'PACKAGE',
+    //             $packageItem->id);
+    //     }
+    //     $model->update(['status' => 'PACKED']);
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功.'));
-    }
+    //     return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功.'));
+    // }
 
     /**
      * 跳转excel页面

@@ -62,7 +62,7 @@ class EventChildController extends Controller
         }
         $models = $category->child()->where('type_id', $id)->get()->sortByDesc('when');
         $html = '';
-        foreach ($models as $key => $model) {
+        foreach ($models as $key1 => $model) {
             $to = json_decode($model->to_arr);
             if ($to) {
                 $to = $this->stdClass_to_array($to);
@@ -74,44 +74,46 @@ class EventChildController extends Controller
             if (!$from) {
                 $html .= "<div class='panel panel-default'>
                         <div class='panel-heading'>备注:" . $model->what . '<br/>操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:" . $model->who . "
-                    <a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample" . $key . "' aria-expanded='false' aria-controls='collapseExample'>数据详情</a>
+                    <a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample" . $key1 . "' aria-expanded='false' aria-controls='collapseExample'>数据详情</a>
                         </div>
-                        <div class='panel-body collapse' id='collapseExample" . $key . "'><div class='col-lg-12'>";
-                foreach ($to as $key => $value) {
-                    $html .= "<div class='row'>to['" . $key . "']<span class='glyphicon glyphicon-arrow-right'></span>";
-                    if (is_array($value)) {
-                        if (count($value) == count($value, 1)) {
-                            $html .= "<div class='col-lg-12'><div class='row'>";
-                            foreach ($value as $k => $v) {
-                                if (!is_array($v)) {
-                                    $html .= "to['" . $key . "']['" . $k . "']<span class='glyphicon glyphicon-arrow-right'></span>" . $v . "&nbsp;&nbsp;&nbsp;&nbsp;";
-                                }
-                            }
-                            $html .= '</div></div>';
-                        } else {
-                            foreach ($value as $k => $v) {
-                                if (is_array($v)) {
-                                    $html .= "<div class='col-lg-12'><div class='row'>";
-                                    foreach ($v as $k1 => $v1) {
-                                        if (!is_array($v1)) {
-                                            $html .= "to['" . $key . "']['" . $k . "']['" . $k1 . "']<span class='glyphicon glyphicon-arrow-right'></span>" . $v1 . "&nbsp;&nbsp;&nbsp;&nbsp;";
-                                        }
+                        <div class='panel-body collapse' id='collapseExample" . $key1 . "'><div class='col-lg-12'>";
+                if($to) {
+                    foreach ($to as $key => $value) {
+                        $html .= "<div class='row'>to['" . $key . "']<span class='glyphicon glyphicon-arrow-right'></span>";
+                        if (is_array($value)) {
+                            if (count($value) == count($value, 1)) {
+                                $html .= "<div class='col-lg-12'><div class='row'>";
+                                foreach ($value as $k => $v) {
+                                    if (!is_array($v)) {
+                                        $html .= "to['" . $key . "']['" . $k . "']<span class='glyphicon glyphicon-arrow-right'></span>" . $v . "&nbsp;&nbsp;&nbsp;&nbsp;";
                                     }
-                                    $html .= "</div></div>";
+                                }
+                                $html .= '</div></div>';
+                            } else {
+                                foreach ($value as $k => $v) {
+                                    if (is_array($v)) {
+                                        $html .= "<div class='col-lg-12'><div class='row'>";
+                                        foreach ($v as $k1 => $v1) {
+                                            if (!is_array($v1)) {
+                                                $html .= "to['" . $key . "']['" . $k . "']['" . $k1 . "']<span class='glyphicon glyphicon-arrow-right'></span>" . $v1 . "&nbsp;&nbsp;&nbsp;&nbsp;";
+                                            }
+                                        }
+                                        $html .= "</div></div>";
+                                    }
                                 }
                             }
+                        } else {
+                            $html .= $value;
                         }
-                    } else {
-                        $html .= $value;
+                        $html .= "</div>";
                     }
-                    $html .= "</div>";
                 }
                 $html .= "</div></div></div>";
                 continue;
             }
             $html .= "<div class='panel panel-default'>
-                        <div class='panel-heading'>备注:" . $model->what . '<br/>操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:" . $model->who . "<a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample" . $key . "' aria-expanded='false' aria-controls='collapseExample'>数据详情</a></div>
-                        <div class='panel-body'  id='collapseExample" . $key . "'><div class='col-lg-12'>";
+                        <div class='panel-heading'>备注:" . $model->what . '<br/>操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:" . $model->who . "<a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample" . $key1 . "' aria-expanded='false' aria-controls='collapseExample'>数据详情</a></div>
+                        <div class='panel-body'  id='collapseExample" . $key1 . "'><div class='col-lg-12'>";
             $flag = 1;
             $this->calcTwoArr($from, $to);
             foreach ($from as $key => $value) {

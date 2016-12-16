@@ -53,7 +53,7 @@ class RequireModel extends BaseModel
 
     public function catalog()
     {
-        return $this->belongsTo('App\Models\CatalogModel', 'catalog_id', 'id');
+        return $this->belongsTo('App\Models\CatalogModel', 'catalog_id');
     }
 
     //查询

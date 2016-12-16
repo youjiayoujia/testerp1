@@ -54,7 +54,7 @@
             <td>{{ $package->created_at }}</td>
             <td>
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample" title='查看'>
-                    <span class="glyphicon glyphicon-eye-open"></span>
+                    <span class="glyphicon glyphicon-eye-open show_detail"></span>
                 </button>
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
@@ -64,11 +64,17 @@
             </td>
         </tr>
         @foreach($package->items as $key => $packageItem)
-            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
+            <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb fb1 {{ $pagetype == 'true' ? 'collapse' : ''}}">
                 @if($key == 0)
                     <td colspan='2' rowspan="{{$package->items->count()}}">
-                        <p>{{ $package->shipping_firstname . $package->shipping_lastname }}</p>
-                        <p>{{ $package->shipping_shipping_address . ' ' .$package->shipping_city . ' ' . $package->shiping_state . ' ' . $package->shipping_country }}
+                        <address>
+                            <strong>{{ $package->shipping_firstname . ' ' . $package->shipping_lastname }}</strong><br>
+                            {{ $package->shipping_address }} {{ $package->shipping_address1 }}<br>
+                            {{ $package->shipping_city . ', ' . $package->shipping_state.' '.$package->shipping_zipcode }}<br>
+                            {{ $package->country ? $package->country->name.' '.$package->country->cn_name : '' }}<br>
+                            <abbr title="ZipCode">Z:</abbr> {{ $package->shipping_zipcode }}
+                            <abbr title="Phone">P:</abbr> {{ $package->shipping_phone }}
+                        </address>
                     </td>
                     <td colspan='3' rowspan="{{$package->items->count()}}">包裹item信息</td>
                 @endif
@@ -86,7 +92,6 @@
                             {{$logistics->name}}
                         @endif
                     @endforeach
-
                 </td>
                 <td>库位</td>
                 <td colspan='2'>{{ $packageItem->warehousePosition ? $packageItem->warehousePosition->name : '' }}</td>
@@ -95,7 +100,7 @@
                 <td colspan='4'>单件重量:{{ $packageItem->item->weight }}</td>
             </tr>
         @endforeach
-        <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb">
+        <tr class="{{ $package->status_color }} packageDetails{{$package->id}} fb {{ $pagetype == 'true' ? 'collapse' : ''}}">
             <td colspan='3'>渠道: {{ $package->channel ? $package->channel->name : '无渠道'}}</td>
             <td colspan='3'>拣货单: {{ $package->picklist ? $package->picklist->picknum : '暂无拣货单信息'}}</td>
             <td colspan='2'>是否标记: {{ $package->is_mark == '1' ? '是' : '否' }}</td>
@@ -108,11 +113,6 @@
                     @if(in_array($package->status, ['NEED', 'PROCESSING', 'ASSIGNED', 'TRACKINGFAILED']))
                         <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs recycle" title='重新匹配物流'>
                             <span class="glyphicon glyphicon-random"></span>
-                        </a>
-                    @endif
-                    @if($package->status == 'ERROR')
-                        <a href="javascript:" data-id="{{ $package->id }}" class="btn btn-primary btn-xs error" title='异常已处理变已包装'>
-                            <span class="glyphicon glyphicon-check"></span>
                         </a>
                     @endif
                     {{--                @if(in_array($package->status,['NEED','PROCESSING','PICKING','PACKED']))--}}
@@ -225,10 +225,10 @@
                    data-target="#change_logistics" class='btn btn-info'>
                     批量修改物流方式
                 </a></li>
-            <li><a href="javascript:" class='btn btn-info changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
-            <li><a href="javascript:" class='btn btn-info remove_logistics'>批量清除追踪号</a></li>
-            <li><a href="javascript:" class='btn btn-info remove_packages'>批量取消包裹</a></li>
-            <li><a class="btn btn-info multiPlace" href="javascript:">
+            <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>
+            <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
+            <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
+            <li><a class="multiPlace" href="javascript:">
                     批量下单
                 </a></li>
         </ul>
@@ -251,13 +251,40 @@
 @stop
 @section('childJs')
     <script type='text/javascript'>
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
         $(document).on('click', '.easy', function () {
             type = $(this).data('type');
             if (type == 'easy') {
-                $('.fb').hide();
+                $.each($('.fb1'), function(){
+                    if(!$(this).is(":hidden")) {
+                        $(this).prev().find('.show_detail').click();
+                    }
+                })
             } else {
-                $('.fb').show();
+                $.each($('.fb1'), function(){
+                    if($(this).is(":hidden")) {
+                        $(this).prev().find('.show_detail').click();
+                    }
+                })
             }
+        });
+
+        $(document).on('change', '.sectionganged_first', function(){
+            val = $(this).val();
+            $.get(
+                "{{ route('package.sectionGanged')}}",
+                {val:val},
+                function(result){
+                    $('.sectionganged_second').html(result);
+                }
+                )
+        })
+
+        $('ul.pagination li').click(function(){
+            url = $(this).find('a').prop('href');
+            type = $('.fb1').is(':hidden');
+            location.href=url + "&pagetype=" + type;
+            return false;
         });
 
         $('.change_logistics').select2();

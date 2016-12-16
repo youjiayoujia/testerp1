@@ -428,4 +428,18 @@ class SpuController extends Controller
         $itemModel = new ItemModel();
         $itemModel->updateOldData();
     }
+
+    public function checkPrivacy()
+    {
+        $text = request()->input('text');
+        $varchar = DB::select('select name from brand');
+        foreach($varchar as $_varchar){
+            if(strstr($text,$_varchar->name)){
+                echo json_encode($_varchar->name);exit;
+            }
+        }
+        echo json_encode(0);exit;
+    }
+
+    
 }

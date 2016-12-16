@@ -13,7 +13,6 @@ namespace App\Models\Logistics;
 use App\Base\BaseModel;
 use App\Models\Channel\AccountModel;
 use App\Models\CountriesModel;
-use App\Models\ChannelModel;
 use App\Models\CatalogModel;
 use App\Models\Logistics\Rule\CatalogModel as RuleCatalogModel;
 use App\Models\Logistics\Rule\ChannelModel as RuleChannelModel;

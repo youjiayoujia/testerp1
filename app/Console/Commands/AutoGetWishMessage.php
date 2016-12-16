@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\ChannelModel;
+use App\Models\Message\MessageModel;
+use Channel;
 
 class AutoGetWishMessage extends Command
 {
@@ -18,7 +21,7 @@ class AutoGetWishMessage extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'wish平台自动获取消息';
 
     /**
      * Create a new command instance.
@@ -39,7 +42,7 @@ class AutoGetWishMessage extends Command
     {
         //
         $channel = ChannelModel::where('driver','=','wish')->first();
-        $accounts =  $channel->accounts;
+        $accounts =  $channel->accounts()->where('is_available','=','1')->get();
 
         if(!$accounts->isEmpty()){
             foreach ($accounts as $account){

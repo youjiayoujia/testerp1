@@ -219,6 +219,7 @@ class PickListModel extends BaseModel
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';
                         $package->save();
+                        $package->eventLog('系统', '包裹加入拣货单，拣货单号:'.$obj->picknum,json_encode($package));
                     }
                 }
             }
@@ -237,6 +238,7 @@ class PickListModel extends BaseModel
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';
                         $package->save();
+                        $package->eventLog('系统', '包裹加入拣货单，拣货单号:'.$obj->picknum,json_encode($package));
                     }
                 }
             }
@@ -256,6 +258,7 @@ class PickListModel extends BaseModel
                     $package->picklist_id = $obj->id;
                     $package->status = 'PICKING';
                     $package->save();
+                    $package->eventLog('系统', '包裹加入拣货单，拣货单号:'.$obj->picknum,json_encode($package));
                 }
                 $this->setPickListId($obj->id);
             }
@@ -287,6 +290,7 @@ class PickListModel extends BaseModel
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';
                         $package->save();
+                        $package->eventLog('系统', '包裹加入拣货单，拣货单号:'.$obj->picknum,json_encode($package));
                     }
                 }
             }
@@ -305,6 +309,7 @@ class PickListModel extends BaseModel
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';
                         $package->save();
+                        $package->eventLog('系统', '包裹加入拣货单，拣货单号:'.$obj->picknum,json_encode($package));
                     }
                 }
             }
@@ -324,6 +329,7 @@ class PickListModel extends BaseModel
                     $package->picklist_id = $obj->id;
                     $package->status = 'PICKING';
                     $package->save();
+                    $package->eventLog('系统', '包裹加入拣货单，拣货单号:'.$obj->picknum,json_encode($package));
                 }
                 $this->setPickListId($obj->id);
             }

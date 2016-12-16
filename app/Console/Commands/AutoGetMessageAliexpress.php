@@ -20,7 +20,9 @@ class AutoGetMessageAliexpress extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+
+    protected $description = '速卖通消息自动导入';
+
 
     /**
      * Create a new command instance.
@@ -44,7 +46,7 @@ class AutoGetMessageAliexpress extends Command
          * 执行时间： 每天  8:00 ，15:40 执行
          */
         $channel = ChannelModel::where('driver','=','aliexpress')->first();
-        $accounts =  $channel->accounts;
+        $accounts =  $channel->accounts()->where('is_available','=','1')->get();
 
         if(!$accounts->isEmpty()){
             foreach ($accounts as $account){
@@ -75,6 +77,8 @@ class AutoGetMessageAliexpress extends Command
                             $messageNew->related  = 0;
                             $messageNew->required  = 1;
                             $messageNew->read  = 0;
+
+                            $messageNew->list_id = !empty($message['list_id']) ? $message['list_id'] : '';
 
                             !empty($message['channel_order_number']) ? $messageNew->channel_order_number=$message['channel_order_number'] : '';
 

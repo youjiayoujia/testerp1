@@ -47,6 +47,7 @@ class SupplierController extends Controller
 
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -55,6 +56,7 @@ class SupplierController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'collectionInfos' => CollectionInfoModel::all(),
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -72,7 +74,9 @@ class SupplierController extends Controller
         $this->model->updateSupplier($id, $data, request()->file('credentials'));
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '数据更新,id='.$id, $to, $from);
-        return redirect($this->mainIndex);
+
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
 }

@@ -89,7 +89,7 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '黑名单',
+                'name' => '风控订单',
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],

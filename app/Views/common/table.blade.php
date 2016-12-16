@@ -69,6 +69,22 @@
                                             @endforeach
                                         @endforeach
                                     @endif
+                                    @if($type == 'doubleRelatedSelectedFields')
+                                        @foreach($value as $relation_ship1 => $value1)
+                                            @foreach($value1 as $relation_ship2 => $value2)
+                                                @foreach($value2 as $key => $content)
+                                                    <div class="col-lg-2 form-group searchItem">
+                                                        <select name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $key }}]" class='form-control select_select0 col-lg-2'>
+                                                            <option value=''>{{config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$key]}}</option>
+                                                            @foreach($content as $k => $v)
+                                                                <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.'.$relation_ship1.'.'.$relation_ship2.'.'.$key) ? ($k==request('mixedSearchFields'.'.'.$type.'.'.$relation_ship1.'.'.$relation_ship2.'.'.$key)?'selected':'') : ''}} >{{$v}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                @endforeach
+                                            @endforeach
+                                        @endforeach
+                                    @endif
                                     @if($type == 'relatedSearchFields')
                                         @if(count($value))
                                             @foreach($value as $relation_ship => $name_arr)
@@ -133,6 +149,38 @@
                                                     </div>
                                                 @endif
                                             @endforeach
+                                        @endforeach
+                                    @endif
+                                    @if($type == 'sectionGanged')
+                                        @foreach($value as $kind => $contents)
+                                            @if($kind == 'first')
+                                                @foreach($contents as $relation_ship1 => $value1)
+                                                    @foreach($value1 as $relation_ship2 => $value2)
+                                                        @foreach($value2 as $key => $content)
+                                                            <div class="col-lg-2 form-group searchItem">
+                                                                <select name="mixedSearchFields[{{$type}}][first][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $key }}]" class='form-control select_select0 col-lg-2 sectionganged_first'>
+                                                                    <option value=''>{{config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$key]}}</option>
+                                                                    @foreach($content as $k => $v)
+                                                                        <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.first.'.$relation_ship1.'.'.$relation_ship2.'.'.$key) ? ($k==request('mixedSearchFields'.'.'.$type.'.first.'.$relation_ship1.'.'.$relation_ship2.'.'.$key)?'selected':'') : ''}} >{{$v}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+                                            @if($kind == 'second')
+                                                @foreach($contents as $name => $content)
+                                                    <div class="col-lg-2 form-group searchItem">
+                                                        <select name="mixedSearchFields[{{$type}}][second][{{ $name }}]" class='form-control select_select0 col-lg-2 sectionganged_second'>
+                                                            <option value=''>{{config('setting.transfer_search')[$name]}}</option>
+                                                            @foreach($content as $k => $v)
+                                                                <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.second.'.$name) ? ($k==request('mixedSearchFields'.'.'.$type.'.second.'.$name)?'selected':'') : ''}} >{{$v}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                @endforeach
+                                            @endif
                                         @endforeach
                                     @endif
                                 @endforeach

@@ -18,7 +18,7 @@ class PurchaseOrderModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'purchase_orders';
+    public $table = 'purchase_orders';
     public $rules = [
         'create' => [
             'supplier_id' => 'required',
@@ -65,7 +65,7 @@ class PurchaseOrderModel extends BaseModel
         return [
             'relatedSearchFields' => ['supplier' => ['name'], 'purchaseUser' => ['name']],
             'filterFields' => [],
-            'filterSelects' => ['warehouse' =>$this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
+            'filterSelects' => ['warehouse_id' =>$this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
                                 'status' => config('purchase.purchaseOrder.status'),
                                 'examineStatus' => config('purchase.purchaseOrder.examineStatus'),
                                 'write_off' => config('purchase.purchaseOrder.write_off'),

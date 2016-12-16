@@ -47,7 +47,7 @@ class AutoGetEbayMessage extends Command
          * 执行时间： 每四分钟一次
          */
         $channel = ChannelModel::where('driver','=','ebay')->first();
-        $accounts =  $channel->accounts;
+        $accounts =  $channel->accounts()->where('is_available','=','1')->get();
 
         if(!$accounts->isEmpty()){
             foreach ($accounts as $account){

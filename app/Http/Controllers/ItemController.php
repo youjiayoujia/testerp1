@@ -17,6 +17,7 @@ use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
+use App\Models\RecieveWrapsModel;
 use App\Models\CatalogModel;
 use App\Models\UserModel;
 use App\Models\Warehouse\PositionModel;
@@ -72,6 +73,8 @@ class ItemController extends Controller
             'logisticsLimit' => $this->logisticsLimit->all(),
             'wrapLimit_arr' => $wrapLimit_arr,
             'logisticsLimit_arr' => $logisticsLimit_arr,
+            'recieveWraps' => RecieveWrapsModel::all(),
+
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -91,7 +94,7 @@ class ItemController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-
+        
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $data['sku_history_values'] = $model->sku_history_values;

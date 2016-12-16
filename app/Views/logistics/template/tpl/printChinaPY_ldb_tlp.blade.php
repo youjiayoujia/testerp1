@@ -49,22 +49,15 @@
                         @endforeach
                     @endif
 				</td>
-				<td style="font-weight:bold;font-size:16px;width:30mm;">{{ $model->logistics_id }}</td>
+				<td style="font-weight:bold;font-size:16px;width:30mm;">{{ $model->logistics ? $model->logistics->logistics_code : '' }}</td>
 			</tr>
 			<tr style="height:23mm;" valign="top">
 				<td style="width:35mm;text-align:left;padding:1px;">
-				    <?php 
-				    /*
-				        $backAddress = DB::table('erp_postpacket_config')->whereRaw("FIND_IN_SET($model->logistics_id, shipment_id_string)")->first();			       
-				        $send_street = $backAddress ? $backAddress->consumer_from : '';
-				        $send_mobilePhone = $backAddress ? $backAddress->consumer_phone : '';
-				        $back_address = $backAddress ? $backAddress->consumer_back : '';*/
-				     
-				    ?>
 					From:<br/>					
 					 {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}<br/>
-			 		 <b style="font-weight:bold;">Phone:
-			 		 {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
+					<b style="font-weight:bold;">Phone:
+						{{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '') : '' }}
+					</b>
 				</td>
 				<td colspan="3" style="text-align:left;padding:2px;font-size:9px">
 					{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>
@@ -75,8 +68,7 @@
 					<b style="font-weight:bold;">{{ $model->country ? $model->country->name : '' }}</b><br/>
 					<b style="font-weight:bold;">Phone：</b>{{ $model->shipping_phone }}
 				</td>
-			</tr>			
-	
+			</tr>
 			<tr style="height:5mm;">
 				<td style="text-align:left;"> 自编号:{{ $model->id }}</td>
 				<td>
@@ -87,7 +79,7 @@
 				               {{$key}}
 				            @endif
 				        @endforeach				     				            
-				   @endif
+				   	@endif
 				</td>
 				<td colspan="2">{{ $model->country ? $model->country->cn_name : '' }}</td>
 			</tr>
@@ -97,7 +89,9 @@
 				<p style="font-size:16px;font-weight:bold;text-align:center;">UNTRACKED</p>
 				</td>
 				<td colspan="3" >
-					<p style="margin-top:2px;"><img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}" style="max-height:200px;"></p>
+					<p style="margin-top:2px;">
+						<img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}" style="max-height:200px;">
+					</p>
 					<p style="margin-top:3px;">{{ $model->logistics_order_number }}</p>
 				</td>
 			</tr>
@@ -110,9 +104,15 @@
 				<td>Val(US $)</td>
 			</tr>
 			<tr style="height:5mm;line-height:11px;font-size:12px;">
-				<td colspan="2">{{ $model->decleared_ename }}({{ $model->decleared_cname  }})</td>
-				<td>{{ $model->signal_weight }}</td>
-				<td>{{ sprintf("%.2f",$model->signal_price) }}</td>
+				<td colspan="2">
+					{{ $model->getDeclaredInfo()['declared_en'] }}({{ $model->getDeclaredInfo()['declared_cn'] }})
+				</td>
+				<td>
+					{{ $model->getDeclaredInfo()['weight'] }}
+				</td>
+				<td>
+					{{ sprintf("%.2f", $model->getDeclaredInfo()['declared_value']) }}
+				</td>
 			</tr>
 			<tr style="height:5mm;line-height:11px;font-size:12px;">
 				<td colspan="2">Total Gross Weight(KG)</td>

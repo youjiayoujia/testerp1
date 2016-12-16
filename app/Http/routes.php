@@ -16,7 +16,6 @@
  *
  */
 Route::get('test1', 'TestController@testYw');
-Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
 Route::post('api/curlApiChangeWarehousePositon',
     ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
@@ -62,6 +61,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('reportedMissing', 'Product\ReportedMissingController');
     //包装限制
     Route::resource('wrapLimits', 'WrapLimitsController');
+    //收货包装
+    Route::resource('recieveWraps', 'RecieveWrapsController');
     Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as' => 'checkName']);
     //汇率
     Route::resource('currency', 'CurrencyController');
@@ -340,6 +341,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('purchaseOrder/purchaseExmaine',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
 
+    Route::any('purchaseList/export/{str}', ['uses' => 'Purchase\PurchaseListController@export', 'as' => 'purchaseList.export']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
     Route::any('purchaseOrder/printInWarehouseOrder/{id}', [
@@ -535,6 +537,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Logistics\TemplateController@preview', 'as' => 'template.preview']);
     Route::get('queren', ['uses' => 'Logistics\TemplateController@queren', 'as' => 'queren']);
     Route::get('logistics/createData', ['uses' => 'LogisticsController@createData', 'as' => 'logistics.createData']);
+    Route::get('logisticsZone/createData', ['uses' => 'Logistics\ZoneController@createData', 'as' => 'logisticsZone.createData']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCollectionInfo', 'Logistics\CollectionInfoController');
@@ -574,6 +577,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Picklist\ErrorListController@exportException', 'as' => 'errorList.exportException']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::post('pickList/createNewPickStore',
+        ['uses' => 'PickListController@createNewPickStore', 'as' => 'pickList.createNewPickStore']);
+    Route::get('pickList/createNewPick',
+        ['uses' => 'PickListController@createNewPick', 'as' => 'pickList.createNewPick']);
     Route::get('pickList/printInfo',
         ['uses' => 'PickListController@printInfo', 'as' => 'pickList.printInfo']);
     Route::get('pickList/changePickBy',
@@ -709,6 +716,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/sectionGanged',
+        ['uses' => 'PackageController@sectionGanged', 'as' => 'package.sectionGanged']);
     Route::get('package/multiPlace/{arr}',
         ['uses' => 'PackageController@multiPlace', 'as' => 'package.multiPlace']);
     Route::get('package/downloadLogisticsTno',
@@ -1109,7 +1118,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setshipping', 'as' => 'joomonline.setshipping']);
     Route::get('setstatus',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@setstatus', 'as' => 'joomonline.setstatus']);
-    Route::get('productBatchEdit',
+    Route::get('JoomproductBatchEdit',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@productBatchEdit', 'as' => 'joomonline.productBatchEdit']);
     Route::any('batchUpdate',
         ['uses' => 'Publish\Joom\JoomOnlineMonitorController@batchUpdate', 'as' => 'joomonline.batchUpdate']);
@@ -1117,19 +1126,26 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
+    Route::any('workflow/doCompleteMsg','MessageController@doCompleteMsg')->name('workflow.doCompleteMsg');
     //关闭工作流
-    Route::any('message/{id}/endWorkflow',
+    Route::any('message/endWorkflow',
         ['as' => 'message.endWorkflow', 'uses' => 'MessageController@endWorkflow']);
     //稍后处理
     Route::any('message/{id}/dontRequireReply',
         ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
+    //workflow稍后处理
+    Route::any('message/workflowDontRequireReply','MessageController@workflowDontRequireReply')
+        ->name('message.workflowDontRequireReply');
     //wish support
-    Route::any('message/{id}/WishSupportReplay',
+    Route::any('message/WishSupportReplay',
         ['as' => 'message.WishSupportReplay', 'uses' => 'MessageController@WishSupportReplay']);
 
     //无需回复
     Route::any('message/{id}/notRequireReply',
         ['as' => 'message.notRequireReply', 'uses' => 'MessageController@notRequireReply']);
+    //workfole无需回复
+    Route::any('message/workflowNoReply',
+        ['as' => 'message.workflowNoReply', 'uses' => 'MessageController@workflowNoReply']);
     //处理信息
     Route::any('message/process',
         ['as' => 'message.process', 'uses' => 'MessageController@process']);
@@ -1145,6 +1161,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //转交他人
     Route::any('message/{id}/assignToOther',
         ['as' => 'message.assignToOther', 'uses' => 'MessageController@assignToOther']);
+    //workflow转交他人
+    Route::any('message/workflowAssignToOther',
+        ['as' => 'message.workflowAssignToOther', 'uses' => 'MessageController@workflowAssignToOther']);
     Route::resource('message', 'MessageController');
     //设置关联订单
     Route::any('message/{id}/setRelatedOrders',
@@ -1168,6 +1187,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //回复信息
     Route::any('message/{id}/reply',
         ['as' => 'message.reply', 'uses' => 'MessageController@reply']);
+    //工作流回复信息
+    Route::any('workflow/reply','MessageController@workflowReply')->name('workflow.reply');
     //信息模版路由
     Route::any('messageTemplate/ajaxGetTemplate',
         ['as' => 'messageTemplate.ajaxGetTemplate', 'uses' => 'Message\TemplateController@ajaxGetTemplate']);
@@ -1189,6 +1210,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['as' => 'doSendAliexpressMessages', 'uses' => 'MessageController@doSendAliexpressMessages']);
     Route::any('SendEbayMessage', ['uses' => 'MessageController@SendEbayMessage', 'as' => 'message.sendEbayMessage']);
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
+    Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
@@ -1239,6 +1261,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Message\Dispute\AliexpressIssueController@doRefuseIssues', 'as' => 'aliexpress.doRefuseIssues']);
     //spu
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
+    Route::get('spu/checkPrivacy', ['uses' => 'SpuController@checkPrivacy', 'as' => 'spu.checkPrivacy']);
     Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
     Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
     Route::get('spu/spuTemp', ['uses' => 'SpuController@spuTemp', 'as' => 'spuTemp']);

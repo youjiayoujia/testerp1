@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\OrderModel;
+use App\Models\ChannelModel;
 use App\Jobs\MatchPaypal as MatchPaypalJob ;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
@@ -45,10 +46,11 @@ class MatchPaypal extends Command
     {
 
         $accounts = $this->argument('accountIDs');
+        $channel = ChannelModel::where('name', 'Ebay')->first();
         $list = OrderModel::where([
             'order_is_alert'=>0,
-            'channel_id'=>4,
-        ])->where('status','!=','UNPAID')->where('status','!=','REVIEW')->where('created_at','>=',date('Y-m-d', strtotime('-4 day')));
+            'channel_id'=>$channel->id,
+        ])->where('status','!=','UNPAID')->where('transaction_number','!=','')->where('created_at','>=',date('Y-m-d', strtotime('-4 day')));
         if($accounts !='all'){
             $accountsArr = explode(',',$accounts);
             $list->whereIn('channel_account_id',$accountsArr);
@@ -59,8 +61,6 @@ class MatchPaypal extends Command
             $job = $job->onQueue('MatchPaypal');
             $this->dispatch($job);
         }
-
-
         //
     }
 }

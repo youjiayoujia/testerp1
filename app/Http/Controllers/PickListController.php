@@ -20,6 +20,7 @@ use App\Models\Pick\ErrorListModel;
 use App\Models\ItemModel;
 use DB;
 use App\Models\UserModel;
+use App\Jobs\AssignStocks;
 use Exception;
 use App\Models\WarehouseModel;
 
@@ -53,8 +54,8 @@ class PickListController extends Controller
                 $model = $this->model->where('pick_by', request('checkid'))->whereBetween('created_at', [date('Y-m-d', strtotime('now')),date('Y-m-d', strtotime('1 day'))])->whereNotIn('status', ['PACKAGED']);
             }
         }
-        $today_print = $this->model->whereBetween('print_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
-        $allocate = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])
+        $today_print = $this->model->where('warehouse_id', $warehouseId)->whereBetween('print_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
+        $allocate = $this->model->where('warehouse_id', $warehouseId)->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])
                     ->get()
                     ->filter(function($single){
                         return $single->pick_by != 0;
@@ -153,8 +154,7 @@ class PickListController extends Controller
                 continue;
             }
             foreach($model->package as $package) {
-                $to = json_encode($package);
-                $package->eventLog($name, '包裹打印', $to);
+                $package->eventLog($name, '包裹对应拣货单已打印', json_encode($package));
             }
             $model->printRecords()->create(['user_id' => request()->user()->id]);
             if($model->status == 'NONE') {
@@ -460,10 +460,76 @@ class PickListController extends Controller
         {
             $package->status = 'PICKED';
             $package->save();
+            $package->eventLog('系统', '包裹对应拣货单已分拣完成', json_encode($package));
         }
         $this->eventLog($name, '分拣完成,id='.$obj->id, $from);
 
         return redirect(route('package.flow'));
+    }
+
+    public function createNewPick()
+    {
+        $userId = request()->user()->id;
+        $user = UserModel::find($userId);
+        $warehouseId = $user->warehouse_id;
+        $logisticses = WarehouseModel::find($warehouseId)->logistics;
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'channels' => ChannelModel::all(),
+            'logisticses' => $logisticses->groupBy('template.size'),
+            'count' => PackageModel::where('status','PROCESSING')->count(),
+            'url' => route('pickList.createNewPickStore'),
+        ];
+
+        return view($this->viewPath.'createPick', $response);
+    }
+
+    public function createNewPickStore()
+    {
+        $sum = 0;
+        $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
+        if(!$warehouse_id) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '人员没有所属仓库'));
+        }
+        if(!request()->has('mixed') && request()->has('logistics')) {
+            foreach(request()->input('logistics') as $logistic_id) {
+                foreach(request('package') as $key => $type) {
+                    $packages = PackageModel::where(['status'=>'PICKING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
+                    ->where(function($query){
+                        if(request()->has('channel')) {
+                            $query =$query->whereIn('channel_id', request('channel'));
+                        }
+                    })->get();
+                    $sum += $packages->count();
+                    if($packages->count()) {
+                        $this->model->createPickListItems($packages);
+                        $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
+                                                     (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id, $warehouse_id);
+                    }
+                }
+            }
+        } elseif(request()->has('mixed') && request()->has('logistics')) {
+            foreach(request('package') as $key => $type) {
+               $packages = PackageModel::where(['status'=>'PICKING', 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
+               ->where(function($query){
+                    if(request()->has('logistics')) {
+                        $query = $query->whereIn('logistics_id', request('logistics'));
+                    }
+                })->where(function($query){
+                    if(request()->has('channel')) {
+                        $query = $query->whereIn('channel_id', request('channel'));
+                    }
+                })->get();
+                $sum += $packages->count();
+                if($packages->count()) {
+                    $this->model->createPickListItems($packages);
+                    $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
+                                                 (request()->has('multitext') ? request()->input('multitext') : '20'), $warehouse_id);
+                } 
+            }
+        }
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $sum.'个包裹已加入生成拣货单'));
     }
 
     /**
@@ -483,36 +549,16 @@ class PickListController extends Controller
         foreach($picklist->package()->withTrashed()->get() as $package)
         {
             if(!in_array($package->status, ['PACKED', 'SHIPPED'])) {
-                $package->status = 'ERROR';
-                $package->save();
-                foreach($package->items()->withTrashed()->get() as $packageItem) {
-                    $sum += $packageItem->quantity - $packageItem->picked_quantity;
-                    $errorLists = ErrorListModel::where('item_id', $packageItem->item_id)->get();
-                    if($errorLists->count()) {
-                        foreach($errorLists as $errorList) {
-                            $errorList->update(['packageNum' => $errorList->packageNum.','.$package->id]);
-                        }
-                    } else {
-                        $item = ItemModel::find($packageItem->item_id);
-                        foreach($item->stocks as $key => $stock) {
-                            $model = ErrorListModel::where(['item_id'=> $stock->item_id, 'warehouse_position_id' => $stock->warehouse_position_id])->first();
-                            if(!$model) {
-                                $model = ErrorListModel::create([
-                                        'item_id' => $stock->item_id,
-                                        'packageNum' => $package->id,
-                                        'warehouse_position_id' => $stock->warehouse_position_id,
-                                        'warehouse_id' => $stock->warehouse_id,
-                                        'quantity' => $stock->all_quantity,
-                                    ]);
-                                continue;
-                            }
-                            $model->update(['packageNum' => $model->packageNum.','.$package->id]);
-                        }
-                    }
+                foreach($package->items as $packageItem) {
+                    $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $packageItem->id);
+                    $packageItem->update(['warehouse_position_id' => '']);
                 }
+                $package->update(['status' => 'NEED', 'picklist_id' => '']);
+                $job = new AssignStocks($package);
+                $job = $job->onQueue('assignStocks');
+                $this->dispatch($job);
             } 
-        $picklist->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time()),
-                            'quantity' => $sum]);
+            $picklist->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);
         }
 
         return redirect(route('package.flow'));
@@ -535,12 +581,12 @@ class PickListController extends Controller
             return json_encode(false);
         }
         if($package) {
-            $package->eventLog(UserModel::find(request()->user()->id)->name, '已包装', json_encode($package));
             $item = $package->items->first();
             $item->update(['picked_quantity' => $item->quantity]);
             $order = $package->order;
             $package->status = 'PACKED';
             $package->save();
+            $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装', json_encode($package));
             $picklistItems = $package->picklistItems;
             foreach($picklistItems as $picklistItem) {
                 $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;
@@ -622,6 +668,7 @@ class PickListController extends Controller
             'channels' => ChannelModel::all(),
             'logisticses' => $logisticses->groupBy('template.size'),
             'count' => PackageModel::where('status','PROCESSING')->count(),
+            'url' => route('pickList.createPickStore'),
         ];
 
         return view($this->viewPath.'createPick', $response);

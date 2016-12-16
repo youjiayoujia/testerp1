@@ -11,8 +11,8 @@ use App\Models\OrderModel;
 use App\Models\UserModel;
 use Tool;
 use Translation;
-use App\Models\Channel\AccountModel;
-
+use App\Models\Channel\AccountModel as Channel_Accounts;
+use App\Models\ChannelModel;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -36,13 +36,17 @@ class MessageModel extends BaseModel{
 
     public $rules = [];
 
-    public function account()
+    public $appends = [
+        'channel_diver_name'
+    ];
+
+  public function account()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel');
     }
     public function assigner()
     {
-        return $this->belongsTo('App\Models\UserModel', 'assign_id');
+        return $this->belongsTo('App\Models\UserModel', 'assign_id' , 'id');
     }
 
     public function getLabelTextAttribute()
@@ -69,6 +73,19 @@ class MessageModel extends BaseModel{
         return $this->belongsTo('App\Models\OrderModel', 'channel_order_number','channel_ordernum');
 
     }
+    public function replies()
+    {
+        return $this->hasMany('App\Models\Message\ReplyModel', 'message_id');
+    }
+
+    public function parts()
+    {
+        return $this->hasMany('App\Models\Message\PartModel', 'message_id');
+    }
+    public function getAttachment()
+    {
+        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
+    }
 
     public function getChannelNameAttribute(){
         if(!empty($this->channel_id)){
@@ -76,6 +93,28 @@ class MessageModel extends BaseModel{
         }else{
             return '无';
         }
+    }
+
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        //dd(UserModel::all()->pluck('name','name'));
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'messages.status' => config('message.statusText'),
+            ],
+            'selectRelatedSearchs' => [
+                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
+                'account' => ['account' => Channel_Accounts::all()->pluck('account', 'account')],
+                //'assigner' => ['name' => UserModel::all()->pluck('name','name')],
+            ],
+            'sectionSelect' => ['time'=>['created_at']],
+        ];
     }
 
     /**
@@ -143,13 +182,12 @@ class MessageModel extends BaseModel{
     public function assignToOther($fromId, $assignId)
     {
 
-        if ($this->assign_id == $fromId) {
-            $assignUser = UserModel::find($assignId);
-            if ($assignUser) {
-                $this->assign_id = $assignId;
-                return $this->save();
-            }
+        $assignUser = UserModel::find($assignId);
+        if ($assignUser) {
+            $this->assign_id = $assignId;
+            return $this->save();
         }
+
         return false;
     }
 
@@ -162,19 +200,7 @@ class MessageModel extends BaseModel{
             ->get();
     }
 
-    public function replies()
-    {
-        return $this->hasMany('App\Models\Message\ReplyModel', 'message_id');
-    }
 
-    public function parts()
-    {
-        return $this->hasMany('App\Models\Message\PartModel', 'message_id');
-    }
-    public function getAttachment()
-    {
-        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
-    }
     public function getMessageContentAttribute()
     {
         $plainBody = '';
@@ -214,12 +240,14 @@ class MessageModel extends BaseModel{
 
     public function notRequireReply($userId)
     {
-        if ($this->assign_id == $userId) {
             $this->required = 0;
             $this->status = 'COMPLETE';
-            return $this->save();
-        }
-        return false;
+            if($this->save()){
+                return true;
+            }else{
+                return false;
+
+            }
     }
 
     public function dontRequireReply($userId)
@@ -268,7 +296,7 @@ class MessageModel extends BaseModel{
         $data['status'] = 'NEW';
         if ($this->replies()->create($data)) {
             //记录回复邮件类型
-            $this->type_id = $data['type_id']?$data['type_id']:"";
+            $this->type_id = 0;
             $this->status = 'COMPLETE';
             $this->end_at = date('Y-m-d H:i:s', time());
             return $this->save();
@@ -287,21 +315,7 @@ class MessageModel extends BaseModel{
         }
         return $attanchments;
     }
-    /**
-     * 更多搜索
-     * @return array
-     */
-    public function getMixedSearchAttribute()
-    {
-        return [
-            'relatedSearchFields' => [],
-            'filterFields' => [],
-            'filterSelects' => [],
-            'selectRelatedSearchs' => [],
-            'sectionSelect' => ['time'=>['created_at']],
 
-        ];
-    }
 
     public function getMessageInfoAttribute(){
         if($this->ContentDecodeBase64){
@@ -354,7 +368,7 @@ class MessageModel extends BaseModel{
                                 $product_html .= '<tr>';
                                 $product_html .= '<td><img src ="'.$message_fields_ary['product_img_url'] .'"/></td>';
                                 $product_html .= '<td>'.$message_fields_ary['product_product_name'] .'</td>';
-                                $product_html .= '<td><a href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
+                                $product_html .= '<td><a target="_blank" href="'.$message_fields_ary['product_product_url'].'">链接</a></td>';
                                 $product_html .= '</tr>';
                                 $product_html .= '</table>';
                                 $product_html .= '</div>';
@@ -444,6 +458,11 @@ class MessageModel extends BaseModel{
         return $this->account->channel->driver;
     }
 
+    public function getChannelDiverNameAttribute ()
+    {
+        return !empty($this->account->channel->driver) ? $this->account->channel->driver : false;
+    }
+
     public function findOrderWithMessage(){
         $order_id = $this->getChannelMessageOrderId(); //根据平台参数获取关联订单号
         if(!empty($order_id)){
@@ -471,8 +490,10 @@ class MessageModel extends BaseModel{
                 }
                 break;
             case 'wish':
-                $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
-                $order_obj = OrderModel::where('transaction_number','=',$transaction_id)->first();
+                 //wish交易号
+                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)
+                    ->where('channel_account_id',$this->account_id)
+                    ->first();
                 $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
                 break;
             case 'aliexpress':
@@ -531,15 +552,55 @@ class MessageModel extends BaseModel{
         }
     }
 
+    public function getMyWorkFlowMsg ($entry = 5)
+    {
+        return $this->workFlowMsg($entry)->get();
+    }
+
     /**
-     *
+     * 工作流消息
+     * 说明：客服负责的账号，并且没有被别人操作的 未读或者处理中
+     * @param $query
+     * @param $entry
+     * @return mixed
      */
-/*    public function getIsAliOptionMsgAttribute(){
-        if ($this->related == '0'){
-            $messages = $this->where('channel_order_number', $this->channel_order_number)->get();
-            dd($messages);
+    public function scopeWorkFlowMsg ($query,$entry)
+    {
+        $user_id = request()->user()->id;
+        $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id'); //客服所属的账号
+        return $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0])
+            ->orWhere(function($query) use ($user_id){
+                $query->where('status','=','PROCESS')
+                    ->where('assign_id','=',$user_id)
+                    ->where('required','=',1)
+                    ->where('dont_reply','=',0)
+                    ->where('read','=',0);
+            })
+            ->whereIn('account_id',$account_ids)
+            ->take($entry)
+            ->orderBy('id', 'DESC');
+    }
+
+    public function contentTemplate ()
+    {
+        if($this->channel_diver_name){
+            switch ($this->channel_diver_name){
+                case 'aliexpress':
+                    break;
+
+            }
+
         }
-    }*/
+    }
+
+    public function completeMsg(){
+        $this->status = 'COMPLETE';
+        if($this->save()){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
 
 }

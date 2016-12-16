@@ -385,7 +385,7 @@ class PackageController extends Controller
             })->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->count(),
-            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto',
+            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',
                 '1')->get()->filter(function ($single) {
                 return $single->order ? ($single->order->status != 'REVIEW' ? true : false) : false;
             })->count(),

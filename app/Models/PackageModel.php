@@ -1584,11 +1584,6 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
-            //查看对应的物流方式是否是所属仓库
-                $warehouse = WarehouseModel::find($this->warehouse_id);
-                if (!$warehouse->logisticsIn($rule->type_id)) {
-                    continue;
-                }
 
             $rules = RuleModel::
             where(function ($query) use ($weight) {

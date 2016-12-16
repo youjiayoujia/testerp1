@@ -20,7 +20,7 @@
             <td>{{ $warehouse->address }}</td>
             <td>{{ $warehouse->contactByName ? $warehouse->contactByName->name : ''}}</td>
             <td>{{ $warehouse->telephone }}</td>
-            <td>{{ $warehouse->type == 'local' ? '本地仓库' : ($warehouse->type == 'oversea' ? '海外仓库' : ($warehouse->type == 'third' ? '第三方仓库' : 'fba本地仓')) }}</td>
+            <td>{{ $warehouse->type == 'local' ? '本地仓库' : ($warehouse->type == 'oversea' ? '海外仓库' : ($warehouse->type == 'third' ? '第三方仓库' : '海外中转仓')) }}</td>
             <td>{{ $warehouse->volumn }}(m<small>3</small>)</td>
             <td>{{ $warehouse->code }}</td>
             <td>{{ $warehouse->is_available == '1' ? '是' : '否'}}</td>

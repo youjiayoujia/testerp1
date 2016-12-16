@@ -13,6 +13,7 @@ use Tool;
 use Translation;
 use App\Models\Channel\AccountModel as Channel_Accounts;
 use App\Models\ChannelModel;
+use App\Models\Logistics\ChannelModel as LogisticChannel;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -314,6 +315,13 @@ class MessageModel extends BaseModel{
             }
         }
         return $attanchments;
+    }
+
+    public function getLogisticsUrlAttribute()
+    {
+
+         LogisticChannel::where()->first();
+
     }
 
 

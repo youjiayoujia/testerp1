@@ -19,7 +19,7 @@
                 <div class="panel-heading">
                     订单:
                     <a href="{{ route('order.show',$relatedOrder->order->id) }}" target="_blank">
-                        <strong>{{ $relatedOrder->order->ordernum }}</strong>
+                        <strong>{{ $relatedOrder->order->id }}</strong>
                     </a>
                     <small>{{ '<'.$relatedOrder->order->email.'>' }}</small>
                     -

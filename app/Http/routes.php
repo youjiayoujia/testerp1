@@ -16,8 +16,8 @@
  *
  */
 Route::get('test1', 'TestController@testYw');
-Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
+Route::get('test_3', 'TestController@test_3');
 Route::post('api/curlApiChangeWarehousePositon',
     ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
 Route::any('api/skuHandleApi', ['uses' => 'ItemController@skuHandleApi', 'as' => 'item.skuHandleApi']);
@@ -62,6 +62,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('reportedMissing', 'Product\ReportedMissingController');
     //包装限制
     Route::resource('wrapLimits', 'WrapLimitsController');
+    //收货包装
+    Route::resource('recieveWraps', 'RecieveWrapsController');
     Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as' => 'checkName']);
     //汇率
     Route::resource('currency', 'CurrencyController');
@@ -691,6 +693,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/sectionGanged',
+        ['uses' => 'PackageController@sectionGanged', 'as' => 'package.sectionGanged']);
     Route::get('package/multiPlace/{arr}',
         ['uses' => 'PackageController@multiPlace', 'as' => 'package.multiPlace']);
     Route::get('package/downloadLogisticsTno',

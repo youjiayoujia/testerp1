@@ -28,7 +28,7 @@ use App\Modules\Logistics\Adapter\kuaiyouAdapter;
 use App\Modules\Logistics\Adapter\MalaixiyaAdapter;
 use App\Modules\Logistics\Adapter\DiouAdapter;
 use App\Modules\Logistics\Adapter\SzPostXBAdapter;
-
+use App\Modules\Logistics\Adapter\DhlAdapter;
 
 
 class LogisticsModule
@@ -173,5 +173,8 @@ class LogisticsModule
     
     public function createSzPostXBDriver($config){
         return new SzPostXBAdapter($config);
+    }
+    public function createDhlDriver($config){
+        return new DhlAdapter($config);
     }
 }

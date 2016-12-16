@@ -21,6 +21,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Product\ProductLogisticsLimitModel;
+use App\Models\Logistics\ChannelModel as LogisticChannel;
 use Queue;
 use Cache;
 
@@ -516,6 +517,17 @@ class PackageModel extends BaseModel
     public function catelog()
     {
         return $this->belongsTo('App\Models\CatalogModel', $this->items->first()->item->product->catalog_id);
+    }
+
+    public function  LogisticsChannel()
+    {
+        return $this->hasMany('App\Models\Logistics\ChannelModel','logistics_id','logistics_id');
+    }
+    //物流网址
+    public function getThisPackageLogisticAttribute()
+    {
+        $url = $this->LogisticsChannel()->where('channel_id','=',$this->channel_id)->select('url')->first();
+        return $url['url'];
     }
 
 

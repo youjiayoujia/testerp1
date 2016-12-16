@@ -90,6 +90,7 @@ class GetMessages extends Command
                             $messageNew->related  = 0;
                             $messageNew->required  = 1;
                             $messageNew->read  = 0;
+                            $messageNew->country  = ! empty($message['country']) ? $message['country'] : '';
 
                             if(!empty($message['list_id'])){
                                 $messageNew->list_id  = $message['list_id'];

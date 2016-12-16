@@ -683,7 +683,6 @@ class OrderModel extends BaseModel
         }
 
         $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-
         return $order;
     }
 

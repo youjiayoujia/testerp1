@@ -1554,12 +1554,6 @@ class PackageModel extends BaseModel
                     }
                 }
             }
-            //查看对应的物流方式是否是所属仓库
-            $warehouse = $this->warehouse_id ? WarehouseModel::find($this->warehouse_id) : WarehouseModel::where('name',
-                '深圳仓')->first();
-            if (!$warehouse->logisticsIn($rule->type_id)) {
-                continue;
-            }
             //物流查询链接
             $trackingUrl = $rule->logistics->url;
             $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
@@ -1584,7 +1578,6 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
-
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)

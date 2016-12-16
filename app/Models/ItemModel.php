@@ -895,6 +895,7 @@ class ItemModel extends BaseModel
         } else {
             PurchasesModel::create($data);
         }
+        
         return $data;
         
     }

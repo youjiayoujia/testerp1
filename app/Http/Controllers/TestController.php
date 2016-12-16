@@ -70,6 +70,24 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
         $this->orderModel = $orderModel;
     }
+    public function test_3()
+    {
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        $package->logistics_id=18;//更改物流ID测试
+        //$package->shipping_country='IT';
+        //echo "<pre/>";var_dump($package);exit;
+        $package->status = 'PACKED';
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        //dd($result);
+        echo "<pre/>";var_dump($result);exit;
+        $package = PackageModel::find(1);
+        var_dump($package->items->toarray());
+    }
     //测试包裹站台是否满足 物流下单状态；
     //进行物流下单
 
@@ -84,7 +102,11 @@ class TestController extends Controller
         }
         dd($result);
     }
-
+    public function test_3()
+    {echo 3331213;exit;
+        $package = PackageModel::find(1);
+        var_dump($package->items->toarray());
+    }
     public function test2()
     {
 

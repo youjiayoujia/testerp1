@@ -784,6 +784,9 @@ class OrderModel extends BaseModel
             case 'wish':
                 $sum = $this->amount * 0.15;
                 break;
+            case 'ebay':
+                $sum = 0;
+                break;
             default:
                 foreach ($this->items as $item) {
                     if ($item->item and $item->item->catalog) {

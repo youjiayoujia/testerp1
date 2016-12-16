@@ -35,7 +35,9 @@ class StockModel extends BaseModel
         'all_quantity',
         'available_quantity',
         'hold_quantity',
-        'created_at'
+        'created_at',
+        'oversea_sku',
+        'oversea_cost'
     ];
 
     // 用于查询
@@ -375,9 +377,15 @@ class StockModel extends BaseModel
             try {
             $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $tmp_item->purchase_price,
                 'MAKE_ACCOUNT');
+            $stock1 = $this->where(['item_id' => $tmp_item->id, 'warehouse_position_id' => $tmp_position->id])->first();
+            
+            if($stock1 && !empty($stock['oversea_sku'])) {
+                $stock1->update(['oversea_sku' => $stock['oversea_sku']]);
+            }
             } catch(Exception $e) {
                 DB::rollback();
-                $error[] = $key;
+                $error[$i]['key'] = $key;
+                $error[$i]['remark'] = '数据有异常';
             }
             DB::commit();
             $i++;

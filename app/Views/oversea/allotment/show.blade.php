@@ -16,6 +16,9 @@
             <strong>调入仓库</strong>: {{ $model->inWarehouse ? $model->inWarehouse->name : '' }}
         </div>
         <div class="col-lg-2">
+            <strong>头程物流</strong>: {{ $model->logistics ? $model->logistics->name : '' }}
+        </div>
+        <div class="col-lg-2">
             <strong>调拨人</strong>: {{ $model->allotmentBy ? $model->allotmentBy->name : '' }}
         </div>
         <div class="col-lg-2">

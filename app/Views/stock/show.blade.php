@@ -11,9 +11,7 @@
             </div>
             <div class="col-lg-2">
                 <strong>海外仓sku</strong>:
-                @if($model->warehouse->type == 'oversea')
-                    {{$model->warehouse->code}}.{{$model->item ? $model->item->sku : ''}}
-                @endif
+                {{ $model->oversea_sku }}
             </div>
             <div class="col-lg-2">
                 <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : ''}}

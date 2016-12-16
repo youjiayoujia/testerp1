@@ -17,7 +17,10 @@
         </div>
         <div class="form-group col-lg-2">
             <label class='control-label'>运输方式</label>
-            <input type='text' name='transport' class='form-control' value="{{ old('transport') ? old('transport') : $model->transport }}">
+            <select name='transport' class='form-control'>
+            <option value='0' {{ $model->transport ? ($model->transport == '0' ? 'selected' : '') : ''}}>海运</option>
+            <option value='1' {{ $model->transport ? ($model->transport == '1' ? 'selected' : '') : ''}}>空运</option>
+        </select>
         </div>
         <div class="form-group col-lg-2">
             <label class='control-label'>公式</label>

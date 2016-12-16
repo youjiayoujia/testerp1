@@ -14,7 +14,7 @@
             <td>{{ $firstLeg->id }}</td>
             <td>{{ $firstLeg->name }}</td>
             <td>{{ $firstLeg->warehouse ? $firstLeg->warehouse->name : ''}}</td>
-            <td>{{ $firstLeg->transport }}</td>
+            <td>{{ $firstLeg->transport == '0' ? '海运' : '空运' }}</td>
             <td>{{ $firstLeg->formula }}</td>
             <td>{{ $firstLeg->created_at }}</td>
             <td>

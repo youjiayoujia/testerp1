@@ -19,9 +19,7 @@
             <td>{{ $stock->id }}</td>
             <td>{{ $stock->item ? $stock->item->sku : '' }}</td>
             <td>
-                @if($stock->warehouse->type == 'oversea')
-                    {{$stock->warehouse->code}}.{{$stock->item ? $stock->item->sku : ''}}
-                @endif
+                {{ $stock->oversea_sku }}
             </td>
             <td>{{ $stock->warehouse ? $stock->warehouse->name : '' }}</td>
             <td>{{ $stock->position ? $stock->position->name : '' }}</td>

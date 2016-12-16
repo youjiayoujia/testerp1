@@ -13,7 +13,7 @@
                 <strong>物流方式</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-4">
-                <strong>运输方式</strong>: {{ $model->transport }}
+                <strong>运输方式</strong>: {{ $model->transport == '0' ? '海运' : '空运' }}
             </div>
             <div class="col-lg-4">
                 <strong>公式</strong>: {{ $model->formula }}

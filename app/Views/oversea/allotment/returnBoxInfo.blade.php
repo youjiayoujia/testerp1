@@ -10,36 +10,62 @@
     <div class="panel panel-info">
         <div class="panel-heading">列表</div>
         <div class="panel-body">
+                <div class='row'>
+                    <div class='form-group col-lg-1'>
+                        <label>箱号</label>
+                    </div>
+                    <div class='form-group col-lg-1'>
+                        <label>长(cm)</label>
+                    </div>
+                    <div class='form-group col-lg-1'>
+                        <label>宽(cm)</label>
+                    </div>
+                    <div class='form-group col-lg-1'>
+                        <label>高(cm)</label>
+                    </div>
+                    <div class='form-group col-lg-2'>
+                        <label>重量(kg)</label>
+                    </div>
+                    <div class='from-group col-lg-2'>
+                        <label>物流方式</label>
+                    </div>
+                    <div class='form-group col-lg-2'>
+                        <label>追踪号</label>
+                    </div>
+                    <div class='form-group col-lg-2'>
+                        <label>物流费(￥)</label>
+                    </div>
+                </div>
             @foreach($model->boxes as $box)
                 <div class='row'>
                     <div class='form-group col-lg-1'>
                         <input type='text' class='form-control' value="{{$box->boxnum}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][length]" class='form-control' placeholder='长(m)'>
+                        <input type='text' name="boxInfo[{{$box->id}}][length]" class='form-control' placeholder='长(m)' value="{{ $box->length}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][width]" class='form-control' placeholder='宽(m)'>
+                        <input type='text' name="boxInfo[{{$box->id}}][width]" class='form-control' placeholder='宽(m)' value="{{ $box->width}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][height]" class='form-control' placeholder='高(m)'>
+                        <input type='text' name="boxInfo[{{$box->id}}][height]" class='form-control' placeholder='高(m)' value="{{ $box->height}}">
+                    </div>
+                    <div class='form-group col-lg-2'>
+                        <input type='text' name="boxInfo[{{$box->id}}][weight]" class='form-control' placeholder="重量" value="{{ $box->weight}}">
                     </div>
                     <div class='from-group col-lg-2'>
                         <select name="boxInfo[{{$box->id}}][logistics_id]" class='form-control logistics'>
                         <option value=''>请选择物流方式</option>
                         @foreach($logisticses as $logistics)
-                            <option value='{{$logistics->id}}'>{{$logistics->name}}</option>
+                            <option value='{{$logistics->id}}' {{ $box->logistics_id == $logistics->id ? 'selected' : ''}}>{{$logistics->name}}</option>
                         @endforeach
                         </select>
                     </div>
                     <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][tracking_no]" class='form-control' placeholder="追踪号">
+                        <input type='text' name="boxInfo[{{$box->id}}][tracking_no]" class='form-control' placeholder="追踪号" value="{{ $box->tracking_no}}">
                     </div>
                     <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][fee]" class='form-control' placeholder="物流费">
-                    </div>
-                    <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][weight]" class='form-control' placeholder="重量">
+                        <input type='text' name="boxInfo[{{$box->id}}][fee]" class='form-control' placeholder="物流费" value="{{ $box->fee}}">
                     </div>
                 </div>
             @endforeach

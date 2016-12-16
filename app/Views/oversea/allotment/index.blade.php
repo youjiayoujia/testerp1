@@ -4,6 +4,7 @@
     <th>调拨单号</th>
     <th>调出仓库</th>
     <th>调入仓库</th>
+    <th>头程物流</th>
     <th>调拨人</th>
     <th>状态</th>
     <th>审核人</th>
@@ -18,6 +19,7 @@
             <td>{{ $overseaAllotment->allotment_num }}</td>
             <td>{{ $overseaAllotment->outWarehouse ? $overseaAllotment->outWarehouse->name : ''}}</td>
             <td>{{ $overseaAllotment->inWarehouse ? $overseaAllotment->inWarehouse->name : ''}}</td>
+            <td>{{ $overseaAllotment->logistics ? $overseaAllotment->logistics->name : '' }}</td>
             <td>{{ $overseaAllotment->allotmentBy ? $overseaAllotment->allotmentBy->name : ''}}</td>
             <td>{{ $overseaAllotment->status_name }}</td>
             <td>{{ $overseaAllotment->checkBy ? $overseaAllotment->checkBy->name : ''}}</td>
@@ -47,7 +49,7 @@
                         <span class="glyphicon glyphicon-gift"></span>
                     </a>
                 @endif
-                @if(in_array($overseaAllotment->status, ['inboxed']))
+                @if(in_array($overseaAllotment->status, ['inboxed', 'out']))
                     <a href="{{route('overseaAllotment.returnBoxInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回填箱子信息并出库'>
                         <span class="glyphicon glyphicon-folder-close"></span>
                     </a>

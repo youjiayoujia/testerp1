@@ -68,7 +68,7 @@ class AllotmentController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'warehouses' => WarehouseModel::where(['is_available' => '1', 'type' => 'local'])->get(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -140,7 +140,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $model,
-            'warehouses' => WarehouseModel::where(['is_available'=>'1'])->get(),
+            'warehouses' => WarehouseModel::where(['is_available' => '1', 'type' => 'local'])->get(),
             'skus' => StockModel::where(['warehouse_id'=>$model->out_warehouse_id])->distinct()->with('item')->get(['item_id']),
             'positions' => $arr,
             'allotmentforms' => $allotment, 

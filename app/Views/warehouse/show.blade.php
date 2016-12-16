@@ -10,12 +10,6 @@
                 <strong>名称</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-2">
-                <strong>省</strong>: {{ $model->province }}
-            </div>
-            <div class="col-lg-2">
-                <strong>市</strong>: {{ $model->city }}
-            </div>
-            <div class="col-lg-2">
                 <strong>详细地址</strong>: {{ $model->address }}
             </div>
             <div class="col-lg-2">

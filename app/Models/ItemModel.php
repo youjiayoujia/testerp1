@@ -71,7 +71,9 @@ class ItemModel extends BaseModel
         'package_weight',
         'competition_url',
         'products_history_values',
-        'new_status'
+        'new_status',
+        'is_oversea',
+        'volumn_rate',
     ];
 
     public function product()

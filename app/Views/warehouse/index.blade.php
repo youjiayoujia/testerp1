@@ -2,8 +2,6 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
-    <th>省</th>   
-    <th>市</th>
     <th>详细地址</th>
     <th>联系人</th>
     <th>联系电话</th>
@@ -19,8 +17,6 @@
         <tr>
             <td>{{ $warehouse->id }}</td>
             <td>{{ $warehouse->name }}</td>
-            <td>{{ $warehouse->province}}</td>
-            <td>{{ $warehouse->city}}</td>
             <td>{{ $warehouse->address }}</td>
             <td>{{ $warehouse->contactByName ? $warehouse->contactByName->name : ''}}</td>
             <td>{{ $warehouse->telephone }}</td>

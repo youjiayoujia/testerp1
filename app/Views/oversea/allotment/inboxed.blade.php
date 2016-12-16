@@ -111,6 +111,7 @@
 @stop
 @section('formButton')
     <button type='button' class="btn btn-success submit">装箱完成</button>
+    <button type='button' href="{{ route('overseaAllotment.inboxOver')}}"class="btn btn-success inboxover">强制结束</button>
 @stop
 @section('pageJs')
 <script type='text/javascript'>
@@ -130,6 +131,16 @@ $(document).ready(function(){
             str += boxnum + '.' + $(this).find('.new_sku').data('id') + '.' + $(this).find('.new_sku').text() + '.'+ $(this).find('.new_quantity').text() + '|';
         });
         location.href="{{ route('overseaAllotment.inboxStore', ['str' => ''])}}/" + str + '/' + modelid;
+    })
+
+    $(document).on('click', '.inboxover', function(){
+        modelid = $('.modelId').val();
+        str = '|';
+        $.each($('.new tr'), function(){
+            boxnum = $(this).find('.new_boxnum').text();
+            str += boxnum + '.' + $(this).find('.new_sku').data('id') + '.' + $(this).find('.new_sku').text() + '.'+ $(this).find('.new_quantity').text() + '|';
+        });
+        location.href="{{ route('overseaAllotment.inboxOver', ['str' => ''])}}/" + str + '/' + modelid;
     })
 
     $(document).on('click', '.search', function(){

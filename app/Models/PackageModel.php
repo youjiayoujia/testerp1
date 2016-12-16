@@ -1329,6 +1329,9 @@ class PackageModel extends BaseModel
 
     public function calculateLogisticsFee()
     {
+        if(!$this->logistics_id && !$this->realTimeLogistics()) {
+            return false;
+        }
         $logisticsId = !empty($this->logistics_id) ? $this->logistics_id : $this->realTimeLogistics()->id;
         $zones = ZoneModel::where('logistics_id', $logisticsId)->get();
         foreach ($zones as $zone) {
@@ -1396,6 +1399,9 @@ class PackageModel extends BaseModel
             $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
         })->where(['is_clearance' => $isClearance])
+          ->whereHas('logistics', function($single){
+                $single->where('warehouse_id', $this->warehouse_id);
+              })
             ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
             ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
             ->get()
@@ -1517,6 +1523,12 @@ class PackageModel extends BaseModel
             } else {
                 $isClearance = 0;
             }
+            //查看对应的物流方式是否是所属仓库
+                $warehouse = WarehouseModel::find($this->warehouse_id);
+                if (!$warehouse->logisticsIn($rule->type_id)) {
+                    continue;
+                }
+
             $rules = RuleModel::
             where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
@@ -1525,6 +1537,9 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
+              ->whereHas('logistics', function($single){
+                $single->where('warehouse_id', $this->warehouse_id);
+              })
                 ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
                 ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
                 ->get()
@@ -1618,11 +1633,6 @@ class PackageModel extends BaseModel
                             }
                         }
                     }
-                }
-                //查看对应的物流方式是否是所属仓库
-                $warehouse = WarehouseModel::find($this->warehouse_id);
-                if (!$warehouse->logisticsIn($rule->type_id)) {
-                    continue;
                 }
                 //物流查询链接
                 $logistics = $rule->logistics;

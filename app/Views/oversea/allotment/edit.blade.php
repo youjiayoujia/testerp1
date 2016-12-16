@@ -3,7 +3,7 @@
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'>
     <div class='row'>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-3">
             <label class='control-label'>调拨单号</label> 
             <input type='text' class="form-control" name='allotment_num' value="{{ $model->allotment_num }}" readonly>
         </div>
@@ -22,6 +22,15 @@
             <option value=''>请选择仓库</option>
             @foreach($inWarehouses as $warehouse)
                 <option value='{{ $warehouse->id }}' {{old('in_warehouse_id') ? (old('in_warehouse_id') == $warehouse->id ? 'selected' : '') : ($model->in_warehouse_id == $warehouse->id ? 'selected' : '')}}>{{ $warehouse->name }}</option>
+            @endforeach
+            </select> 
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="logistics_id" class='control-label'>头程物流</label>
+            <select name='logistics_id' class='form-control'>
+            <option value=''>请选择物流</option>
+            @foreach($logisticses as $logistics)
+                <option value='{{ $logistics->id }}' {{$model->logistics_id == $logistics->id ? 'selected' : ''}}>{{ $logistics->name }}</option>
             @endforeach
             </select> 
         </div>

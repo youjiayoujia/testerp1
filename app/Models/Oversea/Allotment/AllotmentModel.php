@@ -19,7 +19,7 @@ class AllotmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['allotment_num', 'out_warehouse_id', 'in_warehouse_id', 'allotment_by', 'status', 'check_by', 'check_status', 'created_at'];
+    protected $fillable = ['allotment_num', 'out_warehouse_id', 'in_warehouse_id', 'logistics_id', 'allotment_by', 'status', 'check_by', 'check_status', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -65,5 +65,10 @@ class AllotmentModel extends BaseModel
     public function getStatusNameAttribute()
     {
         return config('oversea.allotmentStatus')[$this->status];
+    }
+
+    public function logistics()
+    {
+        return $this->belongsTo('App\Models\Oversea\FirstLeg\FirstLegModel', 'logistics_id', 'id');
     }
 }

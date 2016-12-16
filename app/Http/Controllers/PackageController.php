@@ -145,7 +145,7 @@ class PackageController extends Controller
         foreach ($items as $key => $item) {
             if ($key == 0) {
                 $str .= "<tr><td rowspan='" . $items->count() . "'>" . $model->id . "</td>
-                         <td rowspan='" . $items->count() . "'>" . $model->order->ordernum . "</td>
+                         <td rowspan='" . $items->count() . "'>" . $model->order->id . "</td>
                          <td rowspan='" . $items->count() . "'>" . $model->tracking_no . "</td>
                          <td rowspan='" . $items->count() . "'>" . ($model->warehouse ? $model->warehouse->name : '') . "</td>
                          <td rowspan='" . $items->count() . "'>" . ($model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多')) . "</td>

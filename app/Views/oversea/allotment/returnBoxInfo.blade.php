@@ -42,16 +42,16 @@
                         <input type='text' class='form-control' value="{{$box->boxnum}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][length]" class='form-control' placeholder='长(m)' value="{{ $box->length}}">
+                        <input type='text' name="boxInfo[{{$box->id}}][length]" class='form-control' placeholder='长(cm)' value="{{ ($box->length != 0 ? $box->length : '')}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][width]" class='form-control' placeholder='宽(m)' value="{{ $box->width}}">
+                        <input type='text' name="boxInfo[{{$box->id}}][width]" class='form-control' placeholder='宽(cm)' value="{{ ($box->width != 0 ? $box->width : '')}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][height]" class='form-control' placeholder='高(m)' value="{{ $box->height}}">
+                        <input type='text' name="boxInfo[{{$box->id}}][height]" class='form-control' placeholder='高(cm)' value="{{ ($box->height != 0 ? $box->height : '')}}">
                     </div>
                     <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][weight]" class='form-control' placeholder="重量" value="{{ $box->weight}}">
+                        <input type='text' name="boxInfo[{{$box->id}}][weight]" class='form-control' placeholder="重量(kg)" value="{{ ($box->weight != 0 ? $box->weight : '')}}">
                     </div>
                     <div class='from-group col-lg-2'>
                         <select name="boxInfo[{{$box->id}}][logistics_id]" class='form-control logistics'>
@@ -65,7 +65,7 @@
                         <input type='text' name="boxInfo[{{$box->id}}][tracking_no]" class='form-control' placeholder="追踪号" value="{{ $box->tracking_no}}">
                     </div>
                     <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][fee]" class='form-control' placeholder="物流费" value="{{ $box->fee}}">
+                        <input type='text' name="boxInfo[{{$box->id}}][fee]" class='form-control' placeholder="物流费" value="{{ ($box->fee != 0 ? $box->fee : '')}}">
                     </div>
                 </div>
             @endforeach

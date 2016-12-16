@@ -128,6 +128,9 @@ class InOutModel extends BaseModel
             case 'CANCEL':
                 return $this->relation_id;
                 break;
+            case 'OVERSEA_IN':
+                return '海外仓调拨入库';
+                break;
         }
     }
 

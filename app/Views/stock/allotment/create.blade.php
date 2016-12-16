@@ -6,10 +6,6 @@
             <label for="allotment_id" class='control-label'>调拨单号</label> 
             <input type='text' class="form-control" id="allotment_id" placeholder="调拨单号" name='allotment_id' value="{{ old('allotment_id') ? old('allotment_id') : 'DB'.time()}}" readonly>
         </div>
-        <div class="form-group col-lg-2">
-            <label for="allotment_by" class='control-label'>调拨人</label> 
-            <input type='text' class="form-control" id="allotment_by" placeholder="调拨人" name='allotment_by' value="{{ old('allotment_by') ? old('allotment_by') : '1' }}" readonly>
-        </div>
         <div class="form-group col-lg-3">
             <label for="out_warehouse_id" class='control-label'>调出仓库</label>  <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select id='out_warehouse_id' name='out_warehouse_id' class='form-control'>

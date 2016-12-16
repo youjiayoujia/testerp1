@@ -334,6 +334,63 @@ class StockModel extends BaseModel
         return $this->excelDataProcess($path . 'stockExcelProcess.csv');
     }
 
+    public function overseaExcelProcess($file)
+    {
+        $path = config('setting.stockExcelPath');
+        !file_exists($path . 'stockExcelProcess.csv') or unlink($path . 'stockExcelProcess.csv');
+        $file->move($path, 'stockExcelProcess.csv');
+        return $this->overseaExcelDataProcess($path . 'stockExcelProcess.csv');
+    }
+
+    public function overseaExcelDataProcess($path)
+    {
+        $fd = fopen($path, 'r');
+        $arr = [];
+        while (!feof($fd)) {
+            $row = fgetcsv($fd);
+            $arr[] = $row;
+        }
+        fclose($fd);
+        if (!$arr[count($arr) - 1]) {
+            unset($arr[count($arr) - 1]);
+        }
+        $arr = $this->transfer_arr($arr);
+        $error[] = $arr;
+        $i = 1;
+        foreach ($arr as $key => $stock) {
+            $stock['position'] = iconv('gb2312', 'utf-8', $stock['position']);
+            if (!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
+                $error[$i]['key'] = $key;
+                $error[$i]['remark'] = '库位不存在';
+                $i++;
+                continue;
+            }
+            if($stock['sku'])
+            $stock['sku'] = iconv('gb2312', 'utf-8', $stock['sku']);
+            $tmp_position = PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->first();
+            if (!ItemModel::where(['sku' => $stock['sku']])->count()) {
+                $error[$i]['key'] = $key;
+                $error[$i]['remark'] = 'Item不存在';
+                $i++;
+                continue;
+            }
+            $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
+            $tmp_stock = StockModel::where(['oversea_sku' => $stock['oversea_sku']])->first();
+            if (!$tmp_stock) {
+                $error[$i]['key'] = $key;
+                $error[$i]['remark'] = '该对应Oversea没有库存';
+                $error[$i]['quantity'] = (int)$stock['all_quantity'];
+                $i++;
+                continue;
+            }
+            $error[$i]['key'] = $key;
+            $error[$i]['quantity'] = (int)$stock['all_quantity'] - $tmp_stock->all_quantity;
+            $i++;
+        }
+
+        return $error;
+    }
+
     /**
      * 处理excel数据
      *

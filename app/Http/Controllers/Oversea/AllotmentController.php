@@ -150,7 +150,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'logisticses' => LogisticsModel::all(),
+            'logisticses' => FirstLegModel::all(),
         ];
 
         return view($this->viewPath.'returnBoxInfo', $response);
@@ -162,6 +162,8 @@ class AllotmentController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        //var_dump($model->getLimits()['create']);exit;
+        $this->validate(request(), $model->getLimits()['create']);
         $boxInfo = request('boxInfo');
         if(count($boxInfo)) {
             foreach($boxInfo as $key => $single) {
@@ -192,10 +194,10 @@ class AllotmentController extends Controller
                 $item = $single->item;
                 $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $item->id])->first();
                 if($stock) {
-                    $item->in($stock->warehouse_position_id, $single->inboxed_quantity, $single->inboxed_quantity * $single->item->cost,
+                    $item->in($stock->warehouse_position_id, $single->quantity, $single->quantity * ($single->item->cost ? $single->item->cost : $single->item->purchase_price),
                     'OVERSEA_IN');
-                    $item->update(['volumn_rate' => round($box->length * $box->height * $box->width / 5000 / $box->weight, 4)]);
                 }
+                $item->update(['volumn_rate' => round($box->length * $box->height * $box->width / 5000 / $box->weight, 4)]);
             }
         }
         $model->update(['status' => 'over']);

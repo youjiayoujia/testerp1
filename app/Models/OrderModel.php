@@ -25,6 +25,7 @@ use App\Models\Channel\ProductModel as ChannelProduct;
 use App\Models\Order\BlacklistModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Oversea\ChannelSaleModel;
+use App\Models\WarehouseModel;
 
 class OrderModel extends BaseModel
 {
@@ -674,6 +675,17 @@ class OrderModel extends BaseModel
                 $order->remark($orderItem['channel_sku'] . '找不到对应产品.', 'ITEM');
             }
             $order->items()->create($orderItem);
+        }
+        foreach($order->items as $key => $single) {
+            if(!$key) {
+                if($single->is_oversea) {
+                    $order->update(['is_oversea' => '1']);
+                }
+            }
+            if(!WarehouseModel::where('code', $single->code)->first()) {
+                $order->update(['status' => 'REVIEW']);
+                break;
+            }
         }
         if($order->items()->first()->is_oversea) {
             $order->update(['is_oversea' => '1']);

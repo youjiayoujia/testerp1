@@ -61,4 +61,9 @@
         excel导入
     </a>
 </div>
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('stock.overseaImportByExcel') }}">
+        海外仓库存调整导入
+    </a>
+</div>
 @stop

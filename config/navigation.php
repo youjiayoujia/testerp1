@@ -279,7 +279,7 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '调拨单',
+                    'name' => '海外仓调拨单',
                     'url' => 'overseaAllotment.index',
                     'icon' => '',
                 ],

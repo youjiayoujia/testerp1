@@ -264,6 +264,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::post('stock/overseaImportStore', ['uses' => 'StockController@overseaImportStore', 'as' => 'stock.overseaImportStore']);
+    Route::post('stock/overseaExcelProcess', ['uses' => 'StockController@overseaExcelProcess', 'as' => 'stock.overseaExcelProcess']);
+    Route::get('stock/overseaImportByExcel', ['uses' => 'StockController@overseaImportByExcel', 'as' => 'stock.overseaImportByExcel']);
     Route::get('stock/getTakingExcel', ['uses' => 'StockController@getTakingExcel', 'as' => 'stock.getTakingExcel']);
     Route::get('stock/ajaxAllSku', ['uses' => 'StockController@ajaxAllSku', 'as' => 'stock.ajaxAllSku']);
     Route::get('stock/overseaPosition', ['uses' => 'StockController@overseaPosition', 'as' => 'stock.overseaPosition']);

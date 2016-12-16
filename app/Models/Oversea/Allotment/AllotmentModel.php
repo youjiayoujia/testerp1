@@ -21,13 +21,18 @@ class AllotmentModel extends BaseModel
      */
     protected $fillable = ['allotment_num', 'out_warehouse_id', 'in_warehouse_id', 'logistics_id', 'allotment_by', 'status', 'check_by', 'check_status', 'created_at'];
 
-    // 规则验证
-    public $rules = [
-        'create' => [
-        ],
-        'update' => [
-        ]
-    ];
+    public function getLimits()
+    {
+        $arr = [];
+        foreach($this->boxes as $box) {
+            $arr['create']['boxInfo.'.$box->id.'.length'] = 'required';
+            $arr['create']['boxInfo.'.$box->id.'.width'] = 'required';
+            $arr['create']['boxInfo.'.$box->id.'.height'] = 'required';
+            $arr['create']['boxInfo.'.$box->id.'.weight'] = 'required';
+        }
+
+        return $arr;
+    }
 
     //查询
     public $searchFields=['allotment_num' => '调拨单号'];

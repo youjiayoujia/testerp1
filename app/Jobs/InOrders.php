@@ -42,13 +42,20 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $order = $orderModel->createOrder($this->order);
                 if ($order) {
                     if ($order->status == 'PREPARED') {
-                        $job = new DoPackages($order);
-                        $job->onQueue('doPackages');
-                        $this->dispatch($job);
-                        $order->eventLog('队列', '订单已加入处理队列');
-                        $this->relation_id = $order->id;
-                        $this->result['status'] = 'success';
-                        $this->result['remark'] = 'Success.';
+                        if ($order->channel->driver == 'ebay' and $order->order_is_alert != 2) {
+                            $order->eventLog('队列', 'EBAY订单需要匹配PAYPAL.');
+                            $this->relation_id = $order->id;
+                            $this->result['status'] = 'success';
+                            $this->result['remark'] = 'EBAY订单需要匹配PAYPAL.';
+                        } else {
+                            $job = new DoPackages($order);
+                            $job->onQueue('doPackages');
+                            $this->dispatch($job);
+                            $order->eventLog('队列', '订单已加入处理队列');
+                            $this->relation_id = $order->id;
+                            $this->result['status'] = 'success';
+                            $this->result['remark'] = 'Success.';
+                        }
                     } else {
                         $this->relation_id = 0;
                         $this->result['status'] = 'success';

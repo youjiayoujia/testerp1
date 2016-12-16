@@ -1698,7 +1698,7 @@ class PackageModel extends BaseModel
                     'logistics_order_at' => date('Y-m-d H:i:s'),
                 ]);
             }
-            if ($result['status'] == 'error') {
+            if ($result['status'] == 'error' or $result['status'] == '') {
                 $this->update([
                     'status' => 'TRACKINGFAILED',
                 ]);

@@ -291,11 +291,13 @@ class ItemModel extends BaseModel
             $data[$warehouse_id]['normal'] = 0;
             $data[$warehouse_id]['special'] = 0;
             foreach ($purchaseItemCollection as $purchaseItem) {
-                if ($purchaseItem->purchaseOrder->status > 0 && $purchaseItem->purchaseOrder->status < 4) {
-                    if ($purchaseItem->purchaseOrder->type == 0) {
-                        $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
-                    } else {
-                        $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
+                if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
+                    if ($purchaseItem->purchaseOrder->status >= 0 && $purchaseItem->purchaseOrder->status < 4) {
+                        if ($purchaseItem->purchaseOrder->type == 0) {
+                            $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
+                        } else {
+                            $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
+                        }
                     }
                 }
             }
@@ -903,7 +905,7 @@ class ItemModel extends BaseModel
         } else {
             PurchasesModel::create($data);
         }
-        
+
         return $data;
         
     }

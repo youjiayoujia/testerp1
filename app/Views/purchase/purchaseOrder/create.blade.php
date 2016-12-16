@@ -93,7 +93,7 @@
 			    </div>
 			    <div class="form-group col-md-3">
 			        <label for="size">单价</label>
-			        <input class="form-control"  placeholder="单价" name='item[0][purchase_cost]' value="">
+			        <input class="form-control"  placeholder="单价" name='item[0][purchase_cost]' value="" title='0'>
 			    </div>
 				<button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
 			</div>
@@ -142,11 +142,11 @@
     	});
     	{{-- 添加采购物品  --}}
         $(document).on('click', '#additem', function () {
-            var aa = $("input[name^='item[']:last").attr('name');
-            var num = aa.substr(5, 1);
+            var num = $("input[name^='item[']:last").attr('title');
             num = parseInt(num);
             num = num + 1;
-            $(".purchase_num").last().after('<div class="row  purchase_num"><div class="form-group col-md-3"><label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small><select class="form-control sku" name="item['+num+'][sku]"></select></div><div class="form-group col-md-3"><label for="size">数量</label><input class="form-control"  placeholder="数量" name="item['+num+'][purchase_num]" value=""></div><div class="form-group col-md-3"><label for="size">单价</label><input class="form-control"  placeholder="单价" name="item['+num+'][purchase_cost]" value=""></div><button type="button" class="btn btn-danger bt_right"><i class="glyphicon glyphicon-trash"></i></button></div>');
+
+            $(".purchase_num").last().after('<div class="row  purchase_num"><div class="form-group col-md-3"><label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small><select class="form-control sku" name="item['+num+'][sku]"></select></div><div class="form-group col-md-3"><label for="size">数量</label><input class="form-control"  placeholder="数量" name="item['+num+'][purchase_num]" value=""></div><div class="form-group col-md-3"><label for="size">单价</label><input class="form-control"  placeholder="单价" name="item['+num+'][purchase_cost]" value="" title="'+num+'"></div><button type="button" class="btn btn-danger bt_right"><i class="glyphicon glyphicon-trash"></i></button></div>');
         	$('.sku').select2({
 		        ajax: {
 		            url: "{{ route('purchaseAjaxSku') }}",

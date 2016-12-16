@@ -23,6 +23,8 @@ class ItemModel extends BaseModel
         'quantity',
         'picked_quantity',
         'remark',
+        'code',
+        'is_oversea',
     ];
 
     public function package()

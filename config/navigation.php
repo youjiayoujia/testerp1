@@ -266,6 +266,27 @@ return [
     //         ],
     //     ],
     // ],
+    [
+        'name' => '海外仓',
+        'icon' => 'home',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '海外仓模块' => [
+                [
+                    'name' => '头程物流',
+                    'url' => 'firstLeg.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '海外仓调拨单',
+                    'url' => 'overseaAllotment.index',
+                    'icon' => '',
+                ],
+                
+            ],
+        ],
+    ],
     //物流导航
     [
         'name' => '物流',

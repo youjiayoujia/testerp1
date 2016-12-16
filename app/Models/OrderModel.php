@@ -25,6 +25,7 @@ use App\Models\Channel\ProductModel as ChannelProduct;
 use App\Models\Order\BlacklistModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Oversea\ChannelSaleModel;
+use App\Models\WarehouseModel;
 
 class OrderModel extends BaseModel
 {
@@ -95,6 +96,7 @@ class OrderModel extends BaseModel
         'is_chinese',
         'orders_expired_time',
         'created_at',
+        'is_oversea',
     ];
 
     private $canPackageStatus = ['PREPARED'];
@@ -643,13 +645,26 @@ class OrderModel extends BaseModel
         if ($currency) {
             $data['rate'] = $currency->rate;
         }
+
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {
-                $item = ItemModel::where('sku', $orderItem['sku'])->first();
-                if ($item) {
-                    $orderItem['item_id'] = $item->id;
-                    $orderItem['item_status'] = $item->status;
+                $skuArr = explode('.', $orderItem['sku']);
+                if(count($skuArr) == 1) {
+                    $item = ItemModel::where('sku', $orderItem['sku'])->first();
+                    if ($item) {
+                        $orderItem['item_id'] = $item->id;
+                        $orderItem['item_status'] = $item->status;
+                    }
+                } else {
+                    $item = ItemModel::where('sku', $skuArr[1])->first();
+                    if ($item) {
+                        $orderItem['item_id'] = $item->id;
+                        $orderItem['item_status'] = $item->status;
+                        $orderItem['is_oversea'] = 1;
+                        $orderItem['code'] = $skuArr[0];
+                        $orderItem['sku'] = $skuArr[1];
+                    }
                 }
             }
             if (!isset($orderItem['item_id'])) {
@@ -661,13 +676,25 @@ class OrderModel extends BaseModel
             }
             $order->items()->create($orderItem);
         }
-
+        foreach($order->items as $key => $single) {
+            if(!$key) {
+                if($single->is_oversea) {
+                    $order->update(['is_oversea' => '1']);
+                }
+            }
+            if(!WarehouseModel::where('code', $single->code)->first()) {
+                $order->update(['status' => 'REVIEW']);
+                break;
+            }
+        }
+        if($order->items()->first()->is_oversea) {
+            $order->update(['is_oversea' => '1']);
+        }
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
 
         $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-
         return $order;
     }
 
@@ -744,6 +771,7 @@ class OrderModel extends BaseModel
         $package['shipping_zipcode'] = $this->shipping_zipcode ? $this->shipping_zipcode : '';
         $package['shipping_phone'] = $this->shipping_phone ? $this->shipping_phone : '';
         $package['status'] = 'NEW';
+        $package['is_oversea'] = $this->is_oversea;
         $package = $this->packages()->create($package);
         if ($package) {
             foreach ($this->items->toArray() as $packageItem) {

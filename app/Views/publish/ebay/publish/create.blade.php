@@ -469,33 +469,33 @@
             </div>
 
             <div id="listing_type3" class="hidden">
-
-                <div id="variation_sku">
-                    <div class="row">
-                        <div class="form-group col-sm-1">
-                            <label class="text-center">SKU</label>
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <label class="text-center">价格</label>
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <label class="text-center">数量</label>
-                        </div>
-
-                        <div class="form-group col-sm-1">
-                            <input type="text" value="" name="variation[]"
-                                   class="form-control text-center variation_picture_main">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <input type="text" value="" name="variation[]" class="form-control text-center ">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <input type="text" value="" name="variation[]" class="form-control text-center">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <input type="text" value="UPC" name="variation[]" class="form-control text-center">
-                        </div>
+                <div class="row">
+                    <div class="form-group col-sm-1">
+                        <label class="text-center">SKU</label>
                     </div>
+                    <div class="form-group col-sm-1">
+                        <label class="text-center">价格</label>
+                    </div>
+                    <div class="form-group col-sm-1">
+                        <label class="text-center">数量</label>
+                    </div>
+
+                    <div class="form-group col-sm-1">
+                        <input type="text" value="" name="variation[]"
+                               class="form-control text-center variation_picture_main">
+                    </div>
+                    <div class="form-group col-sm-1">
+                        <input type="text" value="" name="variation[]" class="form-control text-center ">
+                    </div>
+                    <div class="form-group col-sm-1">
+                        <input type="text" value="" name="variation[]" class="form-control text-center">
+                    </div>
+                    <div class="form-group col-sm-1">
+                        <input type="text" value="UPC" name="variation[]" class="form-control text-center">
+                    </div>
+                </div>
+                <div id="variation_sku">
+
 
 
 
@@ -1154,7 +1154,7 @@
                     url: "{{ route('ebayPublish.ajaxInitErpData') }}",
                     data: {
                         sku: $("#ebay_sku").val(),
-                        type: 'sku+picture'
+                        type: 'sku'
                     },
                     dataType: 'json',
                     type: 'get',
@@ -1172,6 +1172,8 @@
                                     addItem(result.sku[i]);
                                 }
                             }
+                            content.setContent( result.description);
+                            //description
                         }
                     }
                 });
@@ -1674,12 +1676,26 @@
             });
         }
         function getSkuPicture() {
-
+            var str = prompt("输入SKU");
+            if (str) {
+                $.ajax({
+                    url: "{{ route('wish.ajaxGetSkuPicture') }}",
+                    data: {
+                        sku: str
+                    },
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        $.each(result.data, function(index, el){
+                            add_pic_in_detail('auto',el);
+                            add_pic_in_description('auto',el);
+                        });
+                    }
+                })
+            }
         }
 
-        function previewDescription(){
-            content.execCommand( 'preview',12312323156 );
-        }
+
 
         /**
          * type = 1;加sku

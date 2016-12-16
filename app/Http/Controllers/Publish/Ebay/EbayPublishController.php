@@ -260,7 +260,7 @@ class EbayPublishController extends Controller
         $skuNew = explode('(',$sku);
         $sku = $skuNew[0];
         $skuRear = count($skuNew)>1?$skuNew[1]:'';
-
+        $description =  '';
         //$skuNew = $this->handleSku($sku);
           /*  foreach($item->product->shape as $image)
                                 <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>*/
@@ -269,7 +269,10 @@ class EbayPublishController extends Controller
         foreach($type as $v){
             if ($v == 'sku') {
                 $erpSku = $this->item-> where('sku', 'like', $sku.'%')->get();
-                foreach ($erpSku as $te) {
+                foreach ($erpSku as $key=> $te) {
+                    if($key==0){
+                        $description = htmlspecialchars_decode($te->html_mod);
+                    }
                     $erpSku = $te->sku;
                     if (!empty($skuFore)) {
                         $erpSku = $skuFore . '*' . $erpSku;
@@ -282,6 +285,7 @@ class EbayPublishController extends Controller
             }
             if($v=='picture'){
                 $return['picture'] = [];
+                /*
                 $return['picture'][] = 'http://www.v3.slme.com//default.jpg';
                 $return['picture'][] = 'http://www.v3.slme.com//default.jpg';
                 $return['picture'][] = 'http://www.v3.slme.com//default.jpg';
@@ -290,11 +294,13 @@ class EbayPublishController extends Controller
                 $erpSku = $this->item-> where('sku', 'like', $sku.'%')->first();
                 foreach($erpSku->product->shape as $image){
                     $return['picture'][]=asset($image);
-                }
+                }*/
 
 
             }
         }
+
+        $return['description'] = $description;
         echo json_encode($return);
         die;
 

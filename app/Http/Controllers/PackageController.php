@@ -67,7 +67,7 @@ class PackageController extends Controller
             $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至assignStocks队列成功'));
-    }use App\Models\PackageModel;
+    }
     /**
      * 列表
      *

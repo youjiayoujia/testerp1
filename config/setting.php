@@ -180,7 +180,9 @@ return [
         'items.item.sku' => 'sku',
         'check_status' => '审核状态',
         'shipping_country' => '收货国家',
-        'assigner' => '客服名称',
+        'assign_id' => '客服名称',
         'messages.status' => '消息状态',
+        'from_name' => '用户昵称',
+        'from' => '用户ID'
     ],
 ];

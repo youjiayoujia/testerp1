@@ -36,7 +36,6 @@ class MessageModel extends BaseModel{
     public $searchFields = [
         'id'=>'ID',
         'subject'=>'主题',
-        'from_name'=>'发信人',
         'from'=>'发件邮箱' ,
         'label' => '消息类型',
         'channel_order_number' => '平台订单号'
@@ -113,9 +112,14 @@ class MessageModel extends BaseModel{
         //dd(UserModel::all()->pluck('name','name'));
         return [
             'relatedSearchFields' => [],
-            'filterFields' => [],
+            'filterFields' => [
+                'from_name',
+                'from',
+
+            ],
             'filterSelects' => [
                 'messages.status' => config('message.statusText'),
+                'assign_id' => UserModel::all()->pluck('name','id'),
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],

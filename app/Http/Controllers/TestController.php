@@ -92,6 +92,7 @@ class TestController extends Controller
     {
         $user = factory(App\Models\UserModel::class)->make(['name' => 'mc']);
         var_dump($user->toarray());exit;
+
 //        $data = Excel::load('d:/456.xls', function ($reader) {
 //            return $reader->all();
 //        });

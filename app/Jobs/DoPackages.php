@@ -43,6 +43,10 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                     $oldPackage->cancelPackage();
                 }
                 if ($this->order->channel->driver == 'ebay' and $this->order->order_is_alert != 2) {
+                    if ($this->order->order_is_alert == 1) {
+                        $this->order->update(['status' => 'REVIEW']);
+                        $this->order->remark('EBAY匹配PAYPAL失败.', 'PAYPAL匹配失败');
+                    }
                     $this->order->eventLog('队列', 'EBAY订单需要匹配PAYPAL.');
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';

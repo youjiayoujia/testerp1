@@ -154,6 +154,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
         //DHL
         $schedule->command('dhl:sureShip')->daily();
+        //匹配paypal
+        $schedule->command('match:account:all')->cron('*/20 * * * *');
 
     }
 }

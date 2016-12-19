@@ -87,9 +87,7 @@ class TestController extends Controller
 
     public function test2()
     {
-
-
-        $orders = OrderModel::all();
+        $orders = OrderModel::where('channel_fee', 0)->get();
         foreach ($orders as $order) {
             $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
         }

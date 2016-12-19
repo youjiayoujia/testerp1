@@ -92,13 +92,13 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
 
 
                 if (!empty($error)) { //设置为匹配失败
-                    $this->order->update(['order_is_alert'=>2]);
+                    $this->order->update(['order_is_alert'=>1]);
                     //$this->order->remark('paypal匹配失败:'.implode(',',$error));
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'fail';
                     $this->result['remark'] = 'paypal匹配失败:'.implode(',',$error);
                 } else { //设置为匹配成功
-                    $this->order->update(['order_is_alert'=>1]);
+                    $this->order->update(['order_is_alert'=>2]);
                     //$this->order->remark('paypal匹配成功:'.implode(',',$error));
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';
@@ -109,7 +109,7 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
         }
         if (!$is_paypals) { //说明对应的paypal 都没有找到信息
 
-            $this->order->update(['order_is_alert'=>2]);
+            $this->order->update(['order_is_alert'=>1]);
             $this->order->remark('paypal匹配失败:当前交易凭证在预设的PayPal组中，未查询到交易详情，请通过其它方式查询');
             $this->relation_id = $this->order->id;
             $this->result['status'] = 'fail';

@@ -279,6 +279,7 @@ class EbayAdapter implements AdapterInterface
         $payMentStatus = $order->CheckoutStatus->eBayPaymentStatus;
         $paidTime = (string)$order->PaidTime;
         $ShippedTime = (string)$order->ShippedTime;
+        $CreatedTime = date('Y-m-d H:i:s', strtotime((string)$order->CreatedTime));
         if (!empty($ShippedTime)) {
             return false; //这个已经发货了吧
         }
@@ -287,7 +288,9 @@ class EbayAdapter implements AdapterInterface
         } else {
             $paidTime = date('Y-m-d H:i:s', strtotime($paidTime));
         }
-
+        if($CreatedTime<'2016-12-19 15:00:00'){
+            return false; //跳过
+        }
 
         //121864765676-1639850594002
         /*   $thisOrder = orderModel::where(['channel_ordernum' => (string)$order->OrderID])->where('status', '!=', 'UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续

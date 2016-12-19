@@ -293,11 +293,13 @@ class ItemModel extends BaseModel
             $data[$warehouse_id]['normal'] = 0;
             $data[$warehouse_id]['special'] = 0;
             foreach ($purchaseItemCollection as $purchaseItem) {
-                if ($purchaseItem->purchaseOrder->status > 0 && $purchaseItem->purchaseOrder->status < 4) {
-                    if ($purchaseItem->purchaseOrder->type == 0) {
-                        $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
-                    } else {
-                        $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
+                if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
+                    if ($purchaseItem->purchaseOrder->status >= 0 && $purchaseItem->purchaseOrder->status < 4) {
+                        if ($purchaseItem->purchaseOrder->type == 0) {
+                            $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
+                        } else {
+                            $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
+                        }
                     }
                 }
             }
@@ -894,7 +896,7 @@ class ItemModel extends BaseModel
         } else {
             PurchasesModel::create($data);
         }
-        
+
         return $data;
         
     }
@@ -1178,8 +1180,9 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url = "http://120.24.100.157:60/api/skuInfoApi.php";
-        $itemModel = $this->all();
-        //$itemModel = $this->where('sku','M001_black')->get();
+        //$itemModel = $this->all();
+        $itemModel = $this->where('purchase_adminer',null)->get();
+        
         foreach ($itemModel as $key => $model) {
             $old_data['sku'] = $model->sku;
             //print_r($old_data);exit;

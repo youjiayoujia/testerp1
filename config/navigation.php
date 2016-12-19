@@ -741,6 +741,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '收货包装',
+                    'url' => 'recieveWraps.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '国家Number信息',
                     'url' => 'countries.index',
                     'icon' => '',

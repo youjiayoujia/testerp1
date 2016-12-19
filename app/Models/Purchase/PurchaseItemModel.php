@@ -63,7 +63,12 @@ class PurchaseItemModel extends BaseModel
     public function getWarehousePositionNameAttribute()
     {
         $stock = StockModel::where('item_id',$this->item_id)->where('warehouse_id',$this->warehouse_id)->get()->first();
-        return $stock->position->name;
+        if($stock){
+            return $stock->position?$stock->position->name:'';
+        }else{
+            return '';
+        }
+        
     }
 
     public function arrivalLog()

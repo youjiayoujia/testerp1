@@ -513,6 +513,7 @@ class OrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
+        $model->calculateOrderChannelFee();
         if($model->packages->count()) {
             $model->update(['status' => 'PICKING', 'is_review' => 1]);
         } else {
@@ -580,6 +581,7 @@ class OrderController extends Controller
         $ids_arr = explode(',', $ids);
         foreach ($ids_arr as $id) {
             $model = $this->model->find($id);
+            $model->calculateOrderChannelFee();
             if ($model) {
                 if ($model->remarks) {
                     foreach ($model->remarks as $remark) {

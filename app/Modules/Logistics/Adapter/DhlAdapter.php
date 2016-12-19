@@ -36,7 +36,7 @@ class DhlAdapter extends BasicAdapter
         $this->_express_type =!empty($config['type'])?$config['type']:'PKD';
     }
     public function checkToken($url){
-        $result = $this->getCurlHttpsData($url);
+        $result = $this->getCurlHttpsData($url);echo $url.'<br/>';
         $result = json_decode($result);echo "<pre/>";var_dump($result);exit;
         @$status = $result->accessTokenResponse->responseStatus->code;
         @$token = $result->accessTokenResponse->token;

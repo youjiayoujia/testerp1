@@ -837,8 +837,7 @@ class OrderModel extends BaseModel
             default:
                 foreach ($this->items as $item) {
                     if ($item->item and $item->item->catalog) {
-                        $channelRate = $item->item->catalog->channels->where('id',
-                            $this->channelAccount->catalog_rates_channel_id)->first();
+                        $channelRate = $item->item->catalog->channels->where('id', $this->channelAccount->catalog_rates_channel_id)->first();
                         if ($channelRate) {
                             $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
                             $sum = $sum * $this->rate;

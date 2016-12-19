@@ -33,7 +33,14 @@ class MessageModel extends BaseModel{
         'label',
     ];
 
-    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱' ,'label' => '消息类型' , 'channel_order_number' => '平台订单号'];
+    public $searchFields = [
+        'id'=>'ID',
+        'subject'=>'主题',
+        'from_name'=>'发信人',
+        'from'=>'发件邮箱' ,
+        'label' => '消息类型',
+        'channel_order_number' => '平台订单号'
+    ];
 
     public $rules = [];
 
@@ -549,16 +556,20 @@ class MessageModel extends BaseModel{
     public function scopeWorkFlowMsg ($query,$entry)
     {
         $user_id = request()->user()->id;
-        $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id'); //客服所属的账号
-        return $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0])
-            ->orWhere(function($query) use ($user_id){
+        $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id')->toArray(); //客服所属的账号
+
+        return $query->where(function ($query) use ($account_ids){
+            $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0])
+                ->whereIn('account_id',$account_ids);
+            })
+            ->orWhere(function($query) use ($user_id, $account_ids){
                 $query->where('status','=','PROCESS')
                     ->where('assign_id','=',$user_id)
                     ->where('required','=',1)
                     ->where('dont_reply','=',0)
-                    ->where('read','=',0);
+                    ->where('read','=',0)
+                ->whereIn('account_id',$account_ids);
             })
-            ->whereIn('account_id',$account_ids)
             ->take($entry)
             ->orderBy('id', 'DESC');
     }

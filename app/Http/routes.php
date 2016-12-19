@@ -23,6 +23,8 @@ Route::post('api/curlApiChangeWarehousePositon',
 Route::any('api/skuHandleApi', ['uses' => 'ItemController@skuHandleApi', 'as' => 'item.skuHandleApi']);
 Route::any('api/SyncSellmoreData',
     ['uses' => 'SyncSellmoreDataController@SyncSuppliersFromSell', 'as' => 'SyncSellmoreData']);
+Route::any('api/SyncWishyoutoken',
+    ['uses' => 'SyncWishyoutokenController@SyncSuppliersFromSell', 'as' => 'SyncWishyoutoken']);
 Route::any('api/skuSupplierApi', ['uses' => 'ItemController@skuSupplierApi', 'as' => 'item.skuSupplierApi']);
 
 // Authentication routes...

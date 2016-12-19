@@ -21,23 +21,23 @@ class DhlAdapter extends BasicAdapter
         //$this->_vip_code = $config['userPassword'];
 
         ////////////正式环境////////////////////////////
-//        $this->GetShipHost='https://api.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
-//        $this->CheckOutHost='https://api.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
-//        $this->getTokenUrl = "https://api.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
-//        $this->account = '5243380896';//账号
+        $this->GetShipHost='https://api.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
+        $this->CheckOutHost='https://api.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
+        $this->getTokenUrl = "https://api.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
+       $this->account = '5243380896';//账号
 
         ////////////////////////////////////////测试环境数据/////////////////////////////////////
-		$this->GetShipHost='https://apitest.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
-		$this->CheckOutHost='https://apitest.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
-		$this->getTokenUrl = "https://apitest.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
-        $this->account = '520285';//账号
+//		$this->GetShipHost='https://apitest.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
+//		$this->CheckOutHost='https://apitest.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
+//		$this->getTokenUrl = "https://apitest.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
+       // $this->account = '520285';//账号
 
         $this->qz = 'CNAMMERP3'.rand(100,1000);//物流号前缀
         $this->_express_type =!empty($config['type'])?$config['type']:'PKD';
     }
     public function checkToken($url){
-        $result = $this->getCurlHttpsData($url);echo $url.'<br/>';
-        $result = json_decode($result);echo "<pre/>";var_dump($result);exit;
+        $result = $this->getCurlHttpsData($url);
+        $result = json_decode($result);
         @$status = $result->accessTokenResponse->responseStatus->code;
         @$token = $result->accessTokenResponse->token;
         if($status == '100000' && $token){
@@ -55,14 +55,14 @@ class DhlAdapter extends BasicAdapter
         $this->account=$customer_id[0];//账号
         $clientId=$customer_id[1];//API账号
         $gqtime=@$customer_id[2]?$customer_id[2]:0;//过期时间
-        $lasttime = time()-25*24*60*60;echo $lasttime;var_dump($customer_id);
-        if($lasttime > $gqtime){
+        $lasttime = time()-25*24*60*60;
+        if($lasttime > $gqtime){echo 333;exit;
             //暂时关掉自动更新
-//            $result =[
-//                'code' => 'error',
-//                'result' => 'TOKEN过期'
-//            ];
-//            return $result;
+            $result =[
+                'code' => 'error',
+                'result' => 'TOKEN过期'
+            ];
+            return $result;
 
             //token过期
             $password = $orderInfo->logistics->supplier->password;//API密码
@@ -298,7 +298,7 @@ class DhlAdapter extends BasicAdapter
         }
         $url = $this->GetShipHost;
         $result = $this->postCurlHttpsData($url,$data);
-        $result = json_decode($result);echo "<pre/>";var_dump($result);exit;
+        $result = json_decode($result);
         $status = $result->labelResponse->bd->responseStatus->code;//200时为成功
         if($status == '200'){
             $shipmentID = $result->labelResponse->bd->labels[0]->shipmentID;
@@ -324,7 +324,7 @@ class DhlAdapter extends BasicAdapter
                 'result' =>$shipmentID //跟踪号
             ];
         }else{
-            if(@$result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
+            if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
                 $msg =  $result->labelResponse->bd->responseStatus->messageDetails;

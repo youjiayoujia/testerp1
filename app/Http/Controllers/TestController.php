@@ -87,12 +87,19 @@ class TestController extends Controller
 
     public function test2()
     {
-        $orders = OrderModel::where('channel_fee', 0)->get();
-        foreach ($orders as $order) {
-            $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        // $package->logistics_id=18;//更改物流ID测试
+        //$package->shipping_country='IT';
+        //echo "<pre/>";var_dump($package);exit;
+        $package->status = 'PACKED';
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
         }
-        return 'success';
-
+        //dd($result);
+        echo "<pre/>";var_dump($result);exit;
 //        $data = Excel::load('d:/456.xls', function ($reader) {
 //            return $reader->all();
 //        });

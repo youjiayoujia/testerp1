@@ -87,7 +87,7 @@ class CoeAdapter extends BasicAdapter
         <eventBody>
             <orders>
                 <order>
-                    <referenceID>" . $package->id . "</referenceID>
+                    <referenceID>moonarstore" . $package->id . "</referenceID>
                     <paymentType>PP</paymentType>
 
                     <pcs>" . $totalCount . "</pcs>

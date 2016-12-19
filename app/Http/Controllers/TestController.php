@@ -74,7 +74,7 @@ class TestController extends Controller
     {
         $id = request()->get('id');
         $package = PackageModel::where('id', $id)->first();
-        $package->logistics_id=18;//更改物流ID测试
+       // $package->logistics_id=18;//更改物流ID测试
         //$package->shipping_country='IT';
         //echo "<pre/>";var_dump($package);exit;
         $package->status = 'PACKED';
@@ -101,11 +101,6 @@ class TestController extends Controller
             $result = $package->placeLogistics();
         }
         dd($result);
-    }
-    public function test_3()
-    {echo 3331213;exit;
-        $package = PackageModel::find(1);
-        var_dump($package->items->toarray());
     }
     public function test2()
     {

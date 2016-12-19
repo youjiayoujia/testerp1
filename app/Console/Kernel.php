@@ -75,6 +75,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ReduceUnuseSuppliers::class, //处理多余供货商
         \App\Console\Commands\FailMessageReplyAgain::class,
         \App\Console\Commands\AutoChangeAliOderRefund::class,
+        //DHL确认发货
+        \App\Console\Commands\AutoSureDHLShip::class,
 
     ];
 
@@ -150,6 +152,8 @@ class Kernel extends ConsoleKernel
 
         //财务
         $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
+        //DHL
+        $schedule->command('dhl:sureShip')->daily();
 
     }
 }

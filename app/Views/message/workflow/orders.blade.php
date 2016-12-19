@@ -17,9 +17,9 @@
         <div class="tab-pane {{ $key == 0 ? 'active' : '' }}" role="tabpanel" id="{{ str_replace('.','_',$relatedOrder->order->ordernum) }}">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    订单:
+                    ERP订单号:
                     <a href="{{ route('order.show',$relatedOrder->order->id) }}" target="_blank">
-                        <strong>{{ $relatedOrder->order->ordernum }}</strong>
+                        <strong>{{ $relatedOrder->order->id }}</strong>
                     </a>
                     <small>{{ '<'.$relatedOrder->order->email.'>' }}</small>
                     -
@@ -117,13 +117,12 @@
                             <div class="row form-group">
                                 <div class="col-lg-6">
                                     <strong>物流</strong>:
-                                    <a href="{{ $package->shipping->url }}" target="_blank">
                                         {{ $package->shipping->type }}
-                                    </a>
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>物流网址</strong>
-                                    {{  $package->shipping->url }}
+                                    <a target="_blank" href="{{$package->ThisPackageLogistic}}"><span class="glyphicon glyphicon-paperclip"></span>
+                                    </a>
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>追踪号</strong>: {{ $package->tracking_no }}

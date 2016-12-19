@@ -40,7 +40,7 @@
                 <div>{{ round($order->profit_rate ,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
-                <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
+                <div>平台费: {{ sprintf("%.2f", $order->channel_fee) }} USD</div>
                 <div>
                     毛利润: {{ round($order->profit, 2) }} USD
                 </div>
@@ -464,7 +464,7 @@
                                     <label for="ordernum" class='control-label'>订单号</label>
                                     <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') ? old('ordernum') : $order->ordernum }}" readonly>
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="channel_account_id">渠道账号</label>
                                     <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : $order->channelAccount->alias }}" readonly>
                                 </div>
@@ -473,15 +473,15 @@
                                 {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
                                 {{--<input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">--}}
                                 {{--</div>--}}
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="refund_amount" class='control-label'>退款金额</label>
                                     <input class="form-control" id="refund_amount{{ $order->id }}" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="price" class='control-label'>确认金额</label>
                                     <input class="form-control" id="price{{ $order->id }}" placeholder="确认金额" name='price' value="{{ old('price') }}">
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-lg-4">
                                     <label for="refund_currency" class='control-label'>退款币种</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="refund_currency" id="refund_currency">
@@ -638,13 +638,13 @@
                             <div class="row">
                                 <div class="form-group col-lg-12">
                                     <label for="remark" class='control-label'>订单备注</label>
-                                    <textarea class="form-control" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
+                                    <textarea class="form-control myRemark" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                            <button type="submit" class="btn btn-primary">提交</button>
+                            <button type="submit" class="btn btn-primary confirm_remark">提交</button>
                         </div>
                     </form>
                 </div>
@@ -863,16 +863,9 @@
         <div class="col-lg-2">
             <strong>当前小计</strong> : {{ '$' . $subtotal }}
         </div>
-        <div class="col-lg-2">
-            <input class="form-control" id="start_date" placeholder="开始日期" name='start_date'>
+        <div class="col-lg-4 text-danger">
+            <strong>统计</strong> : {{ $orderStatistics }}
         </div>
-        <div class="col-lg-2">
-            <input class="form-control" id="end_date" placeholder="结束日期" name='end_date'>
-        </div>
-        <div class="col-lg-1">
-            <button class="statistics">统计</button>
-        </div>
-        <div class="text-danger col-lg-4" id="statistics"></div>
     </div>
 @stop
 @stop
@@ -967,6 +960,15 @@
                     $('.fb').hide();
                 } else {
                     $('.fb').show();
+                }
+            });
+
+            //备注是否为空
+            $(document).on('click', '.confirm_remark', function () {
+                var remark = $(this).parent().prev().find('.myRemark').val();
+                if (!remark) {
+                    alert('请输入备注!!!');
+                    return false;
                 }
             });
 
@@ -1219,7 +1221,7 @@
                     dataType: 'json',
                     type: 'get',
                     success: function (result) {
-//                        window.location.reload();
+                        window.location.reload();
                     }
                 });
             }

@@ -808,13 +808,14 @@ Class WishAdapter implements AdapterInterface
             $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
             $jsonData = $this->getCurlData($url);
             $apiReturn = json_decode($jsonData,true);
+
             if(empty($apiReturn['data'])){
                 break;
             }
             foreach($apiReturn['data'] as $gd){
 
                 $return_array[$j]['message_id']      = $gd['Ticket']['id']; //message_id
-                $return_array[$j]['subject']		 = addslashes($gd['Ticket']['state']);//信息描述
+                $return_array[$j]['subject']		 = addslashes($gd['Ticket']['subject']);//信息描述
                 $return_array[$j]['date'] 	  	     = str_replace('T',' ',$gd['Ticket']['open_date']);//发件人发邮件的时间
                 $return_array[$j]['from_name'] 	  	 = str_replace('T',' ',$gd['Ticket']['UserInfo']['name']);//用户名
                 $return_array[$j]['from'] 	  	     = str_replace('T',' ',$gd['Ticket']['UserInfo']['id']);//用户Id
@@ -822,8 +823,8 @@ Class WishAdapter implements AdapterInterface
                 $return_array[$j]['content'] 	  	 = base64_encode(serialize(['wish' => $gd['Ticket']['replies']]));   //信息内容
                 //$return_array[$j]['order_info']      = serialize(['wish' => $gd['Ticket']['items']]);
                 $return_array[$j]['to']         = 'wish账号';
-                $return_array[$j]['labels']     = '';
-                $return_array[$j]['label']      = 'Wish消息';
+                $return_array[$j]['labels']     = addslashes($gd['Ticket']['label']);
+                $return_array[$j]['label']      = addslashes($gd['Ticket']['sublabel']);
                 $return_array[$j]['date']       = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
                 $return_array[$j]['attachment'] = ''; //附件
                 //$return_array[$j]['asdasd']   	 	 = addslashes($gd['Ticket']['label']);//邮件标题（英文）
@@ -835,6 +836,12 @@ Class WishAdapter implements AdapterInterface
                 $return_array[$j]['photo_proof']		 = $gd['Ticket']['photo_proof'];//邮件是否包含图片
                 $return_array[$j]['channel_order_number']=
                     !empty($gd['Ticket']['items'][0]['Order']['transaction_id']) ? $gd['Ticket']['items'][0]['Order']['transaction_id'] : '';//邮件是否包含图片
+
+                if(! empty($gd['Ticket']['items'][0]['Order']['ShippingDetail']['country'])){
+                    $return_array[$j]['country'] = $gd['Ticket']['items'][0]['Order']['ShippingDetail']['country'];
+                }else{
+                    $return_array[$j]['country'] = '';
+                }
                 /**
                  *订单信息 结构
                  * [Order] => Array
@@ -878,7 +885,7 @@ Class WishAdapter implements AdapterInterface
                 $return_array[$j]['channel_message_fields'] = base64_encode(serialize(
                     [
                         'order_items'    => $gd['Ticket']['items'] ,   //订单信息
-                        'locale'         => $gd['Ticket']['UserInfo']['locale'], // 区域
+                        //'locale'         => strtoupper($gd['Ticket']['UserInfo']['locale']), // 区域
                     ]
                 ));
 
@@ -896,12 +903,10 @@ Class WishAdapter implements AdapterInterface
      */
     public function sendMessages($replyMessage)
     {
-
         $message_obj = $replyMessage->message;
         $param['id'] = $message_obj->message_id;
         $param['access_token'] = $this->access_token;
         $param['reply'] = $replyMessage->content;
-        //print_r($param);exit;
 
         $result_json = $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
         $result_ary = json_decode($result_json,true);
@@ -911,9 +916,9 @@ Class WishAdapter implements AdapterInterface
         }else{
             $replyMessage->status = 'FAIL';
         }
+        $replyMessage->save();
         return $replyMessage->status== 'SENT' ? true : false;
     }
-
 
     public function changeMessageState(){
 
@@ -933,43 +938,6 @@ Class WishAdapter implements AdapterInterface
         }else{
             return false;
         }
-        
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

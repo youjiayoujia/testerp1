@@ -11,7 +11,7 @@
 @extends('common.table')
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
-    <th>wish销售代码</th>
+    <th>Ebay销售代码</th>
     <th>对应人员</th>
     <th>操作</th>
 @stop

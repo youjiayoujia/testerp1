@@ -70,6 +70,8 @@ class ItemModel extends BaseModel
         'competition_url',
         'products_history_values',
         'new_status',
+        'is_oversea',
+        'volumn_rate',
         'html_mod',
         'default_keywords',
         'default_name',
@@ -389,16 +391,6 @@ class ItemModel extends BaseModel
         return count($stocks) ? ($flag ? $stocks->sum('available_quantity') : $stocks->sum('all_quantity')) : 0;
     }
 
-    public function getArray($model, $name)
-    {
-        $arr = [];
-        $inner_models = $model::all();
-        foreach ($inner_models as $key => $single) {
-            $arr[$single->id] = $single->$name;
-        }
-        return $arr;
-    }
-
     //获得sku销量 period参数格式为 -7 day
     public function getsales($period)
     {
@@ -517,8 +509,7 @@ class ItemModel extends BaseModel
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)),
                         3)
                 ]);
-                $this->createPurchaseNeedData([$this->id]);
-
+                $this->createOnePurchaseNeedData();
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -537,7 +528,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -555,7 +546,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -573,7 +564,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -595,7 +586,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -920,7 +911,6 @@ class ItemModel extends BaseModel
             $items = $this->find($item_id_array);
         }
 
-        $requireModel = new RequireModel();
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
             $data['sku'] = $item->sku;

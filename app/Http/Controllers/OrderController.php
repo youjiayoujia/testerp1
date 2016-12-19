@@ -150,23 +150,24 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
-        $sx = request()->input('sx');
-        $lr = request()->input('lr');
-        $special = request()->input('special');
-        if ($sx != null && $lr != '') {
-            if ($sx == 'high') {
-                $order = $this->model->where('profit_rate', '>=', $lr);
-            } else {
-                $order = $this->model->where('profit_rate', '<=', $lr);
+        $order = $this->model;
+        $orderStatistics = '';
+        if ($this->allList($order)->count()) {
+            $totalAmount = 0;
+            $totalPlatform = 0;
+            $profit = 0;
+            foreach ($this->allList($order)->get() as $value) {
+                $totalAmount += $value->amount * $value->rate;
+                $profit += $value->profit_rate;
+                $totalPlatform += $value->channel_fee;
             }
-        } else {
-            $order = $this->model;
-        }
-        if ($special == 'yes') {
-            $order = $this->model->where('customer_remark', '!=', '');
+            $totalAmount = sprintf("%.2f", $totalAmount);
+            $averageProfit = sprintf("%.2f", $profit / $this->allList($order)->count());
+            $totalPlatform = sprintf("%.2f", $totalPlatform);
+            $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
         }
         $subtotal = 0;
-        foreach ($this->autoList($this->model) as $value) {
+        foreach ($this->autoList($order) as $value) {
             $subtotal += $value->amount * $value->rate;
         }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
@@ -176,18 +177,19 @@ class OrderController extends Controller
         if ($url == $orderUrl) {
             $order = $this->model->where('id', 0);
             $subtotal = 0;
+            $orderStatistics = '';
         }
         $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
             'mixedSearchFields' => $this->model->mixed_search,
-            'countries' => CountriesModel::all(),
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,
             'rmbRate' => $rmbRate,
             'hideUrl' => $url,
             'page' => $page,
+            'orderStatistics' => $orderStatistics,
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -207,9 +209,11 @@ class OrderController extends Controller
             foreach ($orders->get() as $order) {
                 $data['totalAmount'] += $order->amount * $order->rate;
                 $profit += $order->profit_rate;
-                $data['totalPlatform'] += $order->calculateOrderChannelFee();
+                $data['totalPlatform'] += $order->channel_fee;
             }
+            $data['totalAmount'] = sprintf("%.2f", $data['totalAmount']);
             $data['averageProfit'] = sprintf("%.2f", $profit / $orders->count());
+            $data['totalPlatform'] = sprintf("%.2f", $data['totalPlatform']);
         }
 
         return $data;
@@ -509,13 +513,19 @@ class OrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
-        $model->update(['status' => 'PREPARED', 'is_review' => 1]);
-        if ($model->packages()->count()) {
-            $model->packagesToQueue();
+        $model->calculateOrderChannelFee();
+        if($model->packages->count()) {
+            $model->update(['status' => 'PICKING', 'is_review' => 1]);
         } else {
+            $model->update(['status' => 'PREPARED', 'is_review' => 1]);
             $job = new DoPackages($model);
             $job = $job->onQueue('doPackages');
             $this->dispatch($job);
+        }
+        if ($model->remarks) {
+            foreach ($model->remarks as $remark) {
+                $remark->delete();
+            }
         }
         $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '审核更新,id=' . $order_id, $to, $from);
@@ -573,13 +583,23 @@ class OrderController extends Controller
         $ids_arr = explode(',', $ids);
         foreach ($ids_arr as $id) {
             $model = $this->model->find($id);
+            $model->calculateOrderChannelFee();
             if ($model) {
+                if ($model->remarks) {
+                    foreach ($model->remarks as $remark) {
+                        $remark->delete();
+                    }
+                }
                 $from = json_encode($model);
                 if ($model->status = 'REVIEW') {
-                    $model->update(['status' => 'PREPARED', 'is_review' => '1']);
-                    $job = new DoPackages($model);
-                    $job->onQueue('doPackages');
-                    $this->dispatch($job);
+                    if($model->packages->count()) {
+                        $model->update(['status' => 'PICKING', 'is_review' => '1']);
+                    } else {
+                        $model->update(['status' => 'PREPARED', 'is_review' => '1']);
+                        $job = new DoPackages($model);
+                        $job = $job->onQueue('doPackages');
+                        $this->dispatch($job);
+                    }
                 }
                 $to = json_encode($model);
                 $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);

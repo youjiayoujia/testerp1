@@ -88,10 +88,17 @@ class TestController extends Controller
     public function test2()
     {
 
-    $data = Excel::load('d:/456.xls', function($reader){
-        return $reader->all();
-    });
-    var_dump($data->toarray());
+
+        $orders = OrderModel::all();
+        foreach ($orders as $order) {
+            $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
+        }
+        return 'success';
+
+//        $data = Excel::load('d:/456.xls', function ($reader) {
+//            return $reader->all();
+//        });
+//        var_dump($data->toarray());
     }
 //    public function test2()
 //    {

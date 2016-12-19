@@ -58,6 +58,8 @@ use Illuminate\Support\Facades\Storage;
 use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
+use Queue;
+use App\Jobs\AssignStocks;
 use Crypt;
 use App\Models\Item\ItemPrepareSupplierModel;
 
@@ -87,14 +89,8 @@ class TestController extends Controller
 
     public function test2()
     {
-
-
-        $orders = OrderModel::all();
-        foreach ($orders as $order) {
-            $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-        }
-        return 'success';
-
+        $package = OrderModel::find('30');
+        $package->packagesToQueue();
 //        $data = Excel::load('d:/456.xls', function ($reader) {
 //            return $reader->all();
 //        });

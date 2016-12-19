@@ -11,6 +11,7 @@
 namespace App\Models;
 
 use Queue;
+use App\Jobs\DoPackages;
 use App\Jobs\AssignStocks;
 use App\Jobs\AssignLogistics;
 use App\Jobs\PlaceLogistics;
@@ -524,6 +525,10 @@ class OrderModel extends BaseModel
 
     public function packagesToQueue()
     {
+        if(!$this->packages->count()) {
+            $job = new DoPackages($this);
+            Queue::pushOn('doPackages', $job);
+        }
         foreach ($this->packages as $package) {
             switch ($package->status) {
                 case 'NEW':

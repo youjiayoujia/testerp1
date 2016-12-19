@@ -37,7 +37,7 @@ class DhlAdapter extends BasicAdapter
     }
     public function checkToken($url){
         $result = $this->getCurlHttpsData($url);
-        $result = json_decode($result);
+        $result = json_decode($result);echo "<pre/>";var_dump($result);exit;
         @$status = $result->accessTokenResponse->responseStatus->code;
         @$token = $result->accessTokenResponse->token;
         if($status == '100000' && $token){

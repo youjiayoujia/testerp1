@@ -314,8 +314,8 @@ class DhlAdapter extends BasicAdapter
                     $shipmentImg=base64_decode($shipmentImg);
                     $filename = 'dhl_'.$orderInfo->id.'_'.$num;
                     @$handle=fopen('./image/dhl_md_img/md/'.$filename.'.jpg',"w");
-                    fwrite($handle,$shipmentImg);
-                    fclose($handle);
+                    @fwrite($handle,$shipmentImg);
+                    @fclose($handle);
                     $num++;
                 }
             }
@@ -415,8 +415,8 @@ class DhlAdapter extends BasicAdapter
             $shipmentImg=base64_decode($shipmentImg);
             $type = 'pdf';
             @$handle=fopen('./image/dhl_md_img/checkOut/'.$handoverID.'.'.$type,"w");
-            fwrite($handle,$shipmentImg);
-            fclose($handle);
+            @fwrite($handle,$shipmentImg);
+            @fclose($handle);
             $res = array('status'=>true,'info'=>'此批次确定发货成功');
             return $res;
         }else{

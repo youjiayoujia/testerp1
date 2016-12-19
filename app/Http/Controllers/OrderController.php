@@ -513,18 +513,19 @@ class OrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
-        $model->update(['status' => 'PREPARED', 'is_review' => 1]);
+        $model->calculateOrderChannelFee();
+        if($model->packages->count()) {
+            $model->update(['status' => 'PICKING', 'is_review' => 1]);
+        } else {
+            $model->update(['status' => 'PREPARED', 'is_review' => 1]);
+            $job = new DoPackages($model);
+            $job = $job->onQueue('doPackages');
+            $this->dispatch($job);
+        }
         if ($model->remarks) {
             foreach ($model->remarks as $remark) {
                 $remark->delete();
             }
-        }
-        if ($model->packages()->count()) {
-            $model->packagesToQueue();
-        } else {
-            $job = new DoPackages($model);
-            $job = $job->onQueue('doPackages');
-            $this->dispatch($job);
         }
         $to = json_encode($this->model->find($order_id));
         $this->eventLog($userName->name, '审核更新,id=' . $order_id, $to, $from);
@@ -582,6 +583,7 @@ class OrderController extends Controller
         $ids_arr = explode(',', $ids);
         foreach ($ids_arr as $id) {
             $model = $this->model->find($id);
+            $model->calculateOrderChannelFee();
             if ($model) {
                 if ($model->remarks) {
                     foreach ($model->remarks as $remark) {
@@ -590,10 +592,14 @@ class OrderController extends Controller
                 }
                 $from = json_encode($model);
                 if ($model->status = 'REVIEW') {
-                    $model->update(['status' => 'PREPARED', 'is_review' => '1']);
-                    $job = new DoPackages($model);
-                    $job->onQueue('doPackages');
-                    $this->dispatch($job);
+                    if($model->packages->count()) {
+                        $model->update(['status' => 'PICKING', 'is_review' => '1']);
+                    } else {
+                        $model->update(['status' => 'PREPARED', 'is_review' => '1']);
+                        $job = new DoPackages($model);
+                        $job = $job->onQueue('doPackages');
+                        $this->dispatch($job);
+                    }
                 }
                 $to = json_encode($model);
                 $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);

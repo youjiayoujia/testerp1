@@ -82,10 +82,6 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                             $order->update(['status' => 'REVIEW']);
                             $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
                         }
-                        if ($order->order_is_alert != 2) { //ebay订单pp未匹配
-                            $order->update(['status' => 'REVIEW']);
-                            $order->remark('EBAY订单PP未匹配.', 'PAYPAL');
-                        }
                         break;
                     case 'lazada':
                         break;

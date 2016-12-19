@@ -40,10 +40,7 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
             if ($this->order->status == 'PREPARED') {
                 $oldPackages = $this->order->packages;
                 foreach ($oldPackages as $oldPackage) {
-                    foreach ($oldPackage->items as $packageItem) {
-                        $packageItem->delete();
-                    }
-                    $oldPackage->delete();
+                    $oldPackage->cancelPackage();
                 }
                 $package = $this->order->createPackage();
                 if ($package) {

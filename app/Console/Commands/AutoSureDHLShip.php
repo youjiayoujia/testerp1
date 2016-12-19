@@ -35,7 +35,10 @@ class AutoSureDHLShip extends Command
         //DHL统一批量确认发货
         set_time_limit(0);
         //创建确认订单的发送数据,渠道，如果增加了DHL的物流方式需要把物流ID加入logistics_id这里
-        $package = PackageModel::whereIn('logistics_id', [62, 66])->where('sure_tracking_no',1)->where('tracking_no','!=','')->get();
+        $package = PackageModel::whereIn('logistics_id', [62, 66])->where('sure_tracking_no',0)->where('tracking_no','!=','')->get();
+        if(count($package)<1){
+            echo "没有需要确认发货的订单";exit;
+        }
         $dhl = Logistics::driver('Dhl','');
         $res=$dhl->SendSureOrderShip($package);
         echo $res['info'];

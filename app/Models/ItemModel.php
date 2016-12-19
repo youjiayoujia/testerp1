@@ -1303,6 +1303,22 @@ class ItemModel extends BaseModel
         }
     }
 
+    public function updateCatalog()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $model = $this->where('is_available',1)->get();
+        //$model = $this->where('id','<','3333')->get();
+        foreach ($model as $key => $itemModel) {
+            $result = DB::select('select catalogs.id from catalogs,sku_catalog where catalogs.name = sku_catalog.catalog_enname and sku = "'.$itemModel->sku.'"');
+            if(count($result)){
+                //print_r($result);exit;
+                $itemModel->update(['catalog_id'=>$result[0]->id]);
+                $itemModel->product->update(['catalog_id'=>$result[0]->id]);
+            }
+        }
+    }
+
     public function updateWeight()
     {
         ini_set('memory_limit', '2048M');

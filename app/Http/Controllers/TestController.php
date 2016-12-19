@@ -58,7 +58,10 @@ use Illuminate\Support\Facades\Storage;
 use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
+use Queue;
+use App\Jobs\AssignStocks;
 use Crypt;
+use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
 
 class TestController extends Controller
@@ -87,11 +90,9 @@ class TestController extends Controller
 
     public function test2()
     {
-        $orders = OrderModel::where('channel_fee', 0)->get();
-        foreach ($orders as $order) {
-            $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-        }
-        return 1;
+        $user = factory(App\Models\UserModel::class)->make(['name' => 'mc']);
+        var_dump($user->toarray());exit;
+
 //        $data = Excel::load('d:/456.xls', function ($reader) {
 //            return $reader->all();
 //        });

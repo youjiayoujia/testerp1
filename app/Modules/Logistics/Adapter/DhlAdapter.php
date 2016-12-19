@@ -55,7 +55,7 @@ class DhlAdapter extends BasicAdapter
         $this->account=$customer_id[0];//账号
         $clientId=$customer_id[1];//API账号
         $gqtime=@$customer_id[2]?$customer_id[2]:0;//过期时间
-        $lasttime = time()-25*24*60*60;
+        $lasttime = time()-25*24*60*60;echo $lasttime;var_dump($customer_id);
         if($lasttime > $gqtime){
             //暂时关掉自动更新
 //            $result =[

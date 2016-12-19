@@ -24,15 +24,15 @@ class DhlAdapter extends BasicAdapter
         $this->GetShipHost='https://api.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
         $this->CheckOutHost='https://api.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
         $this->getTokenUrl = "https://api.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
-//        $this->account = '5243380896';//账号
+        $this->account = '5243380896';//账号
 
         ////////////////////////////////////////测试环境数据/////////////////////////////////////
 //		$this->GetShipHost='https://apitest.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
 //		$this->CheckOutHost='https://apitest.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
 //		$this->getTokenUrl = "https://apitest.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
-       // $this->account = '520285';//账号
+//        $this->account = '520285';//账号
 
-        $this->qz = 'CNAMMERP3'.rand(100,1000);//物流号前缀
+        $this->qz = 'CNAMMERP3';//物流号前缀
         $this->_express_type =!empty($config['type'])?$config['type']:'PKD';
     }
     public function checkToken($url){

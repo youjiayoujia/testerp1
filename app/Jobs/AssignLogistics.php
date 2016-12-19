@@ -60,7 +60,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                     $order->update(['status' => 'REVIEW']);
                     $order->remark('包裹重量大于2kg.', 'WEIGHT');
                 }
-                //利润率判断
+                //分渠道审核
                 $profitRate = $order->calculateProfitProcess();
                 switch ($order->channel->driver) {
                     case 'amazon':

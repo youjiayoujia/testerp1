@@ -146,6 +146,7 @@ return [
         'BLACK' => '黑名单',
         'WEIGHT' => '重量大于2kg',
         'ITEM' => 'SKU异常',
+        'PAYPAL' => 'PAYPAL未匹配',
     ],
 
     //是否标记

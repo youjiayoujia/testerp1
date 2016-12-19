@@ -85,6 +85,11 @@ class StockController extends Controller
         }
         $item = ItemModel::find(request('item_id'));
         $item->in(request('warehouse_position_id'), request()->input('all_quantity'), request()->input('all_quantity') * ($item->cost ? $item->cost : $item->purchase_price), 'MAKE_ACCOUNT');
+        if(!empty(request('oversea_sku'))) {
+            $stock = $this->model->where(['item_id' => request('item_id'), 'warehouse_position_id' => request('warehouse_position_id')])->first();
+            $stock->update(['oversea_sku' => request('oversea_sku')]);
+        }
+        
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
@@ -338,18 +343,32 @@ class StockController extends Controller
     public function ajaxSku()
     {
         $sku = trim(request()->input('sku'));
-        $items = ItemModel::where('sku', 'like', '%'.$sku.'%')->distinct()->take('20')->get();
-        $total = $items->count();
+        $warehouse = request()->has('warehouse_id') ? request('warehouse_id') : '';
+        $stocks = '';
+        if(!empty($warehouse)) {
+            $stocks = StockModel::where('warehouse_id', $warehouse)->whereHas('item', function($query) use ($sku){
+                $query = $query->where('sku', 'like', '%'.$sku.'%');
+            })->distinct()->take('20')->get(['item_id']);
+        } else {
+            $stocks = ItemModel::where('sku', 'like', '%'.$sku.'%')->take('20')->get();
+        }
+        $total = $stocks->count();
         $arr = [];
-        foreach($items as $key => $item) {
-            $arr[$key]['id'] = $item->id;
-            $arr[$key]['text'] = $item->sku;
+        if(!empty($warehouse)) {
+            foreach($stocks as $key => $stock) {
+                $arr[$key]['id'] = $stock->item_id;
+                $arr[$key]['text'] = $stock->item->sku;
+            }
+        } else {
+            foreach($stocks as $key => $stock) {
+                $arr[$key]['id'] = $stock->id;
+                $arr[$key]['text'] = $stock->sku;
+            }
         }
         if($total)
             return json_encode(['results' => $arr, 'total' => $total]);
         else 
             return json_encode('false');
-
     }
 
     /**
@@ -504,6 +523,7 @@ class StockController extends Controller
                      'sku'=>'',
                      'position'=>'',
                      'all_quantity'=>'',
+                     'oversea_sku'=>'',
                     ]
             ];
         $name = 'stock';
@@ -525,6 +545,70 @@ class StockController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view($this->viewPath.'excel', $response);
+    }
+
+    public function overseaExcelProcess()
+    {
+        if(request()->hasFile('excel'))
+        {
+            $file = request()->file('excel');
+            $arr = $this->model->overseaExcelProcess($file);
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'arr' => $arr,
+            ];
+
+            return view($this->viewPath.'overseaImport', $response);
+        }
+    }
+
+    public function overseaImportStore()
+    {
+        $arr = request('arr');
+        $result = request('result');
+        if(!$result) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('fail', '变更失败...'));
+        }
+        foreach($arr['quantity'] as $key => $value) {
+            if($value) {
+                $item = ItemModel::where('sku', $arr['sku'][$key])->first();
+                if(!$item) {
+                    continue;
+                }
+                $position = PositionModel::where('name', $arr['position'][$key])->first();
+                if(!$position) {
+                    continue;
+                }
+                if($value > 0) {
+                    $item->in($position->id, (int)$value, ((int)$value * ($item->cost ? $item->cost : $item->purchase_price)), 'ADJUSTMENT');
+                    $stock = $this->model->where(['item_id' => $item->id, 'warehouse_position_id' => $position->id])->first();
+                    if($stock) {
+                        $stock->update(['oversea_sku' => $arr['oversea_sku'][$key]]);
+                    }
+                }
+                if($value < 0) {
+                    $item->out($position->id, -(int)$value, 'ADJUSTMENT');
+                }
+            }
+        }
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '库存变更成功...'));
+    }
+
+    /**
+     * excel 导入数据
+     *
+     * @param
+     *
+     */
+    public function overseaImportByExcel()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'url' => route('stock.overseaExcelProcess')
         ];
 
         return view($this->viewPath.'excel', $response);

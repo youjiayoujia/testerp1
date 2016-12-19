@@ -141,7 +141,8 @@ class RequireController extends Controller
 				$data['supplier_id']=$v['supplier_id'] ? $v['supplier_id'] : 0;
 				$data['user_id'] = $v['user_id'];
 				$supplier=SupplierModel::find($v['supplier_id']);
-				$data['assigner']=$supplier->purchase_id ? $supplier->purchase_id : 0;
+				//print_r($supplier->purchase_id);exit;
+				//$data['assigner']=$supplier->purchase_id ? $supplier->purchase_id : 0;
 				//echo '<pre>';
 				//print_r($data);exit;
 				$purchaseOrder=PurchaseOrderModel::create($data);

@@ -313,7 +313,7 @@ class DhlAdapter extends BasicAdapter
                     $shipmentImg = $v->content;//面单二进制流
                     $shipmentImg=base64_decode($shipmentImg);
                     $filename = 'dhl_'.$orderInfo->id.'_'.$num;
-                    @$handle=fopen('/home/website/public/picture/dhl_md_img/md/'.$filename.'.jpg',"w");
+                    @$handle=fopen('/home/website/v3.erp.moonarstore.com/public/picture/dhl_md_img/md/'.$filename.'.jpg',"w");
                     @fwrite($handle,$shipmentImg);
                     @fclose($handle);
                     $num++;
@@ -414,7 +414,7 @@ class DhlAdapter extends BasicAdapter
             $handoverID = $result->closeOutResponse->bd->handoverID;
             $shipmentImg=base64_decode($shipmentImg);
             $type = 'pdf';
-            @$handle=fopen('/home/website/public/picture/dhl_md_img/checkOut/'.$handoverID.'.'.$type,"w");
+            @$handle=fopen('/home/website/v3.erp.moonarstore.com/public/picture/dhl_md_img/checkOut/'.$handoverID.'.'.$type,"w");
             @fwrite($handle,$shipmentImg);
             @fclose($handle);
             $res = array('status'=>true,'info'=>'此批次确定发货成功');

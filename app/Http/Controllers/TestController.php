@@ -61,6 +61,7 @@ use Cache;
 use Queue;
 use App\Jobs\AssignStocks;
 use Crypt;
+use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
 
 class TestController extends Controller
@@ -89,9 +90,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = OrderModel::find('30');
-        $package->packagesToQueue();
-
+        $user = factory(App\Models\UserModel::class)->make(['name' => 'mc']);
+        var_dump($user->toarray());exit;
 //        $data = Excel::load('d:/456.xls', function ($reader) {
 //            return $reader->all();
 //        });

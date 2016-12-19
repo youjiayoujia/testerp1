@@ -42,19 +42,26 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                 foreach ($oldPackages as $oldPackage) {
                     $oldPackage->cancelPackage();
                 }
-                $package = $this->order->createPackage();
-                if ($package) {
-                    $job = new AssignStocks($package);
-                    $job->onQueue('assignStocks');
-                    $this->dispatch($job);
+                if ($this->order->channel->driver == 'ebay' and $this->order->order_is_alert != 2) {
+                    $this->order->eventLog('队列', 'EBAY订单需要匹配PAYPAL.');
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success.';
-                    $package->eventLog('队列', '已生成空包裹，加入匹配库存队列', json_encode($package));
+                    $this->result['remark'] = 'EBAY订单需要匹配PAYPAL.';
                 } else {
-                    $this->relation_id = 0;
-                    $this->result['status'] = 'fail';
-                    $this->result['remark'] = 'Fail to create virtual package.';
+                    $package = $this->order->createPackage();
+                    if ($package) {
+                        $job = new AssignStocks($package);
+                        $job->onQueue('assignStocks');
+                        $this->dispatch($job);
+                        $this->relation_id = $this->order->id;
+                        $this->result['status'] = 'success';
+                        $this->result['remark'] = 'Success.';
+                        $package->eventLog('队列', '已生成空包裹，加入匹配库存队列', json_encode($package));
+                    } else {
+                        $this->relation_id = 0;
+                        $this->result['status'] = 'fail';
+                        $this->result['remark'] = 'Fail to create virtual package.';
+                    }
                 }
             } else {
                 $this->relation_id = 0;

@@ -279,7 +279,7 @@ class EbayAdapter implements AdapterInterface
         $payMentStatus = $order->CheckoutStatus->eBayPaymentStatus;
         $paidTime = (string)$order->PaidTime;
         $ShippedTime = (string)$order->ShippedTime;
-        $CreatedTime = (string)$order->CreatedTime;
+        $CreatedTime = date('Y-m-d H:i:s', strtotime((string)$order->CreatedTime));
         if (!empty($ShippedTime)) {
             return false; //这个已经发货了吧
         }

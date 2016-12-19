@@ -518,10 +518,8 @@ class OrderController extends Controller
             $model->update(['status' => 'PICKING', 'is_review' => 1]);
         } else {
             $model->update(['status' => 'PREPARED', 'is_review' => 1]);
-            $job = new DoPackages($model);
-            $job = $job->onQueue('doPackages');
-            $this->dispatch($job);
         }
+        $model->packagesToQueue();
         if ($model->remarks) {
             foreach ($model->remarks as $remark) {
                 $remark->delete();
@@ -596,10 +594,8 @@ class OrderController extends Controller
                         $model->update(['status' => 'PICKING', 'is_review' => '1']);
                     } else {
                         $model->update(['status' => 'PREPARED', 'is_review' => '1']);
-                        $job = new DoPackages($model);
-                        $job = $job->onQueue('doPackages');
-                        $this->dispatch($job);
                     }
+                    $model->packagesToQueue();
                 }
                 $to = json_encode($model);
                 $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);

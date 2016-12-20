@@ -596,8 +596,9 @@ class TestController extends Controller
         }
         exit;
     }
-    public function testPaypal($id)
+    public function testPaypal()
     {
+        $id = request()->get('id');
         $orders = OrderModel::where('id', $id)->get();
         foreach ($orders as $order) {
             $is_paypals = false;

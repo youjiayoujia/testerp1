@@ -30,6 +30,7 @@ use App\Models\Message\ReplyModel;
 use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 use Logistics;
+
 class PackageController extends Controller
 {
     public function __construct(PackageModel $package)
@@ -68,6 +69,7 @@ class PackageController extends Controller
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至assignStocks队列成功'));
     }
+
     /**
      * 列表
      *
@@ -173,7 +175,7 @@ class PackageController extends Controller
                 $buf[$key][1] = 0;
                 continue;
             }
-            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->code : '无匹配';
+            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->logistics->code : '无匹配';
             $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
         }
 
@@ -202,12 +204,12 @@ class PackageController extends Controller
     {
         $val = trim(request('val'));
         $model = LogisticsCatalogModel::where('name', $val)->first();
-        if(!$model) {
+        if (!$model) {
             return false;
         }
         $str = "<option value=''>物流方式</option>";
-        foreach($model->logisticses as $logistics) {
-            $str .= "<option value='".$logistics->id."'>".$logistics->code."</option>";
+        foreach ($model->logisticses as $logistics) {
+            $str .= "<option value='" . $logistics->id . "'>" . $logistics->code . "</option>";
         }
         return $str;
     }
@@ -284,8 +286,8 @@ class PackageController extends Controller
                 continue;
             }
             $logistics = LogisticsModel::find($id);
-            if($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
-                if($model->status == 'ASSIGNFAILED') {
+            if ($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
+                if ($model->status == 'ASSIGNFAILED') {
                     $model->update(['logistics_id' => $id, 'tracking_no' => '', 'status' => 'ASSIGNED']);
                 } else {
                     $model->update(['logistics_id' => $id, 'tracking_no' => '']);
@@ -929,7 +931,8 @@ class PackageController extends Controller
         $order = $package->order;
         if ($order->status == 'REVIEW') {
             $package->update(['status' => 'ERROR']);
-            $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹对应订单待审核,包装中包裹变异常', json_encode($package));
+            $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹对应订单待审核,包装中包裹变异常',
+                json_encode($package));
             return json_encode(false);
         }
         $items = $package->items;
@@ -938,8 +941,9 @@ class PackageController extends Controller
         }
         $package->update(['status' => 'PACKED']);
         $picklistItems = $package->picklistItems;
-        foreach($picklistItems as $picklistItem) {
-            $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;
+        foreach ($picklistItems as $picklistItem) {
+            $picklistItem->packed_quantity += $package->items->where('item_id',
+                $picklistItem->item_id)->first()->quantity;
             $picklistItem->save();
         }
         DB::beginTransaction();
@@ -953,7 +957,8 @@ class PackageController extends Controller
                     throw new Exception('包裹出库库存有问题');
                 }
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
-                $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装，库存数据已出库', json_encode($package));
+                $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装，库存数据已出库',
+                    json_encode($package));
             }
         } catch (Exception $e) {
             DB::rollback();

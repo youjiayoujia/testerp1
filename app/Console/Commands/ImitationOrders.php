@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use factory;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 

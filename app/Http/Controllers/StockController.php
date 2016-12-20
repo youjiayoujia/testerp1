@@ -523,7 +523,6 @@ class StockController extends Controller
                      'sku'=>'',
                      'position'=>'',
                      'all_quantity'=>'',
-                     'oversea_sku'=>'',
                     ]
             ];
         $name = 'stock';

@@ -98,6 +98,7 @@ class OrderModel extends BaseModel
         'orders_expired_time',
         'created_at',
         'is_oversea',
+        'fee_amt',
     ];
 
     private $canPackageStatus = ['PREPARED'];

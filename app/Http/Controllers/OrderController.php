@@ -522,6 +522,9 @@ class OrderController extends Controller
         $model->packagesToQueue();
         if ($model->remarks) {
             foreach ($model->remarks as $remark) {
+                if ($remark->type == 'PAYPAL') {
+                    $model->update(['order_is_alert' => 2]);
+                }
                 $remark->delete();
             }
         }
@@ -585,6 +588,9 @@ class OrderController extends Controller
             if ($model) {
                 if ($model->remarks) {
                     foreach ($model->remarks as $remark) {
+                        if ($remark->type == 'PAYPAL') {
+                            $model->update(['order_is_alert' => 2]);
+                        }
                         $remark->delete();
                     }
                 }

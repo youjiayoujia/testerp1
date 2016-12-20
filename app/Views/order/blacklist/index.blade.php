@@ -86,6 +86,27 @@
             </div>
         </div>
     </div>
+@section('doAction')
+    <div class="panel panel-default">
+        <div class="panel-heading">黑名单客户条件如下:</div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <strong>SMT/eBay:邮编+收货人姓名/收货人ID/邮箱相同</strong><br>
+                <strong>AMZ :邮编+收货人姓名/邮箱相同</strong><br>
+                <strong>Wish:邮编+收货人姓名</strong><br>
+                <strong>1.待确认黑名单客户（不拦截）：提交退款订单个数超过5个；</strong><br>
+                <strong>列表数据每星期日更新一次，已确认为黑名单客户数据跳过；</strong><br>
+                <strong>颜色标识：淡橙色为‘邮编+收货人姓名’搜索，淡绿色为‘邮箱’搜索，黄色为‘收货人id’搜索；</strong><br>
+                <strong>2. 已确认黑名单客户（拦截）：退款率高于15% / 其它恶意客户</strong><br>
+                <strong>颜色标识：红色背景</strong><br>
+                <strong>3. 导入待处理黑名单客户（拦截）</strong><br>
+                <strong>颜色标识：无色背景</strong><br>
+                <strong>4. 疑似黑名单客户（拦截）：当天平邮超过20个（SMT）；订单超过4个（eBay)；</strong><br>
+                <strong>5. 白名单（不拦截）不再出现在疑似黑名单客户里。</strong><br>
+            </div>
+        </div>
+    </div>
+@stop
 @stop
 @section('tableToolButtons')
     <div class="btn-group" role="group">

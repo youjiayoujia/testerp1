@@ -50,6 +50,6 @@ class ImitationOrders extends Command
                 $i++;
             }
         });
-        $this->info('imitation orders data is success');
+        $this->info('imitation orders data is success, quantity:'.$quantity);
     }
 }

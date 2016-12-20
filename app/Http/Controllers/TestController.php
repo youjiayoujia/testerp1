@@ -617,10 +617,11 @@ class TestController extends Controller
                 $api = new  PaypalApi($paypal);
                 $result = $api->apiRequest('gettransactionDetails', $order->transaction_number);
                 $transactionInfo = $api->httpResponse;
+                var_dump($transactionInfo);
+                var_dump($result);
                 if ($result && $transactionInfo != null && (strtoupper($transactionInfo ['ACK']) == 'SUCCESS' || strtoupper($transactionInfo ['ACK']) == 'SUCCESSWITHWARNING')) {
                     $tInfo = $transactionInfo;
-                    var_dump($tInfo);
-                    var_dump($result);
+
                 }
             }
 

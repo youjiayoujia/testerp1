@@ -11,6 +11,7 @@
 namespace App\Models;
 
 use Queue;
+use App\Jobs\DoPackages;
 use App\Jobs\AssignStocks;
 use App\Jobs\AssignLogistics;
 use App\Jobs\PlaceLogistics;
@@ -490,7 +491,13 @@ class OrderModel extends BaseModel
         $total = 0;
         foreach ($this->items as $item) {
             if ($item->item) {
-                $total += $item->item->purchase_price * $item->quantity;
+                if ($item->item->count() > 1) {
+                    if ($item->item->status != 'cleaning') {
+                        $total += $item->item->purchase_price * $item->quantity;
+                    }
+                } else {
+                    $total += $item->item->purchase_price * $item->quantity;
+                }
             }
         }
         return $total;
@@ -524,6 +531,10 @@ class OrderModel extends BaseModel
 
     public function packagesToQueue()
     {
+        if(!$this->packages->count()) {
+            $job = new DoPackages($this);
+            Queue::pushOn('doPackages', $job);
+        }
         foreach ($this->packages as $package) {
             switch ($package->status) {
                 case 'NEW':
@@ -837,8 +848,7 @@ class OrderModel extends BaseModel
             default:
                 foreach ($this->items as $item) {
                     if ($item->item and $item->item->catalog) {
-                        $channelRate = $item->item->catalog->channels->where('id',
-                            $this->channelAccount->catalog_rates_channel_id)->first();
+                        $channelRate = $item->item->catalog->channels->find($this->channelAccount->catalog_rates_channel_id);
                         if ($channelRate) {
                             $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
                             $sum = $sum * $this->rate;

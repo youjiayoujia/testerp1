@@ -929,6 +929,7 @@ class PackageController extends Controller
         $order = $package->order;
         if ($order->status == 'REVIEW') {
             $package->update(['status' => 'ERROR']);
+            $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹对应订单待审核,包装中包裹变异常', json_encode($package));
             return json_encode(false);
         }
         $items = $package->items;
@@ -952,6 +953,7 @@ class PackageController extends Controller
                     throw new Exception('包裹出库库存有问题');
                 }
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
+                $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装，库存数据已出库', json_encode($package));
             }
         } catch (Exception $e) {
             DB::rollback();

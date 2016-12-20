@@ -12,6 +12,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\Order\ItemModel;
 use App\Models\Logistics\SupplierModel;
 use App\Models\PackageModel;
+use Illuminate\Support\Facades\Storage;
 class DhlAdapter extends BasicAdapter
 {
     public function __construct($config)
@@ -313,9 +314,8 @@ class DhlAdapter extends BasicAdapter
                     $shipmentImg = $v->content;//面单二进制流
                     $shipmentImg=base64_decode($shipmentImg);
                     $filename = 'dhl_'.$orderInfo->id.'_'.$num;
-                    @$handle=fopen('./picture/dhl_md_img/md/'.$filename.'.jpg',"w");
-                    @fwrite($handle,$shipmentImg);
-                    @fclose($handle);
+                    $uploads_file ='/dhl_md/md/'.$filename.'.jpg';
+                    Storage::put($uploads_file,$shipmentImg);
                     $num++;
                 }
             }
@@ -414,9 +414,8 @@ class DhlAdapter extends BasicAdapter
             $handoverID = $result->closeOutResponse->bd->handoverID;
             $shipmentImg=base64_decode($shipmentImg);
             $type = 'pdf';
-            @$handle=fopen('./picture/dhl_md_img/checkOut/'.$handoverID.'.'.$type,"w");
-            @fwrite($handle,$shipmentImg);
-            @fclose($handle);
+            $uploads_file ='/dhl_md/checkOut/'.$handoverID.'.'.$type;
+            Storage::put($uploads_file,$shipmentImg);
             $res = array('status'=>true,'info'=>'此批次确定发货成功');
             return $res;
         }else{

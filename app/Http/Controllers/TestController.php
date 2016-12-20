@@ -58,7 +58,10 @@ use Illuminate\Support\Facades\Storage;
 use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
+use Queue;
+use App\Jobs\AssignStocks;
 use Crypt;
+use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
 
 class TestController extends Controller
@@ -87,19 +90,9 @@ class TestController extends Controller
 
     public function test2()
     {
-        $id = request()->get('id');
-        $package = PackageModel::where('id', $id)->first();
-        // $package->logistics_id=18;//更改物流ID测试
-        //$package->shipping_country='IT';
-        //echo "<pre/>";var_dump($package);exit;
-        $package->status = 'PACKED';
-        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
-            $result = $package->placeLogistics('UPDATE');
-        } else {
-            $result = $package->placeLogistics();
-        }
-        //dd($result);
-        echo "<pre/>";var_dump($result);exit;
+        $user = factory(App\Models\UserModel::class)->make(['name' => 'mc']);
+        var_dump($user->toarray());exit;
+
 //        $data = Excel::load('d:/456.xls', function ($reader) {
 //            return $reader->all();
 //        });

@@ -613,9 +613,13 @@ class TestController extends Controller
        // $orders = OrderModel::where('id', $id)->get();
 
         $paypal=(object)array();
-        $paypal->paypal_account ='pandapaly_api1.gmail.com';
+        /*$paypal->paypal_account ='pandapaly_api1.gmail.com';
         $paypal->paypal_password ='7GMKV43MYLU25R6S';
         $paypal->paypal_token ='AFcWxV21C7fd0v3bYYYRCpSSRl31AIiTulEeUsGHmvC38sMypdtaZLd5';
+        $transaction_number ='2X555149CG151123D';*/
+        $paypal->paypal_account ='luckydeer2012_api1.gmail.com';
+        $paypal->paypal_password ='MNP77KZHH6282GHP';
+        $paypal->paypal_token ='At46enSTyl7h.l6hxYwpVHlJJkS9Ah6jXbJCuPFiwN3pOlplTwwTWDg0';
         $transaction_number ='2X555149CG151123D';
         $api = new  PaypalApi($paypal);
 

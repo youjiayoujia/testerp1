@@ -7,6 +7,7 @@
  */
 namespace App\Http\Controllers;
 header('Content-type: text/html; charset=UTF-8');
+use phpDocumentor\Reflection\Types\Object_;
 use Session;
 use App\Models\ChannelModel;
 use App\Models\Message\MessageModel;
@@ -609,7 +610,25 @@ class TestController extends Controller
     public function testPaypal()
     {
         $id = request()->get('id');
-        $orders = OrderModel::where('id', $id)->get();
+       // $orders = OrderModel::where('id', $id)->get();
+
+        $paypal=(object)array();
+        $paypal->paypal_account ='pandapaly_api1.gmail.com';
+        $paypal->paypal_password ='7GMKV43MYLU25R6S';
+        $paypal->paypal_token ='AFcWxV21C7fd0v3bYYYRCpSSRl31AIiTulEeUsGHmvC38sMypdtaZLd5';
+        $transaction_number ='2X555149CG151123D';
+        $api = new  PaypalApi($paypal);
+
+        $result = $api->apiRequest('gettransactionDetails', $transaction_number);
+
+
+
+        exit;
+
+
+
+
+
         foreach ($orders as $order) {
             $paypals = $order->channelAccount->paypal;
             foreach ($paypals as $paypal) {

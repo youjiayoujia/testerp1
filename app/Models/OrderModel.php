@@ -98,6 +98,7 @@ class OrderModel extends BaseModel
         'orders_expired_time',
         'created_at',
         'is_oversea',
+        'fee_amt',
     ];
 
     private $canPackageStatus = ['PREPARED'];
@@ -491,7 +492,13 @@ class OrderModel extends BaseModel
         $total = 0;
         foreach ($this->items as $item) {
             if ($item->item) {
-                $total += $item->item->purchase_price * $item->quantity;
+                if ($item->item->count() > 1) {
+                    if ($item->item->status != 'cleaning') {
+                        $total += $item->item->purchase_price * $item->quantity;
+                    }
+                } else {
+                    $total += $item->item->purchase_price * $item->quantity;
+                }
             }
         }
         return $total;

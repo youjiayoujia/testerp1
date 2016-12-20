@@ -611,69 +611,22 @@ class TestController extends Controller
     }
     public function testPaypal()
     {
-        $orders = OrderModel::where('id', 12851)->get();
+        $id = request()->get('id');
+        $orders = OrderModel::where('id', $id)->get();
         foreach ($orders as $order) {
-            $is_paypals = false;
-            //$erp_country      = trim($order->shipping_country);
-            $erp_country_code = trim($order->shipping_country);
-            $erp_state = trim($order->shipping_state);
-            $erp_city = trim($order->shipping_city);
-            $erp_address = trim($order->shipping_address);
-            $erp_address_1 = trim($order->shipping_address1);
-            $erp_address = trim($erp_address . $erp_address_1);
-            $erp_address = str_replace(' ', '', $erp_address); //把地址信息中的空格都去掉
-            $erp_name = trim($order->shipping_firstname . $order->shipping_lastname);
-            $erp_zip = trim($order->shipping_zipcode);
-            $error = array();
             $paypals = $order->channelAccount->paypal;
             foreach ($paypals as $paypal) {
                 $api = new  PaypalApi($paypal);
                 $result = $api->apiRequest('gettransactionDetails', $order->transaction_number);
                 $transactionInfo = $api->httpResponse;
+                var_dump($transactionInfo);
+                var_dump($result);
                 if ($result && $transactionInfo != null && (strtoupper($transactionInfo ['ACK']) == 'SUCCESS' || strtoupper($transactionInfo ['ACK']) == 'SUCCESSWITHWARNING')) {
-                    $is_paypals = true;
                     $tInfo = $transactionInfo;
-                    $paypal_account = isset($tInfo ['EMAIL']) ? $tInfo ['EMAIL'] : '';
-                    $paypal_buyer_name = trim($tInfo ['SHIPTONAME']);
-                    $paypal_country_code = trim($tInfo['SHIPTOCOUNTRYCODE']); //国家简称
-                    $paypal_country = trim($tInfo['SHIPTOCOUNTRYNAME']); //国家
-                    $paypal_city = trim($tInfo['SHIPTOCITY']);        //城市
-                    $paypal_state = trim($tInfo['SHIPTOSTATE']);       //州
-                    $paypal_street = trim($tInfo['SHIPTOSTREET']);      //街道1
-                    $paypal_street2 = trim($tInfo['SHIPTOSTREET2']);     //街道2
-                    $paypal_zip = trim($tInfo['SHIPTOZIP']);         //邮编
-                    $paypal_phone = isset($tInfo['SHIPTOPHONENUM']) ? trim($tInfo['SHIPTOPHONENUM']) : '';    //电话
-                    $paypalAddress = $paypal_street . ' ' . $paypal_street2 . ' ' . $paypal_city . ' ' . $paypal_state . ' ' . $paypal_country . '(' . $paypal_country_code . ') ' . $paypal_zip;
-                    if (strtoupper($erp_country_code) != strtoupper($paypal_country_code)) {
-                        $error[] = '国家不一致';
-                    }
-                    //把paypal的信息记录
-                    $is_exist = OrderPaypalDetailModel::where('order_id', $order->id)->first();
-                    if (empty($is_exist)) {
-                        $add = [
-                            'order_id' => $order->id,
-                            'paypal_account' => $paypal_account,
-                            'paypal_buyer_name' => $paypal_buyer_name,
-                            'paypal_address' => $paypalAddress,
-                            'paypal_country' => $paypal_country_code
-                        ];
-                        OrderPaypalDetailModel::create($add);
-                    }
-                    if (!empty($error)) { //设置为匹配失败
-                        $order->update(['order_is_alert' => 2]);
-                        $order->remark('paypal匹配失败:' . implode(',', $error));
-                    } else { //设置为匹配成功
-                        $order->update(['order_is_alert' => 3]);
-                        $order->remark('paypal匹配成功');
-                        //remarks
-                    }
-                    break;
+
                 }
             }
-            if (!$is_paypals) { //说明对应的paypal 都没有找到信息
-                $order->update(['order_is_alert' => 2]);
-                $order->remark('paypal匹配失败:当前交易凭证在预设的PayPal组中，未查询到交易详情，请通过其它方式查询');
-            }
+
         }
     }
     public function jdtestCrm()
@@ -1389,4 +1342,9 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
+
+
+
+
 }

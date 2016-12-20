@@ -158,7 +158,7 @@ class Kernel extends ConsoleKernel
         //DHL
         $schedule->command('dhl:sureShip')->daily();
         //匹配paypal
-        $schedule->command('match:account:all')->cron('*/20 * * * *');
+        $schedule->command('match:account all')->cron('*/20 * * * *');
 
     }
 }

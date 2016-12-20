@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ $url ? $url : route('stock.excelProcess') }} @stop
+@section('formAction') {{ isset($url) ? $url : route('stock.excelProcess') }} @stop
 @section('formBody')
 <div class='row'>
     <div class="form-group col-lg-4">

@@ -38,7 +38,7 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if(!$this->package->is_oversea) {
+        if(!$this->package->is_oversea && $this->package->order->status != 'REVIEW') {
             $result = $this->package->placeLogistics($this->type);
             if ($result['status'] == 'success') {
                 $this->result['status'] = 'success';

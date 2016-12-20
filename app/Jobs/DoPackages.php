@@ -36,7 +36,7 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if ($this->order) {
+        if ($this->order && $this->order->status != 'REVIEW') {
             if ($this->order->status == 'PREPARED') {
                 $oldPackages = $this->order->packages;
                 foreach ($oldPackages as $oldPackage) {

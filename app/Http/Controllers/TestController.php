@@ -59,7 +59,10 @@ use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
 use Queue;
+use App\Models\StockModel;
 use App\Jobs\AssignStocks;
+use App\Jobs\DoPackages;
+
 use Crypt;
 use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
@@ -88,16 +91,33 @@ class TestController extends Controller
         dd($result);
     }
 
-    public function test2()
-    {
-        $user = factory(App\Models\UserModel::class)->make(['name' => 'mc']);
-        var_dump($user->toarray());exit;
+    // public function test2()
+    // {
+    //     $i = 0;
+    //     while($i<100) {
+    //         $order = OrderModel::find(2628);
+    //     $job = new DoPackages($order);
+    //     $job = $job->onQueue('doPackages');
+    //     $this->dispatch($job);
+    //     $i++;
+    //     }
+        
+    // }
 
-//        $data = Excel::load('d:/456.xls', function ($reader) {
-//            return $reader->all();
-//        });
-//        var_dump($data->toarray());
-    }
+    //模拟数据
+    // public function test2()
+    // {
+    //     $user = factory(\App\Models\OrderModel::class,10)->create(['status' => 'PREPARED','customer_service' => '63', 'operator' => '195', 'payment' => 'MIXEDCARD', 'currency' => 'USD', 'rate' => '1'])
+    //     ->each(function($single){
+    //         $i = 0;
+    //         $range = mt_rand(1,3);
+    //         while($i<$range) {
+    //             $single->items()->save(factory(\App\Models\Order\ItemModel::class)->make(['currency' => 'USD', 'is_active' => '1', 'status' => 'NEW', 'item_status' => 'selling']));
+    //             $i++;
+    //         }
+            
+    //     });
+    // }
 //    public function test2()
 //    {
 //        foreach (\App\Models\Order\ItemModel::all() as $item) {

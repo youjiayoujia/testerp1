@@ -832,11 +832,7 @@ class OrderModel extends BaseModel
                 $sum = $sum * $this->rate;
                 break;
             case 'ebay':
-                $counterFee = 0;
-                if ($this->orderPaypal) {
-                    $rate = CurrencyModel::where('code', $this->orderPaypal->currencyCode)->first()->rate;
-                    $counterFee = $this->orderPaypal->feeAmt * $rate;
-                }
+                $counterFee = $this->fee_amt * $this->rate;
                 $dealFee = 0;
                 if ($this->items) {
                     foreach ($this->items as $item) {

@@ -42,30 +42,32 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if($this->package->is_oversea) {
-            $flag = $this->package->oversea_createPackageItems();
-        } else {
-            $flag = $this->package->createPackageItems();
-        }
-        if ($flag) {
-            if ($this->package->status == 'WAITASSIGN') {
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success to assign stock.';
-                $this->package->eventLog('队列', '已匹配到库存,待分配', json_encode($this->package));
-            } elseif ($this->package->status == 'PROCESSING') { //todo:如果缺货订单匹配到了库存，不是原匹配仓库，需要匹配物流下单
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success to assign stock.';
-                $this->package->eventLog('队列', '已匹配到库存,待拣货', json_encode($this->package));
-            } elseif ($this->package->status == 'ASSIGNED') {
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success to assign stock.';
-                $this->package->eventLog('队列', '已匹配到库存,待下单', json_encode($this->package));
+        if($this->package->order->status != 'REVIEW') {
+            if($this->package->is_oversea) {
+                $flag = $this->package->oversea_createPackageItems();
+            } else {
+                $flag = $this->package->createPackageItems();
             }
-        } else {
-            $this->result['status'] = 'success';
-            $this->result['remark'] = 'have no enough stocks or can\'t assign stocks.';
-            $this->package->eventLog('队列', 'have no enough stocks or can\'t assign stocks.',
-                json_encode($this->package));
+            if ($flag) {
+                if ($this->package->status == 'WAITASSIGN') {
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success to assign stock.';
+                    $this->package->eventLog('队列', '已匹配到库存,待分配', json_encode($this->package));
+                } elseif ($this->package->status == 'PROCESSING') { //todo:如果缺货订单匹配到了库存，不是原匹配仓库，需要匹配物流下单
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success to assign stock.';
+                    $this->package->eventLog('队列', '已匹配到库存,待拣货', json_encode($this->package));
+                } elseif ($this->package->status == 'ASSIGNED') {
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success to assign stock.';
+                    $this->package->eventLog('队列', '已匹配到库存,待下单', json_encode($this->package));
+                }
+            } else {
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'have no enough stocks or can\'t assign stocks.';
+                $this->package->eventLog('队列', 'have no enough stocks or can\'t assign stocks.',
+                    json_encode($this->package));
+            }
         }
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('assignStocks');

@@ -77,16 +77,16 @@
                     <td style="border-bottom:1px solid black;">Origin</td>
                 </tr>
                 <tr style="height:40px;">
-                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>{{ $model->decleared_ename }}</td>
-                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>{{ sprintf("%.1f",$model->signal_weight *1000) }}</td>
-                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>'.$allParamArr['productsInfo'][0]['item_count'].'</td>
-                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>{{ sprintf("%.1f",$model->signal_price) }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>{{ $model->getDeclaredInfo()['declared_en'] }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>{{ sprintf("%.1f", $model->getDeclaredInfo()['weight'] * 1000) }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>{{ $model->items ? $model->items->first()->quantity : 0 }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;" valign=top>{{ sprintf("%.1f", $model->getDeclaredInfo()['declared_value']) }}</td>
                     <td style="border-bottom:1px solid black;" valign=top>CN</td>
                 </tr>
                 <tr style="font-weight:bold;">
                     <td style="border-right:1px solid black;border-bottom:1px solid black;text-align:right;">Total</td>
                     <td colspan="2" style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->total_weight }}G</td>
-                    <td colspan="2" style="border-bottom:1px solid black;">{{ $model->currency }}&nbsp;{{ sprintf("%.2f",$model->total_price) }}</td>
+                    <td colspan="2" style="border-bottom:1px solid black;">{{ $model->order ? $model->order->currency : '' }}&nbsp;{{ sprintf("%.2f", $model->total_price) }}</td>
                 </tr>
             </table>
             <div style="font-size:12px;line-height:12px;">
@@ -95,9 +95,9 @@
             </div>
             <div style="font-size:13px;line-height:13px;margin-top:5px;">
                 <p style="float:left;width:200px;font-size:13px;">SELLMORE (HK) TRADE CO.,Ltd</p>
-                <p style="float:right;width:140px;"><?php echo date("d-m-Y");?>&nbsp;&nbsp;Page 1/1</p>
+                <p style="float:right;width:140px;">{{ date("d-m-Y") }}&nbsp;&nbsp;Page 1/1</p>
             </div>
-            <div style="text-align:right;width:93mm">{{ $model->order ? $model->order->ordernum : '' }}</div>
+            <div style="text-align:right;width:93mm">{{ $model->id }}</div>
     </div>
 </div>
 </div>

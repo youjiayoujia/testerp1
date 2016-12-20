@@ -601,17 +601,6 @@ class TestController extends Controller
         $id = request()->get('id');
         $orders = OrderModel::where('id', $id)->get();
         foreach ($orders as $order) {
-            $is_paypals = false;
-            //$erp_country      = trim($order->shipping_country);
-            $erp_country_code = trim($order->shipping_country);
-            $erp_state = trim($order->shipping_state);
-            $erp_city = trim($order->shipping_city);
-            $erp_address = trim($order->shipping_address);
-            $erp_address_1 = trim($order->shipping_address1);
-            $erp_address = trim($erp_address . $erp_address_1);
-            $erp_address = str_replace(' ', '', $erp_address); //把地址信息中的空格都去掉
-            $erp_name = trim($order->shipping_firstname . $order->shipping_lastname);
-            $error = array();
             $paypals = $order->channelAccount->paypal;
             foreach ($paypals as $paypal) {
                 $api = new  PaypalApi($paypal);

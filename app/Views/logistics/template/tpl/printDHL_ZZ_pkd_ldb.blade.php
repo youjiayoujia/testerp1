@@ -39,6 +39,8 @@
             <p style="font-size:19px;">{{ $model->shipping_city }}</p>
             <p style="font-size:22px;">{{ $model->country ? $model->country->name : '' }}</p>
         </div>
+        <br>
+        <br>
     </div>
     <div style="width:98mm;height:99mm;border:1px solid black;margin-top: 3mm">
         <div class="header2">
@@ -95,7 +97,7 @@
             </div>
             <div style="font-size:13px;line-height:13px;margin-top:5px;">
                 <p style="float:left;width:200px;font-size:13px;">SELLMORE (HK) TRADE CO.,Ltd</p>
-                <p style="float:right;width:140px;">{{ date("d-m-Y") }}&nbsp;&nbsp;Page 1/1</p>
+                <p style="float:right;width:140px;">{{ date("d-m-Y") }}&nbsp;Page 1/1</p>
             </div>
             <div style="text-align:right;width:93mm">{{ $model->id }}</div>
     </div>

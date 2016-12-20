@@ -98,7 +98,7 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
                     $this->result['status'] = 'fail';
                     $this->result['remark'] = 'paypal匹配失败:'.implode(',',$error);
                 } else { //设置为匹配成功
-                    $this->order->update(['order_is_alert'=>'2']);
+                    $this->order->update(['order_is_alert'=>'2','fee_amt'=>$feeAmt]);
                     //$this->order->remark('paypal匹配成功:'.implode(',',$error));
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';

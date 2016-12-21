@@ -513,19 +513,21 @@ class OrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
-        $model->calculateOrderChannelFee();
-        if($model->packages->count()) {
-            $model->update(['status' => 'PICKING', 'is_review' => 1]);
-        } else {
-            $model->update(['status' => 'PREPARED', 'is_review' => 1]);
-        }
-        $model->packagesToQueue();
-        if ($model->remarks) {
-            foreach ($model->remarks as $remark) {
-                if ($remark->type == 'PAYPAL') {
-                    $model->update(['order_is_alert' => 2]);
+        if ($model->items && $model->items->item) {
+            $model->calculateOrderChannelFee();
+            if($model->packages->count()) {
+                $model->update(['status' => 'PICKING', 'is_review' => 1]);
+            } else {
+                $model->update(['status' => 'PREPARED', 'is_review' => 1]);
+            }
+            $model->packagesToQueue();
+            if ($model->remarks) {
+                foreach ($model->remarks as $remark) {
+                    if ($remark->type == 'PAYPAL') {
+                        $model->update(['order_is_alert' => 2]);
+                    }
+                    $remark->delete();
                 }
-                $remark->delete();
             }
         }
         $to = json_encode($this->model->find($order_id));
@@ -584,27 +586,29 @@ class OrderController extends Controller
         $ids_arr = explode(',', $ids);
         foreach ($ids_arr as $id) {
             $model = $this->model->find($id);
-            $model->calculateOrderChannelFee();
-            if ($model) {
-                if ($model->remarks) {
-                    foreach ($model->remarks as $remark) {
-                        if ($remark->type == 'PAYPAL') {
-                            $model->update(['order_is_alert' => 2]);
+            if ($model->items && $model->items->item) {
+                $model->calculateOrderChannelFee();
+                if ($model) {
+                    if ($model->remarks) {
+                        foreach ($model->remarks as $remark) {
+                            if ($remark->type == 'PAYPAL') {
+                                $model->update(['order_is_alert' => 2]);
+                            }
+                            $remark->delete();
                         }
-                        $remark->delete();
                     }
-                }
-                $from = json_encode($model);
-                if ($model->status = 'REVIEW') {
-                    if($model->packages->count()) {
-                        $model->update(['status' => 'PICKING', 'is_review' => '1']);
-                    } else {
-                        $model->update(['status' => 'PREPARED', 'is_review' => '1']);
+                    $from = json_encode($model);
+                    if ($model->status = 'REVIEW') {
+                        if($model->packages->count()) {
+                            $model->update(['status' => 'PICKING', 'is_review' => '1']);
+                        } else {
+                            $model->update(['status' => 'PREPARED', 'is_review' => '1']);
+                        }
+                        $model->packagesToQueue();
                     }
-                    $model->packagesToQueue();
+                    $to = json_encode($model);
+                    $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);
                 }
-                $to = json_encode($model);
-                $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);
             }
         }
         return 1;

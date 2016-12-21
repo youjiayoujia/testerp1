@@ -56,24 +56,22 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
                 $is_paypals = true;
                 $tInfo = $transactionInfo;
                 $paypal_account=isset($tInfo ['EMAIL'])?$tInfo ['EMAIL']:'';
-                $paypal_buyer_name = trim($tInfo ['SHIPTONAME']);
-                $paypal_country_code = trim($tInfo['SHIPTOCOUNTRYCODE']); //国家简称
-                $paypal_country = trim($tInfo['SHIPTOCOUNTRYNAME']); //国家
-                $paypal_city = trim($tInfo['SHIPTOCITY']);        //城市
-                $paypal_state = trim($tInfo['SHIPTOSTATE']);       //州
-                $paypal_street = trim($tInfo['SHIPTOSTREET']);      //街道1
+                $paypal_buyer_name = isset($tInfo ['SHIPTONAME'])?trim($tInfo ['SHIPTONAME']):'';
+                $paypal_country_code = isset($tInfo['SHIPTOCOUNTRYCODE'])?trim($tInfo['SHIPTOCOUNTRYCODE']):''; //国家简称
+                $paypal_country = isset($tInfo['SHIPTOCOUNTRYNAME'])?trim($tInfo['SHIPTOCOUNTRYNAME']):''; //国家
+                $paypal_city = isset($tInfo['SHIPTOCITY'])?trim($tInfo['SHIPTOCITY']):'';        //城市
+                $paypal_state = isset($tInfo['SHIPTOSTATE'])?trim($tInfo['SHIPTOSTATE']):'';       //州
+                $paypal_street = isset($tInfo['SHIPTOSTREET'])?trim($tInfo['SHIPTOSTREET']):'';      //街道1
                 $paypal_street2 = isset($tInfo['SHIPTOSTREET2'])?trim($tInfo['SHIPTOSTREET2']):'';     //街道2
-                $paypal_zip = trim($tInfo['SHIPTOZIP']);         //邮编
+                $paypal_zip = isset($tInfo['SHIPTOZIP'])?trim($tInfo['SHIPTOZIP']):'';         //邮编
                 $paypal_phone = isset($tInfo['SHIPTOPHONENUM']) ? trim($tInfo['SHIPTOPHONENUM']) : '';    //电话
                 $paypalAddress = $paypal_street . ' ' . $paypal_street2 . ' ' . $paypal_city . ' ' . $paypal_state . ' ' . $paypal_country . '(' . $paypal_country_code . ') ' . $paypal_zip;
                 if (strtoupper($erp_country_code) != strtoupper($paypal_country_code)) {
                     $error[] = '国家不一致';
                 }
-
                 $feeAmt  = $tInfo['FEEAMT'];
                 $currencyCode  = $tInfo['CURRENCYCODE'];
                 //把paypal的信息记录
-
                 $is_exist = OrderPaypalDetailModel::where('order_id', $this->order->id)->first();
                 if (empty($is_exist)) {
                     $add = [
@@ -87,10 +85,7 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
                         'currencyCode'=>$currencyCode
                     ];
                     OrderPaypalDetailModel::create($add);
-
                 }
-
-
                 if (!empty($error)) { //设置为匹配失败
                     $this->order->update(['order_is_alert'=>'1']);
                     //$this->order->remark('paypal匹配失败:'.implode(',',$error));
@@ -103,8 +98,9 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'paypal匹配成功.';
+                    break;
                 }
-                break;
+
             }
         }
         if (!$is_paypals) { //说明对应的paypal 都没有找到信息

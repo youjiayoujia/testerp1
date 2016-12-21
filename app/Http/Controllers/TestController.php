@@ -66,6 +66,8 @@ use App\Jobs\DoPackages;
 use Crypt;
 use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
+use App\Jobs\MatchPaypal as MatchPaypalJob ;
+
 
 class TestController extends Controller
 {
@@ -91,18 +93,14 @@ class TestController extends Controller
         dd($result);
     }
 
-    // public function test2()
-    // {
-    //     $i = 0;
-    //     while($i<100) {
-    //         $order = OrderModel::find(2628);
-    //     $job = new DoPackages($order);
-    //     $job = $job->onQueue('doPackages');
-    //     $this->dispatch($job);
-    //     $i++;
-    //     }
-        
-    // }
+     public function test2()
+     {
+         $orders = OrderModel::where('status', 'SHIPPED')->get();
+         foreach ($orders as $order) {
+             $order->calculateProfitProcess();
+         }
+         return 1;
+     }
 
     public function test2()
     {
@@ -620,6 +618,7 @@ class TestController extends Controller
         $id = request()->get('id');
         $orders = OrderModel::where('id', $id)->get();
         foreach ($orders as $order) {
+            $is_paypals = false;
             $paypals = $order->channelAccount->paypal;
             foreach ($paypals as $paypal) {
                 $api = new  PaypalApi($paypal);
@@ -628,11 +627,50 @@ class TestController extends Controller
                 var_dump($transactionInfo);
                 var_dump($result);
                 if ($result && $transactionInfo != null && (strtoupper($transactionInfo ['ACK']) == 'SUCCESS' || strtoupper($transactionInfo ['ACK']) == 'SUCCESSWITHWARNING')) {
+                    $is_paypals = true;
                     $tInfo = $transactionInfo;
+                    $paypal_account=isset($tInfo ['EMAIL'])?$tInfo ['EMAIL']:'';
+                    $paypal_buyer_name = trim($tInfo ['SHIPTONAME']);
+                    $paypal_country_code = trim($tInfo['SHIPTOCOUNTRYCODE']); //国家简称
+                    $paypal_country = trim($tInfo['SHIPTOCOUNTRYNAME']); //国家
+                    $paypal_city = trim($tInfo['SHIPTOCITY']);        //城市
+                    $paypal_state = trim($tInfo['SHIPTOSTATE']);       //州
+                    $paypal_street = trim($tInfo['SHIPTOSTREET']);      //街道1
+                    $paypal_street2 = isset($tInfo['SHIPTOSTREET2'])?trim($tInfo['SHIPTOSTREET2']):'';     //街道2
+                    $paypal_zip = trim($tInfo['SHIPTOZIP']);         //邮编
+                    $paypal_phone = isset($tInfo['SHIPTOPHONENUM']) ? trim($tInfo['SHIPTOPHONENUM']) : '';    //电话
+                    $paypalAddress = $paypal_street . ' ' . $paypal_street2 . ' ' . $paypal_city . ' ' . $paypal_state . ' ' . $paypal_country . '(' . $paypal_country_code . ') ' . $paypal_zip;
+                    $feeAmt  = $tInfo['FEEAMT'];
+                    $currencyCode  = $tInfo['CURRENCYCODE'];
+                    //把paypal的信息记录
 
+                    $is_exist = OrderPaypalDetailModel::where('order_id',$order->id)->first();
+                    if (empty($is_exist)) {
+                        $add = [
+                            'order_id' => $this->order->id,
+                            'paypal_id' =>$paypal->id,
+                            'paypal_account' => $paypal_account,
+                            'paypal_buyer_name'=>$paypal_buyer_name,
+                            'paypal_address'=>$paypalAddress,
+                            'paypal_country'=>$paypal_country_code,
+                            'feeAmt'=>$feeAmt,
+                            'currencyCode'=>$currencyCode
+                        ];
+                        OrderPaypalDetailModel::create($add);
+                    }
+                    if (!empty($error)) { //设置为匹配失败
+                        $order->update(['order_is_alert'=>'1']);
+                        echo 'false';
+                    } else { //设置为匹配成功
+                        $order->update(['order_is_alert'=>'2','fee_amt'=>$feeAmt]);
+                        echo 'success';
+                    }
                 }
             }
-
+            if (!$is_paypals) { //说明对应的paypal 都没有找到信息
+                $order->update(['order_is_alert'=>'1']);
+                echo 'false2';
+            }
         }
     }
     public function jdtestCrm()

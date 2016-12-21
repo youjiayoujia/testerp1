@@ -663,6 +663,9 @@ class OrderModel extends BaseModel
         if ($currency) {
             $data['rate'] = $currency->rate;
         }
+        if ($data['shipping_country'] == 'PR') {
+            $data['shipping_country'] = 'US';
+        }
 
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
@@ -820,6 +823,20 @@ class OrderModel extends BaseModel
         $orderProfitRate = $orderProfit / $orderAmount;
         $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);
         return $orderProfitRate;
+    }
+
+    //ebay成交费
+    public function getDealFeeAttribute()
+    {
+        $dealFee = 0;
+        if ($this->items) {
+            foreach ($this->items as $item) {
+                $rate = CurrencyModel::where('code', $item->currency)->first()->rate;
+                $dealFee += $item->final_value_fee * $rate;
+            }
+        }
+
+        return $dealFee;
     }
 
     //计算平台费

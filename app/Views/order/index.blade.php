@@ -41,12 +41,12 @@
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                 <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
                 <div>平台费: {{ sprintf("%.2f", $order->channel_fee) }} USD</div>
-                @if(($order->channel ? $order->channel->driver : '') == 'ebay')
-                    手续费: {{ $order->fee_amt }} {{ $order->currency }}
-                @endif
                 <div>
                     毛利润: {{ round($order->profit, 2) }} USD
                 </div>
+                @if(($order->channel ? $order->channel->driver : '') == 'ebay')
+                    手续费: {{ $order->fee_amt * $order->rate }} USD
+                @endif
             </td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userOperator ? $order->userOperator->name : '未分配' }}</td>
@@ -118,6 +118,10 @@
                                 @endif
                                 <br>
                                 {{ $orderItem->orders_item_number }}
+                                <br>
+                                @if(($order->channel ? $order->channel->driver : '') == 'ebay')
+                                    成交费: {{ $order->deal_fee }} USD
+                                @endif
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             {{--@if($orderItem->item)--}}

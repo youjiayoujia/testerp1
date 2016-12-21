@@ -1453,85 +1453,87 @@ class PackageModel extends BaseModel
         } else {
             $isClearance = 0;
         }
-        $rules = $this->warehouse->logisticsRules()
-            ->where(function ($query) use ($weight) {
-                $query->where('weight_from', '<=', $weight)
-                    ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
-            })
-            ->where(function ($query) use ($amount) {
-                $query->where('order_amount_from', '<=', $amount)
-                    ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
-            })
-            ->where(['is_clearance' => $isClearance])
-            ->with([
-                'rule_catalogs_through',
-                'rule_channels_through',
-                'rule_countries_through',
-                'rule_accounts_through',
-                'rule_transports_through',
-                'rule_limits_through'
-            ])
-            ->get()
-            ->sortBy(function ($single, $key) {
-                return $single->logistics ? $single->logistics->priority : 1;
-            });
-        foreach ($rules as $rule) {
-            if ($rule->catalog_section) {
-                $catalogs = $rule->rule_catalogs->pluck('catalog_id');
-                foreach ($this->items as $item) {
-                    if (!in_array($item->catalog_id, $catalogs->toArray())) {
-                        continue 2;
+        if ($this->warehouse) {
+            $rules = $this->warehouse->logisticsRules()
+                ->where(function ($query) use ($weight) {
+                    $query->where('weight_from', '<=', $weight)
+                        ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
+                })
+                ->where(function ($query) use ($amount) {
+                    $query->where('order_amount_from', '<=', $amount)
+                        ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
+                })
+                ->where(['is_clearance' => $isClearance])
+                ->with([
+                    'rule_catalogs_through',
+                    'rule_channels_through',
+                    'rule_countries_through',
+                    'rule_accounts_through',
+                    'rule_transports_through',
+                    'rule_limits_through'
+                ])
+                ->get()
+                ->sortBy(function ($single, $key) {
+                    return $single->logistics ? $single->logistics->priority : 1;
+                });
+            foreach ($rules as $rule) {
+                if ($rule->catalog_section) {
+                    $catalogs = $rule->rule_catalogs->pluck('catalog_id');
+                    foreach ($this->items as $item) {
+                        if (!in_array($item->catalog_id, $catalogs->toArray())) {
+                            continue 2;
+                        }
                     }
                 }
-            }
-            if ($rule->channel_section) {
-                $channel = $rule->rule_channels
-                    ->where('channel_id', $this->channel_id)
-                    ->first();
-                if (!$channel) {
-                    continue;
-                }
-            }
-            if ($rule->country_section) {
-                $country = $rule->rule_countries_through
-                    ->where('code', $this->shipping_country)
-                    ->first();
-                if (!$country) {
-                    continue;
-                }
-            }
-            if ($rule->account_section) {
-                $channel_account = $rule->rule_accounts
-                    ->where('account_id', $this->channel_account_id)
-                    ->first();
-                if (!$channel_account) {
-                    continue;
-                }
-            }
-            if ($rule->transport_section) {
-                if ($this->order->shipping) {
-                    $transport = $rule->rule_transports_through
-                        ->where('name', $this->order->shipping)
+                if ($rule->channel_section) {
+                    $channel = $rule->rule_channels
+                        ->where('channel_id', $this->channel_id)
                         ->first();
-                    if (!$transport) {
+                    if (!$channel) {
                         continue;
                     }
                 }
-            }
-            if ($rule->limit_section) {
-                $shippingLimits = $this->shipping_limits;
-                $mustLimits = $rule->rule_limits->where('type', '0')->pluck('logistics_limit_id');
-                $noLimits = $rule->rule_limits->where('type', '1')->pluck('logistics_limit_id');
-                if ($mustLimits->count() > 0 and $shippingLimits->count() < 1) {
-                    continue;
-                }
-                foreach ($shippingLimits as $shippingLimit) {
-                    if (in_array($shippingLimit, $noLimits->toArray())) {
-                        continue 2;
+                if ($rule->country_section) {
+                    $country = $rule->rule_countries_through
+                        ->where('code', $this->shipping_country)
+                        ->first();
+                    if (!$country) {
+                        continue;
                     }
                 }
+                if ($rule->account_section) {
+                    $channel_account = $rule->rule_accounts
+                        ->where('account_id', $this->channel_account_id)
+                        ->first();
+                    if (!$channel_account) {
+                        continue;
+                    }
+                }
+                if ($rule->transport_section) {
+                    if ($this->order->shipping) {
+                        $transport = $rule->rule_transports_through
+                            ->where('name', $this->order->shipping)
+                            ->first();
+                        if (!$transport) {
+                            continue;
+                        }
+                    }
+                }
+                if ($rule->limit_section) {
+                    $shippingLimits = $this->shipping_limits;
+                    $mustLimits = $rule->rule_limits->where('type', '0')->pluck('logistics_limit_id');
+                    $noLimits = $rule->rule_limits->where('type', '1')->pluck('logistics_limit_id');
+                    if ($mustLimits->count() > 0 and $shippingLimits->count() < 1) {
+                        continue;
+                    }
+                    foreach ($shippingLimits as $shippingLimit) {
+                        if (in_array($shippingLimit, $noLimits->toArray())) {
+                            continue 2;
+                        }
+                    }
+                }
+                return $rule;
             }
-            return $rule;
         }
         return false;
     }

@@ -334,9 +334,15 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //缺货报表
     Route::get('purchaseOrder/outOfStock',
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
+    //表格修改付款状态界面
+    Route::get('purchaseOrder/excelPayOff',
+        ['uses' => 'Purchase\PurchaseOrderController@excelPayOff', 'as' => 'purchaseOrder.excelPayOff']);
+    //表格修改付款状态
+    Route::any('purchaseOrder/excelPayOffExecute',
+        ['uses' => 'Purchase\PurchaseOrderController@excelPayOffExecute', 'as' => 'purchaseOrder.excelPayOffExecute']);
+
     Route::get('purchaseOrder/sevenPurchaseSku',
         ['uses' => 'Purchase\PurchaseOrderController@sevenPurchaseSku', 'as' => 'purchase.sevenPurchaseSku']);
-
     Route::get('purchaseOrder/printButNotWarehouseIn',
         ['uses' => 'Purchase\PurchaseOrderController@printButNotWarehouseIn', 'as' => 'purchase.printButNotWarehouseIn']);
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');

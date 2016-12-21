@@ -41,6 +41,7 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
         if(!$this->package->is_oversea && $this->package->order->status != 'REVIEW') {
             $result = $this->package->placeLogistics($this->type);
             if ($result['status'] == 'success') {
+                $this->package->update(['queue_name' => '']);
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'packages tracking_no:' . $result['tracking_no'];
                 $this->package->eventLog('队列', 'packages tracking_no:' . $result['tracking_no'],
@@ -55,6 +56,7 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
                     'packages logistics_order_number:' . $result['logistics_order_number'] . ' need  get tracking_no ',
                     json_encode($this->package));
             } else {
+                $this->package->update(['queue_name' => '']);
                 $this->release();
                 $this->result['status'] = 'fail';
                 $this->result['remark'] = $result['tracking_no'];

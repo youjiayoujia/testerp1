@@ -391,9 +391,16 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
     Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
     Route::any('purchaseOrder/write_off/{id}', 'Purchase\PurchaseOrderController@write_off');
+    //采购单核销界面
+    Route::any('purchaseOrder/writeOffIndex',
+        ['uses' => 'Purchase\PurchaseOrderController@writeOffIndex', 'as' => 'purchaseOrder.writeOffIndex']);
     //采购单导出
     Route::any('purchaseOrder/purchaseOrdersOut',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
+    //采购单核销格式导出
+    Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
+    //采购单核销导入
+    Route::any('purchaseOrderConfirmCsvFormatExecute', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormatExecute', 'as' => 'purchaseOrderConfirmCsvFormatExecute']);
     
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');

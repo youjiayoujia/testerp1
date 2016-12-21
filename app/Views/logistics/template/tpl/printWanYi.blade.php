@@ -24,7 +24,10 @@
             &nbsp;&nbsp;
             {{ $model->country ? $model->country->cn_name : '' }}
         </p>
-        <p style="width:100%;height:40%;font-size:14px;text-align:right;">
+        <p style="width:100%;height:40%;font-size:14px;">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             @if(($model->logistics ? $model->logistics->logistics_code : '') == 524)
                 {{ 'eDS易递宝 - 香港渠道(平邮) - ebay' }}
             @else

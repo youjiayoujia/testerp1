@@ -18,7 +18,7 @@
         <div>
             <img src="{{ route('barcodeGen', ['content' => $model->sku ,'height'=>'30' , 'orientation'=>'horizontal', 'type'=>'code128' ])}}">
         </div>
-        <span style="font-size:10px;">{{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]</span> </td> 
+        <span style="font-size:10px;">{{date('m-d',time())}}[{{$model->productItem->warehouse_position}}][PO:{{$po_id}}]</span> </td> 
      </tr> 
     </tbody>
    </table> 
@@ -47,7 +47,7 @@
                     
                     
                     <span style="font-size:10px;">
-                        {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]
+                        {{date('m-d',time())}}[{{$model->productItem->warehouse_position}}][PO:{{$po_id}}]
                     </span>
                 </td>
             </tr>
@@ -103,7 +103,7 @@
                         <?php //echo Tool::barcodePrint($model->sku) ?>
                         
                         <span style="font-size:8px;">
-                            {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]
+                            {{date('m-d',time())}}[{{$model->productItem->warehouse_position}}][PO:{{$po_id}}]
                         </span>
                     </td>
                 </tr>

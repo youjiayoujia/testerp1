@@ -526,14 +526,15 @@ class PackageModel extends BaseModel
         return $this->belongsTo('App\Models\CatalogModel', $this->items->first()->item->product->catalog_id);
     }
 
-    public function  LogisticsChannel()
+    public function LogisticsChannel()
     {
-        return $this->hasMany('App\Models\Logistics\ChannelModel','logistics_id','logistics_id');
+        return $this->hasMany('App\Models\Logistics\ChannelModel', 'logistics_id', 'logistics_id');
     }
+
     //物流网址
     public function getThisPackageLogisticAttribute()
     {
-        $url = $this->LogisticsChannel()->where('channel_id','=',$this->channel_id)->select('url')->first();
+        $url = $this->LogisticsChannel()->where('channel_id', '=', $this->channel_id)->select('url')->first();
         return $url['url'];
     }
 
@@ -569,7 +570,8 @@ class PackageModel extends BaseModel
         $item = $this->items()->first();
         if ($item->warehouse_position_id) {
             foreach ($this->items as $packageItem) {
-                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $this->id);
+                $packageItem->item->unhold($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE',
+                    $this->id);
                 $packageItem->forceDelete();
             }
         } else {
@@ -857,7 +859,7 @@ class PackageModel extends BaseModel
     public function oversea_createPackageItems()
     {
         $arr = [];
-        foreach($this->items as $key => $single) {
+        foreach ($this->items as $key => $single) {
             $arr[$single->code][$key]['item_id'] = $single->item_id;
             $arr[$single->code][$key]['quantity'] = $single->quantity;
             $arr[$single->code][$key]['order_item_id'] = $single->order_item_id;
@@ -865,23 +867,23 @@ class PackageModel extends BaseModel
             $arr[$single->code][$key]['is_oversea'] = $single->is_oversea;
             $arr[$single->code][$key]['code'] = $single->code;
         }
-        if(count($arr) > 1) {
+        if (count($arr) > 1) {
             $flag = false;
-            foreach($arr as $code => $value) {
-                if(!$flag) {
+            foreach ($arr as $code => $value) {
+                if (!$flag) {
                     $warehouse = WarehouseModel::where('code', $code)->first();
-                    if(!$warehouse) {
+                    if (!$warehouse) {
                         return false;
                     }
                     $this->update(['warehouse_id' => $warehouse->id]);
-                    foreach($this->items as $single) {
+                    foreach ($this->items as $single) {
                         $single->forceDelete();
                     }
                     $model = $this->find($this->id);
-                    foreach($value as $k => $v) {
+                    foreach ($value as $k => $v) {
                         $model->items()->create($v);
                     }
-                    if($model->oversea_assignStock()) {
+                    if ($model->oversea_assignStock()) {
                         $model->update(['status' => 'WAITASSIGN']);
                         $job = new AssignLogistics($model);
                         Queue::pushOn('assignLogistics', $job);
@@ -894,14 +896,14 @@ class PackageModel extends BaseModel
                 } else {
                     $newPackage = $this->create($this->toarray());
                     $warehouse = WarehouseModel::where('code', $code)->first();
-                    if(!$warehouse) {
+                    if (!$warehouse) {
                         return false;
                     }
                     $newPackage->update(['warehouse_id' => $warehouse->id]);
-                    foreach($value as $k => $v) {
+                    foreach ($value as $k => $v) {
                         $newPackage->items()->create($v);
                     }
-                    if($newPackage->oversea_assignStock()) {
+                    if ($newPackage->oversea_assignStock()) {
                         $newPackage->update(['status' => 'WAITASSIGN']);
                         $job = new AssignLogistics($newPackage);
                         Queue::pushOn('assignLogistics', $job);
@@ -913,14 +915,14 @@ class PackageModel extends BaseModel
                 }
             }
         } else {
-            foreach($arr as $code => $value) {
+            foreach ($arr as $code => $value) {
                 $warehouse = WarehouseModel::where('code', $code)->first();
-                if(!$warehouse) {
+                if (!$warehouse) {
                     return false;
                 }
                 $this->update(['warehouse_id' => $warehouse->id]);
                 $model = $this->find($this->id);
-                if($model->oversea_assignStock()) {
+                if ($model->oversea_assignStock()) {
                     $model->update(['status' => 'WAITASSIGN']);
                     $job = new AssignLogistics($model);
                     Queue::pushOn('assignLogistics', $job);
@@ -939,17 +941,17 @@ class PackageModel extends BaseModel
     {
         $flag = false;
         $arr = [];
-        foreach($this->items as $key => $single) {
+        foreach ($this->items as $key => $single) {
             $stock = StockModel::where(['warehouse_id' => $this->warehouse_id, 'item_id' => $single->item_id])->first();
-            if(!$stock) {
+            if (!$stock) {
                 return false;
             }
-            if($stock->available_quantity < $single->quantity) {
+            if ($stock->available_quantity < $single->quantity) {
                 return false;
             }
             $arr[] = $stock->warehouse_position_id;
         }
-        foreach($this->items as $key => $single) {
+        foreach ($this->items as $key => $single) {
             $single->update(['warehouse_position_id' => $arr[$key]]);
             $single->item->hold($arr[$key], $single->quantity, 'PACKAGE', $this->id);
         }
@@ -1386,7 +1388,7 @@ class PackageModel extends BaseModel
             $logisticsId = $this->logistics_id;
         } else {
             if ($this->realTimeLogistics()) {
-                $logisticsId = $this->realTimeLogistics()->id;
+                $logisticsId = $this->realTimeLogistics()->logistics->id;
             } else {
                 return false;
             }
@@ -1442,7 +1444,6 @@ class PackageModel extends BaseModel
      */
     public function realTimeLogistics()
     {
-        //匹配物流方式
         $weight = $this->weight; //包裹重量
         $amount = $this->order ? $this->order->amount : ''; //订单金额
         $amountShipping = $this->order ? $this->order->amount_shipping : ''; //订单运费
@@ -1453,237 +1454,94 @@ class PackageModel extends BaseModel
         } else {
             $isClearance = 0;
         }
-        $rules = RuleModel::
-        where(function ($query) use ($weight) {
-            $query->where('weight_from', '<=', $weight)
-                ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
-        })->where(function ($query) use ($amount) {
-            $query->where('order_amount_from', '<=', $amount)
-                ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
-        })->where(['is_clearance' => $isClearance])
-          ->whereHas('logistics', function($single){
-                $single->where('warehouse_id', $this->warehouse_id);
-              })
-            ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
-            ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
+        $rules = $this->warehouse->logisticsRules()
+            ->where(function ($query) use ($weight) {
+                $query->where('weight_from', '<=', $weight)
+                    ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
+            })
+            ->where(function ($query) use ($amount) {
+                $query->where('order_amount_from', '<=', $amount)
+                    ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
+            })
+            ->where(['is_clearance' => $isClearance])
+            ->with([
+                'rule_catalogs_through',
+                'rule_channels_through',
+                'rule_countries_through',
+                'rule_accounts_through',
+                'rule_transports_through',
+                'rule_limits_through'
+            ])
             ->get()
             ->sortBy(function ($single, $key) {
                 return $single->logistics ? $single->logistics->priority : 1;
             });
         foreach ($rules as $rule) {
             if ($rule->catalog_section) {
-                $catalogs = $rule->rule_catalogs_through;
+                $catalogs = $rule->rule_catalogs->pluck('catalog_id');
                 foreach ($this->items as $item) {
-                    $flag = 0;
-                    foreach ($catalogs as $catalog) {
-                        if ($catalog->id == $item->catalog_id) {
-                            $flag = 1;
-                            break;
-                        }
-                    }
-                    if ($flag == 0) {
+                    if (!in_array($item->catalog_id, $catalogs->toArray())) {
                         continue 2;
                     }
                 }
             }
             if ($rule->channel_section) {
-                $channels = $rule->rule_channels_through;
-                $flag = 0;
-                foreach ($channels as $channel) {
-                    if ($channel->id == $this->channel_id) {
-                        $flag = 1;
-                        break;
-                    }
-                }
-                if ($flag == 0) {
+                $channel = $rule->rule_channels
+                    ->where('channel_id', $this->channel_id)
+                    ->first();
+                if (!$channel) {
                     continue;
                 }
             }
-
-            //是否在物流方式国家中
             if ($rule->country_section) {
-                $countries = $rule->rule_countries_through;
-                $flag = 0;
-                foreach ($countries as $country) {
-                    if ($country->code == $this->shipping_country) {
-                        $flag = 1;
-                        break;
-                    }
-                }
-                if ($flag == 0) {
+                $country = $rule->rule_countries_through
+                    ->where('code', $this->shipping_country)
+                    ->first();
+                if (!$country) {
                     continue;
                 }
             }
-            //是否在物流方式账号中
             if ($rule->account_section) {
-                $accounts = $rule->rule_accounts_through;
-                $flag = 0;
-                foreach ($accounts as $account) {
-                    if ($account->id == $this->channel_account_id) {
-                        $flag = 1;
-                        break;
-                    }
-                }
-                if ($flag == 0) {
+                $channel_account = $rule->rule_accounts
+                    ->where('account_id', $this->channel_account_id)
+                    ->first();
+                if (!$channel_account) {
                     continue;
                 }
             }
-            //是否在物流方式运输方式中
             if ($rule->transport_section) {
-                $transports = $rule->rule_transports_through;
-                $flag = 0;
-                foreach ($transports as $transport) {
-                    if (!$this->order->shipping || $transport->name == $this->order->shipping) {
-                        $flag = 1;
-                        break;
+                if ($this->order->shipping) {
+                    $transport = $rule->rule_transports_through
+                        ->where('name', $this->order->shipping)
+                        ->first();
+                    if (!$transport) {
+                        continue;
                     }
                 }
-                if ($flag == 0) {
+            }
+            if ($rule->limit_section) {
+                $shippingLimits = $this->shipping_limits;
+                $mustLimits = $rule->rule_limits->where('type', '0')->pluck('logistics_limit_id');
+                $noLimits = $rule->rule_limits->where('type', '1')->pluck('logistics_limit_id');
+                if ($mustLimits->count() > 0 and $shippingLimits->count() < 1) {
                     continue;
                 }
-            }
-
-            //是否有物流限制
-            if ($rule->limit_section && $this->shipping_limits) {
-                $shipping_limits = $this->shipping_limits->toArray();
-                $limits = $rule->rule_limits_through;
-                foreach ($limits as $limit) {
-                    if (in_array($limit->id, $shipping_limits)) {
-                        if ($limit->pivot->type == '1') {
-                            continue 2;
-                        }
+                foreach ($shippingLimits as $shippingLimit) {
+                    if (in_array($shippingLimit, $noLimits->toArray())) {
+                        continue 2;
                     }
                 }
             }
-            //物流查询链接
-            $trackingUrl = $rule->logistics->url;
-            $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
-
-            return $rule->logistics;
+            return $rule;
         }
-
         return false;
     }
 
     public function assignLogistics()
     {
         if ($this->canAssignLogistics()) {
-            //匹配物流方式
-            $weight = $this->weight; //包裹重量
-            $amount = $this->order->amount; //订单金额
-            $amountShipping = $this->order->amount_shipping; //订单运费
-            $celeAdmin = $this->order->cele_admin;
-            //是否通关
-            if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
-                $isClearance = 1;
-            } else {
-                $isClearance = 0;
-            }
-            $rules = RuleModel::
-            where(function ($query) use ($weight) {
-                $query->where('weight_from', '<=', $weight)
-                    ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
-            })->where(function ($query) use ($amount) {
-                $query->where('order_amount_from', '<=', $amount)
-                    ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
-            })->where(['is_clearance' => $isClearance])
-              ->whereHas('logistics', function($single){
-                $single->where('warehouse_id', $this->warehouse_id);
-              })
-                ->with('rule_catalogs_through')->with('rule_channels_through')->with('rule_countries_through')
-                ->with('rule_accounts_through')->with('rule_transports_through')->with('rule_limits_through')
-                ->get()
-                ->sortBy(function ($single, $key) {
-                    return $single->logistics ? $single->logistics->priority : 1;
-                });
-            foreach ($rules as $rule) {
-                //是否在物流方式产品分类中
-                if ($rule->catalog_section) {
-                    $catalogs = $rule->rule_catalogs_through;
-                    foreach ($this->items as $item) {
-                        $flag = 0;
-                        foreach ($catalogs as $catalog) {
-                            if ($catalog->id == $item->catalog_id) {
-                                $flag = 1;
-                                break;
-                            }
-                        }
-                        if ($flag == 0) {
-                            continue 2;
-                        }
-                    }
-                }
-                //是否在物流方式渠道中
-                if ($rule->channel_section) {
-                    $channels = $rule->rule_channels_through;
-                    $flag = 0;
-                    foreach ($channels as $channel) {
-                        if ($channel->id == $this->channel_id) {
-                            $flag = 1;
-                            break;
-                        }
-                    }
-                    if ($flag == 0) {
-                        continue;
-                    }
-                }
-                //是否在物流方式国家中
-                if ($rule->country_section) {
-                    $countries = $rule->rule_countries_through;
-                    $flag = 0;
-                    foreach ($countries as $country) {
-                        if ($country->code == $this->shipping_country) {
-                            $flag = 1;
-                            break;
-                        }
-                    }
-                    if ($flag == 0) {
-                        continue;
-                    }
-                }
-
-                //是否在物流方式账号中
-                if ($rule->account_section) {
-                    $accounts = $rule->rule_accounts_through;
-                    $flag = 0;
-                    foreach ($accounts as $account) {
-                        if ($account->id == $this->channel_account_id) {
-                            $flag = 1;
-                            break;
-                        }
-                    }
-                    if ($flag == 0) {
-                        continue;
-                    }
-                }
-
-                //是否在物流方式运输方式中
-                if ($rule->transport_section) {
-                    $transports = $rule->rule_transports_through;
-                    $flag = 0;
-                    foreach ($transports as $transport) {
-                        if (!$this->order->shipping || $transport->name == $this->order->shipping) {
-                            $flag = 1;
-                            break;
-                        }
-                    }
-                    if ($flag == 0) {
-                        continue;
-                    }
-                }
-
-                //是否有物流限制
-                if ($rule->limit_section && $this->shipping_limits) {
-                    $shipping_limits = $this->shipping_limits->toArray();
-                    $limits = $rule->rule_limits_through;
-                    foreach ($limits as $limit) {
-                        if (in_array($limit->id, $shipping_limits)) {
-                            if ($limit->pivot->type == '1') {
-                                continue 2;
-                            }
-                        }
-                    }
-                }
+            $rule = $this->realTimeLogistics();
+            if ($rule) {
                 //物流查询链接
                 $logistics = $rule->logistics;
                 $object = $logistics->logisticsChannels()->where('channel_id', $this->channel_id)->first();
@@ -1937,7 +1795,7 @@ class PackageModel extends BaseModel
                     }
                     break;
                 case '3':
-                     $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                    $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
                     $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
                     $tmp_package = $this->where('id', $content['package_id'])->first();
                     if (!$tmp_package) {
@@ -1945,16 +1803,17 @@ class PackageModel extends BaseModel
                         continue;
                     }
                     $model = $this->find($content['package_id']);
-                    if($model->is_oversea) {
+                    if ($model->is_oversea) {
                         $model->update(['tracking_no' => $content['tracking_no'], 'status' => 'SHIPPED']);
                         $model->order->update(['status' => 'SHIPPED']);
-                        foreach($model->items as $packageItem) {
-                            $packageItem->item->holdout($packageItem->warehouse_position_id, $packageItem->quantity, 'PACKAGE', $model->id);
+                        foreach ($model->items as $packageItem) {
+                            $packageItem->item->holdout($packageItem->warehouse_position_id, $packageItem->quantity,
+                                'PACKAGE', $model->id);
                         }
                     } else {
                         $model->update(['tracking_no' => $content['tracking_no']]);
                     }
-                    $model->eventLog('系统', '回传追踪号'.$content['tracking_no'], json_encode($model));
+                    $model->eventLog('系统', '回传追踪号' . $content['tracking_no'], json_encode($model));
                     break;
                 case '4':
                     $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));

@@ -58,19 +58,6 @@ class PurchaseOrderController extends Controller
             'mixedSearchFields' => $this->model->mixed_search,
         ];
 
-        // foreach($response['data'] as $key=>$vo){
-        //     $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
-        //     $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
-        //     $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
-        //     foreach($response['data'][$key]['purchase_items'] as $v){
-        //         $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
-        //         $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
-        //         $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
-        //         $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
-        //         $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
-        //     }
-        // }
-
         return view($this->viewPath . 'index', $response);
     }
 
@@ -1347,6 +1334,69 @@ class PurchaseOrderController extends Controller
         Mail::send('purchase.purchaseOrder.mailPrintButNotWarehouseIn', $data, function ($message) use ($data) {
             $message->to($data['email'], $data['name'])->subject('已打印入库单,未入库采购单明细');
         });
+    }
+
+    /**
+     * 上传excel表格修改采购单付款状态付款
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function excelPayOff()
+    {
+        $this->mainTitle = '采购单批量付款';
+        $this->mainIndex = route('purchaseOrder.excelPayOff');
+        $data = [];
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $data,
+        ];
+
+        return view($this->viewPath . 'payOffIndex', $response);
+    }
+
+    /**
+     * 上传excel表格修改采购单付款状态付款
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function excelPayOffExecute()
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '2048M');
+        $file = request()->file('upload');
+        $path = config('setting.excelPath');
+        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        $data_array = '';
+        $result = false;
+        Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
+            $reader->noHeading();
+            $data_array = $reader->all()->toArray();
+            foreach ($data_array[0] as $key => $value) {
+                $purchaseOrderModel = $this->model->find($value['1']);
+                if(count($purchaseOrderModel)){
+                    $purchaseOrderModel->update(['close_status'=>'1']);
+                    $result[$key]['status'] = '1';
+                    $result[$key]['id'] = $value['1'];
+                }else{
+                    $result[$key]['status'] = '2';
+                    $result[$key]['id'] = $value['1'];
+                }
+            }
+        },'gb2312'); 
+
+        $this->mainIndex = route('purchaseOrder.excelPayOff');
+        $this->mainTitle = '采购单批量付款';
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data'  => $result,
+        ];
+
+        return view($this->viewPath . 'payOffIndex', $response);
     }
 
 }

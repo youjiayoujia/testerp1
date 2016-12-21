@@ -102,11 +102,11 @@ class TestController extends Controller
          return 1;
      }
 
-    public function test2()
-    {
-        $package = PackageModel::find(3081);
-        $package->realTimeLogistics();
-    }
+//    public function test2()
+//    {
+//        $package = PackageModel::find(3081);
+//        $package->realTimeLogistics();
+//    }
 
     //模拟数据
     // public function test2()

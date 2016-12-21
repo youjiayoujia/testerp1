@@ -15,7 +15,7 @@
 </head>
 <body>
 <div id="main">
-    <div style="width:100%;height:70px;border-bottom:1px solid #000;">
+    <div style="width:100%;height:55px;border-bottom:1px solid #000;">
         <p style="width:100%;height:60%;font-size:14px;font-weight:bold;">
             Track No:{{$model->tracking_no}}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -25,33 +25,37 @@
             {{ $model->country ? $model->country->cn_name : '' }}
         </p>
         <p style="width:100%;height:40%;font-size:14px;text-align:right;">
-            '.$allParamArr['shipmentTitles'].'
+            @if(($model->logistics ? $model->logistics->logistics_code : '') == 524)
+                {{ 'eDS易递宝 - 香港渠道(平邮) - ebay' }}
+            @else
+                {{ '万邑邮选-香港渠道（平邮）-eBay IDSE' }}
+            @endif
         </p>
     </div>
-    <div style="width:100%;height:60px;border-bottom:1px solid #000;text-align:center;font-size:14px;">
+    <div style="width:100%;height:68px;border-bottom:1px solid #000;text-align:center;font-size:12px;">
         <div style="width:100%;height:2px;"></div>
         <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" />
         <br/>
         Intl Tracking No:{{$model->tracking_no}}
     </div>
     <div style="width:100%;height:180px;border-bottom:1px solid #000;">
-        <div style="width:100%;height:120px;overflow:hidden;font-size:12px;">
+        <div style="width:100%;height:110px;overflow:hidden;font-size:12px;">
             <span style="font-weight:bold;">To:</span>
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
-            {{ $model->shipping_city . ',' . $model->shipping_state }}<br/>'
-            {{ $model->shipping_zipcode . ',' . $model->shipping_phone }}<br/>
-            {{ $model->shipping_country }}
+            {{ $model->shipping_city . ' ' . $model->shipping_state }}<br/>
+            {{ $model->shipping_zipcode . ' ' . $model->shipping_phone }}<br/>
+            {{ $model->country ? $model->country->name : '' }}
         </div>
-        <div style="width:100%;height:60px;overflow:hidden;font-size:12px;">
-            <span style="font-weight:bold;font-size:12px;">From:</span>{{$model->getpostconfig ? $model->getpostconfig->consumer_from : ''}}
+        <div style="width:100%;height:70px;overflow:hidden;font-size:12px;">
+            <span style="font-weight:bold;font-size:12px;">From:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '')}}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span style="font-weight:bold;font-size:12px;">CN:</span>{{ $model->warehouse_id }}
+            <span style="font-weight:bold;font-size:12px;">CN:</span>10004110
             &nbsp;&nbsp;&nbsp;&nbsp;
             <span style="font-weight:bold;font-size:12px;">渠道:</span>{{ $model->logistics_id }}
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <span style="font-weight:bold;font-size:12px;">Tel:</span>{{$model->getpostconfig ? $model->getpostconfig->consumer_phone : ''}}<br/>
-            <span style="font-weight:bold;font-size:12px;">Add:</span>{{$model->getpostconfig ? $model->getpostconfig->consumer_back : ''}}
+            <span style="font-weight:bold;font-size:12px;">Tel:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '')}}<br/>
+            <span style="font-weight:bold;font-size:12px;">Add:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->unit) : '')}}
         </div>
     </div>
     <div style="width:100%;height:70px;">

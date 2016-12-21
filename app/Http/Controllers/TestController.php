@@ -95,24 +95,11 @@ class TestController extends Controller
 
      public function test2()
      {
-         $id = request()->get('id');
-         $package = PackageModel::where('id', $id)->first();
-         $package->status='PICKING';
-         //echo "<pre/>";var_dump($package->status);exit;
-         if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
-             $result = $package->placeLogistics('UPDATE');
-         } else {
-             $result = $package->placeLogistics();
+         $orders = OrderModel::all();
+         foreach ($orders as $order) {
+             $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
          }
-         echo "<pre/>";var_dump($result);exit;
-         while($i<100) {
-             $order = OrderModel::find(2628);
-         $job = new DoPackages($order);
-         $job = $job->onQueue('doPackages');
-         $this->dispatch($job);
-         $i++;
-         }
-        
+         return 1;
      }
 
     //模拟数据

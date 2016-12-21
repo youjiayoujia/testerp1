@@ -15,20 +15,24 @@
 </head>
 <body>
 <div id="main">
-    <div style="width:100%;height:70px;border-bottom:1px solid #000;">
+    <div style="width:100%;height:55px;border-bottom:1px solid #000;">
         <p style="width:100%;height:60%;font-size:14px;font-weight:bold;">
             Track No:{{$model->tracking_no}}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            '.$allParamArr['country_code'].'
+            {{ $model->country ? $model->country->code : '' }}
             &nbsp;&nbsp;
-            '.$allParamArr['country_cn'].'
+            {{ $model->country ? $model->country->cn_name : '' }}
         </p>
         <p style="width:100%;height:40%;font-size:14px;text-align:right;">
-            '.$allParamArr['shipmentTitles'].'
+            @if($model->logistics_code == 73)
+                eDS易递宝 - 香港渠道(平邮) - ebay
+                @else
+                万邑邮选-香港渠道（平邮）-eBay IDSE
+            @endif
         </p>
     </div>
-    <div style="width:100%;height:60px;border-bottom:1px solid #000;text-align:center;font-size:14px;">
+    <div style="width:100%;height:68px;border-bottom:1px solid #000;text-align:center;font-size:12px;">
         <div style="width:100%;height:2px;"></div>
         <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" />
         <br/>
@@ -44,21 +48,21 @@
             {{ $model->shipping_country }}
         </div>
         <div style="width:100%;height:60px;overflow:hidden;font-size:12px;">
-            <span style="font-weight:bold;font-size:12px;">From:</span>{{$model->getpostconfig ? $model->getpostconfig->consumer_from : ''}}
+            <span style="font-weight:bold;font-size:12px;">From:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '')}}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span style="font-weight:bold;font-size:12px;">CN:</span>'.$allParamArr['customer_code'][$allParamArr['ordersInfo']['orders_warehouse_id']].'
+            <span style="font-weight:bold;font-size:12px;">CN:</span>10004110
             &nbsp;&nbsp;&nbsp;&nbsp;
             <span style="font-weight:bold;font-size:12px;">渠道:</span>{{ $model->logistics_id }}
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <span style="font-weight:bold;font-size:12px;">Tel:</span>{{$model->getpostconfig ? $model->getpostconfig->consumer_phone : ''}}<br/>
-            <span style="font-weight:bold;font-size:12px;">Add:</span>{{$model->getpostconfig ? $model->getpostconfig->consumer_back : ''}}
+            <span style="font-weight:bold;font-size:12px;">Tel:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '')}}<br/>
+            <span style="font-weight:bold;font-size:12px;">Add:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->unit) : '')}}
         </div>
     </div>
     <div style="width:100%;height:70px;">
         <p style="width:50%;height:100%;float:left;text-align:center;font-size:12px;">
-            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" />
+            <img src="{{ route('barcodeGen', ['content' => $model->id]) }}" />
             <br/>
-            {{ $model->order ? $model->order->ordernum : '' }}
+            {{ $model->id}}
         </p>
         <p style="width:50%;height:100%;float:left;">
             {{ $model->decleared_cname }}

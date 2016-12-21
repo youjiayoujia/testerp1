@@ -66,6 +66,8 @@ use App\Jobs\DoPackages;
 use Crypt;
 use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
+use App\Jobs\MatchPaypal as MatchPaypalJob ;
+
 
 class TestController extends Controller
 {
@@ -614,7 +616,10 @@ class TestController extends Controller
         $id = request()->get('id');
         $orders = OrderModel::where('id', $id)->get();
         foreach ($orders as $order) {
-            $paypals = $order->channelAccount->paypal;
+            $job = new MatchPaypalJob($order);
+            $job = $job->onQueue('MatchPaypal');
+            $this->dispatch($job);
+            /*$paypals = $order->channelAccount->paypal;
             foreach ($paypals as $paypal) {
                 $api = new  PaypalApi($paypal);
                 $result = $api->apiRequest('gettransactionDetails', $order->transaction_number);
@@ -625,7 +630,7 @@ class TestController extends Controller
                     $tInfo = $transactionInfo;
 
                 }
-            }
+            }*/
 
         }
     }

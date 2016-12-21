@@ -20,9 +20,9 @@
             Track No:{{$model->tracking_no}}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            '.$allParamArr['country_code'].'
+            {{ $model->country ? $model->country->code : '' }}
             &nbsp;&nbsp;
-            '.$allParamArr['country_cn'].'
+            {{ $model->country ? $model->country->cn_name : '' }}
         </p>
         <p style="width:100%;height:40%;font-size:14px;text-align:right;">
             '.$allParamArr['shipmentTitles'].'
@@ -46,7 +46,7 @@
         <div style="width:100%;height:60px;overflow:hidden;font-size:12px;">
             <span style="font-weight:bold;font-size:12px;">From:</span>{{$model->getpostconfig ? $model->getpostconfig->consumer_from : ''}}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span style="font-weight:bold;font-size:12px;">CN:</span>'.$allParamArr['customer_code'][$allParamArr['ordersInfo']['orders_warehouse_id']].'
+            <span style="font-weight:bold;font-size:12px;">CN:</span>{{ $model->warehouse_id }}
             &nbsp;&nbsp;&nbsp;&nbsp;
             <span style="font-weight:bold;font-size:12px;">渠道:</span>{{ $model->logistics_id }}
             &nbsp;&nbsp;&nbsp;&nbsp;
@@ -56,13 +56,13 @@
     </div>
     <div style="width:100%;height:70px;">
         <p style="width:50%;height:100%;float:left;text-align:center;font-size:12px;">
-            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" />
+            <img src="{{ route('barcodeGen', ['content' => $model->id]) }}" />
             <br/>
-            {{ $model->order ? $model->order->ordernum : '' }}
+            {{ $model->id }}
         </p>
         <p style="width:50%;height:100%;float:left;">
-            {{ $model->decleared_cname }}
-            {{ $model->decleared_ename }}
+            {{ $model->getDeclaredInfo()['declared_cn'] }}
+            {{ $model->getDeclaredInfo()['declared_en'] }}
         </p>
     </div>
 </div>

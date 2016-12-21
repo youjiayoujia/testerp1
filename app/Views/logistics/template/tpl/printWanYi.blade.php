@@ -39,7 +39,7 @@
         Intl Tracking No:{{$model->tracking_no}}
     </div>
     <div style="width:100%;height:180px;border-bottom:1px solid #000;">
-        <div style="width:100%;height:110px;overflow:hidden;font-size:12px;">
+        <div style="width:100%;height:105px;overflow:hidden;font-size:12px;">
             <span style="font-weight:bold;">To:</span>
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
@@ -47,19 +47,19 @@
             {{ $model->shipping_zipcode . ' ' . $model->shipping_phone }}<br/>
             {{ $model->country ? $model->country->name : '' }}
         </div>
-        <div style="width:100%;height:70px;overflow:hidden;font-size:12px;">
+        <div style="width:100%;height:75px;overflow:hidden;font-size:12px;">
             <span style="font-weight:bold;font-size:12px;">From:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '')}}
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;
             <span style="font-weight:bold;font-size:12px;">CN:</span>10004110
-            &nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;
             <span style="font-weight:bold;font-size:12px;">渠道:</span>{{ $model->logistics_id }}
-            &nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;
             <span style="font-weight:bold;font-size:12px;">Tel:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->phone) : '')}}<br/>
             <span style="font-weight:bold;font-size:12px;">Add:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->unit) : '')}}
         </div>
     </div>
     <div style="width:100%;height:70px;">
-        <p style="width:50%;height:100%;float:left;text-align:center;font-size:12px;">
+        <p style="margin-top:2px;width:50%;height:100%;float:left;text-align:center;font-size:12px;">
             <img src="{{ route('barcodeGen', ['content' => $model->id]) }}" />
             <br/>
             {{ $model->id }}

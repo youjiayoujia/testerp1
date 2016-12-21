@@ -25,10 +25,10 @@
             {{ $model->country ? $model->country->cn_name : '' }}
         </p>
         <p style="width:100%;height:40%;font-size:14px;text-align:right;">
-            @if($model->logistics_code == 73)
-                eDS易递宝 - 香港渠道(平邮) - ebay
-                @else
-                万邑邮选-香港渠道（平邮）-eBay IDSE
+            @if(($model->logistics ? $model->logistics->logistics_code : '') == 524)
+                {{ 'eDS易递宝 - 香港渠道(平邮) - ebay' }}
+            @else
+                {{ '万邑邮选-香港渠道（平邮）-eBay IDSE' }}
             @endif
         </p>
     </div>
@@ -43,9 +43,9 @@
             <span style="font-weight:bold;">To:</span>
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
-            {{ $model->shipping_city . ',' . $model->shipping_state }}<br/>'
-            {{ $model->shipping_zipcode . ',' . $model->shipping_phone }}<br/>
-            {{ $model->shipping_country }}
+            {{ $model->shipping_city . ' ' . $model->shipping_state }}<br/>
+            {{ $model->shipping_zipcode . ' ' . $model->shipping_phone }}<br/>
+            {{ $model->country ? $model->country->name : '' }}
         </div>
         <div style="width:100%;height:75px;overflow:hidden;font-size:12px;">
             <span style="font-weight:bold;font-size:12px;">From:</span>{{($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->customer) : '')}}
@@ -62,11 +62,11 @@
         <p style="margin-top:2px;width:50%;height:100%;float:left;text-align:center;font-size:12px;">
             <img src="{{ route('barcodeGen', ['content' => $model->id]) }}" />
             <br/>
-            {{ $model->id}}
+            {{ $model->id }}
         </p>
         <p style="width:50%;height:100%;float:left;">
-            {{ $model->decleared_cname }}
-            {{ $model->decleared_ename }}
+            {{ $model->getDeclaredInfo()['declared_cn'] }}
+            {{ $model->getDeclaredInfo()['declared_en'] }}
         </p>
     </div>
 </div>

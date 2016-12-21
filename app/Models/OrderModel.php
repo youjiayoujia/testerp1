@@ -539,18 +539,22 @@ class OrderModel extends BaseModel
         foreach ($this->packages as $package) {
             switch ($package->status) {
                 case 'NEW':
+                    $package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($package);
                     Queue::pushOn('assignStocks', $job);
                     break;
                 case 'WAITASSIGN':
+                    $package->update(['queue_name' => 'assignLogistics']);
                     $job = new AssignLogistics($package);
                     Queue::pushOn('assignLogistics', $job);
                     break;
                 case 'ASSIGNED':
+                    $package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($package);
                     Queue::pushOn('placeLogistics', $job);
                     break;
                 case 'NEED':
+                    $package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($package);
                     Queue::pushOn('assignStocks', $job);
                     break;

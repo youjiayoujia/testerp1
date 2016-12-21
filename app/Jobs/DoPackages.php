@@ -54,6 +54,7 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                 } else {
                     $package = $this->order->createPackage();
                     if ($package) {
+                        $package->update(['queue_name' => 'assignStocks']);
                         $job = new AssignStocks($package);
                         $job->onQueue('assignStocks');
                         $this->dispatch($job);

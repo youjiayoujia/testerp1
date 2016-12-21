@@ -79,6 +79,7 @@ class PackageModel extends BaseModel
         'is_over',
         'lazada_package_id',
         'is_oversea',
+        'queue_name'
     ];
 
     public function getMixedSearchAttribute()

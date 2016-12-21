@@ -1264,12 +1264,9 @@ class PurchaseOrderController extends Controller
      */
     public function purchaseOrdersOut()
     {
-        $purchase_ids = request()->input('purchase_ids');
-        $product_id_arr = explode(',', $purchase_ids);
-
-        $purchaseOrder = PurchaseOrderModel::whereIn('id', $product_id_arr)->get();
+        $purchaseOrder = $this->autoList($this->model,$this->model->with('supplier', 'purchaseUser', 'warehouse', 'purchaseItem', 
+            'purchasePostage','purchaseItem.item', 'purchaseItem.item.product', 'purchaseItem.productItem'),$fields = ['*'], $pageSize = 10000);
         $rows = [];
-
         foreach ($purchaseOrder as $model) {
             $total_num = 0;
             foreach ($model->purchaseItem as $purchase_item) {

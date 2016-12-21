@@ -398,28 +398,10 @@
         });
 
         //采购单导出
-        /*$('#orderExcelOut').click(function () { 
-            var url = "{{route('purchaseOrder.purchaseOrdersOut')}}";
-            var checkbox = document.getElementsByName("tribute_id");
-            var purchase_ids = "";
-            for (var i = 0; i < checkbox.length; i++) {
-                if (!checkbox[i].checked)continue;
-                purchase_ids += checkbox[i].value + ",";
-            }
-            purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
-            location.href = "{{ route('purchaseOrder.purchaseOrdersOut') }}?purchase_ids=" + purchase_ids;
-        });*/
-
         $(document).ready(function(){
             $(document).on('click', '.download', function(){
-                var checkbox = document.getElementsByName("tribute_id");
-                var purchase_ids = "";
-                for (var i = 0; i < checkbox.length; i++) {
-                    if (!checkbox[i].checked)continue;
-                    purchase_ids += checkbox[i].value + ",";
-                }
-                purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
-                location.href="{{ route('purchaseOrder.purchaseOrdersOut')}}?purchase_ids="+purchase_ids;
+                subUrl = window.location.search;
+                location.href="{{ route('purchaseOrder.purchaseOrdersOut')}}"+subUrl;
             })
         })
 

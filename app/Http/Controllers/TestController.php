@@ -622,7 +622,7 @@ class TestController extends Controller
                     $currencyCode  = $tInfo['CURRENCYCODE'];
                     //把paypal的信息记录
 
-                    $is_exist = OrderPaypalDetailModel::where('order_id', $this->order->id)->first();
+                    $is_exist = OrderPaypalDetailModel::where('order_id',$order->id)->first();
                     if (empty($is_exist)) {
                         $add = [
                             'order_id' => $this->order->id,

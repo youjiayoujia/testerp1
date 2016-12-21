@@ -103,8 +103,9 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
                     $this->relation_id = $this->order->id;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'paypal匹配成功.';
+                    break;
                 }
-                break;
+
             }
         }
         if (!$is_paypals) { //说明对应的paypal 都没有找到信息

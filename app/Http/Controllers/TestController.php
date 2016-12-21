@@ -93,18 +93,27 @@ class TestController extends Controller
         dd($result);
     }
 
-    // public function test2()
-    // {
-    //     $i = 0;
-    //     while($i<100) {
-    //         $order = OrderModel::find(2628);
-    //     $job = new DoPackages($order);
-    //     $job = $job->onQueue('doPackages');
-    //     $this->dispatch($job);
-    //     $i++;
-    //     }
+     public function test2()
+     {
+         $id = request()->get('id');
+         $package = PackageModel::where('id', $id)->first();
+         $package->status='PICKING';
+         //echo "<pre/>";var_dump($package->status);exit;
+         if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+             $result = $package->placeLogistics('UPDATE');
+         } else {
+             $result = $package->placeLogistics();
+         }
+         echo "<pre/>";var_dump($result);exit;
+         while($i<100) {
+             $order = OrderModel::find(2628);
+         $job = new DoPackages($order);
+         $job = $job->onQueue('doPackages');
+         $this->dispatch($job);
+         $i++;
+         }
         
-    // }
+     }
 
     //模拟数据
     // public function test2()

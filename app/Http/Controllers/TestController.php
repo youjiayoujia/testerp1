@@ -144,7 +144,7 @@ class TestController extends Controller
 
     public function test3()
     {
-        $orders = OrderModel::where('channel_id', 4)->get();
+        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }
@@ -153,7 +153,7 @@ class TestController extends Controller
 
     public function test4()
     {
-        $orders = OrderModel::where('channel_id', 4)->get();
+        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
         foreach ($orders as $order) {
             $order->calculateOrderChannelFee();
         }

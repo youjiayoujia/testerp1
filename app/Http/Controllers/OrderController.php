@@ -158,11 +158,11 @@ class OrderController extends Controller
             $profit = 0;
             foreach ($this->allList($order)->get() as $value) {
                 $totalAmount += $value->amount * $value->rate;
-                $profit += $value->profit_rate;
+                $profit += $value->profit;
                 $totalPlatform += $value->channel_fee;
             }
             $totalAmount = sprintf("%.2f", $totalAmount);
-            $averageProfit = sprintf("%.2f", $profit / $this->allList($order)->count()) * 100;
+            $averageProfit = sprintf("%.2f", $profit / $totalAmount) * 100;
             $totalPlatform = sprintf("%.2f", $totalPlatform);
             $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
         }

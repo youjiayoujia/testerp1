@@ -1,6 +1,7 @@
 @extends('common.form')
 @section('formAction') {{ route('catalog.update', ['id' => $model->id]) }} @stop
 @section('formBody')
+<input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <div class="form-group">
         <label for="c_name">分类名称中文</label>
         <input class="form-control" id="c_name" placeholder="名称" name='c_name' value="{{$model->c_name}}">

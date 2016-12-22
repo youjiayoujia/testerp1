@@ -301,6 +301,8 @@ class DhlAdapter extends BasicAdapter
         $result = $this->postCurlHttpsData($url,$data);
         $result = json_decode($result);
         $status = $result->labelResponse->bd->responseStatus->code;//200时为成功
+        echo "<pre>";
+        print_r($result);
         if($status == '200'){
             $shipmentID = $result->labelResponse->bd->labels[0]->shipmentID;
 

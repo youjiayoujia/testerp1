@@ -865,28 +865,6 @@ class PackageModel extends BaseModel
         return $sum;
     }
 
-    public function oversea_assignStock()
-    {
-        $flag = false;
-        $arr = [];
-        foreach ($this->items as $key => $single) {
-            $stock = StockModel::where(['warehouse_id' => $this->warehouse_id, 'item_id' => $single->item_id])->first();
-            if (!$stock) {
-                return false;
-            }
-            if ($stock->available_quantity < $single->quantity) {
-                return false;
-            }
-            $arr[] = $stock->warehouse_position_id;
-        }
-        foreach ($this->items as $key => $single) {
-            $single->update(['warehouse_position_id' => $arr[$key]]);
-            $single->item->hold($arr[$key], $single->quantity, 'PACKAGE', $this->id);
-        }
-
-        return true;
-    }
-
     public function explodePackage()
     {
         $arr = $this->packageStockDiff($this->packageNeedArray());
@@ -1136,70 +1114,93 @@ class PackageModel extends BaseModel
             $arr[$single->code][$key]['is_oversea'] = $single->is_oversea;
             $arr[$single->code][$key]['code'] = $single->code;
         }
-        var_dump($arr);exit;
-        if (count($arr) > 1) {
-            $flag = false;
-            foreach ($arr as $code => $value) {
-                if (!$flag) {
-                    $warehouse = WarehouseModel::where('code', $code)->first();
-                    if (!$warehouse) {
-                        return false;
-                    }
-                    $this->update(['warehouse_id' => $warehouse->id]);
-                    foreach ($this->items as $single) {
-                        $single->forceDelete();
-                    }
-                    $model = $this->find($this->id);
-                    foreach ($value as $k => $v) {
-                        $model->items()->create($v);
-                    }
-                    if ($model->oversea_assignStock()) {
-                        $model->update(['status' => 'WAITASSIGN']);
-                        $job = new AssignLogistics($model);
-                        Queue::pushOn('assignLogistics', $job);
-                        $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
-                    } else {
-                        $model->update(['status' => 'NEED']);
-                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
-                    }
-                    $flag = true;
-                } else {
-                    $newPackage = $this->create($this->toarray());
-                    $warehouse = WarehouseModel::where('code', $code)->first();
-                    if (!$warehouse) {
-                        return false;
-                    }
-                    $newPackage->update(['warehouse_id' => $warehouse->id]);
-                    foreach ($value as $k => $v) {
-                        $newPackage->items()->create($v);
-                    }
-                    if ($newPackage->oversea_assignStock()) {
-                        $newPackage->update(['status' => 'WAITASSIGN']);
-                        $job = new AssignLogistics($newPackage);
-                        Queue::pushOn('assignLogistics', $job);
-                        $this->eventLog('队列', '海外仓包裹已匹配到库存', json_encode($newPackage));
-                    } else {
-                        $newPackage->update(['status' => 'NEED']);
-                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($newPackage));
-                    }
-                }
+        foreach ($arr as $code => $value) {
+            $newPackage = $this->create($this->toarray());
+            $warehouse = WarehouseModel::where('code', $code)->first();
+            if (!$warehouse) {
+                return false;
             }
-        } else {
-            foreach ($arr as $code => $value) {
-                $warehouse = WarehouseModel::where('code', $code)->first();
-                if (!$warehouse) {
-                    return false;
+            foreach ($value as $k => $v) {
+                $newPackage->items()->create($v);
+            }
+            $arr = '';
+            if($newPackage->items->count() == 1) {
+                $arr = $newPackage->oversea_setSinglePackageItem($code);
+            } elseif ($newPackage->items->count() > 1) {
+                $arr = $newPackage->oversea_setMultiPackageItem($code);
+            }
+            if($arr) {
+                $newPackage->oversea_createPackageDetail($arr);
+            } else {
+                $newPackage->update(['status' => 'NEED', 'queue_name' => '']);
+            }
+        }
+        $this->cancelPackage();
+    }
+
+    public function oversea_createPackageDetail($items)
+    {
+        foreach ($this->items as $packageItem) {
+            $packageItem->forceDelete();
+        }
+        $this->order->update(['status' => 'PACKED']);
+        $i = true;
+        foreach ($items as $warehouseId => $packageItems) {
+            if ($i) {
+                $i = false;
+                $weight = 0;
+                foreach ($packageItems as $key => $packageItem) {
+                    $newPackageItem = $this->items()->create($packageItem);
+                    $weight += $newPackageItem->item->weight * $newPackageItem->quantity;
+                    DB::beginTransaction();
+                    try {
+                        $newPackageItem->item->hold(
+                            $packageItem['warehouse_position_id'],
+                            $packageItem['quantity'],
+                            'PACKAGE',
+                            $newPackageItem->id);
+                    } catch (Exception $e) {
+                        DB::rollBack();
+                    }
+                    DB::commit();
                 }
-                $this->update(['warehouse_id' => $warehouse->id]);
-                $model = $this->find($this->id);
-                if ($model->oversea_assignStock()) {
-                    $model->update(['status' => 'WAITASSIGN']);
-                    $job = new AssignLogistics($model);
+                $this->update([
+                    'warehouse_id' => $warehouseId,
+                    'status' => 'WAITASSIGN',
+                    'weight' => $weight,
+                    'queue_name' => 'assignLogistics',
+                    'type' => $this->items()->count() > 1 ? 'MULTI' : ($this->items()->first()->quantity > 1 ? 'SINGLEMULTI' : 'SINGLE'),
+                ]);
+                $job = new AssignLogistics($this);
+                Queue::pushOn('assignLogistics', $job);
+            } else {
+                $newPackage = $this->create($this->toArray());
+                $weight = 0;
+                if ($newPackage) {
+                    foreach ($packageItems as $key => $packageItem) {
+                        $newPackageItem = $newPackage->items()->create($packageItem);
+                        $weight += $newPackageItem->item->weight * $newPackageItem->quantity;
+                        DB::beginTransaction();
+                        try {
+                            $newPackageItem->item->hold(
+                                $packageItem['warehouse_position_id'],
+                                $packageItem['quantity'],
+                                'PACKAGE',
+                                $newPackageItem->id);
+                        } catch (Exception $e) {
+                            DB::rollBack();
+                        }
+                        DB::commit();
+                    }
+                    $newPackage->update([
+                        'warehouse_id' => $warehouseId,
+                        'status' => 'WAITASSIGN',
+                        'weight' => $weight,
+                        'queue_name' => 'assignLogistics',
+                        'type' => $this->items()->count() > 1 ? 'MULTI' : ($this->items()->first()->quantity > 1 ? 'SINGLEMULTI' : 'SINGLE'),
+                    ]);
+                    $job = new AssignLogistics($newPackage);
                     Queue::pushOn('assignLogistics', $job);
-                    $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
-                } else {
-                    $model->update(['status' => 'NEED']);
-                    $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
                 }
             }
         }
@@ -1208,10 +1209,86 @@ class PackageModel extends BaseModel
     }
 
 
+    //设置单产品订单包裹产品
+    public function oversea_setSinglePackageItem($code)
+    {
+        $packageItem = [];
+        $originPackageItem = $this->items->first();
+        $quantity = $originPackageItem->quantity;
+        if (!$quantity) {
+            return false;
+        }
+        $stocks = $originPackageItem->item->oversea_assignStock($quantity, $code);
+        if ($stocks) {
+            foreach ($stocks as $warehouseId => $stock) {
+                foreach ($stock as $key => $value) {
+                    $packageItem[$warehouseId][$key] = $value;
+                    $packageItem[$warehouseId][$key]['order_item_id'] = $originPackageItem->order_item_id;
+                    $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                }
+            }
+        } else {
+            return false;
+        }
 
+        return $packageItem;
+    }
 
+    //设置多产品订单包裹产品
+    public function oversea_setMultiPackageItem($code)
+    {
+        $packageItem = [];
+        $stocks = [];
+        //根据仓库满足库存数量进行排序
+        $warehouses = [];
+        foreach ($this->items as $originPackageItem) {
+            $quantity = $originPackageItem->quantity;
+            if (!$quantity) {
+                continue;
+            }
+            $itemStocks = $originPackageItem->item->oversea_matchStock($quantity, $code);
+            if ($itemStocks) {
+                foreach ($itemStocks as $itemStock) {
+                    foreach ($itemStock as $warehouseId => $stock) {
+                        if (isset($warehouses[$warehouseId])) {
+                            $warehouses[$warehouseId] += 1;
+                        } else {
+                            $warehouses[$warehouseId] = 1;
+                        }
+                    }
+                }
+                $stocks[$originPackageItem->order_item_id] = $itemStocks;
+            } else {
+                return false;
+            }
+        }
+        krsort($warehouses);
+        //set package item
+        foreach ($stocks as $orderItemId => $itemStocks) {
+            foreach ($itemStocks as $type => $itemStock) {
+                if ($type == 'SINGLE') {
+                    $stock = collect($itemStock)->sortByDesc(function ($value, $key) use ($warehouses) {
+                        return $warehouses[$key];
+                    })->first();
+                    foreach ($stock as $key => $value) {
+                        $packageItem[$value['warehouse_id']][$key] = $value;
+                        $packageItem[$value['warehouse_id']][$key]['order_item_id'] = $orderItemId;
+                        $packageItem[$value['warehouse_id']][$key]['remark'] = 'REMARK';
+                    }
+                } else {
+                    foreach ($itemStock as $warehouseId => $warehouseStock) {
+                        foreach ($warehouseStock as $key => $value) {
+                            $packageItem[$warehouseId][$key] = $value;
+                            $packageItem[$warehouseId][$key]['order_item_id'] = $orderItemId;
+                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                        }
+                    }
+                }
+            }
+        }
 
-
+        return $packageItem;
+    }
     /*********************************************************************************/
 
     public function createPackageDetail($items)

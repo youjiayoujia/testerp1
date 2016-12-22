@@ -68,7 +68,10 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
                 $this->package->eventLog('队列', 'have no enough stocks or can\'t assign stocks.',
                     json_encode($this->package));
             }
+        } else {
+            $this->package->update(['queue_name' => '']);
         }
+
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('assignStocks');
     }

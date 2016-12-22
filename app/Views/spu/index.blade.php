@@ -71,8 +71,12 @@
                         <h4 class="modal-title" id="myModalLabel">
                            添加备注
                         </h4>
-                     </div>  
-                     <div><input type="text" value='' name='remark'></div>               
+                     </div> 
+                     <div class="modal-body">
+                        <textarea rows="3" cols="80" name='remark'></textarea>
+                         
+                     </div> 
+                                    
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default" 
                            data-dismiss="modal">关闭

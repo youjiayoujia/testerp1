@@ -72,6 +72,7 @@ class ShunfenghlAdapter extends BasicAdapter
         $amount = $amount>20?20:$amount;
         $proStr.='<Cargo ename="'.$products_declared_en.'" count="'.$count.'"  weight="'.$package->weight.'" amount="'.$amount.'" ></Cargo>';
 
+        $package->shipping_state = empty( $package->shipping_state)?$package->shipping_city:$package->shipping_state;
         $xmlStr ='';
         $xmlStr .= '<?xml version="1.0" encoding="UTF-8"?>
 		   		 <Request service="OrderService" lang="zh_CN">';

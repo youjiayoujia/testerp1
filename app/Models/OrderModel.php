@@ -822,7 +822,7 @@ class OrderModel extends BaseModel
         $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
-        $orderChannelFee = $this->calculateOrderChannelFee();
+        $orderChannelFee = $this->channel_fee;
         $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $orderChannelFee, 4);
         $orderProfitRate = $orderProfit / $orderAmount;
         $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);

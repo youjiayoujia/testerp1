@@ -93,14 +93,49 @@ class TestController extends Controller
         dd($result);
     }
 
-     public function test2()
-     {
-         $orders = OrderModel::all();
-         foreach ($orders as $order) {
-             $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-         }
-         return 1;
-     }
+    public function test1()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1470, 1660])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+    public function test2()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1800, 2883])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+    public function test3()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1660, 1800])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+    public function test4()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [674, 1470])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+
+
+//    public function test2()
+//    {
+//        $package = PackageModel::find(3081);
+//        $package->realTimeLogistics();
+//    }
 
     //模拟数据
     // public function test2()
@@ -176,16 +211,7 @@ class TestController extends Controller
             return false;
         }
     }
-    public function test3()
-    {
-        var_dump('123');
-        // $response = [
-        //     'metas' => $this->metas(__FUNCTION__),
-        // ];
-        // return view('test', $response);
-        $model = PackageModel::where('id', '<', 5);
-        return redirect(route('package.index', ['outer_model' => $model]));
-    }
+
     // public function test2()
     // {
     //     $package = PackageModel::find('17');
@@ -250,11 +276,7 @@ class TestController extends Controller
     //         // fbaStock::create($vals);
     //     // }exit;
     // }
-    public function test1()
-    {
-        var_dump('123');
-        exit;
-    }
+
     public function index()
     {
         echo "<pre>";

@@ -79,6 +79,7 @@ class PackageModel extends BaseModel
         'is_over',
         'lazada_package_id',
         'is_oversea',
+        'queue_name'
     ];
 
     public function getMixedSearchAttribute()
@@ -743,7 +744,11 @@ class PackageModel extends BaseModel
                                     break;
                                 }
                             }
-                            $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
+                            $this->update([
+                                'status' => 'WAITASSIGN',
+                                'warehouse_id' => $warehouse_id,
+                                'queue_name' => 'assignLogistics'
+                            ]);
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
                             $this->order->update(['status' => 'NEED']);
@@ -781,7 +786,11 @@ class PackageModel extends BaseModel
                                 break;
                             }
                         }
-                        $this->update(['status' => 'WAITASSIGN', 'warehouse_id' => $warehouse_id]);
+                        $this->update([
+                            'status' => 'WAITASSIGN',
+                            'warehouse_id' => $warehouse_id,
+                            'queue_name' => 'assignLogistics'
+                        ]);
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
                         $this->order->update(['status' => 'NEED']);
@@ -793,8 +802,9 @@ class PackageModel extends BaseModel
                         if ($arr) {
                             $this->createChildPackage($arr);
                         }
-                        return false;
                     }
+                    $this->update(['queue_name' => '']);
+                    return false;
                 }
             }
         }
@@ -1227,7 +1237,12 @@ class PackageModel extends BaseModel
                     DB::commit();
                 }
                 if (empty($oldWarehouseId)) {
-                    $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN', 'weight' => $weight]);
+                    $this->update([
+                        'warehouse_id' => $warehouseId,
+                        'status' => 'WAITASSIGN',
+                        'weight' => $weight,
+                        'queue_name' => 'assignLogistics'
+                    ]);
                     $job = new AssignLogistics($this);
                     Queue::pushOn('assignLogistics', $job);
                 } else {
@@ -1238,23 +1253,24 @@ class PackageModel extends BaseModel
                             'weight' => $weight,
                             'logistics_id' => '',
                             'logistics_order_number' => '',
-                            'tracking_no' => ''
+                            'tracking_no' => '',
+                            'queue_name' => 'assignLogistics'
                         ]);
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
                     } else {
                         if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                             if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                                $this->update(['status' => 'PROCESSING']);
+                                $this->update(['status' => 'PROCESSING', 'queue_name' => '']);
                                 continue;
                             }
                             if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
-                                $this->update(['status' => 'ASSIGNED']);
+                                $this->update(['status' => 'ASSIGNED', 'queue_name' => 'placeLogistics']);
                                 $job = new PlaceLogistics($this);
                                 Queue::pushOn('placeLogistics', $job);
                                 continue;
                             }
-                            $this->update(['status' => 'WAITASSIGN']);
+                            $this->update(['status' => 'WAITASSIGN', 'queue_name' => 'assignLogistics']);
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
                         } else {
@@ -1263,7 +1279,8 @@ class PackageModel extends BaseModel
                                 'weight' => $weight,
                                 'logistics_id' => '',
                                 'logistics_order_number' => '',
-                                'tracking_no' => ''
+                                'tracking_no' => '',
+                                'queue_name' => 'assignLogistics',
                             ]);
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
@@ -1303,31 +1320,37 @@ class PackageModel extends BaseModel
                                 'logistics_id' => '',
                                 'tracking_no' => '',
                                 'logistics_order_number' => '',
+                                'queue_name' => 'assignLogistics',
                             ]);
                             $job = new AssignLogistics($newPackage);
                             Queue::pushOn('assignLogistics', $job);
                         } else {
                             if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                 if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
-                                    $newPackage->update(['status' => 'PROCESSING']);
+                                    $newPackage->update(['status' => 'PROCESSING', 'queue_name' => '']);
                                     continue;
                                 }
                                 if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
-                                    $newPackage->update(['status' => 'ASSIGNED']);
+                                    $newPackage->update(['status' => 'ASSIGNED', 'queue_name' => 'placeLogistics']);
                                     $job = new PlaceLogistics($newPackage);
                                     Queue::pushOn('placeLogistics', $job);
                                     continue;
                                 }
-                                $newPackage->update(['status' => 'WAITASSIGN']);
+                                $newPackage->update(['status' => 'WAITASSIGN', 'queue_name' => 'assignLogistics']);
                                 $job = new AssignLogistics($newPackage);
                                 Queue::pushOn('assignLogistics', $job);
                             } else {
-                                $newPackage->update(['status' => 'WAITASSIGN', 'weight' => $weight]);
+                                $newPackage->update([
+                                    'status' => 'WAITASSIGN',
+                                    'weight' => $weight,
+                                    'queue_name' => 'assignLogistics'
+                                ]);
                                 $job = new AssignLogistics($newPackage);
                                 Queue::pushOn('assignLogistics', $job);
                             }
                         }
                     } else {
+                        $newPackage->update(['queue_name' => 'assignLogistics']);
                         $job = new AssignLogistics($newPackage);
                         Queue::pushOn('assignLogistics', $job);
                     }
@@ -1453,7 +1476,7 @@ class PackageModel extends BaseModel
         } else {
             $isClearance = 0;
         }
-        if ($this->warehouse) {
+        if ($this->warehouse()) {
             $rules = $this->warehouse->logisticsRules()
                 ->where(function ($query) use ($weight) {
                     $query->where('weight_from', '<=', $weight)
@@ -1465,12 +1488,12 @@ class PackageModel extends BaseModel
                 })
                 ->where(['is_clearance' => $isClearance])
                 ->with([
-                    'rule_catalogs_through',
-                    'rule_channels_through',
+                    'rule_catalogs',
+                    'rule_channels',
                     'rule_countries_through',
-                    'rule_accounts_through',
+                    'rule_accounts',
                     'rule_transports_through',
-                    'rule_limits_through'
+                    'rule_limits'
                 ])
                 ->get()
                 ->sortBy(function ($single, $key) {

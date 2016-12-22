@@ -44,9 +44,12 @@
 
 @section('tableBody')
     @foreach($data as $key=>$item)
-    	@foreach($warehouses as $warehouse)
+
+    	@foreach($warehouses as $key=>$warehouse)
 	        <tr>
-	            <td>{{$item->sku}}</td>
+                @if($key==0)
+                <td rowspan="4">{{$item->sku}}</td> 
+                @endif    
 	            <td>{{$warehouse->name}}</td>
 	            <td>{{$item->c_name}}</td>
 	            <td>{{$item->transit_quantity[$warehouse->id]['normal']}}</td>
@@ -58,6 +61,7 @@
 	            <td>{{$item->out_of_stock_time}}</td>
 	        </tr>
         @endforeach
+        
     @endforeach
 @stop
 

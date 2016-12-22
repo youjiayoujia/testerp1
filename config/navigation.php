@@ -314,6 +314,11 @@ return [
                     'url' => 'purchaseOrder.excelPayOff',
                     'icon' => '',
                 ],
+                [
+                    'name' => '采购单核销',
+                    'url' => 'purchaseOrder.writeOffIndex',
+                    'icon' => '',
+                ],
             ],
             '供应链' => [
                 [

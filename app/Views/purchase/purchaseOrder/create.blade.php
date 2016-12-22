@@ -95,7 +95,7 @@
 			        <label for="size">单价</label>
 			        <input class="form-control"  placeholder="单价" name='item[0][purchase_cost]' value="" title='0'>
 			    </div>
-				<button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
+				
 			</div>
 			<div class="panel-footer">
             	<div class="create" id="additem"><i class="glyphicon glyphicon-plus"></i></div>
@@ -175,3 +175,8 @@
 		});
 	</script>
 @stop
+<style type="text/css">
+    .bt_right{
+        margin-top: 22px;
+    }
+</style>

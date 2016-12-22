@@ -30,6 +30,28 @@ class RequireController extends Controller
     }
 
     /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $data = request()->all();
+        $chose_status = '';
+        if(array_key_exists('filters', $data)){
+            $chose_status = config('product.product_require.status')[substr($data['filters'],strrpos($data['filters'], '.')+1)];
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'chose_status' => $chose_status,
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 新建
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View

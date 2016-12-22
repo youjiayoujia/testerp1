@@ -40,6 +40,11 @@ return [
         'types'=>['WISH业务','仓位管理','速卖通业务','采购','美工','质检售后支持','亚马逊业务','产品编辑','价格问题'],
         'uploadPath' =>'uploads/sku/message'
     ],
+
+    //选款需求状态
+    'product_require'=>[
+        'status'=>['0'=>'未处理','1'=>'未找到','2'=>'已找到'],
+    ],
 	
 	//供应商支付类型
 	'product_supplier'=>[

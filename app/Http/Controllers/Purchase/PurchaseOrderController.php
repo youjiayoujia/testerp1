@@ -996,6 +996,48 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+     * 批量核销和删除核销
+     *
+     * @param none
+     * @return 1
+     *
+     */
+    public function batchConfirm()
+    {
+        $type = request()->input('type');
+        $purchase_ids = request()->input("purchase_ids");
+        $arr = explode(',', $purchase_ids);
+        
+        $itemModel = new ItemModel();
+        switch ($type) {
+            case 'batchConfirm':
+                foreach ($arr as $id) {
+                    $purchaseOrderConfirmModel = $this->purchaseOrderConfirm->find($id);
+                    $purchaseOrderConfirmModel->update(['status' => 2]);
+                    $purchaseOrderConfirmModel->purchaseOrder->update(['write_off' => 2, 'status' => 4]);
+                    foreach ($purchaseOrderConfirmModel->purchaseOrder->purchaseItem as $purchaseitemModel) {
+                        $purchaseitemModel->update(['status' => 5]);
+                        $purchaseitemModel->productItem->createOnePurchaseNeedData();
+                    }
+                }
+                break;
+
+            case 'batchDelete':
+                foreach ($arr as $id) {
+                    $purchaseOrderConfirmModel = $this->purchaseOrderConfirm->find($id);
+                    $purchaseOrderConfirmModel->update(['status' => 3]);
+                    foreach ($purchaseOrderConfirmModel->purchaseOrder->purchaseItem as $purchaseitemModel) {
+                        $purchaseitemModel->update(['write_off' => 0]);
+                        $purchaseitemModel->productItem->createOnePurchaseNeedData();
+                    }
+                }
+                break;
+        }
+
+        return 1;
+    }
+
+    /**
      * 采购单提示
      *
      * @param none
@@ -1413,6 +1455,7 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data'  => $this->autoList($this->purchaseOrderConfirm),
+            'mixedSearchFields' => $this->purchaseOrderConfirm->mixed_search,
         ];
 
         return view($this->viewPath . 'writeOffIndex', $response);

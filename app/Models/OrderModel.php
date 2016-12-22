@@ -711,7 +711,6 @@ class OrderModel extends BaseModel
             $order->update(['status' => 'PREPARED']);
         }
 
-        $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
         return $order;
     }
 

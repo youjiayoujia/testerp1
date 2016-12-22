@@ -34,84 +34,23 @@ class SpuController extends Controller
      */
     public function index()
     {
-        /*$model = new SpuModel();
-        $model->test1();exit;
-        $arr = array();
-        $arr['c_name'] = '绒面一字扣防水台高跟鞋【白】【38码】';
-        $arr['sku'] = 'SS4733A1';
-        $arr['purchase_price'] = '261';
-        $arr['supplier_id'] = '10001';
-        $arr['purchase_url'] = 'http://www.ebay.com/itm/ws/eBayISAPI.dll?ViewItem&item=400386085083';
-        $arr['dev_name'] = '曾杨顺';
-        $arr['notify'] = '';
-        $arr['spu'] = '12';
-        $arr['model'] = '122';
-        $arr['purchase_name'] = '张金平';
-        $arr['status'] = 'cleaning';
-        $arr['carriage_limit_arr'] = 'a:2:{i:0;i:1;i:1;i:4;}';
-        $arr['package_limit_arr'] = 'a:0:{}';
-        $arr['warehouse_id'] = '';
-        $arr['type'] = 'edit';
-        $url="http://www.yjerp.com/api/skuHandleApi";
-        $c = curl_init(); 
-        curl_setopt($c, CURLOPT_URL, $url); 
-        curl_setopt($c, CURLOPT_POST, 1);
-        curl_setopt($c, CURLOPT_POSTFIELDS, $arr);
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
-        $buf = curl_exec($c);
-        print_r($buf);exit;
-        $old_data = [];
-        $old_data['sku'] = 'HJ1019W4';
-        $old_data['name'] = '';
-        $old_data['c_name'] = 'eee';
-        $old_data['catalog_id'] = '';
-        $old_data['declared_en'] = 'Eyeshadow';
-        $old_data['declared_cn'] = '眼影';
-        $old_data['declared_value'] = '2.00';
-        $old_data['purchase_price'] = '2.5';
-        $old_data['weight'] = '0.090';
-        $old_data['package_weight'] = '0';
-        $old_data['supplier_id'] = '13700';
-        $old_data['quality_standard'] = '1.检查标签sku是否正确; 2.检查跟上一批次是否一致; 3.外观污染破损检查';
-        $old_data['warehouse_id'] = '1';
-        $old_data['purchase_url'] = 'http://detail.1688.com/offer/37363914469.html?spm=0.0.0.0.Z9JcM6';
-        $old_data['product_require_id'] = '';
-        $old_data['warehouse_position'] = 'B13-01-03';
-        $old_data['notify'] = '';
-        $old_data['unit'] = '千克/件';
-        $old_data['status'] = 'stopping';
-        $old_data['type'] = 'add';
-        $arr = [];
-        $arr[] = '2';
-        $arr[] = '3';
-        $brr = [];
-        $brr[] = '2';
-        $brr[] = '4';
-        $old_data['carriage_limit_arr'] = serialize($arr);
-        $old_data['package_limit_arr'] = serialize($brr);
-
-        //$old_data = json_encode($old_data);
-       //echo '<pre>';
-//print_r($old_data);exit; 
-        $url="http://v3.erp.moonarstore.com/api/skuHandleApi";
-        $c = curl_init(); 
-        curl_setopt($c, CURLOPT_URL, $url); 
-        curl_setopt($c, CURLOPT_POST, 1);
-        curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
-        $buf = curl_exec($c);
-        print_r($buf);exit;
-        exit;*/
         request()->flash();
         foreach(config('spu.status') as $key=>$value){
         	$num_arr[$key] = $this->model->where('status',$key)->count();
+        }
+        $data = request()->all();
+        $chose_status = '';
+        $chose_num = 0;
+        if(array_key_exists('filters', $data)){
+            $chose_status = config('spu.status')[substr($data['filters'],strrpos($data['filters'], '.')+1)];
+            $chose_num = $num_arr[substr($data['filters'],strrpos($data['filters'], '.')+1)];
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model,$this->model->with('Purchase','editUser','imageEdit','Developer')),
             'num_arr' =>$num_arr,
+            'chose_status' => $chose_status,
+            'chose_num' => $chose_num,
             'users' => UserModel::all(),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
@@ -182,6 +121,8 @@ class SpuController extends Controller
     public function saveRemark()
     {
         $data = request()->all();
+        //echo '<pre>';
+        //print_r($data);exit;
         $model = $this->model->find($data['spu_id']);
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($model);

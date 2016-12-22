@@ -2,7 +2,7 @@
 @section('tableToolButtons')
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询当前状态
+            <i class="glyphicon glyphicon-filter"></i> @if($chose_status){{$chose_status}}（{{$chose_num}}）@else查询当前状态@endif
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
@@ -13,7 +13,7 @@
     </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
+    <th width=20><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> </th>
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
     <th>采购员</th>
@@ -71,8 +71,12 @@
                         <h4 class="modal-title" id="myModalLabel">
                            添加备注
                         </h4>
-                     </div>  
-                     <div><input type="text" value='' name='remark'></div>               
+                     </div> 
+                     <div class="modal-body">
+                        <textarea rows="3" cols="80" name='remark'></textarea>
+                         
+                     </div> 
+                                    
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default" 
                            data-dismiss="modal">关闭

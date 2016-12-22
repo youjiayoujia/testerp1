@@ -2190,9 +2190,8 @@ class EbayAdapter implements AdapterInterface
      */
     public function ebayOrderSendMessage($paramAry){
         $total = count($paramAry['itemids']);
-        $ItemIDXML = ($total == 1) ? "<ItemID>$paramAry[itemids][0]</ItemID>" : '' ;
+        $ItemIDXML = ($total == 1) ? '<ItemID>' .$paramAry['itemids'][0] . '</ItemID>' : '' ;
         $moreItem  = ($total > 1) ?  implode(',',$paramAry['itemids']) : '' ;
-
         $xml ='<WarningLevel>High</WarningLevel>
                ' . $ItemIDXML . '
               <MemberMessage>

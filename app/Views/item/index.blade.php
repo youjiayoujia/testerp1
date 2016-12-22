@@ -416,7 +416,7 @@
                             </div>
                             <br>
                             <div><textarea rows="3" cols="88" name='question_content'></textarea></div>
-                            <div><input type='file' name='uploadImage'></div>
+                            <div><input type='file' name='uploadImage'><span style="color:red">(文件为图片格式)</span></div>
                         </div>
 
                         <div class="modal-footer">

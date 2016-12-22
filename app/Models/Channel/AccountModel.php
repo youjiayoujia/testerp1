@@ -80,6 +80,10 @@ class AccountModel extends BaseModel
         return $this->belongsToMany('App\Models\PaypalsModel', 'channel_account_paypal',
             'channel_account_id', 'paypal_id');
     }
+    public function AutoReplyRules()
+    {
+        return $this->hasMany('App\Models\Message\AutoReplyRulesModel', 'channel_id', 'channel_id');
+    }
 
     public function getClearanceAttribute()
     {

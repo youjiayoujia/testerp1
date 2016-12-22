@@ -14,6 +14,7 @@ use Translation;
 use App\Models\Channel\AccountModel as Channel_Accounts;
 use App\Models\ChannelModel;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -306,6 +307,88 @@ class MessageModel extends BaseModel{
         return $attanchments;
     }
 
+    //获取用户所有提问内容
+    public function getUserMsgInfoAttribute(){
+        $content_string = false;
+        //dd($this->from_name);
+        $message_info = $this->ContentDecodeBase64;
+        if(! empty($message_info)){
+            foreach ($message_info as $key => $content){
+                switch ($key) {
+                    case 'aliexpress':
+                        foreach($content->result as $item){
+                            if($this->from_name == $item->senderName){
+                                $content_string .= $item->content;
+                            }
+                        }
+
+                        break;
+                    case 'wish':
+                       foreach ($content as $k => $item){
+                            if($item['Reply']['sender'] == 'user') {
+                                $content_string .= $item['Reply']['message'];
+                            }
+                        }
+                        break;
+                    default:
+                        $content_string = false;
+                }
+            }
+        }
+        return $content_string;
+    }
+
+    public function IsFristMsgForOrder(){
+        $message_info = $this->ContentDecodeBase64;
+        $result = false;
+        foreach ($message_info as $channel_name => $content){
+            switch ($channel_name){
+                case 'aliexpress':
+                    $content_group = Collection::make($content->result)->groupBy('senderName');
+                    if($content_group->count() == 1){ //只存在用户信息
+                        $result = true;
+                    } else {
+                        foreach ($content_group as $key => $item){
+                            if($key != $this->from_name){ //包含自动去信的第一个消息
+                                if($item->count() == 1){
+                                    $result = true;
+                                }
+                            }
+                        }
+
+                    }
+                    break;
+                case 'wish':
+                    $hasMerchant =  Collection::make($content)->flatten()->search('merchant');
+                    if(! $hasMerchant){
+                        $result = true;
+                    }
+                    break;
+
+                case 'ebay':
+
+                    break;
+                default:
+
+
+
+
+            }
+        }
+        return $result;
+    }
+
+    public function MsgOrderIsExpress(){
+        if($order = $this->relatedOrders()->first()){
+            $package = OrderModel::find($order->order_id)->packages()->first();
+            if(! empty($package)){
+                if($package->logistics->is_express == '0'){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public function getMessageInfoAttribute(){
         if($this->ContentDecodeBase64){
@@ -481,9 +564,7 @@ class MessageModel extends BaseModel{
                 break;
             case 'wish':
                  //wish交易号
-                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)
-                    ->where('channel_account_id',$this->account_id)
-                    ->first();
+                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)->first();
                 $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
                 break;
             case 'aliexpress':

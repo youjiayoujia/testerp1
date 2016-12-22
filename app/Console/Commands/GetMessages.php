@@ -6,6 +6,7 @@ use Channel;
 use Illuminate\Console\Command;
 use App\Models\Channel\AccountModel;
 use App\Models\Message\MessageModel;
+use App\Models\Message\AutoReplyRulesModel;
 use App\Models\Message\MessageAttachment;
 use Tool;
 
@@ -68,6 +69,7 @@ class GetMessages extends Command
                 $this->info( $account->account . '  start get messages.');
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
+                dd($channel);
                 //获取Message列表
                 $messageList = $channel->getMessages();
                 if(is_array($messageList)){
@@ -99,8 +101,24 @@ class GetMessages extends Command
                             }
 
                             !empty($message['channel_order_number']) ? $messageNew->channel_order_number=$message['channel_order_number'] : '';
-
                             $messageNew->save();
+
+
+                            /**
+                             * 程序根据消息条件自动回复信息
+                             *
+                             */
+
+                            //step1: 关联消息订单
+                            $messageNew->findOrderWithMessage();
+                            //strp2: 规则过滤 && 对符合规则的进行回复
+
+
+
+
+
+
+
                             $this->info('Message #' . $messageNew->message_id . ' Received.');
 
                             //附件写入
@@ -141,5 +159,10 @@ class GetMessages extends Command
             }
         }
         $this->info('finish.');
+    }
+
+    public function AutomaticCheck($message)
+    {
+
     }
 }

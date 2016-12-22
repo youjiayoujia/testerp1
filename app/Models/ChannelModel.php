@@ -47,4 +47,11 @@ class ChannelModel extends BaseModel
         return $this->hasMany('App\Models\Logistics\ChannelNameModel', 'channel_id', 'id');
     }
 
+    public function getAutoReplyChannel()
+    {
+        $drivers = ['wish', 'ebay', 'aliexpress'];
+        return $this->select(['id','name'])->whereIn('driver', $drivers)->take(3)->get();
+
+    }
+
 }

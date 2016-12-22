@@ -480,7 +480,7 @@ class ItemController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit'),$field = ['*'],$pageSize='10'),
+            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit')),
             'mixedSearchFields' => $this->model->mixed_search,
             'warehouses' => $this->warehouse->all(),
             'Compute_channels' => CatalogRatesModel::all(),

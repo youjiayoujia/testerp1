@@ -326,7 +326,7 @@ class DhlAdapter extends BasicAdapter
                 'result' =>$shipmentID //跟踪号
             ];
         }else{
-            if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
+            /*if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
                 $msg =  $result->labelResponse->bd->responseStatus->messageDetails;
@@ -342,7 +342,12 @@ class DhlAdapter extends BasicAdapter
                     'code' => 'error',
                     'result' => '获取追踪号失败'
                 ];
-            }
+            }*/
+            
+            $result =[
+                'code' => 'error',
+                'result' => '获取追踪号失败'
+            ];
 
         }
         return $result;

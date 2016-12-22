@@ -629,6 +629,39 @@ class ItemModel extends BaseModel
     }
 
     //分配库存
+    public function oversea_assignStock($quantity, $code)
+    {
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function ($query) use ($code){
+            return $query->warehouse->is_available == 1 && $query->warehouse->type == 'oversea' && $query->warehouse->code == $code;
+        });
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            $warehouseStocks = $stocks->groupBy('warehouse_id');
+            $otherStocks = $warehouseStocks
+                ->first(function ($key, $value) use ($quantity) {
+                    return $value->sum('available_quantity') >= $quantity ? $value : false;
+                });
+            $gotStocks = $otherStocks ? $otherStocks : $stocks;
+            $result = [];
+            foreach ($gotStocks as $stock) {
+                if ($stock->available_quantity < $quantity) {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                    $warehouseStock[$stock->id]['code'] = $code;
+                    $warehouseStock[$stock->id]['is_oversea'] = 1;
+                    $quantity -= $stock->available_quantity;
+                } else {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                    $warehouseStock[$stock->id]['code'] = $code;
+                    $warehouseStock[$stock->id]['is_oversea'] = 1;
+                    break;
+                }
+            }
+            return $result;
+        }
+
+        return false;
+    }
+
+    //分配库存
     public function assignDefaultStock($quantity, $order_item_id)
     {
         $stocks = $this->stocks->groupBy('warehouse_id')->get($this->warehouse_id);
@@ -686,6 +719,59 @@ class ItemModel extends BaseModel
                         $quantity -= $stock->available_quantity;
                     } else {
                         $warehouseStock[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                        break;
+                    }
+                }
+                $result['MULTI'] = $warehouseStock;
+            }
+            return $result;
+        }
+        return false;
+    }
+
+    //匹配库存
+    public function oversea_matchStock($quantity, $code)
+    {
+        $result = [];
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function ($query) use ($code) {
+            return $query->warehouse->is_available == 1 && $query->warehouse->type == 'oversea' && $query->warehouse->code == $code;
+        });
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            //单仓库
+            foreach ($stocks->groupBy('warehouse_id') as $warehouseID => $warehouseStocks) {
+                if ($warehouseStocks->sum('available_quantity') >= $quantity) {
+                    $warehouseStock = [];
+                    $matchQuantity = $quantity;
+                    foreach ($warehouseStocks as $stock) {
+                        if ($stock->available_quantity < $matchQuantity) {
+                            $warehouseStock[$stock->id] = $this->setStockData($stock);
+                            $warehouseStock[$stock->id]['code'] = $code;
+                            $warehouseStock[$stock->id]['is_oversea'] = 1;
+                            $matchQuantity -= $stock->available_quantity;
+                        } else {
+                            $warehouseStock[$stock->id] = $this->setStockData($stock, $matchQuantity);
+                            $warehouseStock[$stock->id]['code'] = $code;
+                            $warehouseStock[$stock->id]['is_oversea'] = 1;
+                            break;
+                        }
+                    }
+                    $result['SINGLE'][$warehouseID] = $warehouseStock;
+                    continue;
+                }
+            }
+            //多仓库
+            if (!$result) {
+                $warehouseStock = [];
+                foreach ($stocks as $stock) {
+                    if ($stock->available_quantity < $quantity) {
+                        $warehouseStock[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                        $warehouseStock[$stock->id]['code'] = $code;
+                        $quantity -= $stock->available_quantity;
+                        $warehouseStock[$stock->id]['is_oversea'] = 1;
+                    } else {
+                        $warehouseStock[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                        $warehouseStock[$stock->id]['code'] = $code;
+                        $warehouseStock[$stock->id]['is_oversea'] = 1;
                         break;
                     }
                 }

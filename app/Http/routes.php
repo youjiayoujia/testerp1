@@ -15,10 +15,10 @@
  * 注意a/b  b  a.b 这三部分的样式就OK了
  *
  */
-Route::get('test1', 'TestController@testYw');
+Route::get('test1', ['uses' => 'TestController@test1', 'as' => 'test1']);
 Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
-Route::get('test3', 'TestController@test3');
-Route::get('test2', 'TestController@test2');
+Route::get('test3', ['uses' => 'TestController@test3', 'as' => 'test3']);
+Route::get('test4', ['uses' => 'TestController@test4', 'as' => 'test4']);
 Route::get('test_3', 'TestController@test_3');
 Route::post('api/curlApiChangeWarehousePositon',
     ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);

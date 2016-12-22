@@ -15,14 +15,18 @@
  * 注意a/b  b  a.b 这三部分的样式就OK了
  *
  */
-Route::get('test1', 'TestController@testYw');
-Route::get('test3', 'TestController@test3');
+Route::get('test1', ['uses' => 'TestController@test1', 'as' => 'test1']);
+Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
+Route::get('test3', ['uses' => 'TestController@test3', 'as' => 'test3']);
+Route::get('test4', ['uses' => 'TestController@test4', 'as' => 'test4']);
 Route::get('test_3', 'TestController@test_3');
 Route::post('api/curlApiChangeWarehousePositon',
     ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
 Route::any('api/skuHandleApi', ['uses' => 'ItemController@skuHandleApi', 'as' => 'item.skuHandleApi']);
 Route::any('api/SyncSellmoreData',
     ['uses' => 'SyncSellmoreDataController@SyncSuppliersFromSell', 'as' => 'SyncSellmoreData']);
+Route::any('api/SyncWishyoutoken',
+    ['uses' => 'SyncWishyoutokenController@SyncSuppliersFromSell', 'as' => 'SyncWishyoutoken']);
 Route::any('api/skuSupplierApi', ['uses' => 'ItemController@skuSupplierApi', 'as' => 'item.skuSupplierApi']);
 
 // Authentication routes...
@@ -330,9 +334,15 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //缺货报表
     Route::get('purchaseOrder/outOfStock',
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
+    //表格修改付款状态界面
+    Route::get('purchaseOrder/excelPayOff',
+        ['uses' => 'Purchase\PurchaseOrderController@excelPayOff', 'as' => 'purchaseOrder.excelPayOff']);
+    //表格修改付款状态
+    Route::any('purchaseOrder/excelPayOffExecute',
+        ['uses' => 'Purchase\PurchaseOrderController@excelPayOffExecute', 'as' => 'purchaseOrder.excelPayOffExecute']);
+
     Route::get('purchaseOrder/sevenPurchaseSku',
         ['uses' => 'Purchase\PurchaseOrderController@sevenPurchaseSku', 'as' => 'purchase.sevenPurchaseSku']);
-
     Route::get('purchaseOrder/printButNotWarehouseIn',
         ['uses' => 'Purchase\PurchaseOrderController@printButNotWarehouseIn', 'as' => 'purchase.printButNotWarehouseIn']);
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
@@ -344,7 +354,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@payOrder', 'as' => 'payOrder']);
     Route::any('purchaseOrder/purchaseExmaine',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
-
+    //批量删除和核销
+    Route::any('purchaseOrder/batchConfirm',
+        ['uses' => 'Purchase\PurchaseOrderController@batchConfirm', 'as' => 'purchaseOrder.batchConfirm']);
     Route::any('purchaseList/export/{str}', ['uses' => 'Purchase\PurchaseListController@export', 'as' => 'purchaseList.export']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
@@ -382,9 +394,16 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
     Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
     Route::any('purchaseOrder/write_off/{id}', 'Purchase\PurchaseOrderController@write_off');
+    //采购单核销界面
+    Route::any('purchaseOrder/writeOffIndex',
+        ['uses' => 'Purchase\PurchaseOrderController@writeOffIndex', 'as' => 'purchaseOrder.writeOffIndex']);
     //采购单导出
     Route::any('purchaseOrder/purchaseOrdersOut',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
+    //采购单核销格式导出
+    Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
+    //采购单核销导入
+    Route::any('purchaseOrderConfirmCsvFormatExecute', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormatExecute', 'as' => 'purchaseOrderConfirmCsvFormatExecute']);
     
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');

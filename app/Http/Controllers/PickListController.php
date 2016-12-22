@@ -554,6 +554,8 @@ class PickListController extends Controller
                     $packageItem->update(['warehouse_position_id' => '']);
                 }
                 $package->update(['status' => 'NEED', 'picklist_id' => '']);
+                $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹未包装，点包装完成，包裹变缺货，重新进入缺货流程', json_encode($package));
+                $package->update(['queue_name' => 'assignStocks']);
                 $job = new AssignStocks($package);
                 $job = $job->onQueue('assignStocks');
                 $this->dispatch($job);
@@ -578,6 +580,7 @@ class PickListController extends Controller
         $order = $package->order;
         if($order->status == 'REVIEW') {
             $package->update(['status' => 'ERROR']);
+            $package->eventLog('系统', '包裹对应订单待审核,包装中包裹变异常', json_encode($package));
             return json_encode(false);
         }
         if($package) {
@@ -586,26 +589,25 @@ class PickListController extends Controller
             $order = $package->order;
             $package->status = 'PACKED';
             $package->save();
-            $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装', json_encode($package));
             $picklistItems = $package->picklistItems;
             foreach($picklistItems as $picklistItem) {
                 $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;
                 $picklistItem->save();
             }
-            $buf = 1;
-            foreach($order->packages as $childPackage) {
-                if($childPackage->status != 'PACKED') {
-                    $buf = 0;
-                }
-            }
-            if($buf) {
-                foreach($package->items as $packageItem) {
-                    $packageItem->orderItem->update(['status' => 'PACKED']);
-                }
-                $order->update(['status' => 'PACKED']);
-            }
             DB::beginTransaction();
             try {
+                $buf = 1;
+                foreach($order->packages as $childPackage) {
+                    if($childPackage->status != 'PACKED') {
+                        $buf = 0;
+                    }
+                }
+                if($buf) {
+                    foreach($package->items as $packageItem) {
+                        $packageItem->orderItem->update(['status' => 'PACKED']);
+                    }
+                    $order->update(['status' => 'PACKED']);
+                }
                 foreach($package->items as $packageItem) {
                     $flag = $packageItem->item->holdout($packageItem->warehouse_position_id,
                                                 $packageItem->quantity,
@@ -616,15 +618,16 @@ class PickListController extends Controller
                     }
                     $packageItem->orderItem->update(['status' => 'SHIPPED']);
                 }
+                $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装，库存数据已出库', json_encode($package));
             } catch (Exception $e) {
                 DB::rollback();
-                return json_encode('unhold');
+                return json_encode(false);
             }
             DB::commit();
-            return json_encode('1');
+            return json_encode(true);
         }
 
-        return json_encode('false');
+        return json_encode(false);
     }
 
     /**

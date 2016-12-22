@@ -79,7 +79,7 @@ class CoeAdapter extends BasicAdapter
         <logisticsEvent>
         <eventHeader>
             <eventType>LOGISTICS_PACKAGE_SEND</eventType>
-            <eventMessageId><![CDATA[" . $order->id . "-SLME-2016-COT-B76EFD991B19]]> </eventMessageId>
+            <eventMessageId><![CDATA[moonarstore" . $package->id . "-SLME-2016-COT-B76EFD991B19]]> </eventMessageId>
             <eventTime><![CDATA[" . date("Y-m-d H:i:s") . "]]></eventTime>
             <eventSource><![CDATA[SZE150401]]></eventSource>
             <eventTarget>COE</eventTarget>
@@ -87,7 +87,7 @@ class CoeAdapter extends BasicAdapter
         <eventBody>
             <orders>
                 <order>
-                    <referenceID>" . $order->id . "</referenceID>
+                    <referenceID>moonarstore" . $package->id . "</referenceID>
                     <paymentType>PP</paymentType>
 
                     <pcs>" . $totalCount . "</pcs>

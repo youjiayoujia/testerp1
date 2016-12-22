@@ -30,6 +30,7 @@ use App\Models\Message\ReplyModel;
 use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 use Logistics;
+
 class PackageController extends Controller
 {
     public function __construct(PackageModel $package)
@@ -52,22 +53,28 @@ class PackageController extends Controller
     {
         $len = 1000;
         $start = 0;
-        $packages = $this->model->where('status', 'NEW')->skip($start)->take($len)->get();
+        $packages = $this->model->where('status', 'NEW')->skip($start)->take($len)->get()->filter(function($single){
+            return $single->queue_name != 'assignStocks';
+        });
         $name = UserModel::find(request()->user()->id)->name;
         while ($packages->count()) {
             foreach ($packages as $package) {
+                $package->update(['queue_name' => 'assignStocks']);
                 $job = new AssignStocks($package);
                 $job->onQueue('assignStocks');
                 $this->dispatch($job);
                 $to = json_encode($package);
-                $this->eventLog($name, '包裹放匹配库存队列', $to, $to);
+                $this->eventLog($name, '包裹放匹配库存队列', $to);
             }
             $start += $len;
             unset($packages);
-            $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
+            $packages = $this->model->where('status', 'NEW')->skip($start)->take($len)->get()->filter(function($single){
+                return $single->queue_name != 'assignStocks';
+            });
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至assignStocks队列成功'));
     }
+
     /**
      * 列表
      *
@@ -173,7 +180,7 @@ class PackageController extends Controller
                 $buf[$key][1] = 0;
                 continue;
             }
-            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->code : '无匹配';
+            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->logistics->code : '无匹配';
             $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
         }
 
@@ -202,12 +209,12 @@ class PackageController extends Controller
     {
         $val = trim(request('val'));
         $model = LogisticsCatalogModel::where('name', $val)->first();
-        if(!$model) {
+        if (!$model) {
             return false;
         }
         $str = "<option value=''>物流方式</option>";
-        foreach($model->logisticses as $logistics) {
-            $str .= "<option value='".$logistics->id."'>".$logistics->code."</option>";
+        foreach ($model->logisticses as $logistics) {
+            $str .= "<option value='" . $logistics->id . "'>" . $logistics->code . "</option>";
         }
         return $str;
     }
@@ -284,8 +291,8 @@ class PackageController extends Controller
                 continue;
             }
             $logistics = LogisticsModel::find($id);
-            if($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
-                if($model->status == 'ASSIGNFAILED') {
+            if ($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
+                if ($model->status == 'ASSIGNFAILED') {
                     $model->update(['logistics_id' => $id, 'tracking_no' => '', 'status' => 'ASSIGNED']);
                 } else {
                     $model->update(['logistics_id' => $id, 'tracking_no' => '']);
@@ -380,16 +387,14 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEW')->count(),
-            'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function ($single) {
-                return $single->packages()->count() == 0;
-            })->count(),
+            'ordernum' => DB::table('orders')->leftJoin('packages', 'orders.id', '=', 'packages.order_id')->where('orders.status', 'PREPARED')->whereNULL('packages.order_id')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',
-                '1')->get()->filter(function ($single) {
-                return $single->order ? ($single->order->status != 'REVIEW' ? true : false) : false;
-            })->count(),
-            'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
+                '1')->whereHas('order', function($query){
+                    $query->where('status', '!=', 'REVIEW');
+                })->get()->count(),
+            'manualShip' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
             'singlePack' => PickListModel::where('type', 'SINGLE')->whereIn('status',
@@ -409,7 +414,9 @@ class PackageController extends Controller
 
     public function autoFailAssignLogistics()
     {
-        $packages = $this->model->where('status', 'ASSIGNFAILED')->get();
+        $packages = $this->model->where('status', 'ASSIGNFAILED')->get()->filter(function($single){
+            return $single->queue_name != 'assignLogistics';
+        });
         foreach ($packages as $package) {
             $job = new AssignLogistics($package);
             $job = $job->onQueue('assignLogistics');
@@ -421,14 +428,17 @@ class PackageController extends Controller
 
     public function processingAssignStocks()
     {
-        $packages = $this->model->where('status', 'NEED')->get();
+        $packages = $this->model->where('status', 'NEED')->get()->filter(function($single){
+            return $single->queue_name != 'assignStocks';
+        });
         foreach ($packages as $package) {
+            $package->update(['queue_name' => 'assignStocks']);
             $job = new AssignStocks($package);
             $job = $job->onQueue('assignStocks');
             $this->dispatch($job);
         }
 
-        return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count() . '个包裹放入队列'));
+        return redirect(route('package.flow'))->with('alert', $this->alert('success','包裹已放入队列'));
     }
 
     public function recycle()
@@ -442,7 +452,7 @@ class PackageController extends Controller
             Cache::put('package' . $model->id . 'logisticsId', $model->logistics_id, 10);
             Cache::put('package' . $model->id . 'trackingNo', $model->tracking_no, 10);
         }
-        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '0', 'tracking_no' => '0', 'is_auto' => '1']);
+        $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '', 'tracking_no' => '', 'is_auto' => '1']);
         $package = $this->model->find($id);
         $job = new AssignLogistics($package);
         $job = $job->onQueue('assignLogistics');
@@ -702,9 +712,11 @@ class PackageController extends Controller
         foreach ($buf as $key => $packageId) {
             $model = $this->model->find($packageId);
             if ($model) {
-                $job = new PlaceLogistics($model, 'UPDATE');
-                $job = $job->onQueue('placeLogistics');
-                $this->dispatch($job);
+                if($model->queue_name != 'placeLogistics') {
+                    $job = new PlaceLogistics($model, 'UPDATE');
+                    $job = $job->onQueue('placeLogistics');
+                    $this->dispatch($job);
+                }
             }
         }
 
@@ -929,6 +941,8 @@ class PackageController extends Controller
         $order = $package->order;
         if ($order->status == 'REVIEW') {
             $package->update(['status' => 'ERROR']);
+            $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹对应订单待审核,包装中包裹变异常',
+                json_encode($package));
             return json_encode(false);
         }
         $items = $package->items;
@@ -937,8 +951,9 @@ class PackageController extends Controller
         }
         $package->update(['status' => 'PACKED']);
         $picklistItems = $package->picklistItems;
-        foreach($picklistItems as $picklistItem) {
-            $picklistItem->packed_quantity += $package->items->where('item_id', $picklistItem->item_id)->first()->quantity;
+        foreach ($picklistItems as $picklistItem) {
+            $picklistItem->packed_quantity += $package->items->where('item_id',
+                $picklistItem->item_id)->first()->quantity;
             $picklistItem->save();
         }
         DB::beginTransaction();
@@ -952,10 +967,12 @@ class PackageController extends Controller
                     throw new Exception('包裹出库库存有问题');
                 }
                 $packageItem->orderItem->update(['status' => 'SHIPPED']);
+                $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹已包装，库存数据已出库',
+                    json_encode($package));
             }
         } catch (Exception $e) {
             DB::rollback();
-            return json_encode('unhold');
+            return json_encode(false);
         }
         DB::commit();
 
@@ -1018,11 +1035,13 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->where('status', 'WAITASSIGN')
-            ->where('is_auto', '1')
-            ->skip($start)->take($len)->get();
+            ->where(['status' => 'WAITASSIGN', 'is_auto' => '1'])
+            ->skip($start)->take($len)->get()->filter(function($single){
+                return $single->queue_name != 'assignLogistics';
+            });
         while ($packages->count()) {
             foreach ($packages as $package) {
+                $package->update(['queue_name' => 'assignLogistics']);
                 $job = new AssignLogistics($package);
                 $job = $job->onQueue('assignLogistics');
                 $this->dispatch($job);
@@ -1030,9 +1049,10 @@ class PackageController extends Controller
             $start += $len;
             unset($packages);
             $packages = $this->model
-                ->where('status', 'NEW')
-                ->where('is_auto', '1')
-                ->skip($start)->take($len)->get();
+                ->where(['status' => 'WAITASSIGN', 'is_auto' => '1'])
+                ->skip($start)->take($len)->get()->filter(function($single){
+                return $single->queue_name != 'assignLogistics';
+            });
         }
         return redirect(route('dashboard.index'))->with('alert',
             $this->alert('success', '添加至 [ASSIGN LOGISTICS] 队列成功'));
@@ -1049,11 +1069,14 @@ class PackageController extends Controller
         $packages = $this->model
             ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
             ->where('is_auto', '1')
-            ->skip($start)->take($len)->get();
+            ->skip($start)->take($len)->get()->filter(function($single){
+                return $single->queue_name != 'placeLogistics';
+            });
         $packageIds = [];
         while ($packages->count()) {
             foreach ($packages as $package) {
                 if ($package->order->status != 'REVIEW') {
+                    $package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($package);
                     $job = $job->onQueue('placeLogistics');
                     $this->dispatch($job);
@@ -1065,7 +1088,9 @@ class PackageController extends Controller
             $packages = $this->model
                 ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
                 ->where('is_auto', '1')
-                ->skip($start)->take($len)->get();
+                ->skip($start)->take($len)->get()->filter(function($single){
+                return $single->queue_name != 'placeLogistics';
+            });
         }
         return redirect(route('dashboard.index'))->with('alert',
             $this->alert('success', '包裹[' . implode(',', $packageIds) . ']添加至 [PLACE LOGISTICS] 队列成功'));

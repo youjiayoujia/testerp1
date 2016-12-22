@@ -11,6 +11,7 @@
 namespace App\Models;
 
 use Queue;
+use App\Jobs\DoPackages;
 use App\Jobs\AssignStocks;
 use App\Jobs\AssignLogistics;
 use App\Jobs\PlaceLogistics;
@@ -97,6 +98,7 @@ class OrderModel extends BaseModel
         'orders_expired_time',
         'created_at',
         'is_oversea',
+        'fee_amt',
     ];
 
     private $canPackageStatus = ['PREPARED'];
@@ -490,7 +492,13 @@ class OrderModel extends BaseModel
         $total = 0;
         foreach ($this->items as $item) {
             if ($item->item) {
-                $total += $item->item->purchase_price * $item->quantity;
+                if ($item->item->count() > 1) {
+                    if ($item->item->status != 'cleaning') {
+                        $total += $item->item->purchase_price * $item->quantity;
+                    }
+                } else {
+                    $total += $item->item->purchase_price * $item->quantity;
+                }
             }
         }
         return $total;
@@ -524,21 +532,29 @@ class OrderModel extends BaseModel
 
     public function packagesToQueue()
     {
+        if(!$this->packages->count()) {
+            $job = new DoPackages($this);
+            Queue::pushOn('doPackages', $job);
+        }
         foreach ($this->packages as $package) {
             switch ($package->status) {
                 case 'NEW':
+                    $package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($package);
                     Queue::pushOn('assignStocks', $job);
                     break;
                 case 'WAITASSIGN':
+                    $package->update(['queue_name' => 'assignLogistics']);
                     $job = new AssignLogistics($package);
                     Queue::pushOn('assignLogistics', $job);
                     break;
                 case 'ASSIGNED':
+                    $package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($package);
                     Queue::pushOn('placeLogistics', $job);
                     break;
                 case 'NEED':
+                    $package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($package);
                     Queue::pushOn('assignStocks', $job);
                     break;
@@ -651,25 +667,23 @@ class OrderModel extends BaseModel
         if ($currency) {
             $data['rate'] = $currency->rate;
         }
-
+        if ($data['shipping_country'] == 'PR') {
+            $data['shipping_country'] = 'US';
+        }
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {
-                $skuArr = explode('.', $orderItem['sku']);
-                if(count($skuArr) == 1) {
-                    $item = ItemModel::where('sku', $orderItem['sku'])->first();
-                    if ($item) {
-                        $orderItem['item_id'] = $item->id;
-                        $orderItem['item_status'] = $item->status;
-                    }
+                $item = ItemModel::where('sku', $orderItem['sku'])->first();
+                if ($item) {
+                    $orderItem['item_id'] = $item->id;
+                    $orderItem['item_status'] = $item->status;
                 } else {
-                    $item = ItemModel::where('sku', $skuArr[1])->first();
-                    if ($item) {
-                        $orderItem['item_id'] = $item->id;
-                        $orderItem['item_status'] = $item->status;
+                    $stock = StockModel::where('oversea_sku', $orderItem['sku'])->first();
+                    if($stock) {
+                        $orderItem['item_id'] = $stock->item->id;
+                        $orderItem['item_status'] = $stock->item->status;
                         $orderItem['is_oversea'] = 1;
-                        $orderItem['code'] = $skuArr[0];
-                        $orderItem['sku'] = $skuArr[1];
+                        $orderItem['code'] = $stock->warehouse->code;
                     }
                 }
             }
@@ -692,9 +706,6 @@ class OrderModel extends BaseModel
                 $order->update(['status' => 'REVIEW']);
                 break;
             }
-        }
-        if($order->items()->first()->is_oversea) {
-            $order->update(['is_oversea' => '1']);
         }
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
@@ -810,6 +821,22 @@ class OrderModel extends BaseModel
         return $orderProfitRate;
     }
 
+    //ebay成交费
+    public function getDealFeeAttribute()
+    {
+        $dealFee = 0;
+        if ($this->items) {
+            foreach ($this->items as $item) {
+                $rate = CurrencyModel::where('code', $item->currency)->first();
+                if ($rate) {
+                    $dealFee += $item->final_value_fee * $rate->rate;
+                }
+            }
+        }
+
+        return $dealFee;
+    }
+
     //计算平台费
     public function calculateOrderChannelFee()
     {
@@ -820,16 +847,14 @@ class OrderModel extends BaseModel
                 $sum = $sum * $this->rate;
                 break;
             case 'ebay':
-                $counterFee = 0;
-                if ($this->orderPaypal) {
-                    $rate = CurrencyModel::where('code', $this->orderPaypal->currencyCode)->first()->rate;
-                    $counterFee = $this->orderPaypal->feeAmt * $rate;
-                }
+                $counterFee = $this->fee_amt * $this->rate;
                 $dealFee = 0;
                 if ($this->items) {
                     foreach ($this->items as $item) {
-                        $rate = CurrencyModel::where('code', $item->currency)->first()->rate;
-                        $dealFee += $item->final_value_fee * $rate;
+                        $rate = CurrencyModel::where('code', $item->currency)->first();
+                        if ($rate) {
+                            $dealFee += $item->final_value_fee * $rate->rate;
+                        }
                     }
                 }
                 $sum = $counterFee + $dealFee;
@@ -837,8 +862,7 @@ class OrderModel extends BaseModel
             default:
                 foreach ($this->items as $item) {
                     if ($item->item and $item->item->catalog) {
-                        $channelRate = $item->item->catalog->channels->where('id',
-                            $this->channelAccount->catalog_rates_channel_id)->first();
+                        $channelRate = $item->item->catalog->channels->find($this->channelAccount->catalog_rates_channel_id);
                         if ($channelRate) {
                             $sum += ($item->price * $item->quantity) * ($channelRate->pivot->rate / 100) + $channelRate->pivot->flat_rate;
                             $sum = $sum * $this->rate;

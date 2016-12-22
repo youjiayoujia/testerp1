@@ -293,11 +293,13 @@ class ItemModel extends BaseModel
             $data[$warehouse_id]['normal'] = 0;
             $data[$warehouse_id]['special'] = 0;
             foreach ($purchaseItemCollection as $purchaseItem) {
-                if ($purchaseItem->purchaseOrder->status > 0 && $purchaseItem->purchaseOrder->status < 4) {
-                    if ($purchaseItem->purchaseOrder->type == 0) {
-                        $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
-                    } else {
-                        $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
+                if ($purchaseItem->status >= 0 && $purchaseItem->status < 4) {
+                    if ($purchaseItem->purchaseOrder->status >= 0 && $purchaseItem->purchaseOrder->status < 4) {
+                        if ($purchaseItem->purchaseOrder->type == 0) {
+                            $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
+                        } else {
+                            $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
+                        }
                     }
                 }
             }
@@ -314,7 +316,7 @@ class ItemModel extends BaseModel
         return $data;
     }
 
-    //欠货数量
+    //缺货数量
     public function getOutOfStockAttribute()
     {
         $item_id = $this->id;
@@ -355,7 +357,7 @@ class ItemModel extends BaseModel
     {
         $id = $this->id;
         $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
-            ->whereIn('packages.status', ['NEED'])
+            ->whereIn('packages.status', ['NEED',"TRACKINGFAILED","ASSIGNED","ASSIGNFAILED"])
             ->where('package_items.item_id', $id)
             ->first(['packages.created_at']);
 
@@ -507,8 +509,7 @@ class ItemModel extends BaseModel
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)),
                         3)
                 ]);
-                $this->createPurchaseNeedData([$this->id]);
-
+                $this->createOnePurchaseNeedData();
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -527,7 +528,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -545,7 +546,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -563,7 +564,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -585,7 +586,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
-            $this->createPurchaseNeedData([$this->id]);
+            $this->createOnePurchaseNeedData();
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -726,20 +727,15 @@ class ItemModel extends BaseModel
         //print_r($zaitu_num);exit;
 
         //缺货
-        $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-            orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="' . $this->id . '" ')[0]->num;
-        $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+        //$data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
+            //orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="' . $this->id . '" ')[0]->num;
+        $data['need_total_num'] = $this->out_of_stock?$this->out_of_stock:0;
 
         $data['zaitu_num'] = $zaitu_num;
         //实库存
         $data['all_quantity'] = $this->all_quantity;
         //可用库存
         $data['available_quantity'] = $this->available_quantity;
-        //虚库存
-        /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
-            $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',
-            $item->id)->sum('quantity') : 0;*/
-        //$xu_kucun = $data['all_quantity'] - $quantity;
         $xu_kucun = $this->available_quantity - $data['need_total_num'];
         //7天销量
         $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -879,7 +875,7 @@ class ItemModel extends BaseModel
         $data['user_id'] = $this->purchase_adminer ? $this->purchase_adminer : 0;
 
         $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
-            ->whereIn('packages.status', ['NEED'])
+            ->whereIn('packages.status', ['NEED',"TRACKINGFAILED","ASSIGNED","ASSIGNFAILED"])
             ->where('package_items.item_id', $this->id)
             ->first(['packages.created_at']);
 
@@ -895,7 +891,7 @@ class ItemModel extends BaseModel
         } else {
             PurchasesModel::create($data);
         }
-        
+
         return $data;
         
     }
@@ -1179,8 +1175,9 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url = "http://120.24.100.157:60/api/skuInfoApi.php";
-        $itemModel = $this->all();
-        //$itemModel = $this->where('sku','M001_black')->get();
+        //$itemModel = $this->all();
+        $itemModel = $this->where('purchase_adminer',null)->get();
+        
         foreach ($itemModel as $key => $model) {
             $old_data['sku'] = $model->sku;
             //print_r($old_data);exit;
@@ -1298,6 +1295,22 @@ class ItemModel extends BaseModel
                 $itemModel->update($old_data);
             }*/
 
+        }
+    }
+
+    public function updateCatalog()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $model = $this->where('is_available',1)->get();
+        //$model = $this->where('id','<','3333')->get();
+        foreach ($model as $key => $itemModel) {
+            $result = DB::select('select catalogs.id from catalogs,sku_catalog where catalogs.name = sku_catalog.catalog_enname and sku = "'.$itemModel->sku.'"');
+            if(count($result)){
+                //print_r($result);exit;
+                $itemModel->update(['catalog_id'=>$result[0]->id]);
+                $itemModel->product->update(['catalog_id'=>$result[0]->id]);
+            }
         }
     }
 

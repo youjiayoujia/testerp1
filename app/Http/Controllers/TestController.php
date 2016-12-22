@@ -58,8 +58,16 @@ use Illuminate\Support\Facades\Storage;
 use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
+use Queue;
+use App\Models\StockModel;
+use App\Jobs\AssignStocks;
+use App\Jobs\DoPackages;
+
 use Crypt;
+use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
+use App\Jobs\MatchPaypal as MatchPaypalJob ;
+
 
 class TestController extends Controller
 {
@@ -85,21 +93,95 @@ class TestController extends Controller
         dd($result);
     }
 
+     // public function test2()
+     // {
+     //     $orders = OrderModel::where('status', 'SHIPPED')->get();
+     //     foreach ($orders as $order) {
+     //         $order->calculateProfitProcess();
+     //     }
+     //     return 1;
+     // }
+
+    // public function test2()
+    // {
+    //     $order['channel_id'] = 2;
+    //     $order['channel_account_id'] = 1; 
+    //     $order['channel_ordernum'] = 12345632;
+    //     $order['status'] = 'PAID';
+    //     $order['currency'] = 'USD';
+    //     $order['shipping_country'] = 'US';
+    //     $order['items'][0]['quantity'] = 2;
+    //     $order['items'][0]['sku'] = 'USB030';
+    //     $order['items'][0]['channel_sku'] = '22222222';
+    //     $order['items'][1]['quantity'] = 3;
+    //     $order['items'][1]['sku'] = 'UKB032';
+    //     $order['items'][1]['channel_sku'] = '44444444';
+    //     $job = new InOrders($order);
+    //     $job = $job->onQueue('inOrders');
+    //     $this->dispatch($job);
+    //     var_dump('ok');
+    // }
+
     public function test2()
     {
-
-
-        $orders = OrderModel::all();
-        foreach ($orders as $order) {
-            $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-        }
-        return 'success';
-
-//        $data = Excel::load('d:/456.xls', function ($reader) {
-//            return $reader->all();
-//        });
-//        var_dump($data->toarray());
+        $package = PackageModel::find(3098);
+        $package->oversea_createPackageItems();
     }
+
+    // public function test2()
+    // {
+    //     $order = OrderModel::find(2834);
+    //     $order->createVirtualPackage();
+    // }
+    public function test1()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1470, 1660])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+    public function test3()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1660, 1800])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+    public function test4()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [674, 1470])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+
+
+//    public function test2()
+//    {
+//        $package = PackageModel::find(3081);
+//        $package->realTimeLogistics();
+//    }
+
+    //模拟数据
+    // public function test2()
+    // {
+    //     $user = factory(\App\Models\OrderModel::class,10)->create(['status' => 'PREPARED','customer_service' => '63', 'operator' => '195', 'payment' => 'MIXEDCARD', 'currency' => 'USD', 'rate' => '1'])
+    //     ->each(function($single){
+    //         $i = 0;
+    //         $range = mt_rand(1,3);
+    //         while($i<$range) {
+    //             $single->items()->save(factory(\App\Models\Order\ItemModel::class)->make(['currency' => 'USD', 'is_active' => '1', 'status' => 'NEW', 'item_status' => 'selling']));
+    //             $i++;
+    //         }
+            
+    //     });
+    // }
 //    public function test2()
 //    {
 //        foreach (\App\Models\Order\ItemModel::all() as $item) {
@@ -160,16 +242,7 @@ class TestController extends Controller
             return false;
         }
     }
-    public function test3()
-    {
-        var_dump('123');
-        // $response = [
-        //     'metas' => $this->metas(__FUNCTION__),
-        // ];
-        // return view('test', $response);
-        $model = PackageModel::where('id', '<', 5);
-        return redirect(route('package.index', ['outer_model' => $model]));
-    }
+
     // public function test2()
     // {
     //     $package = PackageModel::find('17');
@@ -234,11 +307,7 @@ class TestController extends Controller
     //         // fbaStock::create($vals);
     //     // }exit;
     // }
-    public function test1()
-    {
-        var_dump('123');
-        exit;
-    }
+
     public function index()
     {
         echo "<pre>";
@@ -593,68 +662,61 @@ class TestController extends Controller
     }
     public function testPaypal()
     {
-        $orders = OrderModel::where('id', 12851)->get();
+        $id = request()->get('id');
+        $orders = OrderModel::where('id', $id)->get();
         foreach ($orders as $order) {
             $is_paypals = false;
-            //$erp_country      = trim($order->shipping_country);
-            $erp_country_code = trim($order->shipping_country);
-            $erp_state = trim($order->shipping_state);
-            $erp_city = trim($order->shipping_city);
-            $erp_address = trim($order->shipping_address);
-            $erp_address_1 = trim($order->shipping_address1);
-            $erp_address = trim($erp_address . $erp_address_1);
-            $erp_address = str_replace(' ', '', $erp_address); //把地址信息中的空格都去掉
-            $erp_name = trim($order->shipping_firstname . $order->shipping_lastname);
-            $erp_zip = trim($order->shipping_zipcode);
-            $error = array();
             $paypals = $order->channelAccount->paypal;
             foreach ($paypals as $paypal) {
                 $api = new  PaypalApi($paypal);
                 $result = $api->apiRequest('gettransactionDetails', $order->transaction_number);
                 $transactionInfo = $api->httpResponse;
+                var_dump($transactionInfo);
+                var_dump($result);
                 if ($result && $transactionInfo != null && (strtoupper($transactionInfo ['ACK']) == 'SUCCESS' || strtoupper($transactionInfo ['ACK']) == 'SUCCESSWITHWARNING')) {
                     $is_paypals = true;
                     $tInfo = $transactionInfo;
-                    $paypal_account = isset($tInfo ['EMAIL']) ? $tInfo ['EMAIL'] : '';
+                    $paypal_account=isset($tInfo ['EMAIL'])?$tInfo ['EMAIL']:'';
                     $paypal_buyer_name = trim($tInfo ['SHIPTONAME']);
                     $paypal_country_code = trim($tInfo['SHIPTOCOUNTRYCODE']); //国家简称
                     $paypal_country = trim($tInfo['SHIPTOCOUNTRYNAME']); //国家
                     $paypal_city = trim($tInfo['SHIPTOCITY']);        //城市
                     $paypal_state = trim($tInfo['SHIPTOSTATE']);       //州
                     $paypal_street = trim($tInfo['SHIPTOSTREET']);      //街道1
-                    $paypal_street2 = trim($tInfo['SHIPTOSTREET2']);     //街道2
+                    $paypal_street2 = isset($tInfo['SHIPTOSTREET2'])?trim($tInfo['SHIPTOSTREET2']):'';     //街道2
                     $paypal_zip = trim($tInfo['SHIPTOZIP']);         //邮编
                     $paypal_phone = isset($tInfo['SHIPTOPHONENUM']) ? trim($tInfo['SHIPTOPHONENUM']) : '';    //电话
                     $paypalAddress = $paypal_street . ' ' . $paypal_street2 . ' ' . $paypal_city . ' ' . $paypal_state . ' ' . $paypal_country . '(' . $paypal_country_code . ') ' . $paypal_zip;
-                    if (strtoupper($erp_country_code) != strtoupper($paypal_country_code)) {
-                        $error[] = '国家不一致';
-                    }
+                    $feeAmt  = $tInfo['FEEAMT'];
+                    $currencyCode  = $tInfo['CURRENCYCODE'];
                     //把paypal的信息记录
-                    $is_exist = OrderPaypalDetailModel::where('order_id', $order->id)->first();
+
+                    $is_exist = OrderPaypalDetailModel::where('order_id',$order->id)->first();
                     if (empty($is_exist)) {
                         $add = [
-                            'order_id' => $order->id,
+                            'order_id' => $this->order->id,
+                            'paypal_id' =>$paypal->id,
                             'paypal_account' => $paypal_account,
-                            'paypal_buyer_name' => $paypal_buyer_name,
-                            'paypal_address' => $paypalAddress,
-                            'paypal_country' => $paypal_country_code
+                            'paypal_buyer_name'=>$paypal_buyer_name,
+                            'paypal_address'=>$paypalAddress,
+                            'paypal_country'=>$paypal_country_code,
+                            'feeAmt'=>$feeAmt,
+                            'currencyCode'=>$currencyCode
                         ];
                         OrderPaypalDetailModel::create($add);
                     }
                     if (!empty($error)) { //设置为匹配失败
-                        $order->update(['order_is_alert' => 2]);
-                        $order->remark('paypal匹配失败:' . implode(',', $error));
+                        $order->update(['order_is_alert'=>'1']);
+                        echo 'false';
                     } else { //设置为匹配成功
-                        $order->update(['order_is_alert' => 3]);
-                        $order->remark('paypal匹配成功');
-                        //remarks
+                        $order->update(['order_is_alert'=>'2','fee_amt'=>$feeAmt]);
+                        echo 'success';
                     }
-                    break;
                 }
             }
             if (!$is_paypals) { //说明对应的paypal 都没有找到信息
-                $order->update(['order_is_alert' => 2]);
-                $order->remark('paypal匹配失败:当前交易凭证在预设的PayPal组中，未查询到交易详情，请通过其它方式查询');
+                $order->update(['order_is_alert'=>'1']);
+                echo 'false2';
             }
         }
     }
@@ -1371,4 +1433,9 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
+
+
+
+
 }

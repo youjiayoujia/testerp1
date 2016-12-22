@@ -95,7 +95,7 @@ class TestController extends Controller
 
      public function test2()
      {
-         $orders = OrderModel::whereBetween('id', '>=', 1850)->get();
+         $orders = OrderModel::where('id', '>=', 1850)->get();
          foreach ($orders as $order) {
              $order->calculateProfitProcess();
          }

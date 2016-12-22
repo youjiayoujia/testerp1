@@ -857,87 +857,6 @@ class PackageModel extends BaseModel
         return $sum;
     }
 
-    public function oversea_createPackageItems()
-    {
-        $arr = [];
-        foreach ($this->items as $key => $single) {
-            $arr[$single->code][$key]['item_id'] = $single->item_id;
-            $arr[$single->code][$key]['quantity'] = $single->quantity;
-            $arr[$single->code][$key]['order_item_id'] = $single->order_item_id;
-            $arr[$single->code][$key]['remark'] = $single->remark;
-            $arr[$single->code][$key]['is_oversea'] = $single->is_oversea;
-            $arr[$single->code][$key]['code'] = $single->code;
-        }
-        if (count($arr) > 1) {
-            $flag = false;
-            foreach ($arr as $code => $value) {
-                if (!$flag) {
-                    $warehouse = WarehouseModel::where('code', $code)->first();
-                    if (!$warehouse) {
-                        return false;
-                    }
-                    $this->update(['warehouse_id' => $warehouse->id]);
-                    foreach ($this->items as $single) {
-                        $single->forceDelete();
-                    }
-                    $model = $this->find($this->id);
-                    foreach ($value as $k => $v) {
-                        $model->items()->create($v);
-                    }
-                    if ($model->oversea_assignStock()) {
-                        $model->update(['status' => 'WAITASSIGN']);
-                        $job = new AssignLogistics($model);
-                        Queue::pushOn('assignLogistics', $job);
-                        $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
-                    } else {
-                        $model->update(['status' => 'NEED']);
-                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
-                    }
-                    $flag = true;
-                } else {
-                    $newPackage = $this->create($this->toarray());
-                    $warehouse = WarehouseModel::where('code', $code)->first();
-                    if (!$warehouse) {
-                        return false;
-                    }
-                    $newPackage->update(['warehouse_id' => $warehouse->id]);
-                    foreach ($value as $k => $v) {
-                        $newPackage->items()->create($v);
-                    }
-                    if ($newPackage->oversea_assignStock()) {
-                        $newPackage->update(['status' => 'WAITASSIGN']);
-                        $job = new AssignLogistics($newPackage);
-                        Queue::pushOn('assignLogistics', $job);
-                        $this->eventLog('队列', '海外仓包裹已匹配到库存', json_encode($newPackage));
-                    } else {
-                        $newPackage->update(['status' => 'NEED']);
-                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($newPackage));
-                    }
-                }
-            }
-        } else {
-            foreach ($arr as $code => $value) {
-                $warehouse = WarehouseModel::where('code', $code)->first();
-                if (!$warehouse) {
-                    return false;
-                }
-                $this->update(['warehouse_id' => $warehouse->id]);
-                $model = $this->find($this->id);
-                if ($model->oversea_assignStock()) {
-                    $model->update(['status' => 'WAITASSIGN']);
-                    $job = new AssignLogistics($model);
-                    Queue::pushOn('assignLogistics', $job);
-                    $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
-                } else {
-                    $model->update(['status' => 'NEED']);
-                    $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
-                }
-            }
-        }
-
-        return true;
-    }
-
     public function oversea_assignStock()
     {
         $flag = false;
@@ -1196,6 +1115,96 @@ class PackageModel extends BaseModel
 
         return false;
     }
+
+    /******************************************************************************/
+    public function oversea_createPackageItems()
+    {
+        $arr = [];
+        foreach ($this->items as $key => $single) {
+            $arr[$single->code][$key]['item_id'] = $single->item_id;
+            $arr[$single->code][$key]['quantity'] = $single->quantity;
+            $arr[$single->code][$key]['order_item_id'] = $single->order_item_id;
+            $arr[$single->code][$key]['remark'] = $single->remark;
+            $arr[$single->code][$key]['is_oversea'] = $single->is_oversea;
+            $arr[$single->code][$key]['code'] = $single->code;
+        }
+        var_dump($arr);exit;
+        if (count($arr) > 1) {
+            $flag = false;
+            foreach ($arr as $code => $value) {
+                if (!$flag) {
+                    $warehouse = WarehouseModel::where('code', $code)->first();
+                    if (!$warehouse) {
+                        return false;
+                    }
+                    $this->update(['warehouse_id' => $warehouse->id]);
+                    foreach ($this->items as $single) {
+                        $single->forceDelete();
+                    }
+                    $model = $this->find($this->id);
+                    foreach ($value as $k => $v) {
+                        $model->items()->create($v);
+                    }
+                    if ($model->oversea_assignStock()) {
+                        $model->update(['status' => 'WAITASSIGN']);
+                        $job = new AssignLogistics($model);
+                        Queue::pushOn('assignLogistics', $job);
+                        $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
+                    } else {
+                        $model->update(['status' => 'NEED']);
+                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
+                    }
+                    $flag = true;
+                } else {
+                    $newPackage = $this->create($this->toarray());
+                    $warehouse = WarehouseModel::where('code', $code)->first();
+                    if (!$warehouse) {
+                        return false;
+                    }
+                    $newPackage->update(['warehouse_id' => $warehouse->id]);
+                    foreach ($value as $k => $v) {
+                        $newPackage->items()->create($v);
+                    }
+                    if ($newPackage->oversea_assignStock()) {
+                        $newPackage->update(['status' => 'WAITASSIGN']);
+                        $job = new AssignLogistics($newPackage);
+                        Queue::pushOn('assignLogistics', $job);
+                        $this->eventLog('队列', '海外仓包裹已匹配到库存', json_encode($newPackage));
+                    } else {
+                        $newPackage->update(['status' => 'NEED']);
+                        $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($newPackage));
+                    }
+                }
+            }
+        } else {
+            foreach ($arr as $code => $value) {
+                $warehouse = WarehouseModel::where('code', $code)->first();
+                if (!$warehouse) {
+                    return false;
+                }
+                $this->update(['warehouse_id' => $warehouse->id]);
+                $model = $this->find($this->id);
+                if ($model->oversea_assignStock()) {
+                    $model->update(['status' => 'WAITASSIGN']);
+                    $job = new AssignLogistics($model);
+                    Queue::pushOn('assignLogistics', $job);
+                    $this->eventLog('队列', '海外仓包裹以匹配到库存', json_encode($model));
+                } else {
+                    $model->update(['status' => 'NEED']);
+                    $this->eventLog('队列', '海外仓包裹未匹配到库存', json_encode($model));
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+
+
+
+
+    /*********************************************************************************/
 
     public function createPackageDetail($items)
     {

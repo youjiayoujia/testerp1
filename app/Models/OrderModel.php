@@ -670,25 +670,20 @@ class OrderModel extends BaseModel
         if ($data['shipping_country'] == 'PR') {
             $data['shipping_country'] = 'US';
         }
-
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {
-                $skuArr = explode('.', $orderItem['sku']);
-                if(count($skuArr) == 1) {
-                    $item = ItemModel::where('sku', $orderItem['sku'])->first();
-                    if ($item) {
-                        $orderItem['item_id'] = $item->id;
-                        $orderItem['item_status'] = $item->status;
-                    }
+                $item = ItemModel::where('sku', $orderItem['sku'])->first();
+                if ($item) {
+                    $orderItem['item_id'] = $item->id;
+                    $orderItem['item_status'] = $item->status;
                 } else {
-                    $item = ItemModel::where('sku', $skuArr[1])->first();
-                    if ($item) {
-                        $orderItem['item_id'] = $item->id;
-                        $orderItem['item_status'] = $item->status;
+                    $stock = StockModel::where('oversea_sku', $orderItem['sku'])->first();
+                    if($stock) {
+                        $orderItem['item_id'] = $stock->item->id;
+                        $orderItem['item_status'] = $stock->item->status;
                         $orderItem['is_oversea'] = 1;
-                        $orderItem['code'] = $skuArr[0];
-                        $orderItem['sku'] = $skuArr[1];
+                        $orderItem['code'] = $stock->warehouse->code;
                     }
                 }
             }
@@ -711,9 +706,6 @@ class OrderModel extends BaseModel
                 $order->update(['status' => 'REVIEW']);
                 break;
             }
-        }
-        if($order->items()->first()->is_oversea) {
-            $order->update(['is_oversea' => '1']);
         }
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);

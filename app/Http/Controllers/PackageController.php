@@ -387,9 +387,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEW')->count(),
-            'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function ($single) {
-                return $single->packages()->count() == 0;
-            })->count(),
+            'ordernum' => DB::table('orders')->leftJoin('packages', 'orders.id', '=', 'packages.order_id')->where('orders.status', 'PREPARED')->whereNULL('packages.order_id')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',

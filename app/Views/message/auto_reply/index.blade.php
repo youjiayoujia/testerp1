@@ -10,8 +10,8 @@
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th class="sort">ID</th>
-    <th>规则名称</th>
     <th>启用状态</th>
+    <th>规则名称</th>
     <th>渠道</th>
     <th>创建者</th>
     <th>创建时间</th>

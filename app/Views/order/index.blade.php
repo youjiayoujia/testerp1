@@ -734,7 +734,7 @@
 
                                         </div>
                                         <div class="form-group col-sm-2">
-                                            <label for="id" class="control-label">ItemID</label>
+                                            <label for="id" class="control-label">渠道ItemID</label>
                                         </div>
                                         <div class="form-group col-sm-2">
                                             <label for="sku" class="control-label">sku</label>
@@ -749,10 +749,10 @@
                                     @foreach($order->items as $item)
                                         <div class="row">
                                             <div class="form-group col-sm-1">
-                                                <input type="checkbox" name="item-ids[]" value="{{$item->id}}"/>
+                                                <input type="checkbox" name="item-ids[]" value="{{$item->orders_item_number}}"/>
                                             </div>
                                             <div class="form-group col-sm-2">
-                                                <label for="id" class="control-label">{{$item->item_id}}</label>
+                                                <label for="id" class="control-label">{{$item->orders_item_number}}</label>
                                             </div>
                                             <div class="form-group col-sm-2">
                                                 <label for="sku" class="control-label">{{$item->sku}}</label>

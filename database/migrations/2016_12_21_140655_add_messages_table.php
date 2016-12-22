@@ -14,7 +14,7 @@ class AddMessagesTable extends Migration
     {
         Schema::table('messages', function (Blueprint $table) {
             //
-            $table->integer('is_auto_reply')->default(0)->comment('是否为自动发件，0为否');
+            $table->integer('is_auto_reply')->default(0)->comment('0 未检查,1 自动发,2 无需自动发');
         });
     }
 

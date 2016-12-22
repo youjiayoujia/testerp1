@@ -108,6 +108,42 @@
         </div>
     </div>
 
+    <!--ebay-->
+    <div class="row">
+        <div class="form-group col-lg-1">
+            <select name="type_ebay_address" class="form-control">
+                <option value="OFF" {{$model->type_ebay_address=='OFF' ? 'selected' : ''}}> OFF </option>
+                <option value="ON" {{$model->type_ebay_address=='ON' ? 'selected' : ''}}> ON </option>
+            </select>
+        </div>
+        <div class="col-lg-10">
+            <code for="name" class="control-label">Ebay:客人要求更改地址的</code>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-1">
+            <select name="type_ebay_color" class="form-control">
+                <option value="OFF" {{$model->type_ebay_color=='OFF' ? 'selected' : ''}}> OFF </option>
+                <option value="ON" {{$model->type_ebay_color=='ON' ? 'selected' : ''}}> ON </option>
+            </select>
+        </div>
+        <div class="col-lg-10">
+            <code for="name" class="control-label">Ebay:客人要求选颜色的</code>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-1">
+            <select name="type_ebay_twenty_five_day" class="form-control">
+                <option value="OFF" {{$model->type_ebay_twenty_five_day=='OFF' ? 'selected' : ''}}> OFF </option>
+                <option value="ON" {{$model->type_ebay_twenty_five_day=='ON' ? 'selected' : ''}}> ON </option>
+            </select>
+        </div>
+        <div class="col-lg-10">
+            <code for="name" class="control-label">Ebay距离发货时间距离大于等于25天</code>
+        </div>
+    </div>
+    <!--ebay-->
+
     <div class="row">
         <div class="col-lg-10">
             <label class="control-label">消息模板</label>

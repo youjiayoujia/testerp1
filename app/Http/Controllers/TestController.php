@@ -669,27 +669,27 @@ class TestController extends Controller
 
     public function testAutoReply()
     {
-        $accounts = AccountModel::where('is_available','1')->where('channel_id',3)->get();
+        $accounts = AccountModel::where('is_available','1')->where('channel_id',4)->get();
         foreach($accounts as  $account){
-            if($account->id !=6)
+            if($account->id !=7)
                 continue;
             //获取此账号的自动规则
             $rules = $account->AutoReplyRules;
 
             $messages =MessageModel::where('account_id', $account->id)->orderBy('id', 'DESC')->get();
-
             foreach($messages as $message){
 
 
                 ////////测试块//////////
 
-                if($message->id != 621)
-                    continue;
+               /* if($message->id != 621)
+                    continue;*/
                 /////////测试块//////////
 
 
                 //step1: 关联消息订单
                 $message->findOrderWithMessage();
+                dd($message);
                 if(! $rules->isEmpty()){ //存在规则
                     $rule = $this->checkAutomaticReply($message, $rules);
                     dd($rule);

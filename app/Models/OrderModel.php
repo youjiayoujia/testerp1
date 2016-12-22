@@ -871,6 +871,7 @@ class OrderModel extends BaseModel
                 break;
         }
 
+        $this->update(['channel_fee' => $sum]);
         return $sum;
     }
 

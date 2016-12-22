@@ -22,7 +22,7 @@ class PurchaseOrderConfirmModel extends BaseModel
         ]
     ];
 
-    public $searchFields = ['id'=>'采购单id'];
+    public $searchFields = ['po_id'=>'采购单id'];
     /**
      * The attributes that are mass assignable.
      *
@@ -43,6 +43,13 @@ class PurchaseOrderConfirmModel extends BaseModel
     public function purchaseUser()
     {
         return $this->belongsTo('App\Models\UserModel', 'po_user');
+    }
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterSelects' => ['status'=>config('purchase.purchaseOrder.confirm_write_off')],
+        ];
     }
 
 }

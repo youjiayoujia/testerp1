@@ -1,6 +1,7 @@
 @extends('common.table')
 @section('tableToolButtons')
-
+    <button class="examine" value="batchConfirm">批量核销</button>
+    <button class="examine" value="batchDelete"><span style="color:red">批量删除</span></button>
     <div class="btn-group">
         <form method="POST" action="{{ route('purchaseOrderConfirmCsvFormatExecute') }}" enctype="multipart/form-data" id="add-lots-form">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -9,16 +10,17 @@
 
     </div>
     <div class="btn-group">
+        <a class="btn btn-success add-lots-of-purchase-confirm" href="javascript:void(0);">
+            <i class="glyphicon glyphicon-plus"></i> 导入数据
+        </a>
         <a href="javascript:" class="btn btn-warning download-csv">CSV格式
             <i class="glyphicon glyphicon-arrow-down"></i>
 
         </a>
-        <a class="btn btn-success add-lots-of-purchase-confirm" href="javascript:void(0);">
-            <i class="glyphicon glyphicon-plus"></i> 导入数据
-        </a>
     </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
+    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th class="sort" data-field="id">ID</th>
     <th>采购单</th>
     <th>核销状态</th>
@@ -35,6 +37,7 @@
 @section('tableBody')
     @foreach($data as $_data)
         <tr>
+            <td><input type="checkbox" name="tribute_id" value="{{$_data->id}}"></td>
             <td>{{$_data->id}}</td>
             <td>{{$_data->po_id}}</td>
             <td>
@@ -70,6 +73,44 @@
                 }
                 $('#add-lots-form').submit();
             });
+
+            //批量核销、删除
+            $('.examine').click(function(){
+                var url = "{{route('purchaseOrder.batchConfirm')}}";
+                var type = $(this).val();
+                if (confirm("确认"+$(this).text()+"?")) {
+                    var checkbox = document.getElementsByName("tribute_id");
+                    var purchase_ids = "";
+                    for (var i = 0; i < checkbox.length; i++) {
+                        if (!checkbox[i].checked)continue;
+                        purchase_ids += checkbox[i].value + ",";
+                    }
+                    purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
+
+                    $.ajax({
+                        url: url,
+                        data: {purchase_ids:purchase_ids,type:type},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    })
+                }
+            });
         });
+
+        //全选
+        function quanxuan() {
+            var collid = document.getElementById("checkall");
+            var coll = document.getElementsByName("tribute_id");
+            if (collid.checked) {
+                for (var i = 0; i < coll.length; i++)
+                    coll[i].checked = true;
+            } else {
+                for (var i = 0; i < coll.length; i++)
+                    coll[i].checked = false;
+            }
+        }
     </script>
 @stop

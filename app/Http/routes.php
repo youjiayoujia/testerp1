@@ -354,7 +354,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@payOrder', 'as' => 'payOrder']);
     Route::any('purchaseOrder/purchaseExmaine',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
-
+    //批量删除和核销
+    Route::any('purchaseOrder/batchConfirm',
+        ['uses' => 'Purchase\PurchaseOrderController@batchConfirm', 'as' => 'purchaseOrder.batchConfirm']);
     Route::any('purchaseList/export/{str}', ['uses' => 'Purchase\PurchaseListController@export', 'as' => 'purchaseList.export']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);

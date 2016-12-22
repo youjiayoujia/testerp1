@@ -182,6 +182,8 @@ class SpuController extends Controller
     public function saveRemark()
     {
         $data = request()->all();
+        //echo '<pre>';
+        //print_r($data);exit;
         $model = $this->model->find($data['spu_id']);
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($model);

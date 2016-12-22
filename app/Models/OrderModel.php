@@ -98,6 +98,7 @@ class OrderModel extends BaseModel
         'orders_expired_time',
         'created_at',
         'is_oversea',
+        'operator_id',
         'fee_amt',
     ];
 
@@ -686,6 +687,10 @@ class OrderModel extends BaseModel
                         $orderItem['code'] = $stock->warehouse->code;
                     }
                 }
+            }
+            if ($orderItem['channel_sku']) {
+                $channelSku = explode('*', $orderItem['channel_sku']);
+                $orderItem['operator_id'] = $channelSku[0];
             }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;

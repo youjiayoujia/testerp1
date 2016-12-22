@@ -835,8 +835,10 @@ class OrderModel extends BaseModel
         $dealFee = 0;
         if ($this->items) {
             foreach ($this->items as $item) {
-                $rate = CurrencyModel::where('code', $item->currency)->first()->rate;
-                $dealFee += $item->final_value_fee * $rate;
+                $rate = CurrencyModel::where('code', $item->currency)->first();
+                if ($rate) {
+                    $dealFee += $item->final_value_fee * $rate->rate;
+                }
             }
         }
 
@@ -857,8 +859,10 @@ class OrderModel extends BaseModel
                 $dealFee = 0;
                 if ($this->items) {
                     foreach ($this->items as $item) {
-                        $rate = CurrencyModel::where('code', $item->currency)->first()->rate;
-                        $dealFee += $item->final_value_fee * $rate;
+                        $rate = CurrencyModel::where('code', $item->currency)->first();
+                        if ($rate) {
+                            $dealFee += $item->final_value_fee * $rate->rate;
+                        }
                     }
                 }
                 $sum = $counterFee + $dealFee;

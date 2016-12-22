@@ -73,7 +73,7 @@
                         </h4>
                      </div> 
                      <div class="modal-body">
-                        <textarea rows="3" cols="90" name='remark'></textarea>
+                        <textarea rows="3" cols="80" name='remark'></textarea>
                          
                      </div> 
                                     

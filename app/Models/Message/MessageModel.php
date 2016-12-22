@@ -303,12 +303,12 @@ class MessageModel extends BaseModel{
         return $attanchments;
     }
 
-    public function getLogisticsUrlAttribute()
+/*    public function getLogisticsUrlAttribute()
     {
 
          LogisticChannel::where()->first();
 
-    }
+    }*/
 
 
     public function getMessageInfoAttribute(){

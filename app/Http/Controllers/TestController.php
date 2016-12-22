@@ -93,18 +93,49 @@ class TestController extends Controller
         dd($result);
     }
 
-    public function test1()
-    {
-        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1470, 1660])->get();
-        foreach ($orders as $order) {
-            $order->calculateProfitProcess();
-        }
-        return 1;
-    }
+     // public function test2()
+     // {
+     //     $orders = OrderModel::where('status', 'SHIPPED')->get();
+     //     foreach ($orders as $order) {
+     //         $order->calculateProfitProcess();
+     //     }
+     //     return 1;
+     // }
+
+    // public function test2()
+    // {
+    //     $order['channel_id'] = 2;
+    //     $order['channel_account_id'] = 1; 
+    //     $order['channel_ordernum'] = 12345632;
+    //     $order['status'] = 'PAID';
+    //     $order['currency'] = 'USD';
+    //     $order['shipping_country'] = 'US';
+    //     $order['items'][0]['quantity'] = 2;
+    //     $order['items'][0]['sku'] = 'USB030';
+    //     $order['items'][0]['channel_sku'] = '22222222';
+    //     $order['items'][1]['quantity'] = 3;
+    //     $order['items'][1]['sku'] = 'UKB032';
+    //     $order['items'][1]['channel_sku'] = '44444444';
+    //     $job = new InOrders($order);
+    //     $job = $job->onQueue('inOrders');
+    //     $this->dispatch($job);
+    //     var_dump('ok');
+    // }
 
     public function test2()
     {
-        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1800, 2883])->get();
+        $package = PackageModel::find(3098);
+        $package->oversea_createPackageItems();
+    }
+
+    // public function test2()
+    // {
+    //     $order = OrderModel::find(2834);
+    //     $order->createVirtualPackage();
+    // }
+    public function test1()
+    {
+        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1470, 1660])->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }

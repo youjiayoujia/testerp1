@@ -162,7 +162,7 @@ class OrderController extends Controller
                 $totalPlatform += $value->channel_fee;
             }
             $totalAmount = sprintf("%.2f", $totalAmount);
-            $averageProfit = sprintf("%.2f", $profit / $this->allList($order)->count());
+            $averageProfit = sprintf("%.2f", $profit / $this->allList($order)->count()) * 100;
             $totalPlatform = sprintf("%.2f", $totalPlatform);
             $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
         }

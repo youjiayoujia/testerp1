@@ -182,5 +182,10 @@ return [
         'shipping_country' => '收货国家',
         'assigner' => '客服名称',
         'messages.status' => '消息状态',
+        'spuMultiOption.en_description' => '英语',
+        'spuMultiOption.de_description' => '德语',
+        'spuMultiOption.fr_description' => '法语',
+        'spuMultiOption.it_description' => '意大利语',
+        'spuMultiOption.zh_description' => '中文',
     ],
 ];

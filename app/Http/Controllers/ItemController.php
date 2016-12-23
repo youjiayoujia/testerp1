@@ -484,6 +484,7 @@ class ItemController extends Controller
             'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit')),
             'mixedSearchFields' => $this->model->mixed_search,
             'warehouses' => $this->warehouse->all(),
+            'channels' => ChannelModel::all(),
             'Compute_channels' => CatalogRatesModel::all(),
 
         ];

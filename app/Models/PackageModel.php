@@ -1579,8 +1579,9 @@ class PackageModel extends BaseModel
                     'rule_channels',
                     'rule_countries_through',
                     'rule_accounts',
-                    'rule_transports',
-                    'rule_limits'
+                    'rule_transports_through',
+                    'rule_limits',
+                    'logistics.logisticsChannels'
                 ])
                 ->get()
                 ->sortBy(function ($single, $key) {

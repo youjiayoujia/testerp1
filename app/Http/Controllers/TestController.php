@@ -118,7 +118,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(3110);
+        $package = PackageModel::find(3112);
         $package->assignLogistics();
         var_dump('123');
     }

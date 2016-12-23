@@ -49,7 +49,7 @@ class ChannelModel extends BaseModel
 
     public function getAutoReplyChannel()
     {
-        $drivers = ['wish', 'ebay', 'aliexpress'];
+        $drivers = ['wish', 'aliexpress'];
         return $this->select(['id','name'])->whereIn('driver', $drivers)->take(3)->get();
 
     }

@@ -34,6 +34,9 @@ class AutoReplyRulesModel extends BaseModel
         'type_shipping_fifty_day',
         'type_within_tuotou',
         'channel_id',
+        'type_ebay_address',
+        'type_ebay_color',
+        'type_ebay_twenty_five_day',
     ];
 
     public $rules = [

@@ -109,7 +109,7 @@
     </div>
 
     <!--ebay-->
-    <div class="row">
+{{--    <div class="row">
         <div class="form-group col-lg-1">
             <select name="type_ebay_address" class="form-control">
                 <option value="OFF" {{$model->type_ebay_address=='OFF' ? 'selected' : ''}}> OFF </option>
@@ -141,7 +141,7 @@
         <div class="col-lg-10">
             <code for="name" class="control-label">Ebay距离发货时间距离大于等于25天</code>
         </div>
-    </div>
+    </div>--}}
     <!--ebay-->
 
     <div class="row">

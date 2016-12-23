@@ -233,4 +233,9 @@ class AccountModel extends BaseModel
         }
         return $image_domain;
     }
+
+    public function getAutoReplyRulesOn()
+    {
+        $this->AutoReplyRules()->where('status', 'ON')->get();
+    }
 }

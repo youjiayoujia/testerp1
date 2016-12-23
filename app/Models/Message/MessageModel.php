@@ -104,6 +104,20 @@ class MessageModel extends BaseModel{
         }
     }
 
+    public function getAutoReplyStatusAttribute()
+    {
+        if($this->is_auto_reply == 2){
+            $status = '未检查';
+        }else if($this->is_auto_reply == 0){
+            $status = '已检查';
+        } else if($this->is_auto_reply == 1){
+            $status = '已回复';
+        } else {
+            $status = '未知';
+        }
+        return $status;
+    }
+
     /**
      * 更多搜索
      * @return array
@@ -310,7 +324,6 @@ class MessageModel extends BaseModel{
     //获取用户所有提问内容
     public function getUserMsgInfoAttribute(){
         $content_string = false;
-        //dd($this->from_name);
         $message_info = $this->ContentDecodeBase64;
         if(! empty($message_info)){
             foreach ($message_info as $key => $content){
@@ -330,6 +343,8 @@ class MessageModel extends BaseModel{
                             }
                         }
                         break;
+          /*          case 'ebay':
+                        print_r($message_info);*/
                     default:
                         $content_string = false;
                 }
@@ -537,44 +552,57 @@ class MessageModel extends BaseModel{
     }
 
     public function findOrderWithMessage(){
-        $order_id = $this->getChannelMessageOrderId(); //根据平台参数获取关联订单号
-        if(!empty($order_id)){
-            //$order_obj = OrderModel::where('channel_ordernum','=',$order_id)->first();
-            if(!empty($order_id)){
+        $order_id = false;
+        switch ($this->getChannelDiver()){
+            case 'ebay':
+                /**
+                 * 由于ebay 的api 没有返回渠道订单号
+                 * 关联规则：渠道用户ID 和 渠道订单的ItemID 进行关联
+                 * 如果由多个情况 同时关联
+                 *
+                 */
+                if(! empty($this->channel_order_number) && ! empty($this->from_name)){
+                    $orders = OrderModel::where('by_id','=', $this->from_name)->get();
+                    if(! $orders->isEmpty()){
+                        $orderByUser = false;
+                        foreach ($orders as $order){
+                            $item = $order->items()->where('orders_item_number', '=', $this->channel_order_number)->first();
+                            if($item){
+                                $orderByUser[$item->order_id] = $item->order_id;
+                            }
+                        }
+                        $order_id = $orderByUser;
+                    }
+                }
+                break;
+            case 'wish':
+                //wish交易号
+                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)->first();
+                $order_id = empty($order_obj) ? false : $order_obj->id;   //根据 orders 表 交易号
+                break;
+            case 'aliexpress':
+                $order_id = !empty($this->Order->id) ? $this->Order->id : false;
+                break;
+            default:
+                $order_id = false;
+
+        }
+        if($order_id){
+            if($this->getChannelDiver() != 'ebay'){
                 if($this->relatedOrders()->create(['order_id' => $order_id])){
                     $this->related = 1;
                     $this->save();
                 }
-            }
-        }
-
-    }
-
-    public function getChannelMessageOrderId(){
-        $fields_ary = $this->MessageFieldsDecodeBase64;
-        switch ($this->getChannelDiver()){
-            case 'ebay':
-                $order_id = $fields_ary['ItemID'];
-                if(!empty($order_id)){
-                    $order_obj = OrderModel::where('transaction_number','=',$order_id)->first();
-                    $order_id = empty($order_obj) ? '' : $order_obj->id;
-                }else{
-                    $order_id = '';
+            } else {
+                foreach($order_id as $item){
+                    $this->relatedOrders()->create(['order_id' => $item]);
                 }
-                break;
-            case 'wish':
-                 //wish交易号
-                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)->first();
-                $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
-                break;
-            case 'aliexpress':
-                $order_id = !empty($this->Order->id) ? $this->Order->id : '';
-                break;
-            default:
-                $order_id = '';
+                $this->related = 1;
+                $this->save();
+            }
+
         }
 
-        return $order_id;
     }
 
     /**

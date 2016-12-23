@@ -669,9 +669,9 @@ class TestController extends Controller
 
     public function testAutoReply()
     {
-        $accounts = AccountModel::where('is_available','1')->where('channel_id',4)->get();
+        $accounts = AccountModel::where('is_available','1')->where('channel_id',3)->get();
         foreach($accounts as  $account){
-            if($account->id !=7)
+            if($account->id !=6)
                 continue;
             //获取此账号的自动规则
             $rules = $account->AutoReplyRules;
@@ -689,7 +689,6 @@ class TestController extends Controller
 
                 //step1: 关联消息订单
                 $message->findOrderWithMessage();
-                dd($message);
                 if(! $rules->isEmpty()){ //存在规则
                     $rule = $this->checkAutomaticReply($message, $rules);
                     dd($rule);
@@ -767,13 +766,11 @@ class TestController extends Controller
 
         $package = $this->basicVerification($message);
 
-        if(! $package){ //验证失败
+        if(! is_object($package)){ //验证失败
             return $result;
         }
-
         $send_time = Carbon::parse($message->date);
         $shipped_at = Carbon::parse($package->shipped_at);
-
         $diff_day = $send_time->diffInDays($shipped_at);  // 相差天数
 
         foreach($rules as $rule){
@@ -792,7 +789,7 @@ class TestController extends Controller
                             $check_wish = false;
                             foreach (explode(',', $rule->message_keywords) as $keyword){
                                 if(! strstr($message->UserMsgInfo, trim($keyword))){
-                                    $check_wish = -2;
+                                    $check_wish = true;
                                 }
                             }
                         }
@@ -809,7 +806,7 @@ class TestController extends Controller
                             }
                         }
 
-                        if($check_wish)
+                        if($check_wish == true)
                             $result = $rule;
                         break;
                     case 'Aliexpress':
@@ -841,6 +838,17 @@ class TestController extends Controller
                     }
                     break;
                     case 'Ebay':
+                        if(! empty($rule->message_keywords)){//用户消息中同时包含关键字
+                            $check_ebay = false;
+                            foreach (explode(',', $rule->message_keywords) as $keyword){
+                                if(! strstr($message->UserMsgInfo, trim($keyword))){
+                                    $check_wish = -2;
+                                }
+                            }
+                        }
+
+
+
 
                     break;
                     default:

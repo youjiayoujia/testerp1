@@ -158,11 +158,11 @@ class OrderController extends Controller
             $profit = 0;
             foreach ($this->allList($order)->get() as $value) {
                 $totalAmount += $value->amount * $value->rate;
-                $profit += $value->profit_rate;
+                $profit += $value->profit;
                 $totalPlatform += $value->channel_fee;
             }
             $totalAmount = sprintf("%.2f", $totalAmount);
-            $averageProfit = sprintf("%.2f", $profit / $this->allList($order)->count());
+            $averageProfit = sprintf("%.4f", $profit / $totalAmount) * 100;
             $totalPlatform = sprintf("%.2f", $totalPlatform);
             $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
         }
@@ -513,18 +513,29 @@ class OrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
-        $model->calculateOrderChannelFee();
-        if($model->packages->count()) {
-            $model->update(['status' => 'PICKING', 'is_review' => 1]);
-        } else {
-            $model->update(['status' => 'PREPARED', 'is_review' => 1]);
-            $job = new DoPackages($model);
-            $job = $job->onQueue('doPackages');
-            $this->dispatch($job);
-        }
-        if ($model->remarks) {
-            foreach ($model->remarks as $remark) {
-                $remark->delete();
+        if ($model->items) {
+            $count = 0;
+            foreach ($model->items as $item) {
+                if ($item->item) {
+                    $count++;
+                }
+            }
+            if ($count == $model->items->count()) {
+                $model->calculateOrderChannelFee();
+                if($model->packages->count()) {
+                    $model->update(['status' => 'PICKING', 'is_review' => 1]);
+                } else {
+                    $model->update(['status' => 'PREPARED', 'is_review' => 1]);
+                }
+                $model->packagesToQueue();
+                if ($model->remarks) {
+                    foreach ($model->remarks as $remark) {
+                        if ($remark->type == 'PAYPAL') {
+                            $model->update(['order_is_alert' => 2]);
+                        }
+                        $remark->delete();
+                    }
+                }
             }
         }
         $to = json_encode($this->model->find($order_id));
@@ -583,26 +594,37 @@ class OrderController extends Controller
         $ids_arr = explode(',', $ids);
         foreach ($ids_arr as $id) {
             $model = $this->model->find($id);
-            $model->calculateOrderChannelFee();
-            if ($model) {
-                if ($model->remarks) {
-                    foreach ($model->remarks as $remark) {
-                        $remark->delete();
+            if ($model->items) {
+                $count = 0;
+                foreach ($model->items as $item) {
+                    if ($item->item) {
+                        $count++;
                     }
                 }
-                $from = json_encode($model);
-                if ($model->status = 'REVIEW') {
-                    if($model->packages->count()) {
-                        $model->update(['status' => 'PICKING', 'is_review' => '1']);
-                    } else {
-                        $model->update(['status' => 'PREPARED', 'is_review' => '1']);
-                        $job = new DoPackages($model);
-                        $job = $job->onQueue('doPackages');
-                        $this->dispatch($job);
+                if ($count == $model->items->count()) {
+                    $model->calculateOrderChannelFee();
+                    if ($model) {
+                        if ($model->remarks) {
+                            foreach ($model->remarks as $remark) {
+                                if ($remark->type == 'PAYPAL') {
+                                    $model->update(['order_is_alert' => 2]);
+                                }
+                                $remark->delete();
+                            }
+                        }
+                        $from = json_encode($model);
+                        if ($model->status = 'REVIEW') {
+                            if($model->packages->count()) {
+                                $model->update(['status' => 'PICKING', 'is_review' => '1']);
+                            } else {
+                                $model->update(['status' => 'PREPARED', 'is_review' => '1']);
+                            }
+                            $model->packagesToQueue();
+                        }
+                        $to = json_encode($model);
+                        $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);
                     }
                 }
-                $to = json_encode($model);
-                $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);
             }
         }
         return 1;

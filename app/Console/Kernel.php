@@ -40,6 +40,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AllReport::class,
         \App\Console\Commands\GetBlacklists::class,
         \App\Console\Commands\UpdateBlacklists::class,
+        \App\Console\Commands\AutoRunPackages::class,
+        \App\Console\Commands\ImitationOrders::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
@@ -117,6 +119,7 @@ class Kernel extends ConsoleKernel
                     foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
+                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
                     break;
                 case 'lazada':
                     foreach ($channel->accounts->where('is_available', '1') as $account) {
@@ -150,10 +153,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
         $schedule->command('SyncImportApi:all')->everyFiveMinutes();
 
+        
         //财务
         $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
         //DHL
         $schedule->command('dhl:sureShip')->daily();
+        //匹配paypal
+        $schedule->command('match:account all')->cron('*/20 * * * *');
 
     }
 }

@@ -183,6 +183,11 @@ return [
         'assign_id' => '客服名称',
         'messages.status' => '消息状态',
         'from_name' => '用户昵称',
-        'from' => '用户ID'
+        'from' => '用户ID',
+        'spuMultiOption.en_description' => '英语',
+        'spuMultiOption.de_description' => '德语',
+        'spuMultiOption.fr_description' => '法语',
+        'spuMultiOption.it_description' => '意大利语',
+        'spuMultiOption.zh_description' => '中文',
     ],
 ];

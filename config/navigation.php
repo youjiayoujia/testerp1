@@ -309,11 +309,16 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                /*[
-                    'name' => '采购入库',
-                    'url' => 'inWarehouse',
+                [
+                    'name' => '采购单批量付款',
+                    'url' => 'purchaseOrder.excelPayOff',
                     'icon' => '',
-                ],*/
+                ],
+                [
+                    'name' => '采购单核销',
+                    'url' => 'purchaseOrder.writeOffIndex',
+                    'icon' => '',
+                ],
             ],
             '供应链' => [
                 [

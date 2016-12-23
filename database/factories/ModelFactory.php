@@ -10,37 +10,30 @@
 | database. Just tell the factory how a default model should look.
 |
 */
-$factory->define(App\Models\OrderModel::class, function (Faker\Generator $faker) {
-    return [
-        'channel_id' => $faker->channel_id,
-        'channel_account_id' => $faker->channel_account_id,
-        'order_num' => $faker->order_num,
-        'channel_ordernum' => $faker->channel_ordernum,
-        'channel_listnum' => $faker->channel_listnum,
-        'by_id' => $faker->by_id,
-        'email' => $faker->email,
-        'amount' => $faker->amount,
-        'customer_service' => $faker->customer_service,
-        'operator' => $faker->operator,
-        'currency' => $faker->currency,
-        'rate' => $faker->rate,
-        'shipping' => $faker->shipping,
-        'shipping_firstname' => $faker->shipping_firstname,
-        'shipping_lastname' => $faker->shipping_lastname,
-        'shipping_address' => $faker->shipping_address,
-        'shipping_address1' => $faker->shipping_address1,
-        'shipping_city' => $faker->shipping_city,
-        'shipping_state' => $faker->shipping_state,
-        'shipping_country' => $faker->shipping_country,
-        'shipping_zipcode' => $faker->shipping_zipcode,
-        'shipping_phone' => $faker->shipping_phone,
-    ];
+$factory->define(\App\Models\OrderModel::class, function ($faker) {
+    $channel_id = mt_rand(2,4);
+   return [
+        'channel_id' => $channel_id,
+        'channel_account_id' => [1,4,7][$channel_id-2],
+        'channel_ordernum' => $faker->phoneNumber,
+        'amount' => mt_rand(10,500)/100,
+        'shipping_firstname' => $faker->firstName,
+        'shipping_lastname' => $faker->lastName,
+        'shipping_address' => $faker->address,
+        'shipping_address1' => $faker->address,
+        'shipping_city' => $faker->city,
+        'shipping_state' => $faker->streetAddress,
+        'shipping_country' => $faker->countryCode,
+        'shipping_zipcode' => mt_rand(100000,999999),
+        'shipping_phone' => $faker->phoneNumber,
+   ];
 });
-//$factory->define(App\User::class, function (Faker\Generator $faker) {
-//    return [
-//        'name' => $faker->name,
-//        'email' => $faker->email,
-//        'password' => bcrypt(str_random(10)),
-//        'remember_token' => str_random(10),
-//    ];
-//});
+
+$factory->define(\App\Models\Order\ItemModel::class, function ($faker) {
+   return [
+        'item_id' => \App\Models\StockModel::take('50')->get(['item_id'])[mt_rand(0,49)]['item_id'],
+        'quantity' => mt_rand(1,10),
+        'price' => mt_rand(14,350)/100,
+
+   ];
+});

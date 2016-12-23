@@ -316,7 +316,7 @@ class ItemModel extends BaseModel
         return $data;
     }
 
-    //欠货数量
+    //缺货数量
     public function getOutOfStockAttribute()
     {
         $item_id = $this->id;
@@ -357,7 +357,7 @@ class ItemModel extends BaseModel
     {
         $id = $this->id;
         $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
-            ->whereIn('packages.status', ['NEED'])
+            ->whereIn('packages.status', ['NEED',"TRACKINGFAILED","ASSIGNED","ASSIGNFAILED"])
             ->where('package_items.item_id', $id)
             ->first(['packages.created_at']);
 
@@ -509,7 +509,7 @@ class ItemModel extends BaseModel
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)),
                         3)
                 ]);
-                $this->createOnePurchaseNeedData();
+                //$this->createOnePurchaseNeedData();
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -528,7 +528,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -546,7 +546,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -564,7 +564,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -586,7 +586,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -619,6 +619,39 @@ class ItemModel extends BaseModel
                     $quantity -= $stock->available_quantity;
                 } else {
                     $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                    break;
+                }
+            }
+            return $result;
+        }
+
+        return false;
+    }
+
+    //分配库存
+    public function oversea_assignStock($quantity, $code)
+    {
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function ($query) use ($code){
+            return $query->warehouse->is_available == 1 && $query->warehouse->type == 'oversea' && $query->warehouse->code == $code;
+        });
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            $warehouseStocks = $stocks->groupBy('warehouse_id');
+            $otherStocks = $warehouseStocks
+                ->first(function ($key, $value) use ($quantity) {
+                    return $value->sum('available_quantity') >= $quantity ? $value : false;
+                });
+            $gotStocks = $otherStocks ? $otherStocks : $stocks;
+            $result = [];
+            foreach ($gotStocks as $stock) {
+                if ($stock->available_quantity < $quantity) {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                    $warehouseStock[$stock->id]['code'] = $code;
+                    $warehouseStock[$stock->id]['is_oversea'] = 1;
+                    $quantity -= $stock->available_quantity;
+                } else {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                    $warehouseStock[$stock->id]['code'] = $code;
+                    $warehouseStock[$stock->id]['is_oversea'] = 1;
                     break;
                 }
             }
@@ -696,6 +729,59 @@ class ItemModel extends BaseModel
         return false;
     }
 
+    //匹配库存
+    public function oversea_matchStock($quantity, $code)
+    {
+        $result = [];
+        $stocks = $this->stocks->sortByDesc('available_quantity')->filter(function ($query) use ($code) {
+            return $query->warehouse->is_available == 1 && $query->warehouse->type == 'oversea' && $query->warehouse->code == $code;
+        });
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            //单仓库
+            foreach ($stocks->groupBy('warehouse_id') as $warehouseID => $warehouseStocks) {
+                if ($warehouseStocks->sum('available_quantity') >= $quantity) {
+                    $warehouseStock = [];
+                    $matchQuantity = $quantity;
+                    foreach ($warehouseStocks as $stock) {
+                        if ($stock->available_quantity < $matchQuantity) {
+                            $warehouseStock[$stock->id] = $this->setStockData($stock);
+                            $warehouseStock[$stock->id]['code'] = $code;
+                            $warehouseStock[$stock->id]['is_oversea'] = 1;
+                            $matchQuantity -= $stock->available_quantity;
+                        } else {
+                            $warehouseStock[$stock->id] = $this->setStockData($stock, $matchQuantity);
+                            $warehouseStock[$stock->id]['code'] = $code;
+                            $warehouseStock[$stock->id]['is_oversea'] = 1;
+                            break;
+                        }
+                    }
+                    $result['SINGLE'][$warehouseID] = $warehouseStock;
+                    continue;
+                }
+            }
+            //多仓库
+            if (!$result) {
+                $warehouseStock = [];
+                foreach ($stocks as $stock) {
+                    if ($stock->available_quantity < $quantity) {
+                        $warehouseStock[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                        $warehouseStock[$stock->id]['code'] = $code;
+                        $quantity -= $stock->available_quantity;
+                        $warehouseStock[$stock->id]['is_oversea'] = 1;
+                    } else {
+                        $warehouseStock[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                        $warehouseStock[$stock->id]['code'] = $code;
+                        $warehouseStock[$stock->id]['is_oversea'] = 1;
+                        break;
+                    }
+                }
+                $result['MULTI'] = $warehouseStock;
+            }
+            return $result;
+        }
+        return false;
+    }
+
     public function setStockData($stock, $quantity = null)
     {
         $quantity = $quantity ? $quantity : $stock->available_quantity;
@@ -727,20 +813,15 @@ class ItemModel extends BaseModel
         //print_r($zaitu_num);exit;
 
         //缺货
-        $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-            orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="' . $this->id . '" ')[0]->num;
-        $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+        //$data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
+            //orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="' . $this->id . '" ')[0]->num;
+        $data['need_total_num'] = $this->out_of_stock?$this->out_of_stock:0;
 
         $data['zaitu_num'] = $zaitu_num;
         //实库存
         $data['all_quantity'] = $this->all_quantity;
         //可用库存
         $data['available_quantity'] = $this->available_quantity;
-        //虚库存
-        /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
-            $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',
-            $item->id)->sum('quantity') : 0;*/
-        //$xu_kucun = $data['all_quantity'] - $quantity;
         $xu_kucun = $this->available_quantity - $data['need_total_num'];
         //7天销量
         $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -880,7 +961,7 @@ class ItemModel extends BaseModel
         $data['user_id'] = $this->purchase_adminer ? $this->purchase_adminer : 0;
 
         $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
-            ->whereIn('packages.status', ['NEED'])
+            ->whereIn('packages.status', ['NEED',"TRACKINGFAILED","ASSIGNED","ASSIGNFAILED"])
             ->where('package_items.item_id', $this->id)
             ->first(['packages.created_at']);
 
@@ -1300,6 +1381,22 @@ class ItemModel extends BaseModel
                 $itemModel->update($old_data);
             }*/
 
+        }
+    }
+
+    public function updateCatalog()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $model = $this->where('is_available',1)->get();
+        //$model = $this->where('id','<','3333')->get();
+        foreach ($model as $key => $itemModel) {
+            $result = DB::select('select catalogs.id from catalogs,sku_catalog where catalogs.name = sku_catalog.catalog_enname and sku = "'.$itemModel->sku.'"');
+            if(count($result)){
+                //print_r($result);exit;
+                $itemModel->update(['catalog_id'=>$result[0]->id]);
+                $itemModel->product->update(['catalog_id'=>$result[0]->id]);
+            }
         }
     }
 

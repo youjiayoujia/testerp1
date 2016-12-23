@@ -434,11 +434,6 @@ class StockModel extends BaseModel
             try {
             $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $tmp_item->purchase_price,
                 'MAKE_ACCOUNT');
-            $stock1 = $this->where(['item_id' => $tmp_item->id, 'warehouse_position_id' => $tmp_position->id])->first();
-            
-            if($stock1 && !empty($stock['oversea_sku'])) {
-                $stock1->update(['oversea_sku' => $stock['oversea_sku']]);
-            }
             } catch(Exception $e) {
                 DB::rollback();
                 $error[$i]['key'] = $key;

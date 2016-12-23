@@ -12,6 +12,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\Order\ItemModel;
 use App\Models\Logistics\SupplierModel;
 use App\Models\PackageModel;
+use Illuminate\Support\Facades\Storage;
 class DhlAdapter extends BasicAdapter
 {
     public function __construct($config)
@@ -300,6 +301,8 @@ class DhlAdapter extends BasicAdapter
         $result = $this->postCurlHttpsData($url,$data);
         $result = json_decode($result);
         $status = $result->labelResponse->bd->responseStatus->code;//200时为成功
+        echo "<pre>";
+        print_r($result);
         if($status == '200'){
             $shipmentID = $result->labelResponse->bd->labels[0]->shipmentID;
 
@@ -313,9 +316,8 @@ class DhlAdapter extends BasicAdapter
                     $shipmentImg = $v->content;//面单二进制流
                     $shipmentImg=base64_decode($shipmentImg);
                     $filename = 'dhl_'.$orderInfo->id.'_'.$num;
-                    @$handle=fopen('/home/website/v3.erp.moonarstore.com/public/picture/dhl_md_img/md/'.$filename.'.jpg',"w");
-                    @fwrite($handle,$shipmentImg);
-                    @fclose($handle);
+                    $uploads_file ='/dhl_md/md/'.$filename.'.jpg';
+                    Storage::put($uploads_file,$shipmentImg);
                     $num++;
                 }
             }
@@ -324,7 +326,7 @@ class DhlAdapter extends BasicAdapter
                 'result' =>$shipmentID //跟踪号
             ];
         }else{
-            if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
+            /*if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
                 $msg =  $result->labelResponse->bd->responseStatus->messageDetails;
@@ -340,7 +342,12 @@ class DhlAdapter extends BasicAdapter
                     'code' => 'error',
                     'result' => '获取追踪号失败'
                 ];
-            }
+            }*/
+            
+            $result =[
+                'code' => 'error',
+                'result' => '获取追踪号失败'
+            ];
 
         }
         return $result;
@@ -414,9 +421,8 @@ class DhlAdapter extends BasicAdapter
             $handoverID = $result->closeOutResponse->bd->handoverID;
             $shipmentImg=base64_decode($shipmentImg);
             $type = 'pdf';
-            @$handle=fopen('/home/website/v3.erp.moonarstore.com/public/picture/dhl_md_img/checkOut/'.$handoverID.'.'.$type,"w");
-            @fwrite($handle,$shipmentImg);
-            @fclose($handle);
+            $uploads_file ='/dhl_md/checkOut/'.$handoverID.'.'.$type;
+            Storage::put($uploads_file,$shipmentImg);
             $res = array('status'=>true,'info'=>'此批次确定发货成功');
             return $res;
         }else{

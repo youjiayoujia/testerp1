@@ -477,6 +477,7 @@ class ItemController extends Controller
     }
     public function index()
     {
+        set_time_limit(0);
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),

@@ -267,7 +267,7 @@ if(!$sender_info){
             {{ $model->country ? ($model->country->geKou ? $model->country->geKou->geID : '') : '' }}
         </p>
         <p style="display:inline-block;width:240px;float:left;font-size:12px;height:50px;text-align:center;padding-top:2px;">
-            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
+            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height: 38px">
             <br/>
             {{ $model->tracking_no }}
         </p>

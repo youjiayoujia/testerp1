@@ -289,6 +289,21 @@
             <td colspan='2'>{{$item->out_of_stock?$item->out_of_stock:0}}</td>
         </tr>
 
+        <tr>  
+            <th colspan='2'>渠道</th>
+            <th colspan='4'>7天销量</th>
+            <th colspan='4'>14天销量</th>
+            <th colspan='4'>28天销量</th>    
+        </tr>
+        @foreach($channels as $channel)
+            <tr>
+                <td colspan='2'>{{$channel->name}}</td>
+                <td colspan='4'>{{$item->getChannelSales('-7 day')[$channel->id]}}</td>
+                <td colspan='4'>{{$item->getChannelSales('-14 day')[$channel->id]}}</td>
+                <td colspan='4'>{{$item->getChannelSales('-28 day')[$channel->id]}}</td>
+            </tr>
+        @endforeach
+
         <!-- 图片模态框（Modal -->
         <div class="modal fade" id="imgModal_{{$item->id}}" role="dialog"
              aria-labelledby="myModalLabel" aria-hidden="true">

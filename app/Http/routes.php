@@ -401,6 +401,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
     //采购单核销格式导出
     Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
+    //采购单付款格式导出
+    Route::any('purchaseOrderPayOffCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderPayOffCsvFormat', 'as' => 'purchaseOrderPayOffCsvFormat']);
     //采购单核销导入
     Route::any('purchaseOrderConfirmCsvFormatExecute', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormatExecute', 'as' => 'purchaseOrderConfirmCsvFormatExecute']);
     

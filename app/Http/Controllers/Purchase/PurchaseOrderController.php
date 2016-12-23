@@ -1406,30 +1406,24 @@ class PurchaseOrderController extends Controller
      */
     public function excelPayOffExecute()
     {
-        set_time_limit(0);
-        ini_set('memory_limit', '2048M');
-        $file = request()->file('upload');
-        $path = config('setting.excelPath');
-        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
-        $file->move($path, 'excelProcess.xls');
-        $data_array = '';
-        $result = false;
-        Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
-            $reader->noHeading();
-            $data_array = $reader->all()->toArray();
-            foreach ($data_array[0] as $key => $value) {
-                $purchaseOrderModel = $this->model->find($value['1']);
-                if(count($purchaseOrderModel)){
-                    $purchaseOrderModel->update(['close_status'=>'1']);
-                    $result[$key]['status'] = '1';
-                    $result[$key]['id'] = $value['1'];
-                }else{
-                    $result[$key]['status'] = '2';
-                    $result[$key]['id'] = $value['1'];
-                }
+        if(empty($_FILES['upload']['tmp_name'])) {
+            return redirect(route('purchaseOrder.excelPayOff'))->with('alert', $this->alert('danger', '请上传表格!'));
+        }
+        $csv = Excel::load($_FILES['upload']['tmp_name'])->noHeading()->toArray();
+        $result = [];
+        foreach ($csv as $key => $value) {
+            if($key==0)continue;
+            $purchaseOrderModel = $this->model->find($value['1']);
+            if(count($purchaseOrderModel)){
+                $purchaseOrderModel->update(['close_status'=>'1']);
+                $result[$key]['status'] = '1';
+                $result[$key]['id'] = $value['1'];
+            }else{
+                $result[$key]['status'] = '2';
+                $result[$key]['id'] = $value['1'];
             }
-        },'gb2312'); 
-
+        }
+      
         $this->mainIndex = route('purchaseOrder.excelPayOff');
         $this->mainTitle = '采购单批量付款';
         $response = [
@@ -1473,6 +1467,23 @@ class PurchaseOrderController extends Controller
         ];
 
         Excel::create('采购单核销CSV格式', function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    public function purchaseOrderPayOffCsvFormat(){
+        $rows = [
+            [
+                '采购单据号'=>'10001',
+            ],
+            [
+                '采购单据号'=>'10002',
+            ]
+        ];
+
+        Excel::create('采购单付款CSV格式', function($excel) use ($rows){
             $excel->sheet('', function($sheet) use ($rows){
                 $sheet->fromArray($rows);
             });

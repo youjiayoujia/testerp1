@@ -4,13 +4,15 @@
          <input type="hidden" name="_token" value="{{ csrf_token() }}">
          <input type="file" name="upload" >
          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" >
+            <button type="submit" class="btn btn-primary" style="float:left;margin-left:-15px">
                批量付款
             </button>
          </div>
      </form>
 
-
+    <a href="javascript:" class="btn btn-warning download-csv">CSV格式
+        <i class="glyphicon glyphicon-arrow-down"></i>
+    </a>
     <div class="panel panel-default">
         <div class="panel-heading">操作结果:</div>
         <div class="panel-body"> 
@@ -58,4 +60,15 @@
         background-color: #ffffff;
     }
 </style>
+@stop
+
+@section('pageJs')
+    <script>
+        $(document).ready(function () {
+            //批量导出模板
+            $('.download-csv').click(function(){
+                location.href="{{ route('purchaseOrderPayOffCsvFormat')}}";
+            });
+        })
+    </script>
 @stop

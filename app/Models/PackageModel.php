@@ -1302,7 +1302,6 @@ class PackageModel extends BaseModel
         foreach ($this->items as $packageItem) {
             $packageItem->forceDelete();
         }
-        $this->order->update(['status' => 'PACKED']);
         $i = true;
         foreach ($items as $warehouseId => $packageItems) {
             if ($i) {

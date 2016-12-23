@@ -805,6 +805,7 @@ class OrderModel extends BaseModel
                 }
             }
         }
+        $package->order->update(['status' => 'PACKED']);
 
         return $package;
     }

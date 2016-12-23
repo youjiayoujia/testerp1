@@ -416,7 +416,7 @@
                             </div>
                             <br>
                             <div><textarea rows="3" cols="88" name='question_content'></textarea></div>
-                            <div><input type='file' name='uploadImage'></div>
+                            <div><input type='file' name='uploadImage'><span style="color:red">(文件为图片格式)</span></div>
                         </div>
 
                         <div class="modal-footer">
@@ -518,7 +518,9 @@
                 item_ids += checkbox[i].value + ",";
             }
             item_ids = item_ids.substr(0, (item_ids.length) - 1);
-
+            if(item_ids==''){
+                alert('请选择sku');return;
+            }
             var url = "{{ route('batchEdit') }}";
             window.location.href = url + "?item_ids=" + item_ids + "&param=" + param;
         });
@@ -537,26 +539,29 @@
         }
 
         $('.batchdelete').click(function () {
+            if (confirm("确认删除?")) {
+                var url = "{{route('item.batchDelete')}}";
 
-            var url = "{{route('item.batchDelete')}}";
-
-            var checkbox = document.getElementsByName("tribute_id");
-            var item_ids = "";
-            for (var i = 0; i < checkbox.length; i++) {
-                if (!checkbox[i].checked)continue;
-                item_ids += checkbox[i].value + ",";
-            }
-            item_ids = item_ids.substr(0, (item_ids.length) - 1);
-
-            $.ajax({
-                url: url,
-                data: {item_ids: item_ids},
-                dataType: 'json',
-                type: 'get',
-                success: function (result) {
-                    window.location.reload();
+                var checkbox = document.getElementsByName("tribute_id");
+                var item_ids = "";
+                for (var i = 0; i < checkbox.length; i++) {
+                    if (!checkbox[i].checked)continue;
+                    item_ids += checkbox[i].value + ",";
                 }
-            })
+                item_ids = item_ids.substr(0, (item_ids.length) - 1);
+                if(item_ids==''){
+                    alert('请选择sku');return;
+                }
+                $.ajax({
+                    url: url,
+                    data: {item_ids: item_ids},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        window.location.reload();
+                    }
+                })
+            }
         });
 
         /*ajax调取采购负责人*/

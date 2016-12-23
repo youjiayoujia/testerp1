@@ -93,15 +93,6 @@ class TestController extends Controller
         dd($result);
     }
 
-     // public function test2()
-     // {
-     //     $orders = OrderModel::where('status', 'SHIPPED')->get();
-     //     foreach ($orders as $order) {
-     //         $order->calculateProfitProcess();
-     //     }
-     //     return 1;
-     // }
-
     // public function test2()
     // {
     //     $order['channel_id'] = 2;
@@ -112,10 +103,13 @@ class TestController extends Controller
     //     $order['shipping_country'] = 'US';
     //     $order['items'][0]['quantity'] = 2;
     //     $order['items'][0]['sku'] = 'USB030';
-    //     $order['items'][0]['channel_sku'] = '22222222';
+    //     $order['items'][0]['channel_sku'] = 'GE*B3010_f1';
     //     $order['items'][1]['quantity'] = 3;
-    //     $order['items'][1]['sku'] = 'UKB032';
-    //     $order['items'][1]['channel_sku'] = '44444444';
+    //     $order['items'][1]['sku'] = 'USB041';
+    //     $order['items'][1]['channel_sku'] = '12*B3012_f1';
+    //     $order['items'][2]['quantity'] = 600;
+    //     $order['items'][2]['sku'] = 'UKB032';
+    //     $order['items'][2]['channel_sku'] = '56*B3010_f1';
     //     $job = new InOrders($order);
     //     $job = $job->onQueue('inOrders');
     //     $this->dispatch($job);
@@ -124,14 +118,17 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(3098);
-        $package->oversea_createPackageItems();
+        $package = PackageModel::find(3112);
+        $package->assignLogistics();
+        var_dump('123');
     }
 
     // public function test2()
     // {
-    //     $order = OrderModel::find(2834);
-    //     $order->createVirtualPackage();
+    //     $order = OrderModel::find(1);
+    //     var_dump($order->toarray());
+    //     $order->createPackage();
+    //     var_dump('123');
     // }
     public function test1()
     {
@@ -144,7 +141,7 @@ class TestController extends Controller
 
     public function test3()
     {
-        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1660, 1800])->get();
+        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }
@@ -153,9 +150,9 @@ class TestController extends Controller
 
     public function test4()
     {
-        $orders = OrderModel::where('profit', 0)->whereBetween('id', [674, 1470])->get();
+        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
         foreach ($orders as $order) {
-            $order->calculateProfitProcess();
+            $order->calculateOrderChannelFee();
         }
         return 1;
     }

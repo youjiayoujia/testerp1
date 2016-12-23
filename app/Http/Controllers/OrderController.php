@@ -152,6 +152,7 @@ class OrderController extends Controller
         request()->flash();
         $order = $this->model;
         $orderStatistics = '';
+<<<<<<< HEAD
 //        if ($this->allList($order)->count()) {
 //            $totalAmount = 0;
 //            $totalPlatform = 0;
@@ -166,6 +167,22 @@ class OrderController extends Controller
 //            $totalPlatform = sprintf("%.2f", $totalPlatform);
 //            $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
 //        }
+=======
+        if ($this->allList($order)->count()) {
+            $totalAmount = 0;
+            $totalPlatform = 0;
+            $profit = 0;
+            foreach ($this->allList($order)->get() as $value) {
+                $totalAmount += $value->amount * $value->rate;
+                $profit += $value->profit;
+                $totalPlatform += $value->channel_fee;
+            }
+            $totalAmount = sprintf("%.2f", $totalAmount);
+            $averageProfit = sprintf("%.4f", $profit / $totalAmount) * 100;
+            $totalPlatform = sprintf("%.2f", $totalPlatform);
+            $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
+        }
+>>>>>>> fe2b70512c408d0545c27b95ea8e28fc6f3b9ba9
         $subtotal = 0;
         foreach ($this->autoList($order) as $value) {
             $subtotal += $value->amount * $value->rate;

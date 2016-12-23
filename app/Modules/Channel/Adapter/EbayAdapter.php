@@ -2190,9 +2190,8 @@ class EbayAdapter implements AdapterInterface
      */
     public function ebayOrderSendMessage($paramAry){
         $total = count($paramAry['itemids']);
-        $ItemIDXML = ($total == 1) ? "<ItemID>$paramAry[itemids][0]</ItemID>" : '' ;
+        $ItemIDXML = ($total == 1) ? '<ItemID>' .$paramAry['itemids'][0] . '</ItemID>' : '' ;
         $moreItem  = ($total > 1) ?  implode(',',$paramAry['itemids']) : '' ;
-
         $xml ='<WarningLevel>High</WarningLevel>
                ' . $ItemIDXML . '
               <MemberMessage>
@@ -2201,7 +2200,7 @@ class EbayAdapter implements AdapterInterface
                 <QuestionType>CustomizedSubject</QuestionType>
                 <RecipientID>' . addslashes($paramAry['buyer_id']) . '</RecipientID>
               </MemberMessage>';
-        $result = $this->buildcaseBody($xml,'AddMemberMessageAAQToPartner');
+        $result = $this->buildEbayBody($xml,'AddMemberMessageAAQToPartner');
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
             return true;
         }else{

@@ -98,6 +98,7 @@ class OrderModel extends BaseModel
         'orders_expired_time',
         'created_at',
         'is_oversea',
+        'operator_id',
         'fee_amt',
     ];
 
@@ -687,6 +688,10 @@ class OrderModel extends BaseModel
                     }
                 }
             }
+            if ($orderItem['channel_sku']) {
+                $channelSku = explode('*', $orderItem['channel_sku']);
+                $orderItem['operator_id'] = $channelSku[0];
+            }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
                 if ($order->status == 'PAID') {
@@ -711,7 +716,6 @@ class OrderModel extends BaseModel
             $order->update(['status' => 'PREPARED']);
         }
 
-        $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
         return $order;
     }
 
@@ -800,7 +804,6 @@ class OrderModel extends BaseModel
                     $newPackageItem = $package->items()->create($packageItem);
                 }
             }
-            $package->update(['weight' => $package->total_weight]);
         }
 
         return $package;
@@ -814,7 +817,7 @@ class OrderModel extends BaseModel
         $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
-        $orderChannelFee = $this->calculateOrderChannelFee();
+        $orderChannelFee = $this->channel_fee;
         $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $orderChannelFee, 4);
         $orderProfitRate = $orderProfit / $orderAmount;
         $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);
@@ -872,6 +875,7 @@ class OrderModel extends BaseModel
                 break;
         }
 
+        $this->update(['channel_fee' => $sum]);
         return $sum;
     }
 

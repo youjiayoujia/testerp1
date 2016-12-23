@@ -1561,7 +1561,7 @@ class PackageModel extends BaseModel
         } else {
             $isClearance = 0;
         }
-        if ($this->warehouse()) {
+        if ($this->warehouse) {
             $rules = $this->warehouse->logisticsRules()
                 ->where(function ($query) use ($weight) {
                     $query->where('weight_from', '<=', $weight)

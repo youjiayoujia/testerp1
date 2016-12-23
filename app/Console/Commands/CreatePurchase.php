@@ -54,26 +54,26 @@ class CreatePurchase extends Command
         
         $itemModel = ItemModel::where('is_available','1')->get();
         
-        if (date("H") != 12) {
-            $i = 0;
-            foreach ($itemModel as $key => $model) {
-                $model->createOnePurchaseNeedData();
-                $i++;
-            }
-            
-            $end = microtime(true);
-            $lasting = round($end - $start, 3);
-            $result['status'] = 'success';
-            $result['remark'] = 'Success.';
-            $commandLog->update([
-                'data' => '',
-                'lasting' => $lasting,
-                'total' => $i,
-                'result' => $result['status'],
-                'remark' => $result['remark'],
-            ]);
-            $this->info('采购需求数据更新耗时' . $lasting . '秒,正在自动创建采购单,请稍后......');
+        
+        $i = 0;
+        foreach ($itemModel as $key => $model) {
+            $model->createOnePurchaseNeedData();
+            $i++;
         }
+        
+        $end = microtime(true);
+        $lasting = round($end - $start, 3);
+        $result['status'] = 'success';
+        $result['remark'] = 'Success.';
+        $commandLog->update([
+            'data' => '',
+            'lasting' => $lasting,
+            'total' => $i,
+            'result' => $result['status'],
+            'remark' => $result['remark'],
+        ]);
+        $this->info('采购需求数据更新耗时' . $lasting . '秒,正在自动创建采购单,请稍后......');
+        
 
         /*$requireModel = new RequireModel();
         $requireModel->createAllPurchaseOrder();

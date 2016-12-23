@@ -15,6 +15,7 @@ use App\Models\ChannelModel;
 use App\Models\Order\BlacklistModel;
 use App\Models\Order\RefundModel;
 use App\Models\OrderModel;
+use App\Models\UserModel;
 use Excel;
 
 class BlacklistController extends Controller
@@ -67,6 +68,7 @@ class BlacklistController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $userName = UserModel::find(request()->user()->id);
         $from = json_encode($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -75,7 +77,7 @@ class BlacklistController extends Controller
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update(request()->all());
         $to = json_encode($model);
-        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据更新', $to, $from);
+        $this->eventLog($userName->name, '数据更新,id=' . $id, $to, $from);
 
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));

@@ -2200,7 +2200,7 @@ class EbayAdapter implements AdapterInterface
                 <QuestionType>CustomizedSubject</QuestionType>
                 <RecipientID>' . addslashes($paramAry['buyer_id']) . '</RecipientID>
               </MemberMessage>';
-        $result = $this->buildcaseBody($xml,'AddMemberMessageAAQToPartner');
+        $result = $this->buildEbayBody($xml,'AddMemberMessageAAQToPartner');
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
             return true;
         }else{

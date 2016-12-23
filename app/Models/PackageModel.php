@@ -766,7 +766,7 @@ class PackageModel extends BaseModel
                         }
                         //todo v3测试，正式上线删除
                         $fItem = $this->items()->first();
-                        $arr = $fItem->item->getTransitQuantityAttribute();
+                        $arr = $fItem->item->transit_quantity;
                         foreach ($arr as $key => $value) {
                             $flag = 0;
                             foreach ($value as $k => $v) {
@@ -1574,12 +1574,14 @@ class PackageModel extends BaseModel
                 })
                 ->where(['is_clearance' => $isClearance])
                 ->with([
+                    'logistics',
                     'rule_catalogs',
                     'rule_channels',
-                    'rule_countries',
+                    'rule_countries_through',
                     'rule_accounts',
-                    'rule_transports',
-                    'rule_limits'
+                    'rule_transports_through',
+                    'rule_limits',
+                    'logistics.logisticsChannels'
                 ])
                 ->get()
                 ->sortBy(function ($single, $key) {

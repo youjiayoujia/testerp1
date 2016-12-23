@@ -65,7 +65,7 @@
 @section('tableToolButtons')
 <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询处理状态
+            <i class="glyphicon glyphicon-filter"></i> @if($chose_status){{$chose_status}}@else查询当前状态@endif
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">

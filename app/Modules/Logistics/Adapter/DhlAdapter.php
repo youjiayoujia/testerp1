@@ -301,6 +301,8 @@ class DhlAdapter extends BasicAdapter
         $result = $this->postCurlHttpsData($url,$data);
         $result = json_decode($result);
         $status = $result->labelResponse->bd->responseStatus->code;//200时为成功
+        echo "<pre>";
+        print_r($result);
         if($status == '200'){
             $shipmentID = $result->labelResponse->bd->labels[0]->shipmentID;
 
@@ -324,7 +326,7 @@ class DhlAdapter extends BasicAdapter
                 'result' =>$shipmentID //跟踪号
             ];
         }else{
-            if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
+            /*if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
                 $msg =  $result->labelResponse->bd->responseStatus->messageDetails;
@@ -340,7 +342,12 @@ class DhlAdapter extends BasicAdapter
                     'code' => 'error',
                     'result' => '获取追踪号失败'
                 ];
-            }
+            }*/
+            
+            $result =[
+                'code' => 'error',
+                'result' => '获取追踪号失败'
+            ];
 
         }
         return $result;

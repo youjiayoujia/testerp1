@@ -84,7 +84,8 @@ class CatalogController extends Controller
         $extra['features'] = request()->input('features');
         //更新品类信息
         $catalogModel->updateCatalog($data, $extra);
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', '更新成功.'));
     }
 
     /**
@@ -230,6 +231,7 @@ class CatalogController extends Controller
      */
     public function edit($id)
     {
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -243,6 +245,7 @@ class CatalogController extends Controller
             'model' => $model,
             'channels_all' => $channels_all,
             'catalogCategory'   => CatalogCategoryModel::all(),
+            'hideUrl' => $hideUrl,
         ];
         return view($this->viewPath . 'edit', $response);
     }

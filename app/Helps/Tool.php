@@ -365,4 +365,18 @@ class Tool
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
+
+    /**
+     * 获取编辑之后的跳转地址
+     * @param $mainIndex
+     */
+    public function referUrl($mainIndex=null)
+    {
+        $refer_url = request()->input('refer_url');
+        if(! empty($refer_url)){
+            return $refer_url;
+        } else {
+            return $mainIndex;
+        }
+    }
 }

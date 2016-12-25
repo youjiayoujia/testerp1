@@ -28,7 +28,7 @@
                 <a href="{{ route('purchaseAccount.show', ['id'=>$account->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('purchaseAccount.edit', ['id'=>$account->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('purchaseAccount.edit', ['id'=>$account->id]) }}" class="btn btn-warning btn-xs index-a-edit">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
 {{--                <a href="javascript:" class="btn btn-danger btn-xs delete_item"

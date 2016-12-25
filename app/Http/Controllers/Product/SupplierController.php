@@ -63,11 +63,11 @@ class SupplierController extends Controller
             $to = json_encode($model);
             $this->eventLog($name, '数据更新', $to, '');
 
-			SupplierChangeHistoryModel::create([
+/*			SupplierChangeHistoryModel::create([
 				'supplier_id' => $model->id,
-				/*'to' =>request()->input('purchase_id'),*/
+				'to' =>request()->input('purchase_id'),
 				'adjust_by' => '3',
-			]);
+			]);*/
         return redirect($this->mainIndex);
 		}
     }
@@ -89,6 +89,8 @@ class SupplierController extends Controller
             'model' => $model,
             'levels' => SupplierLevelModel::all(),
             'users' => UserModel::all(),
+            'attachments' => $model->attachment,
+            'refer_url' => Tool::referUrl(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -110,21 +112,21 @@ class SupplierController extends Controller
         }
         $data=request()->all();
         $this->validate(request(), $this->model->rules('update'));
-        if($model->purchase_id != request('purchase_id')) {
+/*        if($model->purchase_id != request('purchase_id')) {
             SupplierChangeHistoryModel::create([              
                 'supplier_id' => $id,
                 'from' => $model->purchase_id,
                 'to' =>request()->input('purchase_id'),
                 'adjust_by' => '3',
             ]);
-        }
+        }*/
         $res=$this->model->updateSupplier($id,$data,request()->file('qualifications'));
 		if($res == true){
             $name = UserModel::find(request()->user()->id)->name;
             $to = $this->model->find($id);
             $to = json_encode($to);
             $this->eventLog($name, '数据更新', $to, $from);
-            return redirect($this->mainIndex);
+            return redirect(Tool::referUrl($this->mainIndex))->with('alert', $this->alert('success', '修改成功.'));
         }else{
             return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '文件上传失败.'));
 

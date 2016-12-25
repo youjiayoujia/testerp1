@@ -117,6 +117,8 @@ class MessageModel extends BaseModel{
             'filterFields' => [],
             'filterSelects' => [
                 'messages.status' => config('message.statusText'),
+                'assign_id' => UserModel::where('is_available', 1)->get()->pluck('name', 'id'),
+
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],

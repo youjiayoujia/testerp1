@@ -12,6 +12,7 @@ use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\UserModel;
+use App\Models\ChannelModel;
 use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
@@ -406,6 +407,31 @@ class ItemModel extends BaseModel
         return $sellNum;
     }
 
+    //获得sku分平台销量 period参数格式为 -7 day
+    public function getChannelSales($period)
+    {
+        //销量
+        $sellNum = DB::select("select orders.channel_id,sum(`order_items`.`quantity`) as aggregate 
+                    from `order_items` left join `orders` on `orders`.`id` = `order_items`.`order_id` 
+                    where `order_items`.`deleted_at` is null and `orders`.`status` in ('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL') 
+                    and `orders`.`created_at` > '".date('Y-m-d H:i:s', strtotime($period))."'
+                    and `order_items`.`quantity` < 5 
+                    and `order_items`.`item_id` = ".$this->id." 
+                    group by `orders`.`channel_id`");
+        $data = [];
+        foreach($sellNum as $sell){
+            $data[$sell->channel_id] = $sell->aggregate;
+        }
+
+        foreach(ChannelModel::all() as $channel){
+            if(!array_key_exists($channel->id,$data)){
+                $data[$channel->id] = 0;
+            }
+        }
+                
+        return $data;
+    }
+
     //计算sku采购建议数量
     public function getNeedPurchase()
     {
@@ -509,7 +535,7 @@ class ItemModel extends BaseModel
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)),
                         3)
                 ]);
-                $this->createOnePurchaseNeedData();
+                //$this->createOnePurchaseNeedData();
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -528,7 +554,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -546,7 +572,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -564,7 +590,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -586,7 +612,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -1261,7 +1287,6 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url = "http://120.24.100.157:60/api/skuInfoApi.php";
-        //$itemModel = $this->all();
         $itemModel = $this->where('purchase_adminer',null)->get();
         
         foreach ($itemModel as $key => $model) {

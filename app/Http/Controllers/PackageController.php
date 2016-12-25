@@ -53,9 +53,7 @@ class PackageController extends Controller
     {
         $len = 1000;
         $start = 0;
-        $packages = $this->model->where('status', 'NEW')->skip($start)->take($len)->get()->filter(function($single){
-            return $single->queue_name != 'assignStocks';
-        });
+        $packages = $this->model->where('status', 'NEW')->where('queue_name', '!=', 'assignStocks')->skip($start)->take($len)->get();
         $name = UserModel::find(request()->user()->id)->name;
         while ($packages->count()) {
             foreach ($packages as $package) {
@@ -68,9 +66,7 @@ class PackageController extends Controller
             }
             $start += $len;
             unset($packages);
-            $packages = $this->model->where('status', 'NEW')->skip($start)->take($len)->get()->filter(function($single){
-                return $single->queue_name != 'assignStocks';
-            });
+            $packages = $this->model->where('status', 'NEW')->where('queue_name', '!=', 'assignStocks')->skip($start)->take($len)->get();
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至assignStocks队列成功'));
     }
@@ -387,7 +383,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEW')->count(),
-            'ordernum' => DB::table('orders')->leftJoin('packages', 'orders.id', '=', 'packages.order_id')->where('orders.status', 'PREPARED')->whereNULL('packages.order_id')->count(),
+            'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',
@@ -414,9 +410,7 @@ class PackageController extends Controller
 
     public function autoFailAssignLogistics()
     {
-        $packages = $this->model->where('status', 'ASSIGNFAILED')->get()->filter(function($single){
-            return $single->queue_name != 'assignLogistics';
-        });
+        $packages = $this->model->where('status', 'ASSIGNFAILED')->where('queue_name', '!=', 'assignLogistics')->get();
         foreach ($packages as $package) {
             $job = new AssignLogistics($package);
             $job = $job->onQueue('assignLogistics');
@@ -428,9 +422,7 @@ class PackageController extends Controller
 
     public function processingAssignStocks()
     {
-        $packages = $this->model->where('status', 'NEED')->get()->filter(function($single){
-            return $single->queue_name != 'assignStocks';
-        });
+        $packages = $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->get();
         foreach ($packages as $package) {
             $package->update(['queue_name' => 'assignStocks']);
             $job = new AssignStocks($package);
@@ -1036,9 +1028,8 @@ class PackageController extends Controller
         $start = 0;
         $packages = $this->model
             ->where(['status' => 'WAITASSIGN', 'is_auto' => '1'])
-            ->skip($start)->take($len)->get()->filter(function($single){
-                return $single->queue_name != 'assignLogistics';
-            });
+            ->where('queue_name', '!=', 'assignLogistics')
+            ->skip($start)->take($len)->get();
         while ($packages->count()) {
             foreach ($packages as $package) {
                 $package->update(['queue_name' => 'assignLogistics']);
@@ -1050,9 +1041,8 @@ class PackageController extends Controller
             unset($packages);
             $packages = $this->model
                 ->where(['status' => 'WAITASSIGN', 'is_auto' => '1'])
-                ->skip($start)->take($len)->get()->filter(function($single){
-                return $single->queue_name != 'assignLogistics';
-            });
+                ->where('queue_name', '!=', 'assignLogistics')
+                ->skip($start)->take($len)->get();
         }
         return redirect(route('dashboard.index'))->with('alert',
             $this->alert('success', '添加至 [ASSIGN LOGISTICS] 队列成功'));
@@ -1068,10 +1058,9 @@ class PackageController extends Controller
         $start = 0;
         $packages = $this->model
             ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
+            ->where('queue_name', '!=', 'placeLogistics')
             ->where('is_auto', '1')
-            ->skip($start)->take($len)->get()->filter(function($single){
-                return $single->queue_name != 'placeLogistics';
-            });
+            ->skip($start)->take($len)->get();
         $packageIds = [];
         while ($packages->count()) {
             foreach ($packages as $package) {
@@ -1088,9 +1077,8 @@ class PackageController extends Controller
             $packages = $this->model
                 ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
                 ->where('is_auto', '1')
-                ->skip($start)->take($len)->get()->filter(function($single){
-                return $single->queue_name != 'placeLogistics';
-            });
+                ->where('queue_name', '!=', 'placeLogistics')
+                ->skip($start)->take($len)->get();
         }
         return redirect(route('dashboard.index'))->with('alert',
             $this->alert('success', '包裹[' . implode(',', $packageIds) . ']添加至 [PLACE LOGISTICS] 队列成功'));

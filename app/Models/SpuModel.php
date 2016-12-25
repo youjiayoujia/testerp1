@@ -70,7 +70,7 @@ class SpuModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => [],
+            'relatedSearchFields' => ['spuMultiOption' => ['en_description', 'de_description', 'fr_description', 'it_description', 'zh_description']],
             'filterFields' => [],
             'filterSelects' => [],
             'selectRelatedSearchs' => [],

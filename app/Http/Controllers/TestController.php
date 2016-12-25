@@ -66,6 +66,9 @@ use App\Jobs\DoPackages;
 use Crypt;
 use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use App\Jobs\MatchPaypal as MatchPaypalJob ;
 
 
@@ -93,39 +96,42 @@ class TestController extends Controller
         dd($result);
     }
 
+    // public function test2()
+    // {
+    //     $order['channel_id'] = 2;
+    //     $order['channel_account_id'] = 1; 
+    //     $order['channel_ordernum'] = 12345632;
+    //     $order['status'] = 'PAID';
+    //     $order['currency'] = 'USD';
+    //     $order['shipping_country'] = 'US';
+    //     $order['items'][0]['quantity'] = 2;
+    //     $order['items'][0]['sku'] = 'USB030';
+    //     $order['items'][0]['channel_sku'] = 'GE*B3010_f1';
+    //     $order['items'][1]['quantity'] = 3;
+    //     $order['items'][1]['sku'] = 'USB041';
+    //     $order['items'][1]['channel_sku'] = '12*B3012_f1';
+    //     $order['items'][2]['quantity'] = 600;
+    //     $order['items'][2]['sku'] = 'UKB032';
+    //     $order['items'][2]['channel_sku'] = '56*B3010_f1';
+    //     $job = new InOrders($order);
+    //     $job = $job->onQueue('inOrders');
+    //     $this->dispatch($job);
+    //     var_dump('ok');
+    // }
+
     public function test2()
     {
-        $order['channel_id'] = 2;
-        $order['channel_account_id'] = 1; 
-        $order['channel_ordernum'] = 12345632;
-        $order['status'] = 'PAID';
-        $order['currency'] = 'USD';
-        $order['shipping_country'] = 'US';
-        $order['items'][0]['quantity'] = 2;
-        $order['items'][0]['sku'] = 'USB030';
-        $order['items'][0]['channel_sku'] = 'GE*B3010_f1';
-        $order['items'][1]['quantity'] = 3;
-        $order['items'][1]['sku'] = 'USB041';
-        $order['items'][1]['channel_sku'] = '12*B3012_f1';
-        $order['items'][2]['quantity'] = 600;
-        $order['items'][2]['sku'] = 'UKB032';
-        $order['items'][2]['channel_sku'] = '56*B3010_f1';
-        $job = new InOrders($order);
-        $job = $job->onQueue('inOrders');
-        $this->dispatch($job);
-        var_dump('ok');
+        $package = PackageModel::find(3112);
+        $package->assignLogistics();
+        var_dump('123');
     }
 
     // public function test2()
     // {
-    //     $package = PackageModel::find(3112);
-    //     $package->oversea_createPackageItems();
-    // }
-
-    // public function test2()
-    // {
-    //     $order = OrderModel::find(2852);
+    //     $order = OrderModel::find(1);
+    //     var_dump($order->toarray());
     //     $order->createPackage();
+    //     var_dump('123');
     // }
     public function test1()
     {
@@ -714,6 +720,235 @@ class TestController extends Controller
             }
         }
     }
+
+    public function testAutoReply()
+    {
+        $accounts = AccountModel::where('is_available','1')->where('channel_id',3)->get();
+        foreach($accounts as  $account){
+            if($account->id !=6)
+                continue;
+            //获取此账号的自动规则
+            $rules = $account->AutoReplyRules;
+
+            $messages =MessageModel::where('account_id', $account->id)->orderBy('id', 'DESC')->get();
+            foreach($messages as $message){
+
+
+                ////////测试块//////////
+
+               /* if($message->id != 621)
+                    continue;*/
+                /////////测试块//////////
+
+
+                //step1: 关联消息订单
+                $message->findOrderWithMessage();
+                if(! $rules->isEmpty()){ //存在规则
+                    $rule = $this->checkAutomaticReply($message, $rules);
+                    dd($rule);
+                    if(! empty($rule->template)){ //符合发送消息的条件
+
+                        /**
+                         * 创建reply记录
+                         * 塞入发送队列
+                         *
+                         */
+                        $new_reply = [
+                            'message_id' => $message->id,
+                            'to' => $message->from_name,
+                            'to_email' => $message->from,
+                            'title' => $rule->name . '(自动回复)',
+                            'content' => $rule->template,
+                            'status' => 'NEW',
+                        ];
+                        $reply = ReplyModel::firstOrNew($new_reply);
+                        $reply->save();
+
+                        $job = new SendMessages($reply);
+                        $job = $job->onQueue('SendMessages');
+                        $this->dispatch($job);
+
+                        $message->status = 'COMPLETE';
+                        $message->type_id = 0;
+                        $message->end_at = date('Y-m-d H:i:s', time());
+                        $message->is_auto_reply = 1;
+                        $message->save();
+
+                    }}
+
+            }
+        }
+    }
+
+    /**
+     * 基础验证消息关联订单 包裹 物流
+     * @param $message
+     * @return object | bool
+     */
+    public function basicVerification($message)
+    {
+
+        $order = $message->relatedOrders()->orderBy('id', 'DESC')->first();
+        if(empty($order)){
+            return -1;
+        }
+        $packages = OrderModel::find($order->order_id)->packages;
+        if($packages->isEmpty()){ //存在包裹
+            return -2;
+        }
+        if($packages->count() != 1){//只存在一个包裹
+            return -3;
+        }
+        if($packages->first()->status != 'SHIPPED'){ //包裹状态为已发货
+            return -4;
+        }
+        //检查 消息关联的订单物流方式必须是平邮
+        if(! $message->MsgOrderIsExpress()){
+            return -5;
+        }
+        //验证是否为平台第一条消息
+        if(! $message->IsFristMsgForOrder()){
+            return -6;
+        }
+
+        return $packages->first();
+    }
+
+    public function checkAutomaticReply($message, $rules)
+    {
+        $result = false;
+
+        $package = $this->basicVerification($message);
+
+        if(! is_object($package)){ //验证失败
+            return $result;
+        }
+        $send_time = Carbon::parse($message->date);
+        $shipped_at = Carbon::parse($package->shipped_at);
+        $diff_day = $send_time->diffInDays($shipped_at);  // 相差天数
+
+        foreach($rules as $rule){
+            if($rule->status == 'ON'){
+                switch ($rule->ChannelName){
+                    case 'Wish':
+                        $check_wish = true;
+                        if( ! empty($rule->label_keywords)){//主题关键字
+                            if(! strstr($message->labels, $rule->label_keywords)){
+                                //主题匹配
+                                $check_wish = -1;
+                            }
+                        }
+
+                        if(! empty($rule->message_keywords)){//用户消息中同时包含关键字
+                            $check_wish = false;
+                            foreach (explode(',', $rule->message_keywords) as $keyword){
+                                if(! strstr($message->UserMsgInfo, trim($keyword))){
+                                    $check_wish = true;
+                                }
+                            }
+                        }
+
+                        if($rule->type_shipping_fifty_day == 'ON'){ //50天按钮开
+                            if($diff_day < 50){
+                                $check_wish = -3;
+                            }
+                        }
+
+                        if($rule->type_within_tuotou == 'ON'){  //在wish平台妥投时间之内
+                            if($diff_day > 19){
+                                $check_wish = -4;
+                            }
+                        }
+
+                        if($check_wish == true)
+                            $result = $rule;
+                        break;
+                    case 'Aliexpress':
+                    //检查关键词
+                    if(! empty($rule->message_keywords)){
+                        $check_aliexpress = true;
+                        foreach (explode(',', $rule->message_keywords) as $keyword){
+                            $check_aliexpress = false;
+                            if(! strstr($message->UserMsgInfo, $keyword)){
+                                $check_aliexpress = true;
+                            }
+                        }
+
+                            if($rule->type_shipping_one_month == 'ON'){//SMT: 平邮已发货订单，据发货时间一个月之内
+                                if($diff_day > 30){
+                                    $check_aliexpress = false;
+                                }
+                            }
+
+                            if($rule->type_shipping_one_two_month == 'ON'){//SMT 据发货时间  1～2个月没有
+                                if(($diff_day < 30) || ($diff_day > 60 )){
+                                    $check_aliexpress = false;
+                                }
+                            }
+
+                            if($check_aliexpress)
+                                $result = $rule;
+
+                    }
+                    break;
+                    case 'Ebay':
+                        if(! empty($rule->message_keywords)){//用户消息中同时包含关键字
+                            $check_ebay = false;
+                            foreach (explode(',', $rule->message_keywords) as $keyword){
+                                if(! strstr($message->UserMsgInfo, trim($keyword))){
+                                    $check_wish = -2;
+                                }
+                            }
+                        }
+
+
+
+
+                    break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return $result;
+    }
+    //type_shipping_one_month
+    public function AliexpressFilter($message,$type=1){
+
+        $result = false;
+
+        $order = $message->relatedOrders()->orderBy('id', 'DESC')->first();
+        $packages = OrderModel::find($order->order_id)->packages;
+        if(! $packages->isEmpty()){
+            if($packages->count() == 1){  //只存在一个包裹
+                $package = $packages->first();
+                $send_time = Carbon::parse($message->date);
+                $shipped_at = Carbon::parse($package->shipped_at);
+
+                if($type == 1){//发信时间和发货时间的时间差 小于 30天  判断
+
+                    if($send_time->diffInDays($shipped_at) <= 30){
+                        //是否第一次发信 或者 第二次发信其第一封为自动回复的
+                        if($message->IsFristMsgForOrder()){
+                            $result = true;
+                        }
+
+                    }
+                }else{ //发信时间和发货时间的时间差  1-2 月之间     判断
+                    if(($send_time->diffInDays($shipped_at) > 30) && ($send_time->diffInDays($shipped_at) < 60 )){
+                        //是否第一次发信 或者 第二次发信其第一封为自动回复的
+                        if($message->IsFristMsgForOrder()){
+                            $result = true;
+                        }
+                    }
+                }
+
+            }
+        }
+        return $result;
+    }
+
     public function jdtestCrm()
     {
         foreach (AccountModel::all() as $account) {

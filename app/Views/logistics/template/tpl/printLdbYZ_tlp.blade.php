@@ -1,3 +1,11 @@
+<?php
+use App\Models\Logistics\Zone\GzAddressModel;
+$GzAddressModel = new GzAddressModel();
+$sender_info = $GzAddressModel->sender_info;
+if(!$sender_info){
+    //return redirect(route(''))->with('alert', $this->alert('danger', '今日寄件人地址已用完，不允许打印!'));
+}
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -233,8 +241,7 @@
     <div class="from">
         <div style="float:left;margin-right:10px;"><span>From:</span></div>
         <div class="fromads" style="float:left;">
-            {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->sender) : '') : '' }}&nbsp;&nbsp;
-            {{ $model->logistics ? ($model->logistics->emailTemplate ? ($model->logistics->emailTemplate->address) : '') : '' }}
+            {{ $sender_info->sender . ' ' . $sender_info->address }}
         </div>
     </div>
     <div class="to">
@@ -242,8 +249,8 @@
         <div class="toads" style="float:left;">
             {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
-            {{ $model->shipping_city . ',' }}{{ $model->shipping_state }}<br/>
-            {{ $model->country ? $model->country->name : '' . '(' }}{{ $model->country ? $model->country->cn_name : '' . ')' }}
+            {{ $model->shipping_city }},{{ $model->shipping_state }}<br/>
+            {{ $model->country ? $model->country->name : '' }}({{ $model->country ? $model->country->cn_name : '' }})
         </div>
     </div>
     <div class="tel">
@@ -257,10 +264,10 @@
     </div>
     <div class="khdm" style="border-top:1px solid black;font-size:30px;">
         <p style="width:50px;padding:0;float:left;font-size:40px;text-align:center;height:50px;font-weight:bold;">
-            {{ '格口号' }}
+            {{ $model->country ? ($model->country->geKou ? $model->country->geKou->geID : '') : '' }}
         </p>
         <p style="display:inline-block;width:240px;float:left;font-size:12px;height:50px;text-align:center;padding-top:2px;">
-            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
+            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height: 38px">
             <br/>
             {{ $model->tracking_no }}
         </p>
@@ -294,13 +301,13 @@
                 </tr>
                 <tr style="height:30px;">
                     <td style="text-align: center;padding-top:2px;">
-                        {{ $model->items ? $model->items->first()->quantity : '' . '*' . $model->declared_en }}
+                        {{ $model->items ? $model->items->first()->quantity : '' }} * {{ $model->getDeclaredInfo()['declared_en'] }}
                     </td>
                     <td style="text-align: center;">
-                        {{ $model->signal_weight }}
+                        {{ $model->getDeclaredInfo()['weight'] }}
                     </td>
                     <td style="text-align: center;">
-                        USD{{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}
+                        USD{{ sprintf("%.2f", $model->getDeclaredInfo()['declared_value']) > 20 ? 20 : $model->getDeclaredInfo()['declared_value'] }}
                     </td>
                 </tr>
                 <tr>
@@ -351,10 +358,10 @@
         寄件人签字 Sender's signature:
         <div style="float:right;font-size:12px;font-weight:bold;margin-right:30px;">CN22</div>
         <div style="font-size:12px;padding-top:2px;right:0;bottom:0;width:100px;">
-            {{ '(' . $model->order_id . ')' }}
+            ({{ $model->order_id }})
         </div>
         <div style="text-align:right;padding-right:2px;font-size:14px;font-weight:bold;width:100px;position:absolute;right:0;bottom:0">
-            {{ $model->logistics_id }}
+            {{ $model->logistics ? $model->logistics->logistics_code : '' }}
         </div>
     </div>
 </div>

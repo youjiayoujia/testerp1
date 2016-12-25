@@ -402,6 +402,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
     //采购单核销格式导出
     Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
+    //采购单付款格式导出
+    Route::any('purchaseOrderPayOffCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderPayOffCsvFormat', 'as' => 'purchaseOrderPayOffCsvFormat']);
     //采购单核销导入
     Route::any('purchaseOrderConfirmCsvFormatExecute', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormatExecute', 'as' => 'purchaseOrderConfirmCsvFormatExecute']);
     
@@ -1223,6 +1225,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('message_log', 'Message\Messages_logController');
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
+    //消息自动回复规则
+    Route::resource('autoReply', 'Message\AutoReplyController');
+
     Route::any('ajaxGetTranInfo',
         ['as' => 'ajaxGetTranInfo', 'uses' => 'MessageController@ajaxGetTranInfo']);
     Route::any('aliexpressReturnOrderMessages',
@@ -1319,6 +1324,7 @@ Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm', ['uses' => 'TestController@jdtestCrm']);
+Route::any('testAutoReply', ['uses' => 'TestController@testAutoReply']);
 Route::any('testEbayCases', ['uses' => 'TestController@testEbayCases']);
 Route::any('getSmtIssue', ['uses' => 'TestController@getSmtIssue']);
 Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);

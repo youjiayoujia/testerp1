@@ -60,7 +60,7 @@
 @section('childJs')
     <script>
         $(document).ready(function () {
-            //批量导出
+            //批量导出模板
             $('.download-csv').click(function(){
                 location.href="{{ route('purchaseOrderConfirmCsvFormat')}}";
             });

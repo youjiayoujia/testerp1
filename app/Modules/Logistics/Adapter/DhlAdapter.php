@@ -186,6 +186,16 @@ class DhlAdapter extends BasicAdapter
         }
         $orderInfo->shipping_phone = (int)$orderInfo->shipping_phone?$orderInfo->shipping_phone:'1111111';
         $shipmentID = $this->qz.$orderInfo->id;
+        if(!trim($orderInfo->shipping_state)){
+            $res = array('status'=>'error','info'=>'发货地址缺少省/州');
+            return $res;
+        }elseif(!trim($orderInfo->shipping_city)){
+            $res = array('status'=>'error','info'=>'发货地址缺少城市');
+            return $res;
+        }elseif(!trim($orderInfo->shipping_zipcode)){
+            $res = array('status'=>'error','info'=>'发货地址缺少邮编');
+            return $res;
+        }
         $data='{
 				 "labelRequest": {
 				 "hdr": {

@@ -1285,7 +1285,7 @@ class ItemModel extends BaseModel
             $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
             $old_data['purchase_url'] = $erp_products_data[0]->products_more_img;
             $old_data['competition_url'] = $erp_products_data[0]->productsPhotoStandard;
-            $old_data['notify'] = $erp_products_data[0]->products_remark_2;
+            $old_data['notify'] = $erp_products_data[0]->products_warring_string;
             $arr = [];
             $arr = explode(',', $erp_products_data[0]->products_suppliers_ids);
 
@@ -1443,7 +1443,7 @@ class ItemModel extends BaseModel
                 $old_data['warehouse_position'] = $data->products_location;
                 $old_data['purchase_url'] = $data->products_more_img;
                 $old_data['competition_url'] = $data->productsPhotoStandard;
-                $old_data['notify'] = $data->products_remark_2;
+                $old_data['notify'] = $data->products_warring_string;
                 $old_data['is_available'] = $data->productsIsActive;
                 $old_data['status'] = $data->products_status_2;
                 $volume = unserialize($data->products_volume);

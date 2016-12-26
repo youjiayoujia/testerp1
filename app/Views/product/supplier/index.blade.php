@@ -1,8 +1,8 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group" role="group">
 
-        <div class="btn-group">
+
+{{--        <div class="btn-group">
             &nbsp;
             <a class="btn btn-success" href="{{ route('supplierChangeHistory.index') }}">
                 采购员变更历史
@@ -13,23 +13,8 @@
             <a class="btn btn-success" href="{{ route('supplierLevel.index') }}">
                 <i class="glyphicon glyphicon-plus"></i> 供货商评级
             </a>
-        </div>
+        </div>--}}
         @parent
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i>
-            审核状态
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach(config('product.supplier.examine_status') as $key => $item)
-                <li>
-                    <a href="{{ DataList::filtersEncode(['examine_status','=',$key]) }}">{{ $item }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
@@ -86,7 +71,7 @@
                 <a href="{{ route('productSupplier.show', ['id'=>$supplier->id]) }}" title="查看" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
-                <a href="{{ route('productSupplier.edit', ['id'=>$supplier->id]) }}" title="编辑" class="btn btn-warning btn-xs">
+                <a href="{{ route('productSupplier.edit', ['id'=>$supplier->id]) }}" title="编辑" class="btn btn-warning btn-xs index-a-edit">
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>
 {{--                @if($supplier->examine_status == 0)

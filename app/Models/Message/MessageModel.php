@@ -15,6 +15,7 @@ use App\Models\Channel\AccountModel as Channel_Accounts;
 use App\Models\ChannelModel;
 use App\Models\Logistics\ChannelModel as LogisticChannel;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -37,7 +38,6 @@ class MessageModel extends BaseModel{
     public $searchFields = [
         'id'=>'ID',
         'subject'=>'主题',
-        'from_name'=>'发信人',
         'from'=>'发件邮箱' ,
         'label' => '消息类型',
         'channel_order_number' => '平台订单号'
@@ -105,6 +105,20 @@ class MessageModel extends BaseModel{
         }
     }
 
+    public function getAutoReplyStatusAttribute()
+    {
+        if($this->is_auto_reply == 2){
+            $status = '未检查';
+        }else if($this->is_auto_reply == 0){
+            $status = '已检查';
+        } else if($this->is_auto_reply == 1){
+            $status = '已回复';
+        } else {
+            $status = '未知';
+        }
+        return $status;
+    }
+
     /**
      * 更多搜索
      * @return array
@@ -114,9 +128,14 @@ class MessageModel extends BaseModel{
         //dd(UserModel::all()->pluck('name','name'));
         return [
             'relatedSearchFields' => [],
-            'filterFields' => [],
+            'filterFields' => [
+                'from_name',
+                'from',
+
+            ],
             'filterSelects' => [
                 'messages.status' => config('message.statusText'),
+                'assign_id' => UserModel::all()->pluck('name','id'),
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
@@ -303,13 +322,90 @@ class MessageModel extends BaseModel{
         return $attanchments;
     }
 
-/*    public function getLogisticsUrlAttribute()
-    {
 
-         LogisticChannel::where()->first();
+    //获取用户所有提问内容
+    public function getUserMsgInfoAttribute(){
+        $content_string = false;
+        $message_info = $this->ContentDecodeBase64;
+        if(! empty($message_info)){
+            foreach ($message_info as $key => $content){
+                switch ($key) {
+                    case 'aliexpress':
+                        foreach($content->result as $item){
+                            if($this->from_name == $item->senderName){
+                                $content_string .= $item->content;
+                            }
+                        }
 
-    }*/
+                        break;
+                    case 'wish':
+                       foreach ($content as $k => $item){
+                            if($item['Reply']['sender'] == 'user') {
+                                $content_string .= $item['Reply']['message'];
+                            }
+                        }
+                        break;
+          /*          case 'ebay':
+                        print_r($message_info);*/
+                    default:
+                        $content_string = false;
+                }
+            }
+        }
+        return $content_string;
+    }
 
+    public function IsFristMsgForOrder(){
+        $message_info = $this->ContentDecodeBase64;
+        $result = false;
+        foreach ($message_info as $channel_name => $content){
+            switch ($channel_name){
+                case 'aliexpress':
+                    $content_group = Collection::make($content->result)->groupBy('senderName');
+                    if($content_group->count() == 1){ //只存在用户信息
+                        $result = true;
+                    } else {
+                        foreach ($content_group as $key => $item){
+                            if($key != $this->from_name){ //包含自动去信的第一个消息
+                                if($item->count() == 1){
+                                    $result = true;
+                                }
+                            }
+                        }
+
+                    }
+                    break;
+                case 'wish':
+                    $hasMerchant =  Collection::make($content)->flatten()->search('merchant');
+                    if(! $hasMerchant){
+                        $result = true;
+                    }
+                    break;
+
+                case 'ebay':
+
+                    break;
+                default:
+
+
+
+
+            }
+        }
+        return $result;
+    }
+
+    public function MsgOrderIsExpress(){
+        if($order = $this->relatedOrders()->first()){
+            $package = OrderModel::find($order->order_id)->packages()->first();
+            if(! empty($package)){
+                if($package->logistics->is_express == '0'){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public function getMessageInfoAttribute(){
         if($this->ContentDecodeBase64){
@@ -458,46 +554,57 @@ class MessageModel extends BaseModel{
     }
 
     public function findOrderWithMessage(){
-        $order_id = $this->getChannelMessageOrderId(); //根据平台参数获取关联订单号
-        if(!empty($order_id)){
-            //$order_obj = OrderModel::where('channel_ordernum','=',$order_id)->first();
-            if(!empty($order_id)){
+        $order_id = false;
+        switch ($this->getChannelDiver()){
+            case 'ebay':
+                /**
+                 * 由于ebay 的api 没有返回渠道订单号
+                 * 关联规则：渠道用户ID 和 渠道订单的ItemID 进行关联
+                 * 如果由多个情况 同时关联
+                 *
+                 */
+                if(! empty($this->channel_order_number) && ! empty($this->from_name)){
+                    $orders = OrderModel::where('by_id','=', $this->from_name)->get();
+                    if(! $orders->isEmpty()){
+                        $orderByUser = false;
+                        foreach ($orders as $order){
+                            $item = $order->items()->where('orders_item_number', '=', $this->channel_order_number)->first();
+                            if($item){
+                                $orderByUser[$item->order_id] = $item->order_id;
+                            }
+                        }
+                        $order_id = $orderByUser;
+                    }
+                }
+                break;
+            case 'wish':
+                //wish交易号
+                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)->first();
+                $order_id = empty($order_obj) ? false : $order_obj->id;   //根据 orders 表 交易号
+                break;
+            case 'aliexpress':
+                $order_id = !empty($this->Order->id) ? $this->Order->id : false;
+                break;
+            default:
+                $order_id = false;
+
+        }
+        if($order_id){
+            if($this->getChannelDiver() != 'ebay'){
                 if($this->relatedOrders()->create(['order_id' => $order_id])){
                     $this->related = 1;
                     $this->save();
                 }
-            }
-        }
-
-    }
-
-    public function getChannelMessageOrderId(){
-        $fields_ary = $this->MessageFieldsDecodeBase64;
-        switch ($this->getChannelDiver()){
-            case 'ebay':
-                $order_id = $fields_ary['ItemID'];
-                if(!empty($order_id)){
-                    $order_obj = OrderModel::where('transaction_number','=',$order_id)->first();
-                    $order_id = empty($order_obj) ? '' : $order_obj->id;
-                }else{
-                    $order_id = '';
+            } else {
+                foreach($order_id as $item){
+                    $this->relatedOrders()->create(['order_id' => $item]);
                 }
-                break;
-            case 'wish':
-                 //wish交易号
-                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)
-                    ->where('channel_account_id',$this->account_id)
-                    ->first();
-                $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
-                break;
-            case 'aliexpress':
-                $order_id = !empty($this->Order->id) ? $this->Order->id : '';
-                break;
-            default:
-                $order_id = '';
+                $this->related = 1;
+                $this->save();
+            }
+
         }
 
-        return $order_id;
     }
 
     /**
@@ -567,7 +674,7 @@ class MessageModel extends BaseModel{
         $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id')->toArray(); //客服所属的账号
 
         return $query->where(function ($query) use ($account_ids){
-            $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0])
+            $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0 ,'is_auto_reply'=> 0])
                 ->whereIn('account_id',$account_ids);
             })
             ->orWhere(function($query) use ($user_id, $account_ids){
@@ -576,6 +683,7 @@ class MessageModel extends BaseModel{
                     ->where('required','=',1)
                     ->where('dont_reply','=',0)
                     ->where('read','=',0)
+                    ->where('is_auto_reply', '=', 0)
                 ->whereIn('account_id',$account_ids);
             })
             ->take($entry)

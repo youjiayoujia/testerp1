@@ -70,6 +70,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomShelves::class,
         \App\Console\Commands\NotWarehouseInSendEmail::class,
         \App\Console\Commands\SyncSellmoreApi::class,
+        \App\Console\Commands\changeSupplierFlienameDirectory::class, //修改供应商文件目录存储
         \App\Console\Commands\AutoGetEbayMessage::class,
         \App\Console\Commands\SyncImportApi::class,
         \App\Console\Commands\AutoEbayAdd::class, //Ebay 自动补货

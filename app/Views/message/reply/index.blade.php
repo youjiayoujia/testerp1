@@ -17,8 +17,9 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th>账号</th>
-    <th>收信人</th>
-    <th>收信邮箱</th>
+    <th>标题</th>
+    <th>用户昵称</th>
+    <th>用户ID</th>
     <th>状态</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -29,6 +30,7 @@
         <tr>
             <td>{{ $reply->id }}</td>
             <td>{{ $reply->message->account->account }}</td>
+            <td>{{ str_limit($reply->title, 40) }}</td>
             <td>{{ $reply->to }}</td>
             <td>{{ $reply->to_email }}</td>
             <td>{{ $reply->status }}</td>

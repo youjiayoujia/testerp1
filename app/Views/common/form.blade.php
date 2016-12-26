@@ -15,6 +15,11 @@
             <form method="POST" action="@section('formAction')@show{{-- 表单提交地址 --}}" @section('formAttributes')@show{{-- 表单其它属性 --}}  enctype="multipart/form-data">
                 {!! csrf_field() !!}
                 @section('formBody')@show{{-- 表单内容 --}}
+                @section('inputRefer'){{--pageRefer--}}
+                    @if(!empty($refer_url))
+                        <input type="hidden" name="refer_url" value="{{$refer_url}}">
+                    @endif
+                @show
                 @section('formButton')
                     <button type="submit" class="btn btn-success">提交</button>
                     <button type="button" class="btn btn-default" onclick="return history.go(-1);">取消</button>

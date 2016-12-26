@@ -741,7 +741,7 @@
 
                                         </div>
                                         <div class="form-group col-sm-2">
-                                            <label for="id" class="control-label">ItemID</label>
+                                            <label for="id" class="control-label">渠道ItemID</label>
                                         </div>
                                         <div class="form-group col-sm-2">
                                             <label for="sku" class="control-label">sku</label>

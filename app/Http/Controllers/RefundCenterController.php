@@ -44,7 +44,7 @@ class RefundCenterController extends Controller
             'users'   => UserModel::all(),
             'channels'=> ChannelModel::all(),
             'types'    => config('refund.type'),
-           // 'mixedSearchFields' => $this->model->mixed_search,
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index',$response);
     }

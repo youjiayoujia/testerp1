@@ -1130,7 +1130,8 @@ class ItemModel extends BaseModel
 
     public function createPurchaseStaticstics()
     {
-        $users = UserRoleModel::all()->where('role_id', '2');
+        $users = UserRoleModel::where('role_id', '2')->get();
+        
         foreach ($users as $user) {
             $data = [];
             //采购负责人

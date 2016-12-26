@@ -14,7 +14,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
-        \App\Console\Commands\DoPackages::class,
         \App\Console\Commands\GetOrders::class,
         \App\Console\Commands\CreatePurchase::class,
         \App\Console\Commands\PurchaseStaticstics::class,
@@ -93,6 +92,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inspire')->hourly();
         $schedule->command('purchase:create')->cron('20 4,12 * * *');
+        $schedule->command('purchaseStaticstics:create')->cron('20 6 * * *');
+        
         //黑名单定时任务
         $schedule->command('blacklists:get')->dailyAt('2:00');
         $schedule->command('blacklists:update')->dailyAt('3:00');
@@ -139,6 +140,7 @@ class Kernel extends ConsoleKernel
                     break;
             }
         }
+        //包裹报表
         $schedule->command('pick:report')->hourly();
         $schedule->command('all:report')->daily();
         //CRM
@@ -153,8 +155,8 @@ class Kernel extends ConsoleKernel
         //API同步sellmore database
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
         $schedule->command('SyncImportApi:all')->everyFiveMinutes();
-
-        
+        //半小时一次将包裹放入队列
+        $schedule->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')->everyThirtyMinutes();
         //财务
         $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
         //DHL

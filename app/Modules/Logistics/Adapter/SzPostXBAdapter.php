@@ -53,7 +53,6 @@ class SzPostXBAdapter extends BasicAdapter
         }
         $url1 = trim($url1,'&');
         $postD = http_build_query($postD);
-        echo $url1;
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);  
         echo "<pre>";
@@ -93,13 +92,16 @@ class SzPostXBAdapter extends BasicAdapter
         $totalWeight          = $package->total_weight * 1000;
         $totalValue           = $package->total_price * 1000;
         foreach ($package->items as $packageItem) {
-            $productNum += $packageItem->quantity;
+            $productNum = $packageItem->quantity;
             $products_declared_cn = $packageItem->item->product->declared_cn;
             $products_declared_en = $packageItem->item->product->declared_en;
             $category_name        = $packageItem->item->catalog ? $packageItem->item->catalog->name : '裙子';      //获取分类信息
             $category_name_en     = $packageItem->item->catalog ? $packageItem->item->catalog->c_name : 'skirt';
             $single_weight        = $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
             $single_value         = $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+            if(mb_strlen($category_name) > 60){
+                $category_name = mb_substr($category_name,4,mb_strlen($category_name),'utf-8');     //组装申报中文名时，有些ERP品类的长度大于API的限定长度（60,中文字符占3个字符），截取处理。
+            }
             $proStr .='<product>';
             $proStr .='<productNameCN>'.$products_declared_cn.'</productNameCN>';
             $proStr .='<productNameEN>'.$products_declared_en.'</productNameEN>';
@@ -108,8 +110,8 @@ class SzPostXBAdapter extends BasicAdapter
             $proStr .='<productCateEN>'.$category_name_en.'</productCateEN>';
             $proStr .='<productId>'.$productId.'</productId>';
             $proStr .='<producingArea>CN</producingArea>';
-            $proStr .='<productWeight>'.$single_weight.'</productWeight>';
-            $proStr .='<productPrice>'.$single_value.'</productPrice>';
+            $proStr .='<productWeight>'.($single_weight * 1000).'</productWeight>';
+            $proStr .='<productPrice>'.($single_value * 1000).'</productPrice>';
             $proStr .='</product>';
         }
         
@@ -206,10 +208,8 @@ class SzPostXBAdapter extends BasicAdapter
         $str .='</eventBody>';
         $str .='</logisticsEvent>';
         $str .='</logisticsEventsRequest>';
-        
-        
-        
-       /* $str .="<logisticsEventsRequest><logisticsEvent>
+                
+       /*$str .="<logisticsEventsRequest><logisticsEvent>
 <eventHeader>
 <eventType>LOGISTICS_BATCH_SEND</eventType>
 <eventTime>".$dateTime."</eventTime>
@@ -254,7 +254,7 @@ class SzPostXBAdapter extends BasicAdapter
 </order>
 </eventBody>
 </logisticsEvent>
-</logisticsEventsRequest>"; */
+</logisticsEventsRequest>";*/ 
 //         $obj = simplexml_load_string($str);
 //         print_r($obj);
         $str=preg_replace('/&/',' ',$str);
@@ -267,6 +267,7 @@ class SzPostXBAdapter extends BasicAdapter
         $postD['msg_type']            = 'B2C_TRADE';
         $postD['ecCompanyId']         = $this->ecCompanyId;
         $postD['version']             = '2.0';*/
+        echo $postD;
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
         print_r($result);

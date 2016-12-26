@@ -94,6 +94,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '风控订单地址验证',
+                'url' => 'blacklistAddress.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '标记发货规则设置',
                 'url' => 'orderMarkLogic.index',
                 'icon' => '',

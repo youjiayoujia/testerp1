@@ -61,7 +61,7 @@ class DhlAdapter extends BasicAdapter
             //暂时关掉自动更新
             $result =[
                 'code' => 'error',
-                'result' => 'TOKEN过期'
+                'result' => 'TOKEN过期,暂时请到V1手动更新过了'
             ];
             return $result;
 
@@ -186,6 +186,16 @@ class DhlAdapter extends BasicAdapter
         }
         $orderInfo->shipping_phone = (int)$orderInfo->shipping_phone?$orderInfo->shipping_phone:'1111111';
         $shipmentID = $this->qz.$orderInfo->id;
+        if(!trim($orderInfo->shipping_state)){
+            $res = array('status'=>'error','info'=>'发货地址缺少省/州');
+            return $res;
+        }elseif(!trim($orderInfo->shipping_city)){
+            $res = array('status'=>'error','info'=>'发货地址缺少城市');
+            return $res;
+        }elseif(!trim($orderInfo->shipping_zipcode)){
+            $res = array('status'=>'error','info'=>'发货地址缺少邮编');
+            return $res;
+        }
         $data='{
 				 "labelRequest": {
 				 "hdr": {
@@ -301,8 +311,6 @@ class DhlAdapter extends BasicAdapter
         $result = $this->postCurlHttpsData($url,$data);
         $result = json_decode($result);
         $status = $result->labelResponse->bd->responseStatus->code;//200时为成功
-        echo "<pre>";
-        print_r($result);
         if($status == '200'){
             $shipmentID = $result->labelResponse->bd->labels[0]->shipmentID;
 
@@ -326,12 +334,12 @@ class DhlAdapter extends BasicAdapter
                 'result' =>$shipmentID //跟踪号
             ];
         }else{
-            /*if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
+            if(@$result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
                 $msg =  $result->labelResponse->bd->responseStatus->messageDetails;
             }
-            if($msg){
+            if(@$msg){
                 $res = array('status'=>false,'info'=>'请求信息失败:'.$msg);
                 $result =[
                     'code' => 'error',
@@ -342,7 +350,7 @@ class DhlAdapter extends BasicAdapter
                     'code' => 'error',
                     'result' => '获取追踪号失败'
                 ];
-            }*/
+            }
             
             $result =[
                 'code' => 'error',

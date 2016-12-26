@@ -96,41 +96,51 @@ class TestController extends Controller
         dd($result);
     }
 
-    // public function test2()
-    // {
-    //     $order['channel_id'] = 2;
-    //     $order['channel_account_id'] = 1; 
-    //     $order['channel_ordernum'] = 12345632;
-    //     $order['status'] = 'PAID';
-    //     $order['currency'] = 'USD';
-    //     $order['shipping_country'] = 'US';
-    //     $order['items'][0]['quantity'] = 2;
-    //     $order['items'][0]['sku'] = 'USB030';
-    //     $order['items'][0]['channel_sku'] = 'GE*B3010_f1';
-    //     $order['items'][1]['quantity'] = 3;
-    //     $order['items'][1]['sku'] = 'USB041';
-    //     $order['items'][1]['channel_sku'] = '12*B3012_f1';
-    //     $order['items'][2]['quantity'] = 600;
-    //     $order['items'][2]['sku'] = 'UKB032';
-    //     $order['items'][2]['channel_sku'] = '56*B3010_f1';
-    //     $job = new InOrders($order);
-    //     $job = $job->onQueue('inOrders');
-    //     $this->dispatch($job);
-    //     var_dump('ok');
-    // }
-
     public function test2()
     {
-        $package = PackageModel::find(3112);
-        $package->assignLogistics();
-        var_dump('123');
+        $order['channel_id'] = 2;
+        $order['channel_account_id'] = 1; 
+        $order['channel_ordernum'] = 12345632;
+        $order['status'] = 'PAID';
+        $order['currency'] = 'USD';
+        $order['shipping_country'] = 'US';
+        $order['items'][0]['quantity'] = 2;
+        $order['items'][0]['sku'] = 'SS1197W';
+        $order['items'][0]['channel_sku'] = '353*SS1197W';
+        $job = new InOrders($order);
+        $job = $job->onQueue('inOrders');
+        $this->dispatch($job);
+        var_dump('ok');
     }
 
     // public function test2()
     // {
-    //     $order = OrderModel::find(1);
-    //     var_dump($order->toarray());
+    //     $order = PackageModel::find('3593');
+    //     $order->createPackageItems();
+    //     var_dump('123');
+    // }
+
+    // public function test2()
+    // {
+    //     $order = OrderModel::find('4819');
     //     $order->createPackage();
+    //     var_dump('123');
+    // }
+
+    // public function test2()
+    // {
+    //     $orders_arr = OrderModel::all()->chunk(200);
+    //     foreach($orders_arr as $orders) {
+    //         var_dump($orders->toarray());exit;
+    //     }
+    // }
+
+    // public function test2()
+    // {
+    //     $order = OrderModel::find(3854);
+    //     var_dump($order->toarray());
+    //     $order->update(['channel_id' => '25']);
+    //     var_dump($order->channel_id);
     //     var_dump('123');
     // }
     public function test1()

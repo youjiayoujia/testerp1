@@ -17,6 +17,7 @@ use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Product\CatalogCategoryModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -95,6 +96,7 @@ class ItemModel extends BaseModel
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
+            'doubleRelatedSelectedFields' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
             'sectionSelect' => [],
         ];
     }
@@ -1568,6 +1570,10 @@ class ItemModel extends BaseModel
                 if (substr($data->products_suppliers_ids, 0, 1) == ',') {
                     $data->products_suppliers_ids = substr($data->products_suppliers_ids, 1);
                 }
+                
+                if(!$data->products_suppliers_ids){
+                    $data->products_suppliers_ids = 0;
+                }
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id in(' . $data->products_suppliers_ids . ')');
                 if (count($supp_name)) {
@@ -1729,6 +1735,13 @@ class ItemModel extends BaseModel
 
                 //多对多供应商转换id
                 $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+                if (substr($data->products_suppliers_ids, 0, 1) == ',') {
+                    $data->products_suppliers_ids = substr($data->products_suppliers_ids, 1);
+                }
+                
+                if(!$data->products_suppliers_ids){
+                    $data->products_suppliers_ids = 0;
+                }
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id in(' . $data->products_suppliers_ids . ')');
                 if (count($supp_name)) {

@@ -53,7 +53,6 @@ class SzPostXBAdapter extends BasicAdapter
         }
         $url1 = trim($url1,'&');
         $postD = http_build_query($postD);
-        echo $url1;
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);  
         echo "<pre>";
@@ -161,7 +160,7 @@ class SzPostXBAdapter extends BasicAdapter
         $batchNo = date('Ymd');
         $orderId = $package->id;       //内单号
         list($name, $channel) = explode(',',$package->logistics->type);
-        $str = '<logisticsEventsRequest>';
+        /*$str = '<logisticsEventsRequest>';
         $str .='<logisticsEvent>';
         $str .='<eventHeader>';
         $str .='<eventType>LOGISTICS_BATCH_SEND</eventType>';
@@ -205,11 +204,11 @@ class SzPostXBAdapter extends BasicAdapter
         $str .='</order>';
         $str .='</eventBody>';
         $str .='</logisticsEvent>';
-        $str .='</logisticsEventsRequest>';
+        $str .='</logisticsEventsRequest>';*/
         
         
         
-       /* $str .="<logisticsEventsRequest><logisticsEvent>
+       $str .="<logisticsEventsRequest><logisticsEvent>
 <eventHeader>
 <eventType>LOGISTICS_BATCH_SEND</eventType>
 <eventTime>".$dateTime."</eventTime>
@@ -254,9 +253,8 @@ class SzPostXBAdapter extends BasicAdapter
 </order>
 </eventBody>
 </logisticsEvent>
-</logisticsEventsRequest>"; */
-//         $obj = simplexml_load_string($str);
-//         print_r($obj);
+</logisticsEventsRequest>"; 
+
         $str=preg_replace('/&/',' ',$str);
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;

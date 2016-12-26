@@ -121,8 +121,9 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['winitProductCode'] = $channel;
 
         $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
-//         echo "<pre>";
-//         print_r($result);
+        echo "<pre>";
+        print_r($creatOrder);
+        print_r($result);
         $result = json_decode($result,true);
         if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))        {   
               

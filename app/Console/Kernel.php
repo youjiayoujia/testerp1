@@ -14,7 +14,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
-        \App\Console\Commands\DoPackages::class,
         \App\Console\Commands\GetOrders::class,
         \App\Console\Commands\CreatePurchase::class,
         \App\Console\Commands\PurchaseStaticstics::class,

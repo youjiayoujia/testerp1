@@ -8,7 +8,7 @@
         </div>
     </div>
     <div class="panel panel-info">
-        <div class="panel-heading">列表</div>
+        <div class="panel-heading">列表@if($model->status == 'inboxed')<font color='red'>(提交后,item信息出库)</font>@endif</div>
         <div class="panel-body">
                 <div class='row'>
                     <div class='form-group col-lg-1'>

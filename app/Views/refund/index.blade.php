@@ -61,61 +61,6 @@
     </div>
 
 
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 渠 道
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($channels as $channel)
-                <li><a href="{{ DataList::filtersEncode(['channel_id','=',$channel->id]) }}">{{$channel->name}}</a></li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 退款方式
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach(config('refund.refund') as $key => $name)
-                <li><a href="{{ DataList::filtersEncode(['refund','=',$key]) }}">{{$name}}</a></li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 退款类型
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($types as $key => $type)
-                <li><a href="{{ DataList::filtersEncode(['type','=',$key]) }}">{{$type}}</a></li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 客 服
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($users as $user)
-                <li><a href="{{ DataList::filtersEncode(['customer_id','=',$user->id]) }}">{{$user->name}}</a></li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 状态
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach(config('refund.process') as $key => $status)
-                <li><a href="{{ DataList::filtersEncode(['process_status','=',$key]) }}">{{$status}}</a></li>
-            @endforeach
-        </ul>
-    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox"> 全选</th>

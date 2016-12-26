@@ -277,6 +277,7 @@ class PackageController extends Controller
     {
         $arr = explode(',', $arr);
         $name = UserModel::find(request()->user()->id)->name;
+        $buf = [];
         foreach ($arr as $packageId) {
             $model = $this->model->find($packageId);
             $from = json_encode($model);
@@ -284,6 +285,7 @@ class PackageController extends Controller
                 continue;
             }
             if (in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+                $buf['status'][] = $packageId;
                 continue;
             }
             $logistics = LogisticsModel::find($id);
@@ -293,12 +295,26 @@ class PackageController extends Controller
                 } else {
                     $model->update(['logistics_id' => $id, 'tracking_no' => '']);
                 }
+            } else {
+                $buf['warehouse'][] = $packageId;
             }
             $to = json_encode($model);
             $this->eventLog($name, '改变物流方式', $to, $from);
         }
-
-        return redirect($_SERVER['HTTP_REFERER']);
+        $str = '';
+        foreach($buf as $kind => $value) {
+            if($kind == 'warehouse') {
+                $str .= implode(',', $value) . '包裹因仓库不属修改失败 .';
+            }
+            if($kind == 'status') {
+                $str .= implode(',', $value) . '包裹因包裹状态管控修改失败 .';
+            }
+        }
+        if(strlen($str)) {
+            return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('danger', $str));
+        } else {
+            return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '修改成功'));
+        }
     }
 
     /**

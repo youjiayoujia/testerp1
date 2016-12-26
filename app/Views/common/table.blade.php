@@ -328,6 +328,14 @@
 
         $('.datetime_select').datetimepicker({theme: 'dark'});
         $('.select_select0').select2();
+        $( document ).ready(function () {
+            //列表页修改编辑rul
+            $('.index-a-edit').click(function (){
+                var edit_url = $(this).attr('href');
+                var url = edit_url+'?refer_url='+window.location.href;
+                $(this).attr('href', url);
+            });
+        });
     </script>
 @section('childJs')@show
 @stop

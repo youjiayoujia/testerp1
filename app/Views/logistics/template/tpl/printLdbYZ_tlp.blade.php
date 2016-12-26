@@ -101,20 +101,20 @@ if(!$sender_info){
 
     .to {
         border-bottom: 1px black solid;
-        height: 80px;
+        height: 76px;
         font-size: 13px;
         line-height: 13px
     }
 
     .to div:nth-child(1) {
         width: 10mm;
-        height: 80px;
+        height: 76px;
         float: left;
     }
 
     .to div:nth-child(2) {
         width: 83mm;
-        height: 80px;
+        height: 76px;
         float: right;
     }
 
@@ -132,13 +132,13 @@ if(!$sender_info){
 
     .return {
         border-bottom: 1px black solid;
-        height: 18px;
+        height: 16px;
         font-size: 12px;
     }
 
     .khdm {
         border-bottom: 1px black solid;
-        height: 50px;
+        height: 64px;
     }
 
     .khimg {
@@ -206,7 +206,7 @@ if(!$sender_info){
     }
 
     .footer {
-        font-size: 9px;
+        font-size: 8px;
         line-height: 9px;
         position: relative;
     }
@@ -267,7 +267,7 @@ if(!$sender_info){
             {{ $model->country ? ($model->country->geKou ? $model->country->geKou->geID : '') : '' }}
         </p>
         <p style="display:inline-block;width:240px;float:left;font-size:12px;height:50px;text-align:center;padding-top:2px;">
-            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height: 38px">
+            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height: 48px; width: 200px">
             <br/>
             {{ $model->tracking_no }}
         </p>
@@ -358,7 +358,7 @@ if(!$sender_info){
         寄件人签字 Sender's signature:
         <div style="float:right;font-size:12px;font-weight:bold;margin-right:30px;">CN22</div>
         <div style="font-size:12px;padding-top:2px;right:0;bottom:0;width:100px;">
-            ({{ $model->order_id }})
+            ({{ $model->id }})
         </div>
         <div style="text-align:right;padding-right:2px;font-size:14px;font-weight:bold;width:100px;position:absolute;right:0;bottom:0">
             {{ $model->logistics ? $model->logistics->logistics_code : '' }}

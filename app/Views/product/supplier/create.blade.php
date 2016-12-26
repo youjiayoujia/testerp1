@@ -66,12 +66,6 @@
             @endforeach
             </select>
         </div>
-
-        <div class="form-group col-lg-3" id="update_examine" >
-            <label for="url">上传审核资料</label>
-            <input type='file' class=" file" id="qualifications" placeholder="上传审核资料" name='qualifications' >
-        </div>
-
     </div>　
     <div class="row">
 
@@ -121,11 +115,24 @@
             <input class='form-control' type='text' value='{{request()->user()->id}}' name='created_by' style="display: none;"/>
        </div>
    </div>
+    <div class="row">
+        <div class="form-group col-lg-3 file-group" id="update_examine" >
+            <label for="url">上传审核资料</label>
+            <button type="button"  class="btn btn-warning add-input-file">增加一个文件</button>
+            <input type='file' class=" file" id="qualifications" placeholder="上传审核资料" name='qualifications[]' >
+        </div>
+    </div>
 @stop
 @section('pageJs')
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 <script type='text/javascript'>
     $(document).ready(function(){
+        $('.add-input-file').click(function(){
+            var input =  '<input type="file" class=" file" id="qualifications" placeholder="上传审核资料" name="qualifications[]" >';
+            $('.file-group').append(input);
+        });
+
+
         var buf = new Array();
         buf[0] = "{{ old('province') }}" ;
         buf[1] = "{{ old('city') }}" ;

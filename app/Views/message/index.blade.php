@@ -88,6 +88,7 @@
 {{--    <th class="sort" data-field="created_at">创建日期</th>--}}
     {{--<th class="sort" data-field="updated_at">更新日期</th>--}}
     <th>延迟</th>
+    <th>AutoReply</th>
     <th>操作</th>
     <th>无需回复</th>
 @stop
@@ -125,6 +126,10 @@
 
 
             </td>
+            <td>
+                {{$message->AutoReplyStatus}}
+            </td>
+
             <td>
                 @if($message->status == 'UNREAD')
                     <a href="{{ route('message.process', ['id'=>$message->id]) }}" class="btn btn-primary btn-xs">

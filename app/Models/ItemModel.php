@@ -12,6 +12,7 @@ use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\UserModel;
+use App\Models\ChannelModel;
 use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
@@ -404,6 +405,31 @@ class ItemModel extends BaseModel
             ->sum('order_items.quantity');
 
         return $sellNum;
+    }
+
+    //获得sku分平台销量 period参数格式为 -7 day
+    public function getChannelSales($period)
+    {
+        //销量
+        $sellNum = DB::select("select orders.channel_id,sum(`order_items`.`quantity`) as aggregate 
+                    from `order_items` left join `orders` on `orders`.`id` = `order_items`.`order_id` 
+                    where `order_items`.`deleted_at` is null and `orders`.`status` in ('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL') 
+                    and `orders`.`created_at` > '".date('Y-m-d H:i:s', strtotime($period))."'
+                    and `order_items`.`quantity` < 5 
+                    and `order_items`.`item_id` = ".$this->id." 
+                    group by `orders`.`channel_id`");
+        $data = [];
+        foreach($sellNum as $sell){
+            $data[$sell->channel_id] = $sell->aggregate;
+        }
+
+        foreach(ChannelModel::all() as $channel){
+            if(!array_key_exists($channel->id,$data)){
+                $data[$channel->id] = 0;
+            }
+        }
+                
+        return $data;
     }
 
     //计算sku采购建议数量
@@ -1261,7 +1287,6 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url = "http://120.24.100.157:60/api/skuInfoApi.php";
-        //$itemModel = $this->all();
         $itemModel = $this->where('purchase_adminer',null)->get();
         
         foreach ($itemModel as $key => $model) {
@@ -1346,7 +1371,7 @@ class ItemModel extends BaseModel
             $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
             $old_data['purchase_url'] = $erp_products_data[0]->products_more_img;
             $old_data['competition_url'] = $erp_products_data[0]->productsPhotoStandard;
-            $old_data['notify'] = $erp_products_data[0]->products_remark_2;
+            $old_data['notify'] = $erp_products_data[0]->products_warring_string;
             $arr = [];
             $arr = explode(',', $erp_products_data[0]->products_suppliers_ids);
 
@@ -1444,7 +1469,7 @@ class ItemModel extends BaseModel
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1 and products_id > 22815 and spu!="" order by products_id asc');
+                                        from erp_products_data where productsIsActive = 1 and spu!="" order by products_id desc');
 
         foreach ($erp_products_data as $data) {
             $itemModel = $this->where('sku', $data->products_sku)->get()->first();
@@ -1504,7 +1529,7 @@ class ItemModel extends BaseModel
                 $old_data['warehouse_position'] = $data->products_location;
                 $old_data['purchase_url'] = $data->products_more_img;
                 $old_data['competition_url'] = $data->productsPhotoStandard;
-                $old_data['notify'] = $data->products_remark_2;
+                $old_data['notify'] = $data->products_warring_string;
                 $old_data['is_available'] = $data->productsIsActive;
                 $old_data['status'] = $data->products_status_2;
                 $volume = unserialize($data->products_volume);

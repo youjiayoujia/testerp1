@@ -289,7 +289,7 @@ class PackageController extends Controller
                 continue;
             }
             $logistics = LogisticsModel::find($id);
-            if ($logistics && $logistics->belongsToWarehouse($model->warehouse_id, $logistics->code)) {
+            if ($logistics && $logistics->belongsToWarehouse($model->warehouse_id)) {
                 if ($model->status == 'ASSIGNFAILED') {
                     $model->update(['logistics_id' => $id, 'tracking_no' => '', 'status' => 'ASSIGNED']);
                 } else {

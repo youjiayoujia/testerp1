@@ -108,13 +108,13 @@ if(!$sender_info){
 
     .to div:nth-child(1) {
         width: 10mm;
-        height: 80px;
+        height: 76px;
         float: left;
     }
 
     .to div:nth-child(2) {
         width: 83mm;
-        height: 80px;
+        height: 76px;
         float: right;
     }
 
@@ -206,7 +206,7 @@ if(!$sender_info){
     }
 
     .footer {
-        font-size: 9px;
+        font-size: 8px;
         line-height: 9px;
         position: relative;
     }

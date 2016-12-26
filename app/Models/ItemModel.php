@@ -1143,7 +1143,7 @@ class ItemModel extends BaseModel
             //必须当天内下单SKU数
             $data['need_purchase_num'] = DB::select('select count(*) as num from purchases where user_id = "' . $user->user_id . '" and need_purchase_num > 0 and available_quantity+zaitu_num-seven_sales < 0 ')[0]->num;
             //15天缺货订单
-            $data['fifteenday_need_order_num'] = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "' . $item_id . '" and
+            $data['fifteenday_need_order_num'] = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0  and
                 packages.id = package_items.package_id and packages.deleted_at is null and packages.created_at > "' . date('Y-m-d',
                     time() - 24 * 3600 * 15) . '" ')[0]->num;
 
@@ -1155,7 +1155,7 @@ class ItemModel extends BaseModel
             $data['need_percent'] = $data['fifteenday_total_order_num'] ? round($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'],
                 4) : 0;
             //缺货总数
-            $data['need_total_num'] = $this->out_of_stock;
+            $data['need_total_num'] = $this->out_of_stock?$this->out_of_stock:0;
             //平均缺货天数
             $data['avg_need_day'] = round(DB::select('select avg(' . time() . '-UNIX_TIMESTAMP(packages.created_at))/86400 as day from packages,package_items,purchases where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and purchases.user_id = "' . $user->user_id . '" and 
                 packages.id = package_items.package_id and purchases.item_id = package_items.item_id  ')[0]->day, 1);

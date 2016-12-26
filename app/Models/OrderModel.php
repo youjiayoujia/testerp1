@@ -681,7 +681,7 @@ class OrderModel extends BaseModel
                 } else {
                     $stock = StockModel::where('oversea_sku', $orderItem['sku'])->first();
                     if($stock) {
-                        $orderItem['item_id'] = $stock->item->id;
+                        $orderItem['item_id'] = $stock->item_id;
                         $orderItem['item_status'] = $stock->item->status;
                         $orderItem['is_oversea'] = 1;
                         $orderItem['code'] = $stock->warehouse->code;

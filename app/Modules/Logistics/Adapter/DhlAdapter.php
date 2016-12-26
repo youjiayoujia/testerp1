@@ -61,7 +61,7 @@ class DhlAdapter extends BasicAdapter
             //暂时关掉自动更新
             $result =[
                 'code' => 'error',
-                'result' => 'TOKEN过期'
+                'result' => 'TOKEN过期,暂时请到V1手动更新过了'
             ];
             return $result;
 

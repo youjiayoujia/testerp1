@@ -92,7 +92,7 @@ class SzPostXBAdapter extends BasicAdapter
         $totalWeight          = $package->total_weight * 1000;
         $totalValue           = $package->total_price * 1000;
         foreach ($package->items as $packageItem) {
-            $productNum += $packageItem->quantity;
+            $productNum = $packageItem->quantity;
             $products_declared_cn = $packageItem->item->product->declared_cn;
             $products_declared_en = $packageItem->item->product->declared_en;
             $category_name        = $packageItem->item->catalog ? $packageItem->item->catalog->name : '裙子';      //获取分类信息
@@ -107,8 +107,8 @@ class SzPostXBAdapter extends BasicAdapter
             $proStr .='<productCateEN>'.$category_name_en.'</productCateEN>';
             $proStr .='<productId>'.$productId.'</productId>';
             $proStr .='<producingArea>CN</producingArea>';
-            $proStr .='<productWeight>'.$single_weight.'</productWeight>';
-            $proStr .='<productPrice>'.$single_value.'</productPrice>';
+            $proStr .='<productWeight>'.($single_weight * 1000).'</productWeight>';
+            $proStr .='<productPrice>'.($single_value * 1000).'</productPrice>';
             $proStr .='</product>';
         }
         

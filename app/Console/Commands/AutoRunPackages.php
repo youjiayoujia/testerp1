@@ -54,9 +54,7 @@ class AutoRunPackages extends Command
                     $len = 500;
                     $start = 0;
                     $count = 0;
-                    $orders = OrderModel::where('status', 'PREPARED')->skip($start)->take($len)->get()->filter(function($single){
-                        return $single->packages->count() == 0;
-                    });
+                    $orders = OrderModel::where('status', 'PREPARED')->skip($start)->take($len)->get();
                     while($orders->count()) {
                         foreach($orders as $order) {
                             $count++;
@@ -67,9 +65,7 @@ class AutoRunPackages extends Command
                         }
                         unset($orders);
                         $start += $len;
-                        $orders = OrderModel::where('status', 'PREPARED')->skip($start)->take($len)->get()->filter(function($single){
-                            return $single->packages->count() == 0;
-                        });
+                        $orders = OrderModel::where('status', 'PREPARED')->skip($start)->take($len)->get();
                     }
                     $this->info($count.'orders have been put into the doPackages queue');
                     break;
@@ -78,7 +74,7 @@ class AutoRunPackages extends Command
                     $len = 500;
                     $start = 0;
                     $count = 0;
-                    $packages = PackageModel::whereIn('status', ['NEW','NEED'])->skip($start)->take($len)->get();
+                    $packages = PackageModel::whereIn('status', ['NEW','NEED'])->where('queue_name', '!=', 'assignStocks')->skip($start)->take($len)->get();
                     while($packages->count()) {
                         foreach($packages as $package) {
                             $count++;
@@ -89,7 +85,7 @@ class AutoRunPackages extends Command
                         }
                         unset($packages);
                         $start += $len;
-                        $packages = PackageModel::whereIn('status', ['NEW','NEED'])->skip($start)->take($len)->get();
+                        $packages = PackageModel::whereIn('status', ['NEW','NEED'])->where('queue_name', '!=', 'assignStocks')->skip($start)->take($len)->get();
                     }
                     $this->info($count.'packages have been put into the assignStocks queue');
                     break;
@@ -98,7 +94,7 @@ class AutoRunPackages extends Command
                     $len = 500;
                     $start = 0;
                     $count = 0;
-                    $packages = PackageModel::whereIn('status', ['WAITASSIGN','ASSIGNFAILED'])->skip($start)->take($len)->get();
+                    $packages = PackageModel::whereIn('status', ['WAITASSIGN','ASSIGNFAILED'])->where('queue_name', '!=', 'assignLogistics')->skip($start)->take($len)->get();
                     while($packages->count()) {
                         foreach($packages as $package) {
                             $count++;
@@ -109,7 +105,7 @@ class AutoRunPackages extends Command
                         }
                         unset($packages);
                         $start += $len;
-                        $packages = PackageModel::whereIn('status', ['WAITASSIGN','ASSIGNFAILED'])->skip($start)->take($len)->get();
+                        $packages = PackageModel::whereIn('status', ['WAITASSIGN','ASSIGNFAILED'])->where('queue_name', '!=', 'assignLogistics')->skip($start)->take($len)->get();
                     }
                     $this->info($count.'packages have been put into the assignLogistics queue');
                     break;
@@ -118,7 +114,7 @@ class AutoRunPackages extends Command
                     $len = 500;
                     $start = 0;
                     $count = 0;
-                    $packages = PackageModel::whereIn('status', ['ASSIGNED','TRACKINGFAILED'])->skip($start)->take($len)->get();
+                    $packages = PackageModel::whereIn('status', ['ASSIGNED','TRACKINGFAILED'])->where('queue_name', '!=', 'placeLogistics')->skip($start)->take($len)->get();
                     while($packages->count()) {
                         foreach($packages as $package) {
                             $count++;
@@ -129,7 +125,7 @@ class AutoRunPackages extends Command
                         }
                         unset($packages);
                         $start += $len;
-                        $packages = PackageModel::whereIn('status', ['ASSIGNED','TRACKINGFAILED'])->skip($start)->take($len)->get();
+                        $packages = PackageModel::whereIn('status', ['ASSIGNED','TRACKINGFAILED'])->where('queue_name', '!=', 'placeLogistics')->skip($start)->take($len)->get();
                     }
                     $this->info($count.'packages have been put into the placeLogistics queue');
                     break;

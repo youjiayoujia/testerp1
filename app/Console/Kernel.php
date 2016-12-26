@@ -138,6 +138,7 @@ class Kernel extends ConsoleKernel
                     break;
             }
         }
+        //包裹报表
         $schedule->command('pick:report')->hourly();
         $schedule->command('all:report')->daily();
         //CRM
@@ -152,8 +153,8 @@ class Kernel extends ConsoleKernel
         //API同步sellmore database
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
         $schedule->command('SyncImportApi:all')->everyFiveMinutes();
-
-        
+        //半小时一次将包裹放入队列
+        $schedule->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')->everyThirtyMinutes();
         //财务
         $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
         //DHL

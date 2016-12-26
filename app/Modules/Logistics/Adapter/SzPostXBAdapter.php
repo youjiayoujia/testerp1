@@ -205,7 +205,7 @@ class SzPostXBAdapter extends BasicAdapter
         $str .='</eventBody>';
         $str .='</logisticsEvent>';
         $str .='</logisticsEventsRequest>';
-        
+        echo $str.'<br/>';
         
         
        /*$str .="<logisticsEventsRequest><logisticsEvent>
@@ -266,6 +266,7 @@ class SzPostXBAdapter extends BasicAdapter
         $postD['msg_type']            = 'B2C_TRADE';
         $postD['ecCompanyId']         = $this->ecCompanyId;
         $postD['version']             = '2.0';*/
+        echo $postD;
         $result = $this->postCurlHttpsData($url,$postD);
         $result = $this->XmlToArray($result);
         print_r($result);

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Product\SupplierModel;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Product\SupplierAttachmentModel;
 use Tool;
 
 
@@ -22,7 +23,7 @@ class getSellmoreSuppliers extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '获取旧系统的供应商数据同步到新系统';
 
     /**
      * Create a new command instance.
@@ -69,6 +70,10 @@ class getSellmoreSuppliers extends Command
 
                         Storage::put($uploads_file,$content);
                         $qualifications = $filename.$suffix;
+
+                        $filename = $qualifications;
+                        $supplier_id = $value->suppliers_id;
+                        SupplierAttachmentModel::create(compact('supplier_id', 'filename'));
                     }else{
                         $qualifications = '';
                     }
@@ -88,7 +93,7 @@ class getSellmoreSuppliers extends Command
                         'purchase_time'   => $value->supplierArrivalMinDays,
                         'created_by'      => $value->user_id,
                         'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
-                        'qualifications'  => $qualifications
+                        //'qualifications'  => $qualifications
                     ];
 
                     if(!empty($insert)){

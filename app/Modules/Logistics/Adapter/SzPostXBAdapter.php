@@ -253,7 +253,7 @@ class SzPostXBAdapter extends BasicAdapter
 </order>
 </eventBody>
 </logisticsEvent>
-</logisticsEventsRequest>"; 
+</logisticsEventsRequest>";*/ 
 //         $obj = simplexml_load_string($str);
 //         print_r($obj);
         $str=preg_replace('/&/',' ',$str);

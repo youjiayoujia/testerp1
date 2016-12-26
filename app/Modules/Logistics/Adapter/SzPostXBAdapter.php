@@ -99,6 +99,9 @@ class SzPostXBAdapter extends BasicAdapter
             $category_name_en     = $packageItem->item->catalog ? $packageItem->item->catalog->c_name : 'skirt';
             $single_weight        = $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
             $single_value         = $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+            if(mb_strlen($category_name) > 60){
+                $category_name = mb_substr($category_name,4,mb_strlen($category_name),'utf-8');
+            }
             $proStr .='<product>';
             $proStr .='<productNameCN>'.$products_declared_cn.'</productNameCN>';
             $proStr .='<productNameEN>'.$products_declared_en.'</productNameEN>';
@@ -205,9 +208,7 @@ class SzPostXBAdapter extends BasicAdapter
         $str .='</eventBody>';
         $str .='</logisticsEvent>';
         $str .='</logisticsEventsRequest>';
-        echo $str.'<br/>';
-        
-        
+                
        /*$str .="<logisticsEventsRequest><logisticsEvent>
 <eventHeader>
 <eventType>LOGISTICS_BATCH_SEND</eventType>

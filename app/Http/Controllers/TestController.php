@@ -119,18 +119,34 @@ class TestController extends Controller
     //     var_dump('ok');
     // }
 
+    // public function test2()
+    // {
+    //     $order = PackageModel::find('3593');
+    //     $order->createPackageItems();
+    //     var_dump('123');
+    // }
+
     public function test2()
     {
-        $package = PackageModel::find(3112);
-        $package->assignLogistics();
+        $order = OrderModel::find('4819');
+        $order->createPackage();
         var_dump('123');
     }
 
     // public function test2()
     // {
-    //     $order = OrderModel::find(1);
+    //     $orders_arr = OrderModel::all()->chunk(200);
+    //     foreach($orders_arr as $orders) {
+    //         var_dump($orders->toarray());exit;
+    //     }
+    // }
+
+    // public function test2()
+    // {
+    //     $order = OrderModel::find(3854);
     //     var_dump($order->toarray());
-    //     $order->createPackage();
+    //     $order->update(['channel_id' => '25']);
+    //     var_dump($order->channel_id);
     //     var_dump('123');
     // }
     public function test1()

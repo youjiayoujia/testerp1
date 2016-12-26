@@ -106,11 +106,17 @@ class OrderController extends Controller
 
     public function createVirtualPackage()
     {
-        $model = $this->model->where('status', 'PREPARED')->get();
-        foreach ($model as $key => $single) {
-            $job = new DoPackages($single);
-            $job = $job->onQueue('doPackages');
-            $this->dispatch($job);
+        $len = 1000;
+        $start = 0;
+        $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();
+        while(count($model)) {
+            foreach ($model as $key => $single) {
+                $job = new DoPackages($single);
+                $job = $job->onQueue('doPackages');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();
         }
 
         return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));

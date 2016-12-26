@@ -162,7 +162,6 @@ class AllotmentController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        //var_dump($model->getLimits()['create']);exit;
         $this->validate(request(), $model->getLimits()['create']);
         $boxInfo = request('boxInfo');
         if(count($boxInfo)) {
@@ -174,8 +173,10 @@ class AllotmentController extends Controller
                 $box->update($single);
             }
         }
-        foreach($model->allotmentForms as $single) {
-            $single->item->holdout($single->warehouse_position_id, $single->inboxed_quantity, 'OVERSEA_ALLOTMENT', $id);
+        if($model->status == 'inboxed') {
+            foreach($model->allotmentForms as $single) {
+                $single->item->holdout($single->warehouse_position_id, $single->inboxed_quantity, 'OVERSEA_ALLOTMENT', $id);
+            } 
         }
         $model->update(['status' => 'out']);
 

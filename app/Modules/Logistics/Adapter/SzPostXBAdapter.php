@@ -53,7 +53,6 @@ class SzPostXBAdapter extends BasicAdapter
         }
         $url1 = trim($url1,'&');
         $postD = http_build_query($postD);
-        echo $url1;
         $result = $this->postCurlHttpsData($url,$url1);
         $result = json_decode($result,true);  
         echo "<pre>";
@@ -209,7 +208,7 @@ class SzPostXBAdapter extends BasicAdapter
         
         
         
-       /* $str .="<logisticsEventsRequest><logisticsEvent>
+       /*$str .="<logisticsEventsRequest><logisticsEvent>
 <eventHeader>
 <eventType>LOGISTICS_BATCH_SEND</eventType>
 <eventTime>".$dateTime."</eventTime>
@@ -254,7 +253,7 @@ class SzPostXBAdapter extends BasicAdapter
 </order>
 </eventBody>
 </logisticsEvent>
-</logisticsEventsRequest>"; */
+</logisticsEventsRequest>";*/ 
 //         $obj = simplexml_load_string($str);
 //         print_r($obj);
         $str=preg_replace('/&/',' ',$str);

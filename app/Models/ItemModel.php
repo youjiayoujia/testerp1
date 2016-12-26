@@ -17,6 +17,7 @@ use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Product\CatalogCategoryModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -95,6 +96,7 @@ class ItemModel extends BaseModel
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
+            'doubleRelatedSelectedFields' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
             'sectionSelect' => [],
         ];
     }

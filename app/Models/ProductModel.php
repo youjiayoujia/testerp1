@@ -772,7 +772,6 @@ class ProductModel extends BaseModel
         set_time_limit(0);
         $sku = $this->item[0]->sku;
         $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=' . $sku;
-        //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
         $contents = json_decode(file_get_contents($url));
         if (is_array($contents)) {
             $i = 0;
@@ -781,6 +780,8 @@ class ProductModel extends BaseModel
                 $data['product_id'] = $this->item[0]->product_id;
                 $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/';
                 $data['name'] = $image->filename;
+                $old_image = ImageModel::where('name',$data['name'])->count();
+                if($old_image)continue;
                 $arr = (array)$image->fileId;
                 $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id=' . $arr['$id'];
                 if (Storage::disk('product')->put($data['path'] . $data['name'], file_get_contents($image_url))) {

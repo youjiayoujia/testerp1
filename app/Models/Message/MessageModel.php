@@ -131,7 +131,7 @@ class MessageModel extends BaseModel{
             'filterFields' => [
                 'from_name',
                 'from',
-
+                'messages.labels'
             ],
             'filterSelects' => [
                 'messages.status' => config('message.statusText'),

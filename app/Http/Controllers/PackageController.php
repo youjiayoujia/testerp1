@@ -642,7 +642,6 @@ class PackageController extends Controller
                         if (!$model) {
                             $model = $this->model->where('logistics_order_number', $tracking_no)->first();
                             if(!$model) {
-                                var_dump('in');exit;
                                 $errors[$key]['id'] = $tracking_no;
                                 $errors[$key]['remark'] = '对应包裹不存在';
                                 continue;
@@ -667,7 +666,7 @@ class PackageController extends Controller
                         if (request('logistics_id') != 'auto') {
                             $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED', 'queue_name' => 'assignLogistics']);
                         } else {
-                            $model->update(['status' => 'NEW', 'queue_name' => 'assignStocks']);
+                            $model->update(['status' => 'NEW', 'queue_name' => 'assignStocks', 'logistics_id' => '']);
                         }
                         $model->update(['warehouse_id' => request('from_warehouse_id'), 'picklist_id' => '']);
                         foreach($model->items as $packageItem) {
@@ -678,7 +677,7 @@ class PackageController extends Controller
                             $job = $job->onQueue('assignStocks');
                             $this->dispatch($job);
                         }
-                        if($model->status == 'ASGINED') {
+                        if($model->status == 'ASSIGNED') {
                             $job = new AssignLogistics($model);
                             $job = $job->onQueue('assignLogistics');
                             $this->dispatch($job);

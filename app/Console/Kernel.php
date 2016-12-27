@@ -41,6 +41,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\UpdateBlacklists::class,
         \App\Console\Commands\AutoRunPackages::class,
         \App\Console\Commands\ImitationOrders::class,
+        \App\Console\Commands\UpdateUsers::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,

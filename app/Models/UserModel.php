@@ -28,7 +28,7 @@ class UserModel extends BaseModel implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['id', 'name', 'email', 'password','is_available'];
+    protected $fillable = ['id', 'name', 'email', 'password','is_available', 'code'];
     public $searchFields = ['name'=>'name', 'id'=>'id'];
     /**
      * The attributes excluded from the model's JSON form.

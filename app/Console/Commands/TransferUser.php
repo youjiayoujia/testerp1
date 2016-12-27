@@ -50,11 +50,12 @@ class TransferUser extends Command
             foreach ($smCds as $smCd) {
                 $originNum++;
                 $cd = [
-                    'name' => $smCd->nickname,
-                    'email' => $smCd->user_name.'@sellmore.com',
-                    'password' => bcrypt($smCd->user_name.'@sellmore.com'),
+                    'name' => $smCd->user_name,
+                    'email' => $smCd->user_name.'@moonarstore.com',
+                    'password' => bcrypt($smCd->user_name.'@moonarstore.com'),
+                    'is_available' => '1'
                 ];
-                $exist = UserModel::where(['email' => $smCd->user_name.'@sellmore.com'])->first();
+                $exist = UserModel::where(['email' => $smCd->user_name.'@moonarstore.com'])->first();
                 if($exist) {
                     $exist->update($cd);
                     $updatedNum++;

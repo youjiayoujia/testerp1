@@ -1,12 +1,12 @@
 <div class="panel panel-info">
     <div class="panel-heading">
-        <strong>#{{$message->id}}描述：{{ str_limit($message->subject,150) }}</strong><br/>
+        <strong>#{{$message->id}}描述：{{ $message->subject }}</strong><br/>
         <small>
             {{ $message->date }} by <i>{{ $message->from_name }}</i> from {{ '<'.$message->from.'>' }}
         </small>
         To:{{$message->MessageAccountName}}
-        <a href="javascript:" class="close" data-toggle="modal" data-target="#myModal">
-            <small class="glyphicon glyphicon-list"></small>
+        <a href="javascript:"  class="close" data-toggle="modal" data-target="#myModal">
+            <small class="glyphicon glyphicon-list"></small><code>{{ $message->histories->count()}}</code>
         </a>
     </div>
 
@@ -42,7 +42,7 @@
                 @foreach($message->histories->take(5) as $history)
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <strong>Message <a href="{{ url('message',$history->id)}}">#{{ $history->id }}</a></strong>
+                            <strong>MessageID<a href="{{ url('message',$history->id)}}" target="_blank">#{{ $history->id }}</a></strong>
 
                             <br/>
                         </div>
@@ -54,9 +54,8 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-lg-12">
-                                            <div class="embed-responsive embed-responsive-16by9">
+                                                {!! $history->message_info !!}
                                              {{--   <iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$history->id]) }}"></iframe>--}}
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

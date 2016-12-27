@@ -32,7 +32,7 @@ class AutoAddProduct extends Job implements SelfHandling, ShouldQueue
      *
      * @return void
      */
-    public function __construct($order_items,$ordernum)
+    public function __construct($order_items, $ordernum)
     {
         //
 
@@ -44,8 +44,8 @@ class AutoAddProduct extends Job implements SelfHandling, ShouldQueue
             }
         }*/
         $this->order_items = $order_items;
-        $this->ordernum  =  $ordernum;
-        $this->description ='Order:'.$ordernum.' ItemID:'.$this->order_items['orders_item_number'].' SKU:'.$this->order_items['channel_sku']. ' add product .';
+        $this->ordernum = $ordernum;
+        $this->description = 'Order:' . $ordernum . ' ItemID:' . $this->order_items['orders_item_number'] . ' SKU:' . $this->order_items['channel_sku'] . ' add product .';
 
     }
 
@@ -53,43 +53,47 @@ class AutoAddProduct extends Job implements SelfHandling, ShouldQueue
     {
         $start = microtime(true);
         $status = false;
-        $this->relation_id =(int)$this->order_items['orders_item_number'];
-        $orderItems = OrderItemModel::where('id',$this->order_items['id'])->first();
-        if(isset($orderItems->item)){
-            if($orderItems->item->status=='selling'){
+        $this->relation_id = (int)$this->order_items['orders_item_number'];
+        $orderItems = OrderItemModel::where('id', $this->order_items['id'])->first();
+        if (isset($orderItems->item)) {
+            if ($orderItems->item->status == 'selling') {
                 $add_num = $this->order_items['quantity']; //订单sku 数量
                 $active_num = 0;
                 $account = AccountModel::find($orderItems->order->channel_account_id);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $result = $channel->getProductDetail($this->order_items['orders_item_number']);
-                if($result){
-                    foreach($result['sku_info'] as $ebaySku ){
-                        if($ebaySku['sku']==$orderItems->channel_sku){
+                if ($result) {
+                    foreach ($result['sku_info'] as $ebaySku) {
+                        if ($ebaySku['sku'] == $orderItems->channel_sku) {
                             $active_num = $ebaySku['quantity'];
                             break;
                         }
                     }
-                    if($active_num !=0){
-                        $add_data[$orderItems->channel_sku]=$add_num + $active_num;
-                        $is_mul = count($result)>1? true: false;
-                        $add_result = $channel->changeQuantity($this->order_items['orders_item_number'],$add_data,$is_mul,$result['list_info']['site']);
-                        if($add_result['status']){
-                            $status  = true;
+                    if ($active_num != 0) {
+                        $add_data[$orderItems->channel_sku] = $add_num + $active_num;
+                        $is_mul = count($result) > 1 ? true : false;
+                        $add_result = $channel->changeQuantity($this->order_items['orders_item_number'], $add_data,
+                            $is_mul, $result['list_info']['site']);
+                        if ($add_result['status']) {
+                            $status = true;
                             //改变erp的值
-                            EbayPublishProductDetailModel::where(['item_id'=>$this->order_items['orders_item_number'],'sku'=>$orderItems->channel_sku])->update(['quantity'=>$add_num + $active_num]);
+                            EbayPublishProductDetailModel::where([
+                                'item_id' => $this->order_items['orders_item_number'],
+                                'sku' => $orderItems->channel_sku
+                            ])->update(['quantity' => $add_num + $active_num]);
                         }
                         $remark = $add_result['info'];
 
-                    }else{
-                        $remark ='与在线广告SKU匹配不成功';
+                    } else {
+                        $remark = '与在线广告SKU匹配不成功';
                     }
-                }else{
+                } else {
                     $remark = '同步广告详情失败,跳过补货';
                 }
-            }else{
+            } else {
                 $remark = 'SKU状态不为在售';
             }
-        }else{
+        } else {
             $remark = '未找到对应的sku';
         }
 
@@ -97,6 +101,6 @@ class AutoAddProduct extends Job implements SelfHandling, ShouldQueue
         $this->result['status'] = $status;
         $this->result['remark'] = $remark;
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('autoAddProduct',isset($result)?base64_encode(serialize($add_result)):base64_encode(serialize(array($remark))));
+        $this->log('autoAddProduct', isset($result) ? json_encode($add_result) : json_encode(array($remark)));
     }
 }

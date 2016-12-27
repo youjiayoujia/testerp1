@@ -17,6 +17,7 @@ use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Product\CatalogCategoryModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -95,6 +96,7 @@ class ItemModel extends BaseModel
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
+            'doubleRelatedSelectedFields' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
             'sectionSelect' => [],
         ];
     }
@@ -1214,7 +1216,8 @@ class ItemModel extends BaseModel
 
     public function createPurchaseStaticstics()
     {
-        $users = UserRoleModel::all()->where('role_id', '2');
+        $users = UserRoleModel::where('role_id', '2')->get();
+        
         foreach ($users as $user) {
             $data = [];
             //采购负责人
@@ -1226,9 +1229,10 @@ class ItemModel extends BaseModel
             //必须当天内下单SKU数
             $data['need_purchase_num'] = DB::select('select count(*) as num from purchases where user_id = "' . $user->user_id . '" and need_purchase_num > 0 and available_quantity+zaitu_num-seven_sales < 0 ')[0]->num;
             //15天缺货订单
-            $data['fifteenday_need_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-d',
+            $data['fifteenday_need_order_num'] = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0  and
+                packages.id = package_items.package_id and packages.deleted_at is null and packages.created_at > "' . date('Y-m-d',
                     time() - 24 * 3600 * 15) . '" ')[0]->num;
+
             //15天所有订单
             $data['fifteenday_total_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status!= "CANCEL" and purchases.user_id = "' . $user->user_id . '" and 
                 orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-d',
@@ -1237,15 +1241,13 @@ class ItemModel extends BaseModel
             $data['need_percent'] = $data['fifteenday_total_order_num'] ? round($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'],
                 4) : 0;
             //缺货总数
-            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.deleted_at is null')[0]->num;
-            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+            $data['need_total_num'] = $this->out_of_stock?$this->out_of_stock:0;
             //平均缺货天数
-            $data['avg_need_day'] = round(DB::select('select avg(' . time() . '-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day, 1);
+            $data['avg_need_day'] = round(DB::select('select avg(' . time() . '-UNIX_TIMESTAMP(packages.created_at))/86400 as day from packages,package_items,purchases where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and purchases.user_id = "' . $user->user_id . '" and 
+                packages.id = package_items.package_id and purchases.item_id = package_items.item_id  ')[0]->day, 1);
             //最长缺货天数
-            $data['long_need_day'] = round(DB::select('select max(' . time() . '-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day, 1);
+            $data['long_need_day'] = round(DB::select('select max(' . time() . '-UNIX_TIMESTAMP(packages.created_at))/86400 as day from packages,package_items,purchases where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and purchases.user_id = "' . $user->user_id . '" and 
+                packages.id = package_items.package_id and purchases.item_id = package_items.item_id  ')[0]->day, 1);
             //采购单超期
             $data['purchase_order_exceed_time'] = DB::select('select count(*) as num from purchase_orders where user_id = "' . $user->user_id . '" and created_at < "' . date('Y-m-d H:i:s',
                     time() - 86400 * 15) . '" ')[0]->num;

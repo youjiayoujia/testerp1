@@ -124,8 +124,8 @@
             </tr>
         </table>
         <div style="width:80mm;float:left;line-height:18px;">
-            <p style="width:80mm;text-align:center;margin-right:7px;"><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height:40px;margin-top:5px;"></p>
-            <p style="width:80mm;text-align:center;margin-right:7px;font-size:14px;">{{ $model->tracking_no }}</p>
+            <p style="width:80mm;text-align:center;margin-right:7px;"><img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}" style="height:40px;margin-top:5px;"></p>
+            <p style="width:80mm;text-align:center;margin-right:7px;font-size:14px;">{{ $model->logistics_order_number }}</p>
 
         </div>
         <div style="width:16mm;float:right;"><img src="{{ asset('picture/start.png') }}" style="width:16mm;"></div>

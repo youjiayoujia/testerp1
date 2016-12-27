@@ -31,13 +31,13 @@
             <td colspan="10">
                 @if($log->data)
                     @if($log->result=='success')
-                        @foreach(unserialize($log->data) as $item)
+                        @foreach(json_decode($log->data) as $item)
                             @foreach($item as $key => $value)
                                 @if(is_array($value))
                                     <dl class="dl-horizontal">
                                         <dt>{{ $key }}</dt>
                                         <dd>
-                                            <pre>{{ var_dump($value) }}</pre>
+                                            <pre>{{ dump($value) }}</pre>
                                         </dd>
                                     </dl>
                                 @else
@@ -50,7 +50,7 @@
                             <div class="divider"></div>
                         @endforeach
                     @else
-                        <pre>{{ var_dump(unserialize($log->data)) }}</pre>
+                        <pre>{{ dump(json_decode($log->data)) }}</pre>
                     @endif
                 @endif
             </td>

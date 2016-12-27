@@ -26,10 +26,11 @@ class AutoPublish extends Job implements SelfHandling, ShouldQueue
      * @return void
      */
     private $ebayPublishProductId;
+
     public function __construct($ebayPublishProductId)
     {
         $this->ebayPublishProductId = $ebayPublishProductId;
-        $this->description = ' Info:[ 列表id ' . $ebayPublishProductId .'] 开始自动上架.';
+        $this->description = ' Info:[ 列表id ' . $ebayPublishProductId . '] 开始自动上架.';
 
     }
 
@@ -44,26 +45,26 @@ class AutoPublish extends Job implements SelfHandling, ShouldQueue
         $start = microtime(true);
         //echo $this->ebayPublishProductId;
         $ebayPublishProduct = new EbayPublishProductModel();
-        $result =  $ebayPublishProduct->publish($this->ebayPublishProductId,'Add',true);
-        if($result['is_success']){
-            EbayPublishProductModel::where('id',$this->ebayPublishProductId)->update([
-                'status'=>'2',
-                'item_id'=>$result['info'],
-                'start_time'=>date('Y-m-d H:i:s')
+        $result = $ebayPublishProduct->publish($this->ebayPublishProductId, 'Add', true);
+        if ($result['is_success']) {
+            EbayPublishProductModel::where('id', $this->ebayPublishProductId)->update([
+                'status' => '2',
+                'item_id' => $result['info'],
+                'start_time' => date('Y-m-d H:i:s')
             ]);
 
-            EbayPublishProductDetailModel::where('publish_id',$this->ebayPublishProductId)->update([
-                'item_id'=>$result['info'],
-                'status'=>'1',
-                'start_time'=>date('Y-m-d H:i:s'),
+            EbayPublishProductDetailModel::where('publish_id', $this->ebayPublishProductId)->update([
+                'item_id' => $result['info'],
+                'status' => '1',
+                'start_time' => date('Y-m-d H:i:s'),
             ]);
 
             $this->result['status'] = 'success';
-            $this->result['remark'] = '刊登成功 Item：'.$result['info'];
-         }else{
-            EbayPublishProductModel::where('id',$this->ebayPublishProductId)->update([
-                'status'=>'0',
-                'note'=>$result['info'],
+            $this->result['remark'] = '刊登成功 Item：' . $result['info'];
+        } else {
+            EbayPublishProductModel::where('id', $this->ebayPublishProductId)->update([
+                'status' => '0',
+                'note' => $result['info'],
             ]);
 
             $this->result['status'] = 'fail';
@@ -73,7 +74,7 @@ class AutoPublish extends Job implements SelfHandling, ShouldQueue
         $this->result['remark'] = $result['info'];
 
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('AutoPublish',base64_encode(serialize(array($result['data']))));
+        $this->log('AutoPublish', json_encode(array($result['data'])));
 
     }
 }

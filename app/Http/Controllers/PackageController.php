@@ -516,7 +516,7 @@ class PackageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::all(),
+            'warehouses' => WarehouseModel::where(['is_available' => '1', 'type' => 'local'])->get(),
             'logisticses' => LogisticsModel::all(),
         ];
 
@@ -599,26 +599,32 @@ class PackageController extends Controller
             DB::beginTransaction();
             try {
                 foreach ($arr as $key => $tracking_no) {
-                    $model = $this->model->where('tracking_no', $tracking_no)->first();
-                    if (!$model) {
-                        $errors[$key]['id'] = $tracking_no;
-                        $errors[$key]['remark'] = '对应包裹不存在';
-                        continue;
-                    }
-                    foreach ($model->items as $packageItem) {
-                        $stock = StockModel::where([
-                            'item_id' => $packageItem->item_id,
-                            'warehouse_id' => $warehouse_id
-                        ])->first();
-                        if (!$stock) {
-                            $errors[$key]['id'] = $tracking_no;
-                            $errors[$key]['remark'] = '仓库对应库位有问题';
-                            continue;
+                    if($tracking_no) {
+                        $model = $this->model->where('tracking_no', $tracking_no)->first();
+                        if (!$model) {
+                            $model = $this->model->where('logistics_order_number', $tracking_no)->first();
+                            if(!$model) {
+                                $errors[$key]['id'] = $tracking_no;
+                                $errors[$key]['remark'] = '对应包裹不存在';
+                                continue;
+                            }
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity,
-                            $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
+                        foreach ($model->items as $packageItem) {
+                            $stock = StockModel::where([
+                                'item_id' => $packageItem->item_id,
+                                'warehouse_id' => $warehouse_id
+                            ])->first();
+                            if (!$stock) {
+                                $errors[$key]['id'] = $tracking_no;
+                                $errors[$key]['remark'] = '仓库对应库位有问题';
+                                continue;
+                            }
+                            $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity,
+                                $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
+                            $packageItem->delete();
+                        }
+                        $model->delete();
                     }
-                    $model->delete();
                 }
                 if (count($errors)) {
                     throw new Exception('导入数据有问题');
@@ -631,34 +637,53 @@ class PackageController extends Controller
             DB::beginTransaction();
             try {
                 foreach ($arr as $key => $tracking_no) {
-                    $model = $this->model->where('tracking_no', $tracking_no)->first();
-                    if (!$model) {
-                        $errors[$key]['id'] = $tracking_no;
-                        $errors[$key]['remark'] = '对应包裹不存在';
-                        continue;
-                    }
-                    foreach ($model->items as $packageItem) {
-                        $stock = StockModel::where([
-                            'item_id' => $packageItem->item_id,
-                            'warehouse_id' => $warehouse_id
-                        ])->first();
-                        if (!$stock) {
-                            $errors[$key]['id'] = $tracking_no;
-                            $errors[$key]['remark'] = '仓库对应库位有问题';
-                            continue;
+                    if($tracking_no) {
+                        $model = $this->model->where('tracking_no', $tracking_no)->first();
+                        if (!$model) {
+                            $model = $this->model->where('logistics_order_number', $tracking_no)->first();
+                            if(!$model) {
+                                var_dump('in');exit;
+                                $errors[$key]['id'] = $tracking_no;
+                                $errors[$key]['remark'] = '对应包裹不存在';
+                                continue;
+                            }
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity,
-                            $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
+                        foreach ($model->items as $packageItem) {
+                            $stock = StockModel::where([
+                                'item_id' => $packageItem->item_id,
+                                'warehouse_id' => $warehouse_id
+                            ])->first();
+                            if (!$stock) {
+                                $errors[$key]['id'] = $tracking_no;
+                                $errors[$key]['remark'] = '仓库对应库位有问题';
+                                continue;
+                            }
+                            $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity,
+                                $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
+                        }
+                        if (request('trackingNo') == 'on') {
+                            $model->update(['tracking_no' => '']);
+                        }
+                        if (request('logistics_id') != 'auto') {
+                            $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED', 'queue_name' => 'assignLogistics']);
+                        } else {
+                            $model->update(['status' => 'NEW', 'queue_name' => 'assignStocks']);
+                        }
+                        $model->update(['warehouse_id' => request('from_warehouse_id'), 'picklist_id' => '']);
+                        foreach($model->items as $packageItem) {
+                            $packageItem->update(['warehouse_position_id' => '']);
+                        }
+                        if($model->status == 'NEW') {
+                            $job = new AssignStocks($model);
+                            $job = $job->onQueue('assignStocks');
+                            $this->dispatch($job);
+                        }
+                        if($model->status == 'ASGINED') {
+                            $job = new AssignLogistics($model);
+                            $job = $job->onQueue('assignLogistics');
+                            $this->dispatch($job);
+                        }
                     }
-                    if (request('trackingNo') == 'on') {
-                        $model->update(['tracking_no' => '']);
-                    }
-                    if (request('logistics_id') != 'auto') {
-                        $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
-                    } else {
-                        $model->update(['status' => 'NEW']);
-                    }
-                    $model->update(['warehouse_id' => request('from_warheouse_id')]);
                 }
                 if (count($errors)) {
                     throw new Exception('导入数据有问题');

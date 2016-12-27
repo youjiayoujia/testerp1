@@ -27,23 +27,9 @@
         </tr>
         <tr class="collapse" id="collapseExample{{ $log->id }}">
             <td colspan="10">
-                @if(is_array(json_decode($log->data,true)))
-                    @foreach(json_decode($log->data) as $key => $value)
-                        @if(is_array($value))
-                            <dl class="dl-horizontal">
-                                <dt>{{ $key }}</dt>
-                                <dd>
-                                    <pre>{{ var_dump($value) }}</pre>
-                                </dd>
-                            </dl>
-                        @else
-                            <dl class="dl-horizontal">
-                                <dt>{{ $key }}</dt>
-                                <dd>{{ $value }}</dd>
-                            </dl>
-                        @endif
-                    @endforeach
-                @endif
+                {{--@if(is_array(json_decode($log->data,true)))--}}
+                    {{--<pre>{{ json_decode($log->data) }}</pre>--}}
+                {{--@endif--}}
             </td>
         </tr>
     @endforeach

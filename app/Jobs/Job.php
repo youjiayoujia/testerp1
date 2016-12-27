@@ -43,12 +43,19 @@ abstract class Job
     public function eventLog($user, $content = '', $to = '', $from = '')
     {
         $modelName = $this->table;
-        if($modelName) {
+        if ($modelName) {
             $category = CategoryModel::where('model_name', $modelName)->first();
-            if(!$category) {
+            if (!$category) {
                 $category = CategoryModel::create(['model_name' => $modelName]);
             }
-            $category->child()->create(['type_id' => ($to ? json_decode($to)->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user]);
+            $category->child()->create([
+                'type_id' => ($to ? json_decode($to)->id : ''),
+                'what' => $content,
+                'when' => date('Y-m-d H:i:s', time()),
+                'to_arr' => $to,
+                'from_arr' => $from,
+                'who' => $user
+            ]);
         }
     }
 }

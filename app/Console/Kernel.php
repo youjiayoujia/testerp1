@@ -92,6 +92,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inspire')->hourly();
         $schedule->command('purchase:create')->cron('20 4,12 * * *');
+        $schedule->command('purchaseStaticstics:create')->cron('20 6 * * *');
+        
         //黑名单定时任务
         $schedule->command('blacklists:get')->dailyAt('2:00');
         $schedule->command('blacklists:update')->dailyAt('3:00');

@@ -39,7 +39,7 @@
             </div>
             <div class="modal-body">
 
-                @foreach($message->histories->take(5) as $history)
+                @foreach($message->histories->take(15) as $history)
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <strong>MessageID<a href="{{ url('message',$history->id)}}" target="_blank">#{{ $history->id }}</a></strong>

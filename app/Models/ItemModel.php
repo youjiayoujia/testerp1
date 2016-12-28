@@ -26,7 +26,7 @@ class ItemModel extends BaseModel
 
     protected $stock;
 
-    public $searchFields = ['sku' => 'sku', 'id' => 'id', 'c_name' => '中文名'];
+    public $searchFields = ['sku' => 'sku', 'c_name' => '中文名'];
 
     public $rules = ['update' => []];
 
@@ -98,6 +98,10 @@ class ItemModel extends BaseModel
             'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
             'doubleRelatedSelectedFields' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
             'sectionSelect' => [],
+            'sectionGangedDouble' => [
+                'first' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
+                'second' => ['catalog' => ['c_name' => CatalogModel::all()->pluck('c_name', 'c_name')]]
+            ],
         ];
     }
 
@@ -324,7 +328,7 @@ class ItemModel extends BaseModel
     {
         $item_id = $this->id;
         $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "' . $item_id . '" and
-                packages.id = package_items.package_id and packages.deleted_at is null')[0]->num;
+                packages.id = package_items.package_id and package_items.deleted_at is null')[0]->num;
 
         return $num;
     }

@@ -35,6 +35,7 @@ class DhlAdapter extends BasicAdapter
 
         $this->qz = 'CNAMMERP3';//物流号前缀
         $this->_express_type =!empty($config['type'])?$config['type']:'PKD';
+        $this->get_olderp_token =1;
     }
     public function checkToken($url){
         $result = $this->getCurlHttpsData($url);
@@ -51,12 +52,12 @@ class DhlAdapter extends BasicAdapter
         $customer_id = $orderInfo->logistics->supplier->customer_id;
         $model = SupplierModel::find($orderInfo->logistics->supplier->id);
         $this->token = $orderInfo->logistics->supplier->secret_key;
-        // $model->update(['secret_key' => '0']);
+
         $customer_id = explode(',',$customer_id);
         $this->account=$customer_id[0];//账号
         $clientId=$customer_id[1];//API账号
         $gqtime=@$customer_id[2]?$customer_id[2]:0;//过期时间
-        $lasttime = time()-25*24*60*60;
+        $lasttime = time()-24*60*60;
         if($lasttime > $gqtime){
             //暂时关掉自动更新
             $result =[
@@ -351,9 +352,28 @@ class DhlAdapter extends BasicAdapter
                     'result' => '获取追踪号失败'
                 ];
             }
-
+        if($status==202 && $this->get_olderp_token ==1){
+            $orderInfo=$this->getolderpToken($orderInfo);
+            $this->get_olderp_token=2;
+            $result=$this->getTracking($orderInfo);
+        }
         }
         return $result;
+    }
+    public function getolderpToken($orderInfo){
+        $customer_id = $orderInfo->logistics->supplier->customer_id;
+        $model = SupplierModel::find($orderInfo->logistics->supplier->id);
+        $url = "http://erp.moonarstore.com/api/get_dhl_token.php";
+        $res = $this->getCurlHttpsData($url);
+        $res = @explode(',',$res);
+        if(@$res[1]){
+            $this->token=$orderInfo->logistics->supplier->secret_key=$res[0];
+            $customer_id = explode(',',$customer_id);
+            $customer_id[2] = $res[1];
+            $customer_id = implode(',',$customer_id);
+            $res = $model->update(['customer_id' => $customer_id,'secret_key'=>$this->token]);
+        }
+        return $orderInfo;
     }
     //创建确认订单的发送数据
     public function createSureShip($orderArray){

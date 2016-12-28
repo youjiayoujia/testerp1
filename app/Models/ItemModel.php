@@ -26,7 +26,7 @@ class ItemModel extends BaseModel
 
     protected $stock;
 
-    public $searchFields = ['sku' => 'sku', 'id' => 'id', 'c_name' => '中文名'];
+    public $searchFields = ['sku' => 'sku', 'c_name' => '中文名'];
 
     public $rules = ['update' => []];
 

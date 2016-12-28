@@ -96,21 +96,27 @@ class TestController extends Controller
         dd($result);
     }
 
+    // public function test2()
+    // {
+    //     $order['channel_id'] = 2;
+    //     $order['channel_account_id'] = 1; 
+    //     $order['channel_ordernum'] = 12345632;
+    //     $order['status'] = 'PAID';
+    //     $order['currency'] = 'USD';
+    //     $order['shipping_country'] = 'US';
+    //     $order['items'][0]['quantity'] = 2;
+    //     $order['items'][0]['sku'] = 'SS1197W';
+    //     $order['items'][0]['channel_sku'] = '353*SS1197W';
+    //     $job = new InOrders($order);
+    //     $job = $job->onQueue('inOrders');
+    //     $this->dispatch($job);
+    //     var_dump('ok');
+    // }
+
     public function test2()
     {
-        $order['channel_id'] = 2;
-        $order['channel_account_id'] = 1; 
-        $order['channel_ordernum'] = 12345632;
-        $order['status'] = 'PAID';
-        $order['currency'] = 'USD';
-        $order['shipping_country'] = 'US';
-        $order['items'][0]['quantity'] = 2;
-        $order['items'][0]['sku'] = 'SS1197W';
-        $order['items'][0]['channel_sku'] = '353*SS1197W';
-        $job = new InOrders($order);
-        $job = $job->onQueue('inOrders');
-        $this->dispatch($job);
-        var_dump('ok');
+        $lo = LogisticsModel::find(10);
+        var_dump($lo->belongsToWarehouse('3'));
     }
 
     // public function test2()

@@ -42,7 +42,7 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if($this->package->order->status != 'REVIEW') {
+        if($this->package->order->status != 'REVIEW' && in_array($this->package->status, ['NEW', 'NEED'])) {
             if($this->package->is_oversea) {
                 $flag = $this->package->oversea_createPackageItems();
             } else {

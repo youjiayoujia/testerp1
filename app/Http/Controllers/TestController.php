@@ -115,8 +115,14 @@ class TestController extends Controller
 
     public function test2()
     {
-        $lo = LogisticsModel::find(10);
-        var_dump($lo->belongsToWarehouse('3'));
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
     }
 
     // public function test2()

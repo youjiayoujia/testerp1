@@ -535,29 +535,29 @@ class OrderModel extends BaseModel
     {
         if(!$this->packages->count()) {
             $job = new DoPackages($this);
-            Queue::pushOn('doPackages', $job);
+            Queue::pushOn('doPackagesTest', $job);
         }
         foreach ($this->packages as $package) {
             switch ($package->status) {
                 case 'NEW':
                     $package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($package);
-                    Queue::pushOn('assignStocks', $job);
+                    Queue::pushOn('assignStocksTest', $job);
                     break;
                 case 'WAITASSIGN':
                     $package->update(['queue_name' => 'assignLogistics']);
                     $job = new AssignLogistics($package);
-                    Queue::pushOn('assignLogistics', $job);
+                    Queue::pushOn('assignLogisticsTest', $job);
                     break;
                 case 'ASSIGNED':
                     $package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($package);
-                    Queue::pushOn('placeLogistics', $job);
+                    Queue::pushOn('placeLogisticsTest', $job);
                     break;
                 case 'NEED':
                     $package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($package);
-                    Queue::pushOn('assignStocks', $job);
+                    Queue::pushOn('assignStocksTest', $job);
                     break;
             }
         }

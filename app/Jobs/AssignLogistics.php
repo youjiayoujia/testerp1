@@ -94,7 +94,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
             if ($this->package->status == 'ASSIGNED') {
                 $this->package->update(['queue_name' => 'placeLogistics']);
                 $job = new PlaceLogistics($this->package);
-                $job = $job->onQueue('placeLogistics');
+                $job = $job->onQueue('placeLogisticsTest');
                 $this->dispatch($job);
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Success.';

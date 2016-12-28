@@ -59,7 +59,7 @@ class AutoRunPackages extends Command
                         foreach($orders as $order) {
                             $count++;
                             $job = new autoDoPackages($order);
-                            $job = $job->onQueue('doPackages');
+                            $job = $job->onQueue('doPackagesTest');
                             $this->dispatch($job);
                             $order->eventLog('系统', '定时任务自动加入doPackages队列', json_encode($order));
                         }
@@ -79,7 +79,7 @@ class AutoRunPackages extends Command
                         foreach($packages as $package) {
                             $count++;
                             $job = new autoAssignStocks($package);
-                            $job = $job->onQueue('assignStocks');
+                            $job = $job->onQueue('assignStocksTest');
                             $this->dispatch($job);
                             $package->eventLog('系统', '定时任务自动加入assignStocks队列', json_encode($package));
                         }
@@ -99,7 +99,7 @@ class AutoRunPackages extends Command
                         foreach($packages as $package) {
                             $count++;
                             $job = new autoAssignLogistics($package);
-                            $job = $job->onQueue('assignLogistics');
+                            $job = $job->onQueue('assignLogisticsTest');
                             $this->dispatch($job);
                             $package->eventLog('系统', '定时任务自动加入assignLogistics队列', json_encode($package));
                         }
@@ -119,7 +119,7 @@ class AutoRunPackages extends Command
                         foreach($packages as $package) {
                             $count++;
                             $job = new autoPlaceLogistics($package);
-                            $job = $job->onQueue('placeLogistics');
+                            $job = $job->onQueue('placeLogisticsTest');
                             $this->dispatch($job);
                             $package->eventLog('系统', '定时任务自动加入placeLogistics队列', json_encode($package));
                         }

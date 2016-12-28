@@ -56,7 +56,7 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                     if ($package) {
                         $package->update(['queue_name' => 'assignStocks']);
                         $job = new AssignStocks($package);
-                        $job->onQueue('assignStocks');
+                        $job->onQueue('assignStocksTest');
                         $this->dispatch($job);
                         $this->relation_id = $this->order->id;
                         $this->result['status'] = 'success';

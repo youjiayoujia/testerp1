@@ -112,7 +112,7 @@ class OrderController extends Controller
         while(count($model)) {
             foreach ($model as $key => $single) {
                 $job = new DoPackages($single);
-                $job = $job->onQueue('doPackages');
+                $job = $job->onQueue('doPackagesTest');
                 $this->dispatch($job);
             }
             $start += $len;
@@ -407,7 +407,7 @@ class OrderController extends Controller
             }
         }
         $job = new DoPackages($this->model->find($id));
-        $job->onQueue('doPackages');
+        $job->onQueue('doPackagesTest');
         $this->dispatch($job);
 
         $to = json_encode($this->model->with('items')->find($id));

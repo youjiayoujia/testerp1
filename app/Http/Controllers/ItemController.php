@@ -448,30 +448,33 @@ class ItemController extends Controller
      */
     public function uploadSku()
     {
-        $file = request()->file('upload');
-        $path = config('setting.excelPath');
-        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
-        $file->move($path, 'excelProcess.xls');
-        $data_array = '';
-        $result = false;
-        Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
-            $reader->noHeading();
-            $data_array = $reader->all()->toArray();
-            foreach ($data_array as $key => $value) {
-                if($key==0)continue;
-                if($this->model->where('sku',$value['1'])->first()){
-                    $this->model->where('sku',$value['1'])->first()->update(['status'=>$value['2']]);
-                }else{
-                    $result = $key;
-                }
-                
-            }
-        },'gb2312');
+        $status = request()->input('spu_status'); 
+        if(substr($_FILES['upload']['name'], strrpos($_FILES['upload']['name'], '.')+1)!='csv'){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '请上传csv表格!'));
+        }
+        if(empty($_FILES['upload']['tmp_name'])) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '请上传表格!'));
+        }
+        $csv = Excel::load($_FILES['upload']['tmp_name'])->noHeading()->toArray();
+        $result = '';
 
-        if($result){
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '第'.$result."行SKU不存在，请重新上传"));
+        foreach ($csv as $key => $spu) {
+            $sku_array = $this->model->where('sku', 'like', '%'.$spu['1'].'%')->get();
+
+            if(count($sku_array)){
+                foreach ($sku_array as $sku) {
+                    $sku->update(['status'=>$status]);
+                }
+            }else{
+                $result .= ($key+1).',';
+            }
+           
+        }
+
+        if(!$result){
+            return redirect($this->mainIndex)->with('alert', $this->alert('success',  '状态修改为.'.config('item.status')[$status]));   
         }else{
-            return redirect($this->mainIndex)->with('alert', $this->alert('success',  '状态修改成功.')); 
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '第'.substr($result,0,strlen($result)-1)."行SPU不存在，请重新上传"));
         }
         
     }

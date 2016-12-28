@@ -103,7 +103,8 @@
                 <button class="doAction" value="edit">批量已建SKU维护资料</button>
                 <button class="doAction" value="image_edit">批量已编辑</button>
                 <button class="doAction" value="image_examine">批量已制图</button>
-                <button class="doAction" value="final_examine">批量已审图</button>
+                <button class="doAction" value="quality">批量已审图</button>
+                <button class="doAction" value="final_examine">批量质检</button>
                 <button class="doAction" value="pass">批量 终审</button>
                 <?php $condition = request()->input('filters')?explode('.',request()->input('filters'))[2]:''; ?>
                 <?php if($condition=='image_edit'||$condition=='edit'||$condition=='image_examine'||$condition=='final_examine'){ ?>

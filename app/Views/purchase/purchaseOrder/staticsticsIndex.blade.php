@@ -29,13 +29,13 @@
             <td>{{$staticstics->need_purchase_num}}</td>
             <td>{{$staticstics->fifteenday_need_order_num}}</td>
             <td>{{$staticstics->fifteenday_total_order_num}}</td>
-            <td>{{$staticstics->need_percent}}</td>
+            <td>{{round($staticstics->need_percent,2)}}%</td>
             <td>{{$staticstics->need_total_num}}</td>
             <td>{{$staticstics->avg_need_day}}</td>
             <td>{{$staticstics->long_need_day}}</td>
             <td>{{$staticstics->purchase_order_exceed_time}}</td>
             <td>{{$staticstics->month_order_num }}</td>
-            <td>{{$staticstics->month_order_money}}</td>
+            <td>{{round($staticstics->month_order_money)}}</td>
             <td>{{$staticstics->total_carriage}}</td>
             <td>{{$staticstics->save_money}}</td>
             <td>{{$staticstics->get_time}}</td>

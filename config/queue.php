@@ -93,13 +93,14 @@ return [
 
     'queues' => [
         'InOrders' => '存储订单',
-        'DoPackages' => '打包',
+        'DoPackages' => '生成包裹',
+        'AssignStocks' => '分配库存',
         'AssignLogistics' => '分配物流',
         'PlaceLogistics' => '物流下单',
         'SendMessages' => '发送邮件',
-        'MatchPaypal'=>'匹配Paypal',
-        'ReturnTrack'=>'物流回传',
-        'ImportImages'=>'图片导入',
+        'MatchPaypal' => '匹配Paypal',
+        'ReturnTrack' => '物流回传',
+        'ImportImages' => '图片导入',
     ]
 
 ];

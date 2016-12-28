@@ -1,6 +1,6 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group btn-info" role="group">
+    <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 批量修改属性
             <span class="caret"></span>
@@ -501,22 +501,34 @@
                         上传表格修改sku状态
                     </h4>
                 </div>
-                <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="file" name="upload">
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default"
-                                data-dismiss="modal">关闭
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            提交
-                        </button>
-                    </div>
-                </form>
+
+                <div class="modal-body">
+                    <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
+                        <div>
+                            <span>状态选择:</span>
+                            <select class="form-control" id="spu_status" style="width: 160px;" name="spu_status">
+                                <option value="none">请选择</option>
+                                @foreach(config('item.status') as $key=>$value)
+                                    <option value="{{$key}}">{{$value}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="file" name="upload">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                            data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                提交
+                            </button>
+                        </div>
+                    </form>
+                </div>             
             </div>
         </div>
     </div>
-
 
 @stop
 

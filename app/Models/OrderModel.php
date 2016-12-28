@@ -690,8 +690,8 @@ class OrderModel extends BaseModel
             }
             if ($orderItem['channel_sku']) {
                 $channelSku = explode('*', $orderItem['channel_sku']);
-                $user = UserModel::where('code', $channelSku[0])->first();
-                $orderItem['operator_id'] = $user ? $user->id : 0;
+                // $user = UserModel::where('code', $channelSku[0])->first();
+                $orderItem['operator_id'] = $channelSku[0];
             }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;

@@ -189,11 +189,13 @@ return [
         'assign_id' => '客服',
         'from_name' => '用户昵称',
         'from' => '用户ID',
+        'messages.labels' => '标签',
         'spuMultiOption.en_description' => '英语',
         'spuMultiOption.de_description' => '德语',
         'spuMultiOption.fr_description' => '法语',
         'spuMultiOption.it_description' => '意大利语',
         'spuMultiOption.zh_description' => '中文',
         'catalog.catalogCategory.cn_name' => '一级分类',
+        'catalog.second' => '二级分类',
     ],
 ];

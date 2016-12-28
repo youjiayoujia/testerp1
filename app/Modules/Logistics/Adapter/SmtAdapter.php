@@ -187,7 +187,8 @@ class SmtAdapter extends BasicAdapter
                 return array('code' => 'error', 'result' => $result['result']['errorDesc']);
             }
         }else{
-            $res = $this->getOnlineLogisticsInfo($channel_account_id,$orderId); 
+            $res = $this->getOnlineLogisticsInfo($channel_account_id,$orderId);
+            echo '<pre>';
             print_r($res);
             $onlineLogisticsId = $package->logistics_order_number;
             if(array_key_exists('success', $res) && $res['success']){

@@ -118,6 +118,8 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                 $this->result['remark'] = '订单需审核.';
                 $this->package->eventLog('队列', '订单需审核.', json_encode($this->package));
             }
+        } else {
+            $this->package->update(['queue_name' => '']);
         }
         $this->lasting = round(microtime(true) - $start, 2);
         $this->log('AssignLogistics');

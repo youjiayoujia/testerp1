@@ -24,6 +24,15 @@ return [
             'SELLER_RESPONSE_ISSUE_TIMEOUT' => '卖家响应纠纷超时',
         ]
     ],
+
+    'reply' => [
+        'status' => [
+            'NEW' => '等待发送',
+            'SENT' => '已发送',
+            'FAIL' => '发送失败',
+        ],
+    ],
+
     'wish' => [
         'country' => [
             'AE' => 'United Arab Emirates',

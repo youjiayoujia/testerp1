@@ -1,18 +1,5 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group">
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="glyphicon glyphicon-filter"></i> 过滤
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="{{ DataList::filtersEncode(['status','=','NEW']) }}">待发</a></li>
-                <li><a href="{{ DataList::filtersEncode(['status','=','SENT']) }}">已发</a></li>
-                <li><a href="{{ DataList::filtersEncode(['status','=','FAIL']) }}">失败</a></li>
-            </ul>
-        </div>
-    </div>
 @stop
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>

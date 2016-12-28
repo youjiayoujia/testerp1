@@ -351,11 +351,6 @@ class DhlAdapter extends BasicAdapter
                     'result' => '获取追踪号失败'
                 ];
             }
-            
-            $result =[
-                'code' => 'error',
-                'result' => '获取追踪号失败'
-            ];
 
         }
         return $result;

@@ -491,7 +491,7 @@ class OrderModel extends BaseModel
     public function getAllItemCostAttribute()
     {
         $total = 0;
-        foreach ($this->items as $item) {
+        foreach ($this->items()->with('item')->get() as $item) {
             if ($item->item) {
                 if ($this->items->count() > 1) {
                     if ($item->item->status != 'cleaning') {
@@ -690,6 +690,7 @@ class OrderModel extends BaseModel
             }
             if ($orderItem['channel_sku']) {
                 $channelSku = explode('*', $orderItem['channel_sku']);
+                // $user = UserModel::where('code', $channelSku[0])->first();
                 $orderItem['operator_id'] = $channelSku[0];
             }
             if (!isset($orderItem['item_id'])) {

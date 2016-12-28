@@ -62,8 +62,10 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
                 $this->result['remark'] = $result['tracking_no'];
                 $this->package->eventLog('队列', '下单失败' . $result['tracking_no'], json_encode($this->package));
             }
-            $this->lasting = round(microtime(true) - $start, 3);
-            $this->log('PlaceLogistics');
-        } 
+        } else {
+            $this->package->update(['queue_name' => '']);
+        }
+        $this->lasting = round(microtime(true) - $start, 3);
+        $this->log('PlaceLogistics');
     }
 }

@@ -897,6 +897,11 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('ebayDetail/getEbaySite',
         ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
     Route::resource('ebayDetail', 'Publish\Ebay\EbayDetailController');
+
+
+    Route::get('ebayProduct/ajaxGetLog',
+        ['uses' => 'Publish\Ebay\EbayDataMonitorController@ajaxGetLog', 'as' => 'ebayProduct.ajaxGetLog']);
+
     Route::any('ebay/batchUpdate',
         ['uses' => 'Publish\Ebay\EbayDataMonitorController@batchUpdate', 'as' => 'ebay.batchUpdate']);
     Route::any('ebay/productBatchEdit',

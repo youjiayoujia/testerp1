@@ -131,7 +131,7 @@ class MessageModel extends BaseModel{
             'filterFields' => [
                 'from_name',
                 'from',
-
+                'messages.labels'
             ],
             'filterSelects' => [
                 'messages.status' => config('message.statusText'),
@@ -463,6 +463,11 @@ class MessageModel extends BaseModel{
                                 $product_html .= '</table>';
                                 $product_html .= '</div>';
 
+                            } else{
+                                if($k==0 && ! empty($item->summary->orderUrl)){
+                                    $product_html .= '<div class="col-lg-12" >渠道订单链接:<a target="_blank" href="' . $item->summary->orderUrl . '">'.$item->summary->orderUrl.'</a></div>';
+                                }
+
                             }
 
                             //dd($message_fields_ary);
@@ -611,11 +616,12 @@ class MessageModel extends BaseModel{
      * 渠道参数信息
      */
     public function getChannelParamsAttribute(){
-        $html = '';
+        $html = '<ul class="list-group">';
         $channel = $this->getChannelDiver();
         switch ($channel){
             case 'aliexpress':
-                $html .= '<span class="label label-warning">'.$this->label.'</span>';
+                $html .= '<li class="list-group-item"><span class="label label-warning">'.$this->label.'</span></li>';
+                $html .= '<li class="list-group-item"><code>渠道单号：'.$this->channel_order_number.'</code></li>';
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;
@@ -623,17 +629,18 @@ class MessageModel extends BaseModel{
                 $language = ! empty(config('message.wish')['country'][$this->country]) ? config('message.wish')['country'][$this->country] : '未知';
 
                 if($files){
-                    $html .= '<p><strong>Transaction id</strong>:'.$files['order_items'][0]['Order']['transaction_id'].'</p>';
-                    $html .= '<p><strong>语言</strong>:'.$language.'</p>';
+                    $html .= '<li class="list-group-item"><p><strong>Transaction id</strong>:'.$files['order_items'][0]['Order']['transaction_id'].'</p></li>';
+                    $html .= '<li class="list-group-item"><p><strong>语言</strong>:'.$language.'</p></li>';
                 }else{
-                    $html .= '<p>暂无</p>';
+                    $html .= '<li class="list-group-item"><p>暂无</p></li>';
                 }
                 break;
             case 'ebay':
                 $files = $this->MessageFieldsDecodeBase64;
+                //dd($files);
                 if(!empty($files)){
-                    $html .= '<p><strong>ItemID</strong>:'.$files['ItemID'].'</p>';
-                    $html .= '<p><strong>Ebay链接</strong>:<a target="_blank" href="'.$files['ResponseDetails'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
+                    $html .= '<li class="list-group-item"><p><strong>ItemID</strong><a href="http://www.ebay.com/itm/'.$files['ItemID'].'" target="_blank">:'.$files['ItemID'].'</a></p></li>';
+                    $html .= '<li class="list-group-item"><p><strong>Ebay平台链接</strong>:<a target="_blank" href="'.$files['ResponseDetails'].'"><span class="glyphicon glyphicon-link"></span></a></p></li>';
 
                 }
 
@@ -642,6 +649,7 @@ class MessageModel extends BaseModel{
             default:
                 $html = '';
         }
+        $html .= '</ul>';
 
         return $html;
     }

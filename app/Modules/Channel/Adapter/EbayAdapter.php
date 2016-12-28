@@ -1974,6 +1974,15 @@ class EbayAdapter implements AdapterInterface
                               <RecipientID>' . $message_obj->from_name . '</RecipientID>
                               </MemberMessage>';
             $content = $this->buildEbayBody($reply_xml_dom,'AddMemberMessageRTQ');
+
+            if($content->Ack == 'Success'){
+                $replyMessage->status = 'SENT';
+
+            }else{
+                $replyMessage->status = 'FAIL';
+            }
+            $replyMessage->save();
+
             return $content->Ack == 'Success' ? true : false;
         }
     }

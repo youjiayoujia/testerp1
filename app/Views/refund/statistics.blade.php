@@ -1,6 +1,8 @@
 @extends('common.detail')
 
 @section('detailBody')
+    <div class="panel-body">
+
     <form id="refund-statistics-form" method="post" action="">
         {!! csrf_field() !!}
     <div class="row">
@@ -82,6 +84,7 @@
         <input type="hidden" name="refund-statistics-account-ids" value="">
         <input type="hidden" name="refund-statistics-reason" value="">
     </form>
+    </div>
 @stop
 @section('pageJs')
     <link href="{{ asset('css/multiple-select.css') }}" rel="stylesheet">

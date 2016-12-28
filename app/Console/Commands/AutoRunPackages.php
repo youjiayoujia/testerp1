@@ -78,6 +78,7 @@ class AutoRunPackages extends Command
                     while($packages->count()) {
                         foreach($packages as $package) {
                             $count++;
+                            $package->update(['queue_name' => 'assignStocks']);
                             $job = new autoAssignStocks($package);
                             $job = $job->onQueue('assignStocks');
                             $this->dispatch($job);
@@ -98,6 +99,7 @@ class AutoRunPackages extends Command
                     while($packages->count()) {
                         foreach($packages as $package) {
                             $count++;
+                            $package->update(['queue_name' => 'assignLogistics']);
                             $job = new autoAssignLogistics($package);
                             $job = $job->onQueue('assignLogistics');
                             $this->dispatch($job);
@@ -118,6 +120,7 @@ class AutoRunPackages extends Command
                     while($packages->count()) {
                         foreach($packages as $package) {
                             $count++;
+                            $package->update(['queue_name' => 'placeLogistics']);
                             $job = new autoPlaceLogistics($package);
                             $job = $job->onQueue('placeLogistics');
                             $this->dispatch($job);

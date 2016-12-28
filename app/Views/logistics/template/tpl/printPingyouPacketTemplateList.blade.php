@@ -61,7 +61,7 @@
 
         </table>
         <div style="width:100%;font-size: 28px;font-weight: bold;">
-            <div style="width:50px;float:left;font-size:30px;">{{ $model->logistics_id }}</div>
+            <div style="width:50px;float:left;font-size:30px;">{{ $model->logistics ? $model->logistics->logistics_code : '' }}</div>
             <div style="width:50px;float:right;">{{ $model->items ? $model->items()->sum('quantity') : '' }}</div>
         </div>
     </div>

@@ -493,12 +493,12 @@ class OrderModel extends BaseModel
         $total = 0;
         foreach ($this->items as $item) {
             if ($item->item) {
-                if ($item->item->count() > 1) {
+                if ($this->items->count() > 1) {
                     if ($item->item->status != 'cleaning') {
-                        $total += $item->item->purchase_price * $item->quantity;
+                        $total += $item->item->cost * $item->quantity;
                     }
                 } else {
-                    $total += $item->item->purchase_price * $item->quantity;
+                    $total += $item->item->cost * $item->quantity;
                 }
             }
         }

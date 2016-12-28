@@ -1,7 +1,7 @@
 <div class="panel panel-primary">
     <div class="panel-heading"><p class="glyphicon glyphicon-tags"></p>&nbsp;Order detail From Wish</div>
     <div class="panel-body">
-        <div class="row">
+        <div class="col-lg-12">
             <table class="table table-bordered">
                 <tr>
                     <th><input type="checkbox"></th>
@@ -14,7 +14,7 @@
                     <th>Tracking Num</th>
                     <th>Marked Shipped</th>
                     <th>Marked Refunded</th>
-                    <th>Operation</th>
+                   {{-- <th>Operation</th>--}}
                 </tr>
                 @if($message->MessageFieldsDecodeBase64 && isset($message->MessageFieldsDecodeBase64['order_items']))
                     @foreach($message->MessageFieldsDecodeBase64['order_items'] as $item_order)
@@ -33,11 +33,11 @@
                             </td>
                             <td>{{$item_order['Order']['shipped_date']}}</td>
                             <td></td>
-                            <td><a class="btn btn-danger" >退款</a></td>
+                            {{--<td><a class="btn btn-danger" >退款</a></td>--}}
                         </tr>
-                        <tr>
+                   {{--     <tr>
                             <td colspan="11"><a class="btn btn-danger" style="float: right">选中退款</a></td>
-                        </tr>
+                        </tr>--}}
                     @endforeach
                 @endif
             </table>

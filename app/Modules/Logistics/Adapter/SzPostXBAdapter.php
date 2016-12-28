@@ -95,8 +95,8 @@ class SzPostXBAdapter extends BasicAdapter
             $productNum = $packageItem->quantity;
             $products_declared_cn = $packageItem->item->product->declared_cn;
             $products_declared_en = $packageItem->item->product->declared_en;
-            $category_name        = $packageItem->item->catalog ? $packageItem->item->catalog->name : '裙子';      //获取分类信息
-            $category_name_en     = $packageItem->item->catalog ? $packageItem->item->catalog->c_name : 'skirt';
+            $category_name        = $packageItem->item->catalog ? $packageItem->item->catalog->c_name : '裙子';      //获取分类信息
+            $category_name_en     = $packageItem->item->catalog ? $packageItem->item->catalog->name : 'skirt';
             $single_weight        = $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
             $single_value         = $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
             /*if(mb_strlen($category_name) > 60){

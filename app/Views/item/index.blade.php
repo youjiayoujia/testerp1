@@ -614,6 +614,17 @@
             },
         });
 
+        $(document).on('change', '.sectiongangeddouble_first', function () {
+            val = $(this).val();
+            $.get(
+                "{{ route('item.sectionGangedDouble')}}",
+                {val: val},
+                function (result) {
+                    $('.sectiongangeddouble_second').html(result);
+                }
+            )
+        })
+
         function changeSelectVlaue(selected, type, productId) {
             var id = selected.val();
             if (id) {

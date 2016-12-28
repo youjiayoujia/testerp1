@@ -628,8 +628,7 @@ class OrderModel extends BaseModel
         }
         if ($data['type'] == 'FULL') {
             $total = 0;
-            foreach ($data['arr']['id'] as $id) {
-                $orderItem = $this->items->find($id);
+            foreach ($this->items as $orderItem) {
                 $orderItem->update(['is_refund' => 1]);
                 $total = $orderItem['price'] * $orderItem['quantity'] + $total;
             }
@@ -646,8 +645,7 @@ class OrderModel extends BaseModel
         $refund = new RefundModel();
         $refund_new = $refund->create($data);
         if ($data['type'] == 'FULL') {
-            foreach ($data['arr']['id'] as $fullid) {
-                $orderItem = $this->items->find($fullid);
+            foreach ($this->items as $orderItem) {
                 $orderItem->update(['refund_id' => $refund_new->id]);
             }
         } else {

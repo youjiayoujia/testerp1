@@ -470,6 +470,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('addLotsOfCatalogs', ['uses' => 'CatalogController@addLotsOfCatalogs', 'as' => 'addLotsOfCatalogs']);
 
     //item路由
+    Route::get('item/sectionGangedDouble', ['uses' => 'ItemController@sectionGangedDouble', 'as' => 'item.sectionGangedDouble']);
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('itemUser/ajaxSupplierUser',

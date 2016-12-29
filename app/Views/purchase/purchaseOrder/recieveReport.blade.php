@@ -1,6 +1,10 @@
 @extends('common.table')
 @section('tableToolButtons')
-    
+    <div class="btn-group" >
+        <a href="javascript:" class="btn btn-warning download">到货记录导出
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </a>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     
@@ -33,5 +37,13 @@
 @stop
 
 @section('childJs')
-    
+    <script type='text/javascript'>
+    //采购单导出
+        $(document).ready(function(){
+            $(document).on('click', '.download', function(){
+                subUrl = window.location.search;
+                location.href="{{ route('purchaseOrder.purchaseArrivalLogOut')}}"+subUrl;
+            })
+        })
+    </script>
 @stop

@@ -37,10 +37,11 @@ use App\Models\StockModel;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder, PurchaseItemModel $purchaseItem, ItemModel $item,PurchaseOrderConfirmModel $purchaseOrderConfirm)
+    public function __construct(PurchaseOrderModel $purchaseOrder, PurchaseItemModel $purchaseItem, ItemModel $item,PurchaseOrderConfirmModel $purchaseOrderConfirm,PurchaseItemArrivalLogModel $arrival)
     {
         //$this->middleware('roleCheck');
         $this->model = $purchaseOrder;
+        $this->arrival = $arrival;
         $this->item = $item;
         $this->purchaseOrderConfirm = $purchaseOrderConfirm;
         $this->purchaseItem = $purchaseItem;
@@ -1337,7 +1338,7 @@ class PurchaseOrderController extends Controller
      * 导出采购单
      *
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return csv
      */
     public function purchaseOrdersOut()
     {
@@ -1362,6 +1363,37 @@ class PurchaseOrderController extends Controller
                 '订单总金额' => $model->total_purchase_cost,
                 '供应商编号' => $model->supplier_id,
                 '下单时间' => $model->created_at,
+            ];
+        }
+        $name = 'export_exception';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    /**
+     * 导出到货记录
+     *
+     * @param $id
+     * @return csv
+     */
+    public function purchaseArrivalLogOut()
+    {
+        $purchaseItemArrivalLogModel = $this->autoList($this->arrival, null, $fields = ['*'], $pageSize = 10000);
+        $rows = [];
+        
+        foreach ($purchaseItemArrivalLogModel as $recieve) {
+            $rows[] = [
+                '采购单号' => $recieve->purchase_order_id,
+                'sku' => $recieve->purchaseItem->productItem->sku,
+                '库位' => $recieve->purchaseItem->warehouse_position_name,
+                '到货数量' => $recieve->arrival_num,
+                '入库数量' => $recieve->good_num,
+                '名称' => $recieve->purchaseItem->productItem->c_name,
+                '到货时间' => $recieve->created_at,
+                '收货人' => $recieve->user?$recieve->user->name:'',
             ];
         }
         $name = 'export_exception';

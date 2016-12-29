@@ -188,5 +188,6 @@ return [
         'spuMultiOption.it_description' => '意大利语',
         'spuMultiOption.zh_description' => '中文',
         'catalog.catalogCategory.cn_name' => '一级分类',
+        'is_second' => '到货记录',
     ],
 ];

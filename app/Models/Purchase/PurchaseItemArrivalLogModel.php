@@ -27,18 +27,33 @@ class PurchaseItemArrivalLogModel extends BaseModel
  			
         ]
     ];
-    public $searchFields = ['sku'];
+    public $searchFields = ['sku'=>'sku'];
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
 	 
-    protected $fillable = ['id','sku','purchase_item_id','arrival_num','good_num','bad_num','quality_time'];
+    protected $fillable = ['id','sku','purchase_item_id','arrival_num','good_num','bad_num','quality_time','purchase_order_id','user_id','is_second'];
 
     public function purchaseItem()
     {
         return $this->belongsTo('App\Models\Purchase\PurchaseItemModel', 'purchase_item_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id');
+    }
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterSelects' => [
+                'is_second' => config('purchase.purchaseItemArrival.is_second'),
+            ],
+            'sectionSelect' => ['time' => ['created_at']],
+        ];
     }
 	
 }

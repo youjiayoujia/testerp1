@@ -787,6 +787,11 @@ return [
                     'url' => 'paypal.ShowPaypalRate',
                     'icon' => '',
                 ],
+                [
+                    'name' => '邮件推送',
+                    'url' => 'mail_push.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

@@ -1314,6 +1314,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //接口路由
     Route::resource('syncApi', 'SyncApiController');
     Route::resource('importSyncApi', 'SyncSellmoreDataController');
+    //系统模块
+    Route::resource('mail_push', 'MailPushController');
 });
 
 

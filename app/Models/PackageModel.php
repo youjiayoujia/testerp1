@@ -724,7 +724,7 @@ class PackageModel extends BaseModel
                             }
                             //todo v3测试，正式上线删除
                             $fItem = $this->items()->first();
-                            $arr = $fItem->item->getTransitQuantityAttribute();
+                            $arr = $fItem->item->transit_quantity;
                             foreach ($arr as $key => $value) {
                                 $flag = 0;
                                 foreach ($value as $k => $v) {
@@ -1061,7 +1061,7 @@ class PackageModel extends BaseModel
     //设置多产品订单包裹产品
     public function setPackageItemFb()
     {
-        $warehouses = WarehouseModel::where('is_available', '1')->where('type', 'local')->get();
+        $warehouses = WarehouseModel::where(['type' => 'local', 'is_available' => '1'])->get();
         foreach ($warehouses as $key => $warehouse) {
             $warehouseId = $warehouse->id;
             $buf = [];
@@ -1069,8 +1069,8 @@ class PackageModel extends BaseModel
             foreach ($this->items as $packageItem) {
                 $pquantity = $packageItem->quantity;
                 $stocks = StockModel::where([
-                    'warehouse_id' => $warehouseId,
-                    'item_id' => $packageItem->item_id
+                    'item_id' => $packageItem->item_id,
+                    'warehouse_id' => $warehouseId
                 ])->get()->sortByDesc('available_quantity');
                 if ($stocks->sum('available_quantity') < $pquantity) {
                     unset($stocks);

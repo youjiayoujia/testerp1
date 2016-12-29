@@ -197,5 +197,7 @@ return [
         'spuMultiOption.zh_description' => '中文',
         'catalog.catalogCategory.cn_name' => '一级分类',
         'catalog.second' => '二级分类',
+        'mail_push.name' => '变量名称',
+        'mail_push.code' => '变量代码',
     ],
 ];

@@ -403,6 +403,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购单导出
     Route::any('purchaseOrder/purchaseOrdersOut',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
+    //到货记录
+    Route::any('purchaseOrder/purchaseArrivalLogOut',
+        ['uses' => 'Purchase\PurchaseOrderController@purchaseArrivalLogOut', 'as' => 'purchaseOrder.purchaseArrivalLogOut']);
     //采购单核销格式导出
     Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
     //采购单付款格式导出

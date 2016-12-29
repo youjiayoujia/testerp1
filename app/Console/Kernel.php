@@ -92,78 +92,81 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
-        $schedule->command('purchase:create')->cron('20 4,12 * * *');
-        $schedule->command('purchaseStaticstics:create')->cron('20 6 * * *');
-        
-        //黑名单定时任务
-        $schedule->command('blacklists:get')->dailyAt('2:00');
-        $schedule->command('blacklists:update')->dailyAt('3:00');
-        //抓单定时任务规则
-        foreach (ChannelModel::all() as $channel) {
-            switch ($channel->driver) {
-                case 'amazon':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
-                    break;
-                case 'aliexpress':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
-                        $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
-                    }
-                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
-                    break;
-                case 'wish':
-                    foreach ($channel->accounts->where('is_available', '1')->where('id',5) as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
-                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
-                    break;
-                case 'ebay':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
-                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
-                    break;
-                case 'lazada':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
-                    break;
-                case 'cdiscount':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
-                    break;
-                case 'joom':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
-                    break;
-            }
-        }
-        //包裹报表
-        $schedule->command('pick:report')->hourly();
-        $schedule->command('all:report')->daily();
-        //CRM
-        $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');
-        $schedule->command('AutoEbayMessage:get')->everyFiveMinutes();
-        $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
-        $schedule->command('getEbayCases')->cron('8,12,13,14,16,30 17 * * *');
-        $schedule->command('getFeedBack:account')->everyTenMinutes();
-        //采购
-        $schedule->command('aliShipmentName:get')->hourly();
-        $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
-        //API同步sellmore database
-        $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
-        $schedule->command('SyncImportApi:all')->everyFiveMinutes();
+        $schedule->command('imitate:orders 10000')->everyThirtyMinutes();
         //半小时一次将包裹放入队列
-        $schedule->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')->everyThirtyMinutes();
+        $schedule
+            ->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')
+            ->everyThirtyMinutes();
+//        $schedule->command('purchase:create')->cron('20 4,12 * * *');
+//        $schedule->command('purchaseStaticstics:create')->cron('20 6 * * *');
+//
+//        //黑名单定时任务
+//        $schedule->command('blacklists:get')->dailyAt('2:00');
+//        $schedule->command('blacklists:update')->dailyAt('3:00');
+        //抓单定时任务规则
+//        foreach (ChannelModel::all() as $channel) {
+//            switch ($channel->driver) {
+//                case 'amazon':
+//                    foreach ($channel->accounts->where('is_available', '1') as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+//                    }
+//                    break;
+//                case 'aliexpress':
+//                    foreach ($channel->accounts->where('is_available', '1') as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->cron('2 6,18,22 * * *');
+//                    }
+//                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('05 */2 * * *');
+//                    break;
+//                case 'wish':
+//                    foreach ($channel->accounts->where('is_available', '1')->where('id', 5) as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+//                    }
+//                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
+//                    break;
+//                case 'ebay':
+//                    foreach ($channel->accounts->where('is_available', '1') as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+//                    }
+//                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
+//                    break;
+//                case 'lazada':
+//                    foreach ($channel->accounts->where('is_available', '1') as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+//                    }
+//                    break;
+//                case 'cdiscount':
+//                    foreach ($channel->accounts->where('is_available', '1') as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+//                    }
+//                    break;
+//                case 'joom':
+//                    foreach ($channel->accounts->where('is_available', '1') as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+//                    }
+//                    break;
+//            }
+//        }
+        //包裹报表
+//        $schedule->command('pick:report')->hourly();
+//        $schedule->command('all:report')->daily();
+//        //CRM
+//        $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');
+//        $schedule->command('AutoEbayMessage:get')->everyFiveMinutes();
+//        $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
+//        $schedule->command('getEbayCases')->cron('8,12,13,14,16,30 17 * * *');
+//        $schedule->command('getFeedBack:account')->everyTenMinutes();
+//        //采购
+//        $schedule->command('aliShipmentName:get')->hourly();
+//        $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');
+//        //API同步sellmore database
+//        $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
+//        $schedule->command('SyncImportApi:all')->everyFiveMinutes();
         //财务
-        $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
-        //DHL
-        $schedule->command('dhl:sureShip')->daily();
-        //匹配paypal
-        $schedule->command('match:account all')->cron('*/20 * * * *');
+//        $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
+//        //DHL
+//        $schedule->command('dhl:sureShip')->daily();
+//        //匹配paypal
+//        $schedule->command('match:account all')->cron('*/20 * * * *');
 
     }
 }

@@ -49,7 +49,7 @@
     <th>延迟</th>
     <th>AutoReply</th>
     <th>操作</th>
-{{--    <th>无需回复</th>--}}
+    <th>无需回复</th>
 @stop
 @section('tableBody')
     @foreach($data as $message)
@@ -109,7 +109,7 @@
                     </a>
                 @endif
             </td>
-{{--            <td>
+            <td>
                 @if($message->status == 'PROCESS' and $message->assign_id == request()->user()->id)
                     <button class="btn btn-warning btn-xs" style="background-color: #88775A;border-color: #FFFFFF;" type="button" onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply_1', ['id'=>$message->id]) }}'}">
                         <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
@@ -120,7 +120,7 @@
                         <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
                     </button>
                 @endif
-            </td>--}}
+            </td>
         </tr>
 
     @endforeach

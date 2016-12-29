@@ -1,6 +1,6 @@
 <script type="text/javascript">
     var message = {
-        entry : 5, //配置初始化消息数量
+        entry : 3, //配置初始化消息数量
         smt_order_operate : false, //速卖通订单操作
         has_workflow_message : true, //
         @if(request()->session()->get('workflow')=='keeping')

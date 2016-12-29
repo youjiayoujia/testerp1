@@ -285,7 +285,7 @@ class TestController extends Controller
 
     public function test1()
     {
-        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1470, 1660])->get();
+        $orders = OrderModel::whereBetween('id', [2979, 3081])->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }
@@ -294,7 +294,7 @@ class TestController extends Controller
 
     public function test3()
     {
-        $orders = OrderModel::where('id', '>=', 3189)->get();
+        $orders = OrderModel::whereBetween('id', [3081, 3189])->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }

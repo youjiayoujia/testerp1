@@ -123,4 +123,9 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
         $this->lasting = round(microtime(true) - $start, 2);
         $this->log('AssignLogistics');
     }
+
+    public function failed()
+    {
+        $this->package->update(['queue_name' => '']);
+    }
 }

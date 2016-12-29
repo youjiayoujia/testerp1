@@ -331,6 +331,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
+    //到货记录报表
+    Route::get('purchaseOrder/recieveReport',
+        ['uses' => 'Purchase\PurchaseOrderController@recieveReport', 'as' => 'purchaseOrder.recieveReport']);
     //缺货报表
     Route::get('purchaseOrder/outOfStock',
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);

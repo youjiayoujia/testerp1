@@ -129,107 +129,107 @@ class TestController extends Controller
 //    dd($result);
     // }
 
-    public function test2()
-    {
-        $package = PackageModel::find('19');
-        if(in_array($package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
-            $order = $package->order;
-            $package->assignLogistics();
-            if (!$order->is_review) { //审核通过的订单无需再审核
-                //验证黑名单
-                if ($order->checkBlack()) {
-                    $order->update(['status' => 'REVIEW']);
-                    $order->remark('黑名单需审核.', 'BLACK');
-                }
-                //特殊需求
-                if (!empty($order->customer_remark)) {
-                    $order->update(['status' => 'REVIEW']);
-                    $order->remark('特殊需求需审核.', 'REQUIRE');
-                }
-                //订单留言
-                if ($order->messages->count() == 1 and $order->messages->first()->replies->count() == 0) {
-                    $order->update(['status' => 'REVIEW']);
-                    $order->remark('客户有订单留言.', 'MESSAGE');
-                }
-                //包裹重量大于2kg
-                if ($package->weight >= 2) {
-                    $order->update(['status' => 'REVIEW']);
-                    $order->remark('包裹重量大于2kg.', 'WEIGHT');
-                }
-                //分渠道审核
-                $profitRate = $order->calculateProfitProcess();
-                // switch ($order->channel->driver) {
-                //     case 'amazon':
-                //         break;
-                //     case 'aliexpress':
-                //         if ($profitRate <= 0 or $profitRate >= 0.4) {
-                //             $order->update(['status' => 'REVIEW']);
-                //             $order->remark('速卖通订单利润率小于0或大于40%.', 'PROFIT');
-                //         }
-                //         break;
-                //     case 'wish':
-                //         if ($profitRate < 0.08) {
-                //             $order->update(['status' => 'REVIEW']);
-                //             $order->remark('WISH订单利润率小于8%.', 'PROFIT');
-                //         }
-                //         break;
-                //     case 'ebay':
-                //         if ($profitRate <= 0.05) {
-                //             $order->update(['status' => 'REVIEW']);
-                //             $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
-                //         }
-                //         break;
-                //     case 'lazada':
-                //         break;
-                //     case 'cdiscount':
-                //         break;
-                //     case 'joom':
-                //         break;
-                // }
-            }
-            if($package->order->status != 'REVIEW') {
-                if ($package->status == 'ASSIGNED') {
-                    $package->update(['queue_name' => 'placeLogistics']);
-                    $job = new PlaceLogistics($package);
-                    $job = $job->onQueue('placeLogistics');
-                    $this->dispatch($job);
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success.';
-                    $package->eventLog('队列', '已匹配物流，加入下单队列', json_encode($package));
-                } elseif ($package->status == 'ASSIGNFAILED') {
-                    $package->update(['queue_name' => '']);
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = '未匹配到物流.';
-                    $package->eventLog('队列', '匹配失败,未匹配到物流', json_encode($package));
-                } elseif ($package->status == 'NEED') {
-                    $package->update(['queue_name' => '']);
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = '已匹配到物流,缺货中，不需要提前标记发货.';
-                    $package->eventLog('队列', '已匹配到物流,缺货中,不需要提前标记发货.', json_encode($package));
-                }
-            } else {
-                $package->update(['queue_name' => '']);
-                $this->result['status'] = 'fail';
-                $this->result['remark'] = '订单需审核.';
-                $package->eventLog('队列', '订单需审核.', json_encode($package));
-            }
-        } else {
-            $package->update(['queue_name' => '']);
-        }
-        var_dump('123');
-    }
-
     // public function test2()
     // {
-
-    // }
-
-    // public function test2()
-    // {
-    //     $order = OrderModel::find('4819');
-    //     $order->createPackage();
+    //     $package = PackageModel::find('60417');
+    //     if(in_array($package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
+    //         $order = $package->order;
+    //         $package->assignLogistics();
+    //         if (!$order->is_review) { //审核通过的订单无需再审核
+    //             //验证黑名单
+    //             if ($order->checkBlack()) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('黑名单需审核.', 'BLACK');
+    //             }
+    //             //特殊需求
+    //             if (!empty($order->customer_remark)) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('特殊需求需审核.', 'REQUIRE');
+    //             }
+    //             //订单留言
+    //             if ($order->messages->count() == 1 and $order->messages->first()->replies->count() == 0) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('客户有订单留言.', 'MESSAGE');
+    //             }
+    //             //包裹重量大于2kg
+    //             if ($package->weight >= 2) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('包裹重量大于2kg.', 'WEIGHT');
+    //             }
+    //             //分渠道审核
+    //             $profitRate = $order->calculateProfitProcess();
+    //             // switch ($order->channel->driver) {
+    //             //     case 'amazon':
+    //             //         break;
+    //             //     case 'aliexpress':
+    //             //         if ($profitRate <= 0 or $profitRate >= 0.4) {
+    //             //             $order->update(['status' => 'REVIEW']);
+    //             //             $order->remark('速卖通订单利润率小于0或大于40%.', 'PROFIT');
+    //             //         }
+    //             //         break;
+    //             //     case 'wish':
+    //             //         if ($profitRate < 0.08) {
+    //             //             $order->update(['status' => 'REVIEW']);
+    //             //             $order->remark('WISH订单利润率小于8%.', 'PROFIT');
+    //             //         }
+    //             //         break;
+    //             //     case 'ebay':
+    //             //         if ($profitRate <= 0.05) {
+    //             //             $order->update(['status' => 'REVIEW']);
+    //             //             $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
+    //             //         }
+    //             //         break;
+    //             //     case 'lazada':
+    //             //         break;
+    //             //     case 'cdiscount':
+    //             //         break;
+    //             //     case 'joom':
+    //             //         break;
+    //             // }
+    //         }
+    //         if($package->order->status != 'REVIEW') {
+    //             if ($package->status == 'ASSIGNED') {
+    //                 $package->update(['queue_name' => 'placeLogistics']);
+    //                 $job = new PlaceLogistics($package);
+    //                 $job = $job->onQueue('placeLogistics');
+    //                 $this->dispatch($job);
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success.';
+    //                 $package->eventLog('队列', '已匹配物流，加入下单队列', json_encode($package));
+    //             } elseif ($package->status == 'ASSIGNFAILED') {
+    //                 $package->update(['queue_name' => '']);
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = '未匹配到物流.';
+    //                 $package->eventLog('队列', '匹配失败,未匹配到物流', json_encode($package));
+    //             } elseif ($package->status == 'NEED') {
+    //                 $package->update(['queue_name' => '']);
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = '已匹配到物流,缺货中，不需要提前标记发货.';
+    //                 $package->eventLog('队列', '已匹配到物流,缺货中,不需要提前标记发货.', json_encode($package));
+    //             }
+    //         } else {
+    //             $package->update(['queue_name' => '']);
+    //             $this->result['status'] = 'fail';
+    //             $this->result['remark'] = '订单需审核.';
+    //             $package->eventLog('队列', '订单需审核.', json_encode($package));
+    //         }
+    //     } else {
+    //         $package->update(['queue_name' => '']);
+    //     }
     //     var_dump('123');
     // }
+
+    // public function test2()
+    // {
+
+    // }
+
+    public function test2()
+    {
+        $order = PackageModel::find('40423');
+        $order->createpackageitems();
+        var_dump('123');
+    }
 
     // public function test2()
     // {
@@ -241,12 +241,48 @@ class TestController extends Controller
 
     // public function test2()
     // {
-    //     $order = OrderModel::find(3854);
-    //     var_dump($order->toarray());
-    //     $order->update(['channel_id' => '25']);
-    //     var_dump($order->channel_id);
+    //     $order = OrderModel::find(60201);
+    //     if ($order && $order->status != 'REVIEW') {
+    //         if ($order->status == 'PREPARED') {
+    //             $oldPackages = $order->packages;
+    //             foreach ($oldPackages as $oldPackage) {
+    //                 $oldPackage->cancelPackage();
+    //             }
+    //             if ($order->channel->driver == 'ebay' and $order->order_is_alert != 2) {
+    //                 if ($order->order_is_alert == 1) {
+    //                     $order->update(['status' => 'REVIEW']);
+    //                     $order->remark('EBAY订单匹配PAYPAL失败.', 'PAYPAL');
+    //                 }
+    //                 $order->eventLog('队列', 'EBAY订单需要匹配PAYPAL.');
+    //                 $this->relation_id = $order->id;
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'EBAY订单需要匹配PAYPAL.';
+    //             } else {
+    //                 $package = $order->createPackage();
+    //                 if ($package) {
+    //                     $package->update(['queue_name' => 'assignStocks']);
+    //                     $job = new AssignStocks($package);
+    //                     $job->onQueue('assignStocks');
+    //                     $this->dispatch($job);
+    //                     $this->relation_id = $order->id;
+    //                     $this->result['status'] = 'success';
+    //                     $this->result['remark'] = 'Success.';
+    //                     $package->eventLog('队列', '已生成空包裹，加入匹配库存队列', json_encode($package));
+    //                 } else {
+    //                     $this->relation_id = 0;
+    //                     $this->result['status'] = 'fail';
+    //                     $this->result['remark'] = 'Fail to create virtual package.';
+    //                 }
+    //             }
+    //         } else {
+    //             $this->relation_id = 0;
+    //             $this->result['status'] = 'success';
+    //             $this->result['remark'] = 'Order status is not PREPARED. Can not create package';
+    //         }
+    //     }
     //     var_dump('123');
     // }
+
     public function test1()
     {
         $orders = OrderModel::whereBetween('id', [2979, 3081])->get();

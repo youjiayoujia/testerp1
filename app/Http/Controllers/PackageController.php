@@ -401,9 +401,9 @@ class PackageController extends Controller
             'packageNum' => $this->model->where('status', 'NEW')->count(),
             'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->count(),
-            'assignNum' => $this->model->where('status', 'WAITASSIGN')->count(),
+            'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',
-                '1')->whereHas('order', function($query){
+                '1')->where('queue_name', '!=', 'placeLogistics')->whereHas('order', function($query){
                     $query->where('status', '!=', 'REVIEW');
                 })->get()->count(),
             'manualShip' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->count(),
@@ -1100,6 +1100,9 @@ class PackageController extends Controller
             ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
             ->where('queue_name', '!=', 'placeLogistics')
             ->where('is_auto', '1')
+            ->whereHas('order', function($query){
+                $query->where('status', '!=', 'REVIEW');
+            })
             ->skip($start)->take($len)->get();
         $packageIds = [];
         while ($packages->count()) {
@@ -1118,6 +1121,9 @@ class PackageController extends Controller
                 ->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])
                 ->where('is_auto', '1')
                 ->where('queue_name', '!=', 'placeLogistics')
+                ->whereHas('order', function($query){
+                    $query->where('status', '!=', 'REVIEW');
+                })
                 ->skip($start)->take($len)->get();
         }
         return redirect(route('dashboard.index'))->with('alert',

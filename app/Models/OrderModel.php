@@ -533,7 +533,7 @@ class OrderModel extends BaseModel
 
     public function packagesToQueue()
     {
-        if(!$this->packages->count()) {
+        if (!$this->packages->count()) {
             $job = new DoPackages($this);
             Queue::pushOn('doPackages', $job);
         }
@@ -678,7 +678,7 @@ class OrderModel extends BaseModel
                     $orderItem['item_status'] = $item->status;
                 } else {
                     $stock = StockModel::where('oversea_sku', $orderItem['sku'])->first();
-                    if($stock) {
+                    if ($stock) {
                         $orderItem['item_id'] = $stock->item_id;
                         $orderItem['item_status'] = $stock->item->status;
                         $orderItem['is_oversea'] = 1;
@@ -700,13 +700,13 @@ class OrderModel extends BaseModel
             }
             $order->items()->create($orderItem);
         }
-        foreach($order->items as $key => $single) {
-            if(!$key) {
-                if($single->is_oversea) {
+        foreach ($order->items as $key => $single) {
+            if (!$key) {
+                if ($single->is_oversea) {
                     $order->update(['is_oversea' => '1']);
                 }
             }
-            if(!WarehouseModel::where('code', $single->code)->first()) {
+            if (!WarehouseModel::where('code', $single->code)->first()) {
                 $order->update(['status' => 'REVIEW']);
                 break;
             }
@@ -817,7 +817,7 @@ class OrderModel extends BaseModel
         $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
-        $orderChannelFee = $this->channel_fee;
+        $orderChannelFee = $this->calculateOrderChannelFee();
         $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $orderChannelFee, 4);
         $orderProfitRate = $orderProfit / $orderAmount;
         $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);

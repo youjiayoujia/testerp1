@@ -601,6 +601,11 @@ return [
                     'url' => 'purchaseStaticstics',
                     'icon' => '',
                 ],
+                [
+                    'name' => '缺货报告',
+                    'url' => 'purchase.outOfStock',
+                    'icon' => '',
+                ],
             ],
             'CRM报表' => [
                 [
@@ -615,13 +620,14 @@ return [
                     'url' => 'package.logisticsDelivery',
                     'icon' => '',
                 ],
-                [
-                    'name' => '缺货报告',
-                    'url' => 'purchase.outOfStock',
-                    'icon' => '',
-                ],
+                
             ],
             'SKU报表' => [
+                [
+                    'name' => '到货记录',
+                    'url' => 'purchaseOrder.recieveReport',
+                    'icon' => '',
+                ],
                 [
                     'name' => 'EbaySku销量报表',
                     'url' => 'sku.saleReport',

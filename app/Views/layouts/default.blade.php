@@ -20,6 +20,7 @@
     <script src="{{ asset('js/select2.min.js') }}"></script>
     <script src="{{ asset('js/jquery.datetimepicker.full.js') }}"></script>  
     <script src="{{ asset('js/admin.js') }}"></script>  
+    <script src="{{ asset('js/lodash.js') }}"></script>
 @stop
 @section('init')
     <script type="text/javascript">

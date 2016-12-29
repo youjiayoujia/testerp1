@@ -23,6 +23,7 @@ use App\Models\Message\SendEbayMessageListModel;
 use App\Models\Order\ItemModel;
 use App\Models\ChannelModel;
 use Channel;
+use App\Models\CurrencyModel;
 
 
 class MessageController extends Controller
@@ -59,6 +60,7 @@ class MessageController extends Controller
     }
 
     public function process(){
+        $currencys = CurrencyModel::all();
 
         if (request()->input('id')) {
             $message = $this->model->find(request()->input('id'));
@@ -70,6 +72,8 @@ class MessageController extends Controller
                 'metas' => $this->metas(__FUNCTION__),
                 //'parents' => TypeModel::where('parent_id', 0)->get(), //模版分类
                 'users' => UserModel::all(),
+                'currencys' => $currencys,
+
                 //'messages' => $messages,
             ];
 
@@ -105,7 +109,8 @@ class MessageController extends Controller
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
-                'is_ali_msg_option' => $IsOption
+                'is_ali_msg_option' => $IsOption,
+                'currencys' => $currencys,
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
 

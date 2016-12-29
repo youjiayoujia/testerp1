@@ -1276,7 +1276,7 @@ class PurchaseOrderController extends Controller
 
         $rows = [];
         $warehouses = WarehouseModel::all();
-        //print_r($item_id_arr);exit;
+        
         foreach ($item_id_arr as $item_id) {
             $model = $this->item->find($item_id['item_id']);
             foreach ($warehouses as $warehouse) {

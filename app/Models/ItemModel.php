@@ -26,7 +26,7 @@ class ItemModel extends BaseModel
 
     protected $stock;
 
-    public $searchFields = ['sku' => 'sku', 'id' => 'id', 'c_name' => '中文名'];
+    public $searchFields = ['sku' => 'sku', 'c_name' => '中文名'];
 
     public $rules = ['update' => []];
 
@@ -95,9 +95,13 @@ class ItemModel extends BaseModel
                 'new_status' => config('item.new_status'),
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
-            'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
-            'doubleRelatedSelectedFields' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
+            'selectRelatedSearchs' => [],
+            'doubleRelatedSelectedFields' => [],
             'sectionSelect' => [],
+            'sectionGangedDouble' => [
+                'first' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
+                'second' => ['catalog' => ['c_name' => CatalogModel::all()->pluck('c_name', 'c_name')]]
+            ],
         ];
     }
 

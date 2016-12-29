@@ -9,11 +9,9 @@
     <script src="{{ asset('plugins/pace/pace.min.js') }}"></script>
     <link href="{{ asset('plugins/pace/dataurl.css') }}" rel="stylesheet" />
         @if($driver == 'wish')
-            <div class="row">
-                <div class="col-lg-12">
+            <div class="col-lg-12">
 
-                @include('message.workflow.wish_order_detail')
-                </div>
+            @include('message.workflow.wish_order_detail')
             </div>
         @endif
     <div class="col-lg-8">

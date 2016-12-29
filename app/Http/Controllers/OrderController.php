@@ -412,6 +412,27 @@ class OrderController extends Controller
     }
 
     /**
+     * ajax 创建退款记录
+     */
+    public function ajaxAddRefund(){
+        $data = request()->input();
+        $model = $this->model->find($data['order_id']);
+        $data['order_id'] = $model->id;
+        $data['channel_id'] = $model->channel_id;
+        $data['account_id'] = $model->channel_account_id;
+        if(! empty($data['tribute_id'])){
+            $data['tribute_id'] = array_unique($data['tribute_id']);
+        }
+        if(!empty($model->refundCreate($data, request()->file('image')))){
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
+            return config('status.ajax.success');
+        }else{
+            return conifg('status.ajax.fail');
+        }
+
+    }
+
+    /**
      * 更新备注
      */
     public function remarkUpdate($id)

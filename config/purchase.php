@@ -51,6 +51,6 @@ return [
 	],
 
 	'purchaseItemArrival' =>[
-		'is_second'=>['0'=>'到货统计','1'=>'二次到货']
+		'is_second'=>['0'=>'到货记录','1'=>'二次到货']
 	],	
 ];

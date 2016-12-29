@@ -92,7 +92,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
-        $schedule->command('imitate:orders 10000')->everyThirtyMinutes();
+        $schedule->command('imitate:orders 20000')->everyThirtyMinutes();
         //半小时一次将包裹放入队列
         $schedule
             ->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')

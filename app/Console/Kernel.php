@@ -14,7 +14,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
-        \App\Console\Commands\DoPackages::class,
         \App\Console\Commands\GetOrders::class,
         \App\Console\Commands\CreatePurchase::class,
         \App\Console\Commands\PurchaseStaticstics::class,
@@ -40,6 +39,9 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AllReport::class,
         \App\Console\Commands\GetBlacklists::class,
         \App\Console\Commands\UpdateBlacklists::class,
+        \App\Console\Commands\AutoRunPackages::class,
+        \App\Console\Commands\ImitationOrders::class,
+        \App\Console\Commands\UpdateUsers::class,
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
@@ -69,6 +71,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetJoomShelves::class,
         \App\Console\Commands\NotWarehouseInSendEmail::class,
         \App\Console\Commands\SyncSellmoreApi::class,
+        \App\Console\Commands\changeSupplierFlienameDirectory::class, //修改供应商文件目录存储
         \App\Console\Commands\AutoGetEbayMessage::class,
         \App\Console\Commands\SyncImportApi::class,
         \App\Console\Commands\AutoEbayAdd::class, //Ebay 自动补货
@@ -119,6 +122,7 @@ class Kernel extends ConsoleKernel
                     foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
+                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
                     break;
                 case 'lazada':
                     foreach ($channel->accounts->where('is_available', '1') as $account) {
@@ -137,6 +141,7 @@ class Kernel extends ConsoleKernel
                     break;
             }
         }
+        //包裹报表
         $schedule->command('pick:report')->hourly();
         $schedule->command('all:report')->daily();
         //CRM
@@ -151,11 +156,14 @@ class Kernel extends ConsoleKernel
         //API同步sellmore database
         $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
         $schedule->command('SyncImportApi:all')->everyFiveMinutes();
-
+        //半小时一次将包裹放入队列
+        $schedule->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')->everyThirtyMinutes();
         //财务
         $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
         //DHL
         $schedule->command('dhl:sureShip')->daily();
+        //匹配paypal
+        $schedule->command('match:account all')->cron('*/20 * * * *');
 
     }
 }

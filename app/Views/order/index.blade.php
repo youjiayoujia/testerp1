@@ -44,6 +44,9 @@
                 <div>
                     毛利润: {{ round($order->profit, 2) }} USD
                 </div>
+                @if(($order->channel ? $order->channel->driver : '') == 'ebay')
+                    手续费: {{ $order->fee_amt * $order->rate }} USD
+                @endif
             </td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userOperator ? $order->userOperator->name : '未分配' }}</td>
@@ -115,6 +118,10 @@
                                 @endif
                                 <br>
                                 {{ $orderItem->orders_item_number }}
+                                <br>
+                                @if(($order->channel ? $order->channel->driver : '') == 'ebay')
+                                    成交费: {{ $order->deal_fee }} USD
+                                @endif
                             </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             {{--@if($orderItem->item)--}}
@@ -466,7 +473,7 @@
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label for="channel_account_id">渠道账号</label>
-                                    <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : $order->channelAccount->alias }}" readonly>
+                                    <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : ($order->channelAccount ? $order->channelAccount->alias : '') }}" readonly>
                                 </div>
                                 {{--<div class="form-group col-lg-2" id="payment">--}}
                                 {{--<label for="payment_date" class='control-label'>支付时间</label>--}}
@@ -734,7 +741,7 @@
 
                                         </div>
                                         <div class="form-group col-sm-2">
-                                            <label for="id" class="control-label">ItemID</label>
+                                            <label for="id" class="control-label">渠道ItemID</label>
                                         </div>
                                         <div class="form-group col-sm-2">
                                             <label for="sku" class="control-label">sku</label>
@@ -749,10 +756,10 @@
                                     @foreach($order->items as $item)
                                         <div class="row">
                                             <div class="form-group col-sm-1">
-                                                <input type="checkbox" name="item-ids[]" value="{{$item->id}}"/>
+                                                <input type="checkbox" name="item-ids[]" value="{{$item->orders_item_number}}"/>
                                             </div>
                                             <div class="form-group col-sm-2">
-                                                <label for="id" class="control-label">{{$item->item_id}}</label>
+                                                <label for="id" class="control-label">{{$item->orders_item_number}}</label>
                                             </div>
                                             <div class="form-group col-sm-2">
                                                 <label for="sku" class="control-label">{{$item->sku}}</label>

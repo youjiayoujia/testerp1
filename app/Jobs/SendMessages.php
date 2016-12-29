@@ -59,6 +59,6 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
         $start = microtime(true);
 
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('SendMessages', base64_encode(serialize($this->reply)));
+        $this->log('SendMessages', json_encode($this->reply));
     }
 }

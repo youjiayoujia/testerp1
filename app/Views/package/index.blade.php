@@ -224,11 +224,11 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class='btn btn-info returnFee' data-type='1'>回传一次运费</a></li>
-            <li><a href="javascript:" class='btn btn-info returnFee' data-type='2'>回传二次运费</a></li>
-            <li><a href="javascript:" class='btn btn-info multiEditTracking' data-type='3'>批量修改追踪号</a></li>
-            <li><a data-toggle="modal"
-                   data-target="#change_logistics" class='btn btn-info'>
+            <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
+            <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
+            <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
+            <li><a href="javascript:" data-toggle="modal"
+                   data-target="#change_logistics">
                     批量修改物流方式
                 </a></li>
             <li><a href="javascript:" class='changeLogisticsTn' data-type='4'>(包装/发货)修改追踪号物流方式</a></li>

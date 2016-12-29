@@ -31,10 +31,10 @@
         <label for="ordernum" class='control-label'>清空挂号码</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='trackingNo' checked>是
+                <input type='radio' name='trackingNo' value='on' checked>是
             </label>
             <label>
-                <input type='radio' name='trackingNo'>否
+                <input type='radio' name='trackingNo' value='off'>否
             </label>
         </div>
     </div>

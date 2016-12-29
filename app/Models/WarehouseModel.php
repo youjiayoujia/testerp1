@@ -43,7 +43,7 @@ class WarehouseModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['name' => '仓库名'];
+    public $searchFields = ['name' => '仓库名'];
 
     /**
      * get the relationship
@@ -76,6 +76,12 @@ class WarehouseModel extends BaseModel
     public function logistics()
     {
         return $this->hasMany('App\Models\LogisticsModel', 'warehouse_id', 'id');
+    }
+
+    public function logisticsRules()
+    {
+        return $this->hasManyThrough('App\Models\Logistics\RuleModel', 'App\Models\LogisticsModel',
+            'warehouse_id', 'type_id');
     }
 
     public function logisticsIn($id)

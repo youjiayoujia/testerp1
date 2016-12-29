@@ -36,9 +36,9 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        $order = $this->package->order;
-        $this->package->assignLogistics();
-        if ($order->status != 'REVIEW') {
+        if(in_array($this->package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
+            $order = $this->package->order;
+            $this->package->assignLogistics();
             if (!$order->is_review) { //审核通过的订单无需再审核
                 //验证黑名单
                 if ($order->checkBlack()) {
@@ -91,28 +91,41 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                         break;
                 }
             }
-            if ($this->package->status == 'ASSIGNED') {
-                $job = new PlaceLogistics($this->package);
-                $job = $job->onQueue('placeLogistics');
-                $this->dispatch($job);
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success.';
-                $this->package->eventLog('队列', '已匹配物流，加入下单队列', json_encode($this->package));
-            } elseif ($this->package->status == 'ASSIGNFAILED') {
-                $this->result['status'] = 'success';
-                $this->result['remark'] = '未匹配到物流.';
-                $this->package->eventLog('队列', '匹配失败,未匹配到物流', json_encode($this->package));
-            } elseif ($this->package->status == 'NEED') {
-                $this->result['status'] = 'success';
-                $this->result['remark'] = '已匹配到物流,缺货中，不需要提前标记发货.';
-                $this->package->eventLog('队列', '已匹配到物流,缺货中,不需要提前标记发货.', json_encode($this->package));
+            if($this->package->order->status != 'REVIEW') {
+                if ($this->package->status == 'ASSIGNED') {
+                    $this->package->update(['queue_name' => 'placeLogistics']);
+                    $job = new PlaceLogistics($this->package);
+                    $job = $job->onQueue('placeLogistics');
+                    $this->dispatch($job);
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success.';
+                    $this->package->eventLog('队列', '已匹配物流，加入下单队列', json_encode($this->package));
+                } elseif ($this->package->status == 'ASSIGNFAILED') {
+                    $this->package->update(['queue_name' => '']);
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = '未匹配到物流.';
+                    $this->package->eventLog('队列', '匹配失败,未匹配到物流', json_encode($this->package));
+                } elseif ($this->package->status == 'NEED') {
+                    $this->package->update(['queue_name' => '']);
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = '已匹配到物流,缺货中，不需要提前标记发货.';
+                    $this->package->eventLog('队列', '已匹配到物流,缺货中,不需要提前标记发货.', json_encode($this->package));
+                }
+            } else {
+                $this->package->update(['queue_name' => '']);
+                $this->result['status'] = 'fail';
+                $this->result['remark'] = '订单需审核.';
+                $this->package->eventLog('队列', '订单需审核.', json_encode($this->package));
             }
         } else {
-            $this->result['status'] = 'fail';
-            $this->result['remark'] = '订单需审核.';
-            $this->package->eventLog('队列', '订单需审核.', json_encode($this->package));
+            $this->package->update(['queue_name' => '']);
         }
         $this->lasting = round(microtime(true) - $start, 2);
         $this->log('AssignLogistics');
+    }
+
+    public function failed()
+    {
+        $this->package->update(['queue_name' => '']);
     }
 }

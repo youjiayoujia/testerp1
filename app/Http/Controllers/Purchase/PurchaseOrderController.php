@@ -815,7 +815,8 @@ class PurchaseOrderController extends Controller
                 $packageItem = PackageItemModel::where('item_id', $purchase_item->item_id)->get();
                 if (count($packageItem) > 0) {
                     foreach ($packageItem as $_packageItem) {
-                        if ($_packageItem->package->status == 'NEED') {
+                        if ($_packageItem->package->status == 'NEED' && $_packageItem->package->queue_name != 'assignStocks') {
+                            $_packageItem->package->update(['queue_name' => 'assignStocks']);
                             $job = new AssignStocks($_packageItem->package);
                             $job = $job->onQueue('assignStocks');
                             $this->dispatch($job);
@@ -895,7 +896,8 @@ class PurchaseOrderController extends Controller
         $packageItem = PackageItemModel::where('item_id', $purchase_item->item_id)->get();
         if (count($packageItem) > 0) {
             foreach ($packageItem as $_packageItem) {
-                if ($_packageItem->package->status == 'NEED') {
+                if ($_packageItem->package->status == 'NEED' && $_packageItem->package->queue_name != 'assignStocks') {
+                    $_packageItem->package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($_packageItem->package);
                     $job = $job->onQueue('assignStocks');
                     $this->dispatch($job);

@@ -58,8 +58,21 @@ use Illuminate\Support\Facades\Storage;
 use BarcodeGen;
 use App\Models\ProductModel;
 use Cache;
+use Queue;
+use App\Models\StockModel;
+use App\Jobs\AssignStocks;
+use App\Jobs\DoPackages;
+use App\Jobs\PlaceLogistics;
+
+
 use Crypt;
+use factory;
 use App\Models\Item\ItemPrepareSupplierModel;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use App\Jobs\MatchPaypal as MatchPaypalJob ;
+
 
 class TestController extends Controller
 {
@@ -85,21 +98,244 @@ class TestController extends Controller
         dd($result);
     }
 
+    // public function test2()
+    // {
+    //     $order['channel_id'] = 2;
+    //     $order['channel_account_id'] = 1; 
+    //     $order['channel_ordernum'] = 12345632;
+    //     $order['status'] = 'PAID';
+    //     $order['currency'] = 'USD';
+    //     $order['shipping_country'] = 'US';
+    //     $order['items'][0]['quantity'] = 2;
+    //     $order['items'][0]['sku'] = 'SS1197W';
+    //     $order['items'][0]['channel_sku'] = '353*SS1197W';
+    //     $job = new InOrders($order);
+    //     $job = $job->onQueue('inOrders');
+    //     $this->dispatch($job);
+    //     var_dump('ok');
+    // }
+
+    // public function test2()
+    // {
+    //     $lo = LogisticsModel::find(10);
+    //     var_dump($lo->belongsToWarehouse('3'));
+//    $id = request()->get('id');
+//    $package = PackageModel::where('id', $id)->first();
+//    if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+//    $result = $package->placeLogistics('UPDATE');
+//    } else {
+//        $result = $package->placeLogistics();
+//    }
+//    dd($result);
+    // }
+
+    // public function test2()
+    // {
+    //     $package = PackageModel::find('60417');
+    //     if(in_array($package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
+    //         $order = $package->order;
+    //         $package->assignLogistics();
+    //         if (!$order->is_review) { //审核通过的订单无需再审核
+    //             //验证黑名单
+    //             if ($order->checkBlack()) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('黑名单需审核.', 'BLACK');
+    //             }
+    //             //特殊需求
+    //             if (!empty($order->customer_remark)) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('特殊需求需审核.', 'REQUIRE');
+    //             }
+    //             //订单留言
+    //             if ($order->messages->count() == 1 and $order->messages->first()->replies->count() == 0) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('客户有订单留言.', 'MESSAGE');
+    //             }
+    //             //包裹重量大于2kg
+    //             if ($package->weight >= 2) {
+    //                 $order->update(['status' => 'REVIEW']);
+    //                 $order->remark('包裹重量大于2kg.', 'WEIGHT');
+    //             }
+    //             //分渠道审核
+    //             $profitRate = $order->calculateProfitProcess();
+    //             // switch ($order->channel->driver) {
+    //             //     case 'amazon':
+    //             //         break;
+    //             //     case 'aliexpress':
+    //             //         if ($profitRate <= 0 or $profitRate >= 0.4) {
+    //             //             $order->update(['status' => 'REVIEW']);
+    //             //             $order->remark('速卖通订单利润率小于0或大于40%.', 'PROFIT');
+    //             //         }
+    //             //         break;
+    //             //     case 'wish':
+    //             //         if ($profitRate < 0.08) {
+    //             //             $order->update(['status' => 'REVIEW']);
+    //             //             $order->remark('WISH订单利润率小于8%.', 'PROFIT');
+    //             //         }
+    //             //         break;
+    //             //     case 'ebay':
+    //             //         if ($profitRate <= 0.05) {
+    //             //             $order->update(['status' => 'REVIEW']);
+    //             //             $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
+    //             //         }
+    //             //         break;
+    //             //     case 'lazada':
+    //             //         break;
+    //             //     case 'cdiscount':
+    //             //         break;
+    //             //     case 'joom':
+    //             //         break;
+    //             // }
+    //         }
+    //         if($package->order->status != 'REVIEW') {
+    //             if ($package->status == 'ASSIGNED') {
+    //                 $package->update(['queue_name' => 'placeLogistics']);
+    //                 $job = new PlaceLogistics($package);
+    //                 $job = $job->onQueue('placeLogistics');
+    //                 $this->dispatch($job);
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success.';
+    //                 $package->eventLog('队列', '已匹配物流，加入下单队列', json_encode($package));
+    //             } elseif ($package->status == 'ASSIGNFAILED') {
+    //                 $package->update(['queue_name' => '']);
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = '未匹配到物流.';
+    //                 $package->eventLog('队列', '匹配失败,未匹配到物流', json_encode($package));
+    //             } elseif ($package->status == 'NEED') {
+    //                 $package->update(['queue_name' => '']);
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = '已匹配到物流,缺货中，不需要提前标记发货.';
+    //                 $package->eventLog('队列', '已匹配到物流,缺货中,不需要提前标记发货.', json_encode($package));
+    //             }
+    //         } else {
+    //             $package->update(['queue_name' => '']);
+    //             $this->result['status'] = 'fail';
+    //             $this->result['remark'] = '订单需审核.';
+    //             $package->eventLog('队列', '订单需审核.', json_encode($package));
+    //         }
+    //     } else {
+    //         $package->update(['queue_name' => '']);
+    //     }
+    //     var_dump('123');
+    // }
+
+    // public function test2()
+    // {
+
+    // }
+
     public function test2()
     {
-
-
-        $orders = OrderModel::all();
-        foreach ($orders as $order) {
-            $order->update(['channel_fee' => $order->calculateOrderChannelFee()]);
-        }
-        return 'success';
-
-//        $data = Excel::load('d:/456.xls', function ($reader) {
-//            return $reader->all();
-//        });
-//        var_dump($data->toarray());
+        $order = PackageModel::find('40423');
+        $order->createpackageitems();
+        var_dump('123');
     }
+
+    // public function test2()
+    // {
+    //     $orders_arr = OrderModel::all()->chunk(200);
+    //     foreach($orders_arr as $orders) {
+    //         var_dump($orders->toarray());exit;
+    //     }
+    // }
+
+    // public function test2()
+    // {
+    //     $order = OrderModel::find(60201);
+    //     if ($order && $order->status != 'REVIEW') {
+    //         if ($order->status == 'PREPARED') {
+    //             $oldPackages = $order->packages;
+    //             foreach ($oldPackages as $oldPackage) {
+    //                 $oldPackage->cancelPackage();
+    //             }
+    //             if ($order->channel->driver == 'ebay' and $order->order_is_alert != 2) {
+    //                 if ($order->order_is_alert == 1) {
+    //                     $order->update(['status' => 'REVIEW']);
+    //                     $order->remark('EBAY订单匹配PAYPAL失败.', 'PAYPAL');
+    //                 }
+    //                 $order->eventLog('队列', 'EBAY订单需要匹配PAYPAL.');
+    //                 $this->relation_id = $order->id;
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'EBAY订单需要匹配PAYPAL.';
+    //             } else {
+    //                 $package = $order->createPackage();
+    //                 if ($package) {
+    //                     $package->update(['queue_name' => 'assignStocks']);
+    //                     $job = new AssignStocks($package);
+    //                     $job->onQueue('assignStocks');
+    //                     $this->dispatch($job);
+    //                     $this->relation_id = $order->id;
+    //                     $this->result['status'] = 'success';
+    //                     $this->result['remark'] = 'Success.';
+    //                     $package->eventLog('队列', '已生成空包裹，加入匹配库存队列', json_encode($package));
+    //                 } else {
+    //                     $this->relation_id = 0;
+    //                     $this->result['status'] = 'fail';
+    //                     $this->result['remark'] = 'Fail to create virtual package.';
+    //                 }
+    //             }
+    //         } else {
+    //             $this->relation_id = 0;
+    //             $this->result['status'] = 'success';
+    //             $this->result['remark'] = 'Order status is not PREPARED. Can not create package';
+    //         }
+    //     }
+    //     var_dump('123');
+    // }
+
+    public function test1()
+    {
+        $orders = OrderModel::whereBetween('id', [2979, 3081])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+    public function test3()
+    {
+        $orders = OrderModel::whereBetween('id', [3081, 3189])->get();
+        foreach ($orders as $order) {
+            $order->calculateProfitProcess();
+        }
+        return 1;
+    }
+
+    public function test4()
+    {
+        $orders = OrderModel::where('channel_id', 4)->get();
+        foreach ($orders as $order) {
+            if ($order->items) {
+                foreach ($order->items as $item) {
+                    $item->update(['channel_id' => 4]);
+                }
+            }
+        }
+        return 1;
+    }
+
+
+
+//    public function test2()
+//    {
+//        $package = PackageModel::find(3081);
+//        $package->realTimeLogistics();
+//    }
+
+    //模拟数据
+    // public function test2()
+    // {
+    //     $user = factory(\App\Models\OrderModel::class,10)->create(['status' => 'PREPARED','customer_service' => '63', 'operator' => '195', 'payment' => 'MIXEDCARD', 'currency' => 'USD', 'rate' => '1'])
+    //     ->each(function($single){
+    //         $i = 0;
+    //         $range = mt_rand(1,3);
+    //         while($i<$range) {
+    //             $single->items()->save(factory(\App\Models\Order\ItemModel::class)->make(['currency' => 'USD', 'is_active' => '1', 'status' => 'NEW', 'item_status' => 'selling']));
+    //             $i++;
+    //         }
+            
+    //     });
+    // }
 //    public function test2()
 //    {
 //        foreach (\App\Models\Order\ItemModel::all() as $item) {
@@ -160,16 +396,7 @@ class TestController extends Controller
             return false;
         }
     }
-    public function test3()
-    {
-        var_dump('123');
-        // $response = [
-        //     'metas' => $this->metas(__FUNCTION__),
-        // ];
-        // return view('test', $response);
-        $model = PackageModel::where('id', '<', 5);
-        return redirect(route('package.index', ['outer_model' => $model]));
-    }
+
     // public function test2()
     // {
     //     $package = PackageModel::find('17');
@@ -234,11 +461,7 @@ class TestController extends Controller
     //         // fbaStock::create($vals);
     //     // }exit;
     // }
-    public function test1()
-    {
-        var_dump('123');
-        exit;
-    }
+
     public function index()
     {
         echo "<pre>";
@@ -593,71 +816,293 @@ class TestController extends Controller
     }
     public function testPaypal()
     {
-        $orders = OrderModel::where('id', 12851)->get();
+        $id = request()->get('id');
+        $orders = OrderModel::where('id', $id)->get();
         foreach ($orders as $order) {
             $is_paypals = false;
-            //$erp_country      = trim($order->shipping_country);
-            $erp_country_code = trim($order->shipping_country);
-            $erp_state = trim($order->shipping_state);
-            $erp_city = trim($order->shipping_city);
-            $erp_address = trim($order->shipping_address);
-            $erp_address_1 = trim($order->shipping_address1);
-            $erp_address = trim($erp_address . $erp_address_1);
-            $erp_address = str_replace(' ', '', $erp_address); //把地址信息中的空格都去掉
-            $erp_name = trim($order->shipping_firstname . $order->shipping_lastname);
-            $erp_zip = trim($order->shipping_zipcode);
-            $error = array();
             $paypals = $order->channelAccount->paypal;
             foreach ($paypals as $paypal) {
                 $api = new  PaypalApi($paypal);
                 $result = $api->apiRequest('gettransactionDetails', $order->transaction_number);
                 $transactionInfo = $api->httpResponse;
+                var_dump($transactionInfo);
+                var_dump($result);
                 if ($result && $transactionInfo != null && (strtoupper($transactionInfo ['ACK']) == 'SUCCESS' || strtoupper($transactionInfo ['ACK']) == 'SUCCESSWITHWARNING')) {
                     $is_paypals = true;
                     $tInfo = $transactionInfo;
-                    $paypal_account = isset($tInfo ['EMAIL']) ? $tInfo ['EMAIL'] : '';
+                    $paypal_account=isset($tInfo ['EMAIL'])?$tInfo ['EMAIL']:'';
                     $paypal_buyer_name = trim($tInfo ['SHIPTONAME']);
                     $paypal_country_code = trim($tInfo['SHIPTOCOUNTRYCODE']); //国家简称
                     $paypal_country = trim($tInfo['SHIPTOCOUNTRYNAME']); //国家
                     $paypal_city = trim($tInfo['SHIPTOCITY']);        //城市
                     $paypal_state = trim($tInfo['SHIPTOSTATE']);       //州
                     $paypal_street = trim($tInfo['SHIPTOSTREET']);      //街道1
-                    $paypal_street2 = trim($tInfo['SHIPTOSTREET2']);     //街道2
+                    $paypal_street2 = isset($tInfo['SHIPTOSTREET2'])?trim($tInfo['SHIPTOSTREET2']):'';     //街道2
                     $paypal_zip = trim($tInfo['SHIPTOZIP']);         //邮编
                     $paypal_phone = isset($tInfo['SHIPTOPHONENUM']) ? trim($tInfo['SHIPTOPHONENUM']) : '';    //电话
                     $paypalAddress = $paypal_street . ' ' . $paypal_street2 . ' ' . $paypal_city . ' ' . $paypal_state . ' ' . $paypal_country . '(' . $paypal_country_code . ') ' . $paypal_zip;
-                    if (strtoupper($erp_country_code) != strtoupper($paypal_country_code)) {
-                        $error[] = '国家不一致';
-                    }
+                    $feeAmt  = $tInfo['FEEAMT'];
+                    $currencyCode  = $tInfo['CURRENCYCODE'];
                     //把paypal的信息记录
-                    $is_exist = OrderPaypalDetailModel::where('order_id', $order->id)->first();
+
+                    $is_exist = OrderPaypalDetailModel::where('order_id',$order->id)->first();
                     if (empty($is_exist)) {
                         $add = [
-                            'order_id' => $order->id,
+                            'order_id' => $this->order->id,
+                            'paypal_id' =>$paypal->id,
                             'paypal_account' => $paypal_account,
-                            'paypal_buyer_name' => $paypal_buyer_name,
-                            'paypal_address' => $paypalAddress,
-                            'paypal_country' => $paypal_country_code
+                            'paypal_buyer_name'=>$paypal_buyer_name,
+                            'paypal_address'=>$paypalAddress,
+                            'paypal_country'=>$paypal_country_code,
+                            'feeAmt'=>$feeAmt,
+                            'currencyCode'=>$currencyCode
                         ];
                         OrderPaypalDetailModel::create($add);
                     }
                     if (!empty($error)) { //设置为匹配失败
-                        $order->update(['order_is_alert' => 2]);
-                        $order->remark('paypal匹配失败:' . implode(',', $error));
+                        $order->update(['order_is_alert'=>'1']);
+                        echo 'false';
                     } else { //设置为匹配成功
-                        $order->update(['order_is_alert' => 3]);
-                        $order->remark('paypal匹配成功');
-                        //remarks
+                        $order->update(['order_is_alert'=>'2','fee_amt'=>$feeAmt]);
+                        echo 'success';
                     }
-                    break;
                 }
             }
             if (!$is_paypals) { //说明对应的paypal 都没有找到信息
-                $order->update(['order_is_alert' => 2]);
-                $order->remark('paypal匹配失败:当前交易凭证在预设的PayPal组中，未查询到交易详情，请通过其它方式查询');
+                $order->update(['order_is_alert'=>'1']);
+                echo 'false2';
             }
         }
     }
+
+    public function testAutoReply()
+    {
+        $accounts = AccountModel::where('is_available','1')->where('channel_id',3)->get();
+        foreach($accounts as  $account){
+            if($account->id !=6)
+                continue;
+            //获取此账号的自动规则
+            $rules = $account->AutoReplyRules;
+
+            $messages =MessageModel::where('account_id', $account->id)->orderBy('id', 'DESC')->get();
+            foreach($messages as $message){
+
+
+                ////////测试块//////////
+
+               /* if($message->id != 621)
+                    continue;*/
+                /////////测试块//////////
+
+
+                //step1: 关联消息订单
+                $message->findOrderWithMessage();
+                if(! $rules->isEmpty()){ //存在规则
+                    $rule = $this->checkAutomaticReply($message, $rules);
+                    dd($rule);
+                    if(! empty($rule->template)){ //符合发送消息的条件
+
+                        /**
+                         * 创建reply记录
+                         * 塞入发送队列
+                         *
+                         */
+                        $new_reply = [
+                            'message_id' => $message->id,
+                            'to' => $message->from_name,
+                            'to_email' => $message->from,
+                            'title' => $rule->name . '(自动回复)',
+                            'content' => $rule->template,
+                            'status' => 'NEW',
+                        ];
+                        $reply = ReplyModel::firstOrNew($new_reply);
+                        $reply->save();
+
+                        $job = new SendMessages($reply);
+                        $job = $job->onQueue('SendMessages');
+                        $this->dispatch($job);
+
+                        $message->status = 'COMPLETE';
+                        $message->type_id = 0;
+                        $message->end_at = date('Y-m-d H:i:s', time());
+                        $message->is_auto_reply = 1;
+                        $message->save();
+
+                    }}
+
+            }
+        }
+    }
+
+    /**
+     * 基础验证消息关联订单 包裹 物流
+     * @param $message
+     * @return object | bool
+     */
+    public function basicVerification($message)
+    {
+
+        $order = $message->relatedOrders()->orderBy('id', 'DESC')->first();
+        if(empty($order)){
+            return -1;
+        }
+        $packages = OrderModel::find($order->order_id)->packages;
+        if($packages->isEmpty()){ //存在包裹
+            return -2;
+        }
+        if($packages->count() != 1){//只存在一个包裹
+            return -3;
+        }
+        if($packages->first()->status != 'SHIPPED'){ //包裹状态为已发货
+            return -4;
+        }
+        //检查 消息关联的订单物流方式必须是平邮
+        if(! $message->MsgOrderIsExpress()){
+            return -5;
+        }
+        //验证是否为平台第一条消息
+        if(! $message->IsFristMsgForOrder()){
+            return -6;
+        }
+
+        return $packages->first();
+    }
+
+    public function checkAutomaticReply($message, $rules)
+    {
+        $result = false;
+
+        $package = $this->basicVerification($message);
+
+        if(! is_object($package)){ //验证失败
+            return $result;
+        }
+        $send_time = Carbon::parse($message->date);
+        $shipped_at = Carbon::parse($package->shipped_at);
+        $diff_day = $send_time->diffInDays($shipped_at);  // 相差天数
+
+        foreach($rules as $rule){
+            if($rule->status == 'ON'){
+                switch ($rule->ChannelName){
+                    case 'Wish':
+                        $check_wish = true;
+                        if( ! empty($rule->label_keywords)){//主题关键字
+                            if(! strstr($message->labels, $rule->label_keywords)){
+                                //主题匹配
+                                $check_wish = -1;
+                            }
+                        }
+
+                        if(! empty($rule->message_keywords)){//用户消息中同时包含关键字
+                            $check_wish = false;
+                            foreach (explode(',', $rule->message_keywords) as $keyword){
+                                if(! strstr($message->UserMsgInfo, trim($keyword))){
+                                    $check_wish = true;
+                                }
+                            }
+                        }
+
+                        if($rule->type_shipping_fifty_day == 'ON'){ //50天按钮开
+                            if($diff_day < 50){
+                                $check_wish = -3;
+                            }
+                        }
+
+                        if($rule->type_within_tuotou == 'ON'){  //在wish平台妥投时间之内
+                            if($diff_day > 19){
+                                $check_wish = -4;
+                            }
+                        }
+
+                        if($check_wish == true)
+                            $result = $rule;
+                        break;
+                    case 'Aliexpress':
+                    //检查关键词
+                    if(! empty($rule->message_keywords)){
+                        $check_aliexpress = true;
+                        foreach (explode(',', $rule->message_keywords) as $keyword){
+                            $check_aliexpress = false;
+                            if(! strstr($message->UserMsgInfo, $keyword)){
+                                $check_aliexpress = true;
+                            }
+                        }
+
+                            if($rule->type_shipping_one_month == 'ON'){//SMT: 平邮已发货订单，据发货时间一个月之内
+                                if($diff_day > 30){
+                                    $check_aliexpress = false;
+                                }
+                            }
+
+                            if($rule->type_shipping_one_two_month == 'ON'){//SMT 据发货时间  1～2个月没有
+                                if(($diff_day < 30) || ($diff_day > 60 )){
+                                    $check_aliexpress = false;
+                                }
+                            }
+
+                            if($check_aliexpress)
+                                $result = $rule;
+
+                    }
+                    break;
+                    case 'Ebay':
+                        if(! empty($rule->message_keywords)){//用户消息中同时包含关键字
+                            $check_ebay = false;
+                            foreach (explode(',', $rule->message_keywords) as $keyword){
+                                if(! strstr($message->UserMsgInfo, trim($keyword))){
+                                    $check_wish = -2;
+                                }
+                            }
+                        }
+
+
+
+
+                    break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return $result;
+    }
+    //type_shipping_one_month
+    public function AliexpressFilter($message,$type=1){
+
+        $result = false;
+
+        $order = $message->relatedOrders()->orderBy('id', 'DESC')->first();
+        $packages = OrderModel::find($order->order_id)->packages;
+        if(! $packages->isEmpty()){
+            if($packages->count() == 1){  //只存在一个包裹
+                $package = $packages->first();
+                $send_time = Carbon::parse($message->date);
+                $shipped_at = Carbon::parse($package->shipped_at);
+
+                if($type == 1){//发信时间和发货时间的时间差 小于 30天  判断
+
+                    if($send_time->diffInDays($shipped_at) <= 30){
+                        //是否第一次发信 或者 第二次发信其第一封为自动回复的
+                        if($message->IsFristMsgForOrder()){
+                            $result = true;
+                        }
+
+                    }
+                }else{ //发信时间和发货时间的时间差  1-2 月之间     判断
+                    if(($send_time->diffInDays($shipped_at) > 30) && ($send_time->diffInDays($shipped_at) < 60 )){
+                        //是否第一次发信 或者 第二次发信其第一封为自动回复的
+                        if($message->IsFristMsgForOrder()){
+                            $result = true;
+                        }
+                    }
+                }
+
+            }
+        }
+        return $result;
+    }
+
     public function jdtestCrm()
     {
         foreach (AccountModel::all() as $account) {
@@ -1371,4 +1816,9 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
+
+
+
+
 }

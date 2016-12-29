@@ -29,7 +29,8 @@ class AllReportController extends Controller
      */
     public function createData()
     {
-        $allByWarehouseId = PackageModel::where('created_at', '>', date('Y-m-d', strtotime('now')))->get()
+
+        $allByWarehouseId = PackageModel::where('created_at', '>', date('Y-m', strtotime('now')))->get()
                     ->filter(function($single){
                         return !in_array($single->status, ['NEW', 'NEED', 'WAITASSIGN', 'CANCEL']);
                     })

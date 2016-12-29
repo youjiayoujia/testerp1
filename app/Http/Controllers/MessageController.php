@@ -110,7 +110,7 @@ class MessageController extends Controller
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
                 'is_ali_msg_option' => $IsOption,
-                //'currencys' => $currencys,
+                'currencys' => $currencys,
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
 

@@ -699,6 +699,7 @@ class OrderModel extends BaseModel
                 }
                 $order->remark($orderItem['channel_sku'] . '找不到对应产品.', 'ITEM');
             }
+            $orderItem['channel_id'] = $order->channel_id;
             $order->items()->create($orderItem);
         }
         foreach($order->items as $key => $single) {

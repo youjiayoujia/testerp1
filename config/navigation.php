@@ -621,6 +621,18 @@ return [
                     'icon' => '',
                 ],
             ],
+            'SKU报表' => [
+                [
+                    'name' => 'EbaySku销量报表',
+                    'url' => 'sku.saleReport',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'EB销量额统计',
+                    'url' => 'sku.amountStatistics',
+                    'icon' => '',
+                ],
+            ],
             '包裹报表' => [
                 [
                     'name' => '包裹信息',

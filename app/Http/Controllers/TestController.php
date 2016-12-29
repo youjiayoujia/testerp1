@@ -258,7 +258,7 @@ class TestController extends Controller
 
     public function test3()
     {
-        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
+        $orders = OrderModel::where('id', '>=', 3189)->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }
@@ -271,7 +271,7 @@ class TestController extends Controller
         foreach ($orders as $order) {
             if ($order->items) {
                 foreach ($order->items as $item) {
-                    $item->update(['channel_id', 4]);
+                    $item->update(['channel_id' => 4]);
                 }
             }
         }

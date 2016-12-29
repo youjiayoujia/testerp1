@@ -722,6 +722,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('package/logisticsDelivery',
         ['uses' => 'PackageController@logisticsDelivery', 'as' => 'package.logisticsDelivery']);
 
+    //sku报表
+    Route::get('sku/saleReport',
+        ['uses' => 'OrderController@saleReport', 'as' => 'sku.saleReport']);
+    Route::get('sku/amountStatistics',
+        ['uses' => 'OrderController@amountStatistics', 'as' => 'sku.amountStatistics']);
+
     //包裹报表
     Route::get('allReport/createData',
         ['uses' => 'AllReportController@createData', 'as' => 'allReport.createData']);

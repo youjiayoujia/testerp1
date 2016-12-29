@@ -18,6 +18,7 @@ use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\LogisticsModel;
 use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
@@ -120,6 +121,80 @@ class OrderController extends Controller
         }
 
         return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));
+    }
+
+    /**
+     * EbaySku销量报表
+     */
+    public function saleReport()
+    {
+        $sku = request()->input('sku');
+        $site = request()->input('site');
+        $status = request()->input('status');
+        $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
+        $orders = OrderModel::where('channel_id', $channelId)->get();
+        if ($orders) {
+            foreach ($orders->items as $item) {
+                dd($orders->items->groupBy('item_id')->toArray());
+            }
+        }
+
+        if (!$sku && !$site && !$status) {
+
+        }
+        $items = ItemModel::where('sku', $sku)->get();
+        $data = [];
+        $count = $this->model->where('logistics_id', '!=', 0)
+//            ->where('shipped_at', '>=', $start . ' 00:00:00')
+//            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00')
+            ->count();
+        $totalWeight = 0;
+        $logisticses = LogisticsModel::where('is_enable', 1)->get();
+        foreach ($logisticses as $key => $logistics) {
+            $data[$key]['logisticsName'] = $logistics->name;
+            $data[$key]['logisticsId'] = $logistics->id;
+            $data[$key]['logisticsPriority'] = $logistics->priority;
+            $data[$key]['weight'] = 0;
+            $data[$key]['percent'] = 0 . '%';
+            $packages = $this->model
+                ->where('logistics_id', $logistics->id);
+//                ->where('shipped_at', '>=', $start . ' 00:00:00')
+//                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00');
+            foreach ($packages->get() as $package) {
+                $data[$key]['weight'] += $package->weight;
+            }
+            $data[$key]['quantity'] = $packages->count();
+            $totalWeight += $data[$key]['weight'];
+            if ($count) {
+                $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
+            }
+        }
+        $arr = array();
+        foreach ($data as $value) {
+            $arr[] = $value['logisticsPriority'];
+        }
+        array_multisort($arr, SORT_ASC, $data);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'datas' => $data,
+            'count' => $count,
+//            'start' => $start,
+//            'end' => $end,
+            'totalWeight' => $totalWeight,
+        ];
+
+        return view($this->viewPath . 'saleReport', $response);
+    }
+
+    /**
+     * EB销量额统计
+     */
+    public function amountStatistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view($this->viewPath . 'amountStatistics', $response);
     }
 
     /**

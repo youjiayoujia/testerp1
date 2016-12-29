@@ -677,10 +677,12 @@ class PurchaseOrderController extends Controller
     {
         $data = request()->input("data");
         $p_id = request()->input("p_id");
-
+        $is_second = 0;
         if ($data != '') {
             $data = substr($data, 0, strlen($data) - 1);
             $arr = explode(',', $data);
+            $count_num = PurchaseItemArrivalLogModel::where('purchase_order_id',$p_id)->count();
+            if($count_num)$is_second = 1;
             foreach ($arr as $value) {
                 $update_data = explode(':', $value);
                 $purchase_item = PurchaseItemModel::find($update_data[0]);
@@ -693,13 +695,18 @@ class PurchaseOrderController extends Controller
                     $filed['arrival_time'] = date('Y-m-d H:i:s', time());
                     $filed['status'] = 2;
                     $purchase_item->update($filed);
+                    $filed['purchase_order_id'] = $p_id;
+                    $filed['user_id'] = request()->user()->id;
                     $filed['arrival_num'] = $update_data[1];
+                    $filed['is_second'] = $is_second;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
                 $purchase_item->purchaseOrder->update(['status' => 2]);
             }
         } else {
             $purchaseOrderModel = $this->model->find($p_id);
+            $count_num = PurchaseItemArrivalLogModel::where('purchase_order_id',$p_id)->count();
+            if($count_num)$is_second = 1;
             foreach ($purchaseOrderModel->purchaseItem as $p_item) {
                 if ($p_item->purchase_num != $p_item->arrival_num) {
                     $arrival_num = $p_item->lack_num;
@@ -707,7 +714,10 @@ class PurchaseOrderController extends Controller
                     $filed['purchase_item_id'] = $p_item->id;
                     $filed['sku'] = $p_item->sku;
                     $filed['status'] = 2;
+                    $filed['purchase_order_id'] = $p_id;
+                    $filed['user_id'] = request()->user()->id;
                     $filed['arrival_num'] = $arrival_num;
+                    $filed['is_second'] = $is_second;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
             }
@@ -1172,6 +1182,27 @@ class PurchaseOrderController extends Controller
         ];
 
         return view($this->viewPath . 'staticsticsIndex', $response);
+    }
+
+    /**
+     * 到货记录报表
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function recieveReport()
+    {
+        $model = new PurchaseItemArrivalLogModel();
+        $this->mainIndex = route('purchaseOrder.recieveReport');
+        $this->mainTitle = '到货记录';
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($model),
+            'mixedSearchFields' => $model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'recieveReport', $response);
     }
 
     /**

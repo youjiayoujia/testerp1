@@ -110,7 +110,7 @@ class MessageController extends Controller
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
                 'is_ali_msg_option' => $IsOption,
-                'currencys' => $currencys,
+                //'currencys' => $currencys,
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
 
@@ -594,6 +594,8 @@ class MessageController extends Controller
         $template = '';
 
         if(!$messages->isEmpty()){
+            $currencys = CurrencyModel::all();
+
             foreach($messages as $message){
                 //分配消息操作人
                 $message->assign(request()->user()->id);
@@ -608,6 +610,7 @@ class MessageController extends Controller
                     'is_ali_msg_option' => $IsOption,
                     'driver' => $message->getChannelDiver(),
                     'users' => UserModel::all(),
+                    'currencys' => $currencys,
                 ];
                 $template .= view($this->viewPath.'workflow.template')->with($response);
                 $message->read = 1;

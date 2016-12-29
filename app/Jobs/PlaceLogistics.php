@@ -68,4 +68,9 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('PlaceLogistics');
     }
+
+    public function failed()
+    {
+        $this->package->update(['queue_name' => '']);
+    }
 }

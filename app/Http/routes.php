@@ -331,6 +331,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
+    //到货记录报表
+    Route::get('purchaseOrder/recieveReport',
+        ['uses' => 'Purchase\PurchaseOrderController@recieveReport', 'as' => 'purchaseOrder.recieveReport']);
     //缺货报表
     Route::get('purchaseOrder/outOfStock',
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
@@ -721,6 +724,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //物流报表
     Route::get('package/logisticsDelivery',
         ['uses' => 'PackageController@logisticsDelivery', 'as' => 'package.logisticsDelivery']);
+
+    //sku报表
+    Route::get('sku/saleReport',
+        ['uses' => 'OrderController@saleReport', 'as' => 'sku.saleReport']);
+    Route::get('sku/amountStatistics',
+        ['uses' => 'OrderController@amountStatistics', 'as' => 'sku.amountStatistics']);
 
     //包裹报表
     Route::get('allReport/createData',

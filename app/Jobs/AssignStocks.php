@@ -75,4 +75,9 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('assignStocks');
     }
+
+    public function failed()
+    {
+        $this->package->update(['queue_name' => '']);
+    }
 }

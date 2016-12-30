@@ -77,7 +77,10 @@ class ItemModel extends BaseModel
         'html_mod',
         'default_keywords',
         'default_name',
-        'recieve_wrap_id'
+        'recieve_wrap_id',
+        'us_rate',
+        'uk_rate',
+        'eu_rate',
     ];
 
     public function getMixedSearchAttribute()

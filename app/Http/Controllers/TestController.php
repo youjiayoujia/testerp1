@@ -131,7 +131,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find('42995');
+        $package = PackageModel::find('42990');
         if(in_array($package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
             $order = $package->order;
             $package->assignLogistics();
@@ -187,11 +187,8 @@ class TestController extends Controller
                         break;
                 }
             }
-            var_dump($package->order->status);
             if($package->order->status != 'REVIEW') {
-                var_dump('not review');
                 if ($package->status == 'ASSIGNED') {
-                    var_dump('in');
                     $package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($package);
                     $job = $job->onQueue('placeLogistics');

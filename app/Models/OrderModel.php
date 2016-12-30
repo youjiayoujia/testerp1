@@ -661,6 +661,7 @@ class OrderModel extends BaseModel
     //创建订单
     public function createOrder($data)
     {
+        DB::beginTransaction();
         $data['ordernum'] = str_replace('.', '', microtime(true));
         $currency = CurrencyModel::where('code', $data['currency'])->first();
         if ($currency) {
@@ -669,7 +670,18 @@ class OrderModel extends BaseModel
         if ($data['shipping_country'] == 'PR') {
             $data['shipping_country'] = 'US';
         }
+        //判断是否有订单产品
+        if (!isset($data['items']) or empty($data['items'])) {
+            DB::rollBack();
+            return false;
+        }
         $order = $this->create($data);
+        //判断订单头是否创建成功
+        if (!$order) {
+            DB::rollBack();
+            return false;
+        }
+        //插入订单产品
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {
                 $item = ItemModel::where('sku', $orderItem['sku'])->first();
@@ -715,7 +727,7 @@ class OrderModel extends BaseModel
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
-
+        DB::commit();
         return $order;
     }
 

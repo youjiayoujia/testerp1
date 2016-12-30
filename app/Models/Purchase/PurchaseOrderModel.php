@@ -63,7 +63,7 @@ class PurchaseOrderModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'purchaseUser' => ['name']],
+            'relatedSearchFields' => ['purchaseUser' => ['name']],
             'filterFields' => [],
             'filterSelects' => ['warehouse_id' =>$this->getAvailableWarehouse('App\Models\WarehouseModel', 'name'),
                                 'status' => config('purchase.purchaseOrder.status'),
@@ -73,7 +73,7 @@ class PurchaseOrderModel extends BaseModel
                                 'pay_type'=>config('purchase.purchaseOrder.pay_type'),
                                 'close_status'=>config('purchase.purchaseOrder.close_status'),
                                 ],
-            'selectRelatedSearchs' => [],
+            'selectRelatedSearchs' => ['supplier' => ['name' => SupplierModel::all()->pluck('name', 'name')],],
             'sectionSelect' => ['time' => ['created_at']],
             'doubleRelatedSearchFields' => ['purchaseItem' => ['productItem' => ['sku']]],
         ];

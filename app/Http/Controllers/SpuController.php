@@ -68,8 +68,14 @@ class SpuController extends Controller
         $action = request()->input("action");
         $spu_ids = request()->input("spu_ids");
         $arr = explode(',', $spu_ids);
+        $userName = UserModel::find(request()->user()->id);
         foreach($arr as $id){
-        	$this->model->find($id)->update([$action=>$user_id]);
+            $model = $this->model->find($id);
+            $from = json_encode($model);
+            $model->update([$action=>$user_id]);
+            $to = json_encode($model);
+            $this->eventLog($userName->name, '分配人员更新,id='.$model->id, $to, $from);
+        	
         }	
         return 1;
     }
@@ -84,8 +90,13 @@ class SpuController extends Controller
         $action = request()->input("action");
         $spu_ids = request()->input("spu_ids");
         $arr = explode(',', $spu_ids);
+        $userName = UserModel::find(request()->user()->id);
         foreach($arr as $id){
-        	$this->model->find($id)->update(['status'=>$action]);
+            $model = $this->model->find($id);
+            $from = json_encode($model);
+        	$model->update(['status'=>$action]);
+            $to = json_encode($model);
+            $this->eventLog($userName->name, '处理任务更新,id='.$model->id, $to, $from);
         }	
         return 1;
     }
@@ -100,6 +111,7 @@ class SpuController extends Controller
         $action = request()->input("action");
         $spu_ids = request()->input("spu_ids");
         $arr = explode(',', $spu_ids);
+        $userName = UserModel::find(request()->user()->id);
         foreach(config("spu.status") as $key=>$value){
             if($key==$action){
                 $action = config("spu.status")[$key];break;
@@ -108,7 +120,12 @@ class SpuController extends Controller
         }
         
         foreach($arr as $id){
-            $this->model->find($id)->update(['status'=>$prev_action]);
+            $model = $this->model->find($id);
+            $from = json_encode($model);
+            $model->update(['status'=>$prev_action]);
+            $to = json_encode($model);
+            $this->eventLog($userName->name, '退回任务更新,id='.$model->id, $to, $from);
+            
         }   
         return 1;
     }

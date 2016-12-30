@@ -77,7 +77,7 @@ class GetOrders extends Command
                         if (isset($response['error'])) {
                             $result['status'] = 'fail';
                             $result['remark'] = '[' . $response['error']['code'] . '] ' . $response['error']['message'] . '.';
-                            $result['data'] = serialize($response['error']);
+                            $result['data'] = json_encode($response['error']);
                             $this->error($account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页失败');
                             $this->error($result['remark']);
                         } else {
@@ -95,7 +95,7 @@ class GetOrders extends Command
                             $nextToken = $response['nextToken'];
                             $result['status'] = 'success';
                             $result['remark'] = 'Success.';
-                            $result['data'] = serialize($response['orders']);
+                            $result['data'] = json_encode($response['orders']);
                             $this->info($account->alias . ':' . $account->id . ' 抓取第 ' . $i . ' 页成功');
                             $i++;
                         }

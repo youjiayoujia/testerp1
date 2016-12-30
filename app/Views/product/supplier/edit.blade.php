@@ -66,23 +66,6 @@
         </div>
     </div>　
     <div class="row">
-        <div class="form-group col-lg-3" id="update_examine" >
-            <label for="url">上传审核资料</label>
-                @if($model->qualifications && $model->type == 0)
-                    <br/>
-                    <filearea id="filearea">
-                        <a href="../../{{config('product.product_supplier.file_path')}}{{$model->qualifications}}" target="_blank">{{$model->qualifications}}</a>
-                     &nbsp;&nbsp;<a class="glyphicon glyphicon-remove" href="javascript:void(0)" onclick="deleteFile()" ></a>
-                    </filearea>
-                @else
-                    @if($model->type == 0)
-                        <input type='file' class=" file" id="qualifications" placeholder="上传审核资料" name='qualifications' value="" />
-                    @else
-                        <input type='file' class=" file" id="qualifications" placeholder="上传审核资料" name='qualifications' value=""  disabled  />
-                    @endif
-                @endif
-
-        </div>
 {{--        <div class="form-group col-lg-3">
             <label for="url">供货商网址</label>
             <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $model->url }}" {{ old('type') ? old('type') != '1' ? 'readonly' : '' :$model->type != '1' ? 'readonly' : ''}}>
@@ -127,6 +110,21 @@
         </div>
     </div>
     <div class="row">
+        <div class="form-group col-lg-3 file-group" id="update_examine" >
+            <label for="url">上传审核资料</label>
+            <button type="button"  class="btn btn-warning add-input-file">增加一个文件</button>
+        @if(! $attachments->isEmpty())
+                @foreach($attachments as $attachment)
+                    <filearea id="filearea">
+                        <a href="../../{{config('product.product_supplier.file_path')}}{{$attachment->filename}}" target="_blank">{{$attachment->filename}}</a>
+{{--
+                        &nbsp;&nbsp;<a class="glyphicon glyphicon-remove" href="javascript:void(0)" onclick="deleteFile($attachment->filename)" ></a>
+--}}
+                    </filearea>
+                @endforeach
+            @endif
+
+        </div>
 {{--        <div class="form-group col-lg-4">
             <label for="purchase_id">采购员</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='purchase_id' class='form-control'>
@@ -141,6 +139,11 @@
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 <script type='text/javascript'>
     $(document).ready(function(){
+        $('.add-input-file').click(function(){
+            var input =  '<input type="file" class=" file" id="qualifications" placeholder="上传审核资料" name="qualifications[]" >';
+            $('.file-group').append(input);
+        });
+
         var buf = new Array();
         buf[0] = "{{ old('province') ? old('province') : $model->province }}" ;
         buf[1] = "{{ old('city') ? old('city') : $model->city }}" ;
@@ -168,9 +171,12 @@
         });
 
     });
-    function deleteFile() {
+    function deleteFile(filename) {
+        if(confirm('是否删除此附件？')){
+
             var fileThml = '<input type="file" class="file white-space:nowrap" id="qualifications" placeholder="上传审核资料" name="qualifications" value="" />';
             $('#filearea').html(fileThml);
+        }
     }
 </script>
 @stop

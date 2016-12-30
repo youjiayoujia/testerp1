@@ -491,14 +491,14 @@ class OrderModel extends BaseModel
     public function getAllItemCostAttribute()
     {
         $total = 0;
-        foreach ($this->items as $item) {
+        foreach ($this->items()->with('item')->get() as $item) {
             if ($item->item) {
-                if ($item->item->count() > 1) {
+                if ($this->items->count() > 1) {
                     if ($item->item->status != 'cleaning') {
-                        $total += $item->item->purchase_price * $item->quantity;
+                        $total += $item->item->cost * $item->quantity;
                     }
                 } else {
-                    $total += $item->item->purchase_price * $item->quantity;
+                    $total += $item->item->cost * $item->quantity;
                 }
             }
         }
@@ -533,7 +533,7 @@ class OrderModel extends BaseModel
 
     public function packagesToQueue()
     {
-        if(!$this->packages->count()) {
+        if (!$this->packages->count()) {
             $job = new DoPackages($this);
             Queue::pushOn('doPackages', $job);
         }
@@ -628,8 +628,7 @@ class OrderModel extends BaseModel
         }
         if ($data['type'] == 'FULL') {
             $total = 0;
-            foreach ($data['arr']['id'] as $id) {
-                $orderItem = $this->items->find($id);
+            foreach ($this->items as $orderItem) {
                 $orderItem->update(['is_refund' => 1]);
                 $total = $orderItem['price'] * $orderItem['quantity'] + $total;
             }
@@ -646,8 +645,7 @@ class OrderModel extends BaseModel
         $refund = new RefundModel();
         $refund_new = $refund->create($data);
         if ($data['type'] == 'FULL') {
-            foreach ($data['arr']['id'] as $fullid) {
-                $orderItem = $this->items->find($fullid);
+            foreach ($this->items as $orderItem) {
                 $orderItem->update(['refund_id' => $refund_new->id]);
             }
         } else {
@@ -663,6 +661,7 @@ class OrderModel extends BaseModel
     //创建订单
     public function createOrder($data)
     {
+        DB::beginTransaction();
         $data['ordernum'] = str_replace('.', '', microtime(true));
         $currency = CurrencyModel::where('code', $data['currency'])->first();
         if ($currency) {
@@ -671,7 +670,18 @@ class OrderModel extends BaseModel
         if ($data['shipping_country'] == 'PR') {
             $data['shipping_country'] = 'US';
         }
+        //判断是否有订单产品
+        if (!isset($data['items']) or empty($data['items'])) {
+            DB::rollBack();
+            return false;
+        }
         $order = $this->create($data);
+        //判断订单头是否创建成功
+        if (!$order) {
+            DB::rollBack();
+            return false;
+        }
+        //插入订单产品
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {
                 $item = ItemModel::where('sku', $orderItem['sku'])->first();
@@ -680,8 +690,8 @@ class OrderModel extends BaseModel
                     $orderItem['item_status'] = $item->status;
                 } else {
                     $stock = StockModel::where('oversea_sku', $orderItem['sku'])->first();
-                    if($stock) {
-                        $orderItem['item_id'] = $stock->item->id;
+                    if ($stock) {
+                        $orderItem['item_id'] = $stock->item_id;
                         $orderItem['item_status'] = $stock->item->status;
                         $orderItem['is_oversea'] = 1;
                         $orderItem['code'] = $stock->warehouse->code;
@@ -690,6 +700,7 @@ class OrderModel extends BaseModel
             }
             if ($orderItem['channel_sku']) {
                 $channelSku = explode('*', $orderItem['channel_sku']);
+                // $user = UserModel::where('code', $channelSku[0])->first();
                 $orderItem['operator_id'] = $channelSku[0];
             }
             if (!isset($orderItem['item_id'])) {
@@ -699,15 +710,16 @@ class OrderModel extends BaseModel
                 }
                 $order->remark($orderItem['channel_sku'] . '找不到对应产品.', 'ITEM');
             }
+            $orderItem['channel_id'] = $order->channel_id;
             $order->items()->create($orderItem);
         }
-        foreach($order->items as $key => $single) {
-            if(!$key) {
-                if($single->is_oversea) {
+        foreach ($order->items as $key => $single) {
+            if (!$key) {
+                if ($single->is_oversea) {
                     $order->update(['is_oversea' => '1']);
                 }
             }
-            if(!WarehouseModel::where('code', $single->code)->first()) {
+            if (!WarehouseModel::where('code', $single->code)->first()) {
                 $order->update(['status' => 'REVIEW']);
                 break;
             }
@@ -715,7 +727,7 @@ class OrderModel extends BaseModel
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
-
+        DB::commit();
         return $order;
     }
 
@@ -804,8 +816,8 @@ class OrderModel extends BaseModel
                     $newPackageItem = $package->items()->create($packageItem);
                 }
             }
-            $package->update(['weight' => $package->total_weight]);
         }
+        $package->order->update(['status' => 'PACKED']);
 
         return $package;
     }
@@ -818,7 +830,7 @@ class OrderModel extends BaseModel
         $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
-        $orderChannelFee = $this->channel_fee;
+        $orderChannelFee = $this->calculateOrderChannelFee();
         $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $orderChannelFee, 4);
         $orderProfitRate = $orderProfit / $orderAmount;
         $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);

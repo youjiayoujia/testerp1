@@ -36,8 +36,8 @@ class CreateMessagesTable extends Migration
 			$table->dateTime('start_at')->nullable();
 			$table->dateTime('end_at')->nullable();
 			$table->integer('dont_reply')->nullable()->default(0);
-			$table->text('channel_message_fields', 16777215)->nullable();
-			$table->text('content', 16777215)->nullable();
+			$table->mediumText('channel_message_fields')->nullable();
+			$table->mediumText('content')->nullable();
 			$table->string('channel_order_number')->nullable();
 			$table->string('channel_url')->nullable();
 			$table->timestamps();

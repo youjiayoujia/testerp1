@@ -18,11 +18,11 @@
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                     @endforeach
                                 </select>
-                                <span class="input-group-btn">
-                            <button class="btn btn-success option-group" do="other-customer" type="button">
-                                <span class="glyphicon glyphicon-random"></span> 转交
-                            </button>
-                        </span>
+                                <span>
+                                <button class="btn btn-success option-group" do="other-customer" type="button">
+                                 <span class="glyphicon glyphicon-random"></span> 转交
+                                </button>
+                              </span>
                             </div>
                         </form>
                     </div>

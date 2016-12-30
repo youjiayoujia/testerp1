@@ -59,7 +59,10 @@ class ReplyModel extends BaseModel
         return [
             'relatedSearchFields' => [],
             'filterFields' => [],
-            'filterSelects' => [],
+            'filterSelects' => [
+                'status' => config('message.reply.status'),
+
+            ],
             'selectRelatedSearchs' => [],
             'sectionSelect' => ['time'=>['created_at']],
         ];

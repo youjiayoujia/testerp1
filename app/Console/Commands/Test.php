@@ -13,7 +13,7 @@ class Test extends Command
      *
      * @var string
      */
-    protected $signature = 'test:create';
+    protected $signature = 'test:create {type}';
 
     /**
      * The console command description.
@@ -39,12 +39,15 @@ class Test extends Command
      */
     public function handle()
     {
+        $type = $this->argument('type');
         $begin = microtime(true);
         $itemModel = new ItemModel();
+        $itemModel->$type();
+        
         //$itemModel->oneKeyUpdateSku();
         //$itemModel->updateWarehouse();
         //$itemModel->updateUser();
-        $itemModel->updateCatalog();
+        //$itemModel->updateCatalog();
         // $itemModel->updateOldData();
         // $itemModel->updateBasicData();
         $end = microtime(true);

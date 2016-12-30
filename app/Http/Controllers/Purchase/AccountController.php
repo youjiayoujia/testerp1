@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\AlibabaSupliersAccountModel;
 use App\Models\UserModel;
+use Tool;
 
 
 class AccountController extends Controller
@@ -75,8 +76,26 @@ class AccountController extends Controller
             'metas'   => $this->metas(__FUNCTION__),
             'model'   => $account,
             'users' => UserModel::where('is_available','=',1)->get(),
+            'refer_url' => Tool::referUrl(),
+
         ];
         return view($this->viewPath . 'edit', $response);
+    }
+
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        $from = json_encode($model);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        $model->update(request()->all());
+        $to = json_encode($model);
+        $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据更新', $to, $from);
+
+        return redirect(Tool::referUrl($this->mainIndex))->with('alert', $this->alert('success', '操作成功.'));
     }
 
     /**

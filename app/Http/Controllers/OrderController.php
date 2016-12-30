@@ -18,6 +18,7 @@ use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\LogisticsModel;
 use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
@@ -106,14 +107,94 @@ class OrderController extends Controller
 
     public function createVirtualPackage()
     {
-        $model = $this->model->where('status', 'PREPARED')->get();
-        foreach ($model as $key => $single) {
-            $job = new DoPackages($single);
-            $job = $job->onQueue('doPackages');
-            $this->dispatch($job);
+        $len = 1000;
+        $start = 0;
+        $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();
+        while(count($model)) {
+            foreach ($model as $key => $single) {
+                $job = new DoPackages($single);
+                $job = $job->onQueue('doPackages');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();
         }
 
         return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));
+    }
+
+    /**
+     * EbaySku销量报表
+     */
+    public function saleReport()
+    {
+        $sku = request()->input('sku');
+        $site = request()->input('site');
+        $status = request()->input('status');
+        $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
+        $orders = OrderModel::where('channel_id', $channelId)->get();
+        if ($orders) {
+            foreach ($orders->items as $item) {
+                dd($orders->items->groupBy('item_id')->toArray());
+            }
+        }
+
+        if (!$sku && !$site && !$status) {
+
+        }
+        $items = ItemModel::where('sku', $sku)->get();
+        $data = [];
+        $count = $this->model->where('logistics_id', '!=', 0)
+//            ->where('shipped_at', '>=', $start . ' 00:00:00')
+//            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00')
+            ->count();
+        $totalWeight = 0;
+        $logisticses = LogisticsModel::where('is_enable', 1)->get();
+        foreach ($logisticses as $key => $logistics) {
+            $data[$key]['logisticsName'] = $logistics->name;
+            $data[$key]['logisticsId'] = $logistics->id;
+            $data[$key]['logisticsPriority'] = $logistics->priority;
+            $data[$key]['weight'] = 0;
+            $data[$key]['percent'] = 0 . '%';
+            $packages = $this->model
+                ->where('logistics_id', $logistics->id);
+//                ->where('shipped_at', '>=', $start . ' 00:00:00')
+//                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00');
+            foreach ($packages->get() as $package) {
+                $data[$key]['weight'] += $package->weight;
+            }
+            $data[$key]['quantity'] = $packages->count();
+            $totalWeight += $data[$key]['weight'];
+            if ($count) {
+                $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
+            }
+        }
+        $arr = array();
+        foreach ($data as $value) {
+            $arr[] = $value['logisticsPriority'];
+        }
+        array_multisort($arr, SORT_ASC, $data);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'datas' => $data,
+            'count' => $count,
+//            'start' => $start,
+//            'end' => $end,
+            'totalWeight' => $totalWeight,
+        ];
+
+        return view($this->viewPath . 'saleReport', $response);
+    }
+
+    /**
+     * EB销量额统计
+     */
+    public function amountStatistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view($this->viewPath . 'amountStatistics', $response);
     }
 
     /**
@@ -158,11 +239,11 @@ class OrderController extends Controller
             $profit = 0;
             foreach ($this->allList($order)->get() as $value) {
                 $totalAmount += $value->amount * $value->rate;
-                $profit += $value->profit_rate;
+                $profit += $value->profit;
                 $totalPlatform += $value->channel_fee;
             }
             $totalAmount = sprintf("%.2f", $totalAmount);
-            $averageProfit = sprintf("%.2f", $profit / $this->allList($order)->count()) * 100;
+            $averageProfit = sprintf("%.4f", $profit / $totalAmount) * 100;
             $totalPlatform = sprintf("%.2f", $totalPlatform);
             $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
         }
@@ -328,6 +409,27 @@ class OrderController extends Controller
         $to = json_encode($model);
         $this->eventLog($userName->name, '退款新增,id=' . $id, $to, $from);
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
+    }
+
+    /**
+     * ajax 创建退款记录
+     */
+    public function ajaxAddRefund(){
+        $data = request()->input();
+        $model = $this->model->find($data['order_id']);
+        $data['order_id'] = $model->id;
+        $data['channel_id'] = $model->channel_id;
+        $data['account_id'] = $model->channel_account_id;
+        if(! empty($data['tribute_id'])){
+            $data['tribute_id'] = array_unique($data['tribute_id']);
+        }
+        if(!empty($model->refundCreate($data, request()->file('image')))){
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
+            return config('status.ajax.success');
+        }else{
+            return conifg('status.ajax.fail');
+        }
+
     }
 
     /**

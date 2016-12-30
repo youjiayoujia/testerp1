@@ -94,6 +94,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '风控订单地址验证',
+                'url' => 'blacklistAddress.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '标记发货规则设置',
                 'url' => 'orderMarkLogic.index',
                 'icon' => '',
@@ -553,6 +558,13 @@ return [
                     'icon' => '',
                 ]
             ],
+            '程序智能处理' => [
+                [
+                    'name' => '自动回复设置',
+                    'url' => 'autoReply.index',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     [
@@ -589,6 +601,11 @@ return [
                     'url' => 'purchaseStaticstics',
                     'icon' => '',
                 ],
+                [
+                    'name' => '缺货报告',
+                    'url' => 'purchase.outOfStock',
+                    'icon' => '',
+                ],
             ],
             'CRM报表' => [
                 [
@@ -603,9 +620,22 @@ return [
                     'url' => 'package.logisticsDelivery',
                     'icon' => '',
                 ],
+                
+            ],
+            'SKU报表' => [
                 [
-                    'name' => '缺货报告',
-                    'url' => 'purchase.outOfStock',
+                    'name' => '到货记录',
+                    'url' => 'purchaseOrder.recieveReport',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'EbaySku销量报表',
+                    'url' => 'sku.saleReport',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'EB销量额统计',
+                    'url' => 'sku.amountStatistics',
                     'icon' => '',
                 ],
             ],
@@ -773,6 +803,11 @@ return [
                 [
                     'name' => 'paypal固定税率',
                     'url' => 'paypal.ShowPaypalRate',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '邮件推送',
+                    'url' => 'mail_push.index',
                     'icon' => '',
                 ],
             ],

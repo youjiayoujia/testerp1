@@ -1,6 +1,6 @@
 <script type="text/javascript">
     var message = {
-        entry : 5, //配置初始化消息数量
+        entry : 3, //配置初始化消息数量
         smt_order_operate : false, //速卖通订单操作
         has_workflow_message : true, //
         @if(request()->session()->get('workflow')=='keeping')
@@ -389,6 +389,92 @@
         }
 
     }
+
+    //全选订单产品
+    function quanxuan(id) {
+        var collid = document.getElementById("checkall" + id);
+        var coll = document.getElementsByName("tribute_id[]");
+        if (collid.checked) {
+            for (var i = 0; i < coll.length; i++)
+                coll[i].checked = true;
+            $('.price').style.readonly = 'false';
+        } else {
+            for (var i = 0; i < coll.length; i++)
+                coll[i].checked = false;
+        }
+    }
+
+    /**
+     * 订单退款
+     */
+    function refundOrder(orderId){
+        var itemids =  $('input[name="tribute_id[]"]:checked').serialize();
+        if(_.isEmpty($('.refund-type-'+orderId).val())){
+            alert('请选择退款方式');
+            return false;
+        }
+        if(_.isEmpty($('.reason-'+orderId).val())){
+            alert('请选择退款原因');
+            return false;
+        }
+        if(_.isEmpty($('.type-'+orderId).val())){
+            alert('请选择退款类型');
+            return false;
+        }
+
+        if(_.isEmpty(itemids) && $('.type-'+orderId).val() == 'PARTIAL'){
+            alert('请先勾选需要部分退款的商品');
+            return false;
+        }
+        var forminfo = $('#reufnd-form-'+orderId).serialize();
+        if(! _.isEmpty(itemids)){
+            forminfo += '&='+itemids;
+        }
+        $.ajax({
+            url : "{{ route('ajaxAddRefund')}}",
+            data : forminfo,
+            type : 'GET',
+            success : function (data) {
+                if(data == 1){
+                    alert('添加退款记录成功')
+                    $('#refund-'+orderId).modal('hide');
+                    $('#button-refund-order-'+orderId).hide();
+                    return;
+                }else if(data == -1){
+                    alert('添加退款记录失败')
+                    return;
+                }
+            }
+        });
+    }
+
+    $(document).on('change', '.refund-type', function () {
+        if ($(this).val() == '1') {
+            $('#paypal-input-' + $(this).attr('order-id')).show();
+        } else {
+            $('#paypal-input-' + $(this).attr('order-id')).hide();
+        }
+    });
+
+    $(document).on('click', '.type', function () {
+        var type = $(this).val();
+        var id = $(this).attr('id');
+        if (type == 'FULL') {
+            $('.dom-items').hide();
+            document.getElementById('price' + id).readOnly = true;
+            document.getElementById('refund_amount' + id).readOnly = true;
+        } else if(type == 'PARTIAL'){
+            $('.dom-items').show();
+            $('#price' + id).val('');
+            $('#refund_amount' + id).val('');
+            document.getElementById('price' + id).readOnly = false;
+            document.getElementById('refund_amount' + id).readOnly = false;
+        } else {
+            $('.dom-items').hide();
+
+        }
+    });
+
 
 
 

@@ -50,9 +50,13 @@
                 <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-warning btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-envelope"></span>备注
                 </a>
-                <a href="" class="btn btn-info btn-xs">
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $spu->table }}" data-id="{{$spu->id}}" title='日志'>
+                <span class="glyphicon glyphicon-road"></span>
+                <!-- <a href="" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-road"></span> 日志
-                </a>
+                </a> -->
             </td>
         </tr>
 
@@ -99,7 +103,8 @@
                 <button class="doAction" value="edit">批量已建SKU维护资料</button>
                 <button class="doAction" value="image_edit">批量已编辑</button>
                 <button class="doAction" value="image_examine">批量已制图</button>
-                <button class="doAction" value="final_examine">批量已审图</button>
+                <button class="doAction" value="quality">批量已审图</button>
+                <button class="doAction" value="final_examine">批量质检</button>
                 <button class="doAction" value="pass">批量 终审</button>
                 <?php $condition = request()->input('filters')?explode('.',request()->input('filters'))[2]:''; ?>
                 <?php if($condition=='image_edit'||$condition=='edit'||$condition=='image_examine'||$condition=='final_examine'){ ?>

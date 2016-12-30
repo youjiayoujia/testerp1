@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use App\Jobs\DoPackages;
 
 class ImitationOrders extends Command
 {
@@ -59,6 +60,9 @@ class ImitationOrders extends Command
                 ]));
                 $i++;
             }
+            $job = new DoPackages($single);
+            $job = $job->onQueue('doPackages');
+            $this->dispatch($job);
         });
         $this->info('imitation orders data is success, quantity:' . $quantity);
     }

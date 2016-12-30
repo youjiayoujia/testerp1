@@ -12,10 +12,12 @@ use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\UserModel;
+use App\Models\ChannelModel;
 use App\Models\Stock\CarryOverFormsModel;
 use App\Models\User\UserRoleModel;
 use App\Models\Spu\SpuMultiOptionModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Product\CatalogCategoryModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -24,7 +26,7 @@ class ItemModel extends BaseModel
 
     protected $stock;
 
-    public $searchFields = ['sku' => 'sku', 'id' => 'id', 'c_name' => '中文名'];
+    public $searchFields = ['sku' => 'sku', 'c_name' => '中文名'];
 
     public $rules = ['update' => []];
 
@@ -93,8 +95,13 @@ class ItemModel extends BaseModel
                 'new_status' => config('item.new_status'),
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
-            'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
+            'selectRelatedSearchs' => [],
+            'doubleRelatedSelectedFields' => [],
             'sectionSelect' => [],
+            'sectionGangedDouble' => [
+                'first' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
+                'second' => ['catalog' => ['c_name' => CatalogModel::all()->pluck('c_name', 'c_name')]]
+            ],
         ];
     }
 
@@ -321,7 +328,7 @@ class ItemModel extends BaseModel
     {
         $item_id = $this->id;
         $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "' . $item_id . '" and
-                packages.id = package_items.package_id and packages.deleted_at is null')[0]->num;
+                packages.id = package_items.package_id and package_items.deleted_at is null')[0]->num;
 
         return $num;
     }
@@ -404,6 +411,31 @@ class ItemModel extends BaseModel
             ->sum('order_items.quantity');
 
         return $sellNum;
+    }
+
+    //获得sku分平台销量 period参数格式为 -7 day
+    public function getChannelSales($period)
+    {
+        //销量
+        $sellNum = DB::select("select orders.channel_id,sum(`order_items`.`quantity`) as aggregate 
+                    from `order_items` left join `orders` on `orders`.`id` = `order_items`.`order_id` 
+                    where `order_items`.`deleted_at` is null and `orders`.`status` in ('PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE', 'PICKING', 'PARTIAL') 
+                    and `orders`.`created_at` > '".date('Y-m-d H:i:s', strtotime($period))."'
+                    and `order_items`.`quantity` < 5 
+                    and `order_items`.`item_id` = ".$this->id." 
+                    group by `orders`.`channel_id`");
+        $data = [];
+        foreach($sellNum as $sell){
+            $data[$sell->channel_id] = $sell->aggregate;
+        }
+
+        foreach(ChannelModel::all() as $channel){
+            if(!array_key_exists($channel->id,$data)){
+                $data[$channel->id] = 0;
+            }
+        }
+                
+        return $data;
     }
 
     //计算sku采购建议数量
@@ -509,7 +541,7 @@ class ItemModel extends BaseModel
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)),
                         3)
                 ]);
-                $this->createOnePurchaseNeedData();
+                //$this->createOnePurchaseNeedData();
                 return $stock->in($quantity, $amount, $type, $relation_id, $remark);
             }
         }
@@ -528,7 +560,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->hold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -546,7 +578,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -564,7 +596,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -586,7 +618,7 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
-            $this->createOnePurchaseNeedData();
+            //$this->createOnePurchaseNeedData();
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
         return false;
@@ -1188,7 +1220,8 @@ class ItemModel extends BaseModel
 
     public function createPurchaseStaticstics()
     {
-        $users = UserRoleModel::all()->where('role_id', '2');
+        $users = UserRoleModel::where('role_id', '2')->get();
+        
         foreach ($users as $user) {
             $data = [];
             //采购负责人
@@ -1200,9 +1233,10 @@ class ItemModel extends BaseModel
             //必须当天内下单SKU数
             $data['need_purchase_num'] = DB::select('select count(*) as num from purchases where user_id = "' . $user->user_id . '" and need_purchase_num > 0 and available_quantity+zaitu_num-seven_sales < 0 ')[0]->num;
             //15天缺货订单
-            $data['fifteenday_need_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-d',
+            $data['fifteenday_need_order_num'] = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0  and
+                packages.id = package_items.package_id and packages.deleted_at is null and packages.created_at > "' . date('Y-m-d',
                     time() - 24 * 3600 * 15) . '" ')[0]->num;
+
             //15天所有订单
             $data['fifteenday_total_order_num'] = DB::select('select count(*) as num from orders,order_items,purchases where orders.status!= "CANCEL" and purchases.user_id = "' . $user->user_id . '" and 
                 orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.created_at > "' . date('Y-m-d',
@@ -1211,15 +1245,13 @@ class ItemModel extends BaseModel
             $data['need_percent'] = $data['fifteenday_total_order_num'] ? round($data['fifteenday_need_order_num'] / $data['fifteenday_total_order_num'],
                 4) : 0;
             //缺货总数
-            $data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id and orders.deleted_at is null')[0]->num;
-            $data['need_total_num'] = $data['need_total_num'] ? $data['need_total_num'] : 0;
+            $data['need_total_num'] = $this->out_of_stock?$this->out_of_stock:0;
             //平均缺货天数
-            $data['avg_need_day'] = round(DB::select('select avg(' . time() . '-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day, 1);
+            $data['avg_need_day'] = round(DB::select('select avg(' . time() . '-UNIX_TIMESTAMP(packages.created_at))/86400 as day from packages,package_items,purchases where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and purchases.user_id = "' . $user->user_id . '" and 
+                packages.id = package_items.package_id and purchases.item_id = package_items.item_id  ')[0]->day, 1);
             //最长缺货天数
-            $data['long_need_day'] = round(DB::select('select max(' . time() . '-UNIX_TIMESTAMP(orders.created_at))/86400 as day from orders,order_items,purchases where orders.status= "NEED" and purchases.user_id = "' . $user->user_id . '" and 
-                orders.id = order_items.order_id and purchases.item_id = order_items.item_id  ')[0]->day, 1);
+            $data['long_need_day'] = round(DB::select('select max(' . time() . '-UNIX_TIMESTAMP(packages.created_at))/86400 as day from packages,package_items,purchases where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and purchases.user_id = "' . $user->user_id . '" and 
+                packages.id = package_items.package_id and purchases.item_id = package_items.item_id  ')[0]->day, 1);
             //采购单超期
             $data['purchase_order_exceed_time'] = DB::select('select count(*) as num from purchase_orders where user_id = "' . $user->user_id . '" and created_at < "' . date('Y-m-d H:i:s',
                     time() - 86400 * 15) . '" ')[0]->num;
@@ -1261,7 +1293,6 @@ class ItemModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $url = "http://120.24.100.157:60/api/skuInfoApi.php";
-        //$itemModel = $this->all();
         $itemModel = $this->where('purchase_adminer',null)->get();
         
         foreach ($itemModel as $key => $model) {
@@ -1346,7 +1377,7 @@ class ItemModel extends BaseModel
             $old_data['warehouse_position'] = $erp_products_data[0]->products_location;
             $old_data['purchase_url'] = $erp_products_data[0]->products_more_img;
             $old_data['competition_url'] = $erp_products_data[0]->productsPhotoStandard;
-            $old_data['notify'] = $erp_products_data[0]->products_remark_2;
+            $old_data['notify'] = $erp_products_data[0]->products_warring_string;
             $arr = [];
             $arr = explode(',', $erp_products_data[0]->products_suppliers_ids);
 
@@ -1444,7 +1475,7 @@ class ItemModel extends BaseModel
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1 and products_id > 22815 and spu!="" order by products_id asc');
+                                        from erp_products_data where productsIsActive = 1 and spu!="" order by products_id desc');
 
         foreach ($erp_products_data as $data) {
             $itemModel = $this->where('sku', $data->products_sku)->get()->first();
@@ -1504,7 +1535,7 @@ class ItemModel extends BaseModel
                 $old_data['warehouse_position'] = $data->products_location;
                 $old_data['purchase_url'] = $data->products_more_img;
                 $old_data['competition_url'] = $data->productsPhotoStandard;
-                $old_data['notify'] = $data->products_remark_2;
+                $old_data['notify'] = $data->products_warring_string;
                 $old_data['is_available'] = $data->productsIsActive;
                 $old_data['status'] = $data->products_status_2;
                 $volume = unserialize($data->products_volume);
@@ -1542,6 +1573,10 @@ class ItemModel extends BaseModel
                 $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
                 if (substr($data->products_suppliers_ids, 0, 1) == ',') {
                     $data->products_suppliers_ids = substr($data->products_suppliers_ids, 1);
+                }
+                
+                if(!$data->products_suppliers_ids){
+                    $data->products_suppliers_ids = 0;
                 }
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id in(' . $data->products_suppliers_ids . ')');
@@ -1704,6 +1739,13 @@ class ItemModel extends BaseModel
 
                 //多对多供应商转换id
                 $crr = explode(',', $erp_products_data[0]->products_suppliers_ids);
+                if (substr($data->products_suppliers_ids, 0, 1) == ',') {
+                    $data->products_suppliers_ids = substr($data->products_suppliers_ids, 1);
+                }
+                
+                if(!$data->products_suppliers_ids){
+                    $data->products_suppliers_ids = 0;
+                }
                 $supp_name = DB::select('select suppliers_id,suppliers_company
                                         from erp_suppliers where suppliers_id in(' . $data->products_suppliers_ids . ')');
                 if (count($supp_name)) {

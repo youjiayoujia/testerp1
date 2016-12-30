@@ -44,7 +44,7 @@ class RefundCenterController extends Controller
             'users'   => UserModel::all(),
             'channels'=> ChannelModel::all(),
             'types'    => config('refund.type'),
-           // 'mixedSearchFields' => $this->model->mixed_search,
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index',$response);
     }
@@ -350,13 +350,14 @@ class RefundCenterController extends Controller
             $items = $items->whereIn('sku',explode(',',$form['skus']));
         $items = $items->where('refund_id','<>','');
 
-        if($form['time-type'] == 'order'){
-            $items = $items->where('created_at','<=',$form['end']);
-            $items = $items->where('created_at','>=',$form['start']);
+        if(! empty($form['time-type'])){
+            if($form['time-type'] == 'order'){
+                $items = $items->where('created_at','<=',$form['end']);
+                $items = $items->where('created_at','>=',$form['start']);
+            }
         }
         $items = $items->distinct();
         $items = $items->get(['refund_id']);
-
 
         $refunds =  new RefundModel;
         if(!$items->isEmpty()){

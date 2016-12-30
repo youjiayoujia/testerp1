@@ -183,6 +183,41 @@
                                             @endif
                                         @endforeach
                                     @endif
+
+                                    @if($type == 'sectionGangedDouble')
+                                        @foreach($value as $kind => $contents)
+                                            @if($kind == 'first')
+                                                @foreach($contents as $relation_ship1 => $value1)
+                                                    @foreach($value1 as $relation_ship2 => $value2)
+                                                        @foreach($value2 as $key => $content)
+                                                            <div class="col-lg-2 form-group searchItem">
+                                                                <select name="mixedSearchFields[{{$type}}][first][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $key }}]" class='form-control select_select0 col-lg-2 sectiongangeddouble_first'>
+                                                                    <option value=''>{{config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$key]}}</option>
+                                                                    @foreach($content as $k => $v)
+                                                                        <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.first.'.$relation_ship1.'.'.$relation_ship2.'.'.$key) ? ($k==request('mixedSearchFields'.'.'.$type.'.first.'.$relation_ship1.'.'.$relation_ship2.'.'.$key)?'selected':'') : ''}} >{{$v}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+                                            @if($kind == 'second')
+                                                @foreach($contents as $relation_ship1 => $content)
+                                                    @foreach($content as $name => $content1)
+                                                        <div class="col-lg-2 form-group searchItem">
+                                                            <select name="mixedSearchFields[{{$type}}][second][{{$relation_ship1}}][{{ $name }}]" class='form-control select_select0 col-lg-2 sectiongangeddouble_second'>
+                                                                <option value=''>{{config('setting.transfer_search')[$relation_ship1.'.second']}}</option>
+                                                                @foreach($content1 as $k => $v)
+                                                                    <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.second.'.$relation_ship1.'.'.$name) ? ($k==request('mixedSearchFields'.'.'.$type.'.second.'.$relation_ship1.'.'.$name)?'selected':'') : ''}} >{{$v}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 @endforeach
                                 <div class="col-lg-2">
                                     <button class="btn btn-success" type="submit">查询</button>
@@ -328,6 +363,14 @@
 
         $('.datetime_select').datetimepicker({theme: 'dark'});
         $('.select_select0').select2();
+        $( document ).ready(function () {
+            //列表页修改编辑rul
+            $('.index-a-edit').click(function (){
+                var edit_url = $(this).attr('href');
+                var url = edit_url+'?refer_url='+window.location.href;
+                $(this).attr('href', url);
+            });
+        });
     </script>
 @section('childJs')@show
 @stop

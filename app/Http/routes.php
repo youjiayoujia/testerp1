@@ -331,6 +331,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
+    //到货记录报表
+    Route::get('purchaseOrder/recieveReport',
+        ['uses' => 'Purchase\PurchaseOrderController@recieveReport', 'as' => 'purchaseOrder.recieveReport']);
     //缺货报表
     Route::get('purchaseOrder/outOfStock',
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
@@ -400,8 +403,13 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购单导出
     Route::any('purchaseOrder/purchaseOrdersOut',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
+    //到货记录
+    Route::any('purchaseOrder/purchaseArrivalLogOut',
+        ['uses' => 'Purchase\PurchaseOrderController@purchaseArrivalLogOut', 'as' => 'purchaseOrder.purchaseArrivalLogOut']);
     //采购单核销格式导出
     Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
+    //采购单付款格式导出
+    Route::any('purchaseOrderPayOffCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderPayOffCsvFormat', 'as' => 'purchaseOrderPayOffCsvFormat']);
     //采购单核销导入
     Route::any('purchaseOrderConfirmCsvFormatExecute', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormatExecute', 'as' => 'purchaseOrderConfirmCsvFormatExecute']);
     
@@ -468,6 +476,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('addLotsOfCatalogs', ['uses' => 'CatalogController@addLotsOfCatalogs', 'as' => 'addLotsOfCatalogs']);
 
     //item路由
+    Route::get('item/sectionGangedDouble', ['uses' => 'ItemController@sectionGangedDouble', 'as' => 'item.sectionGangedDouble']);
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('itemUser/ajaxSupplierUser',
@@ -690,6 +699,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('unpaidOrder', 'Order\UnpaidOrderController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
+    Route::resource('blacklistAddress', 'Order\BlacklistAddressController');
     Route::any('withdrawAll', ['uses' => 'OrderController@withdrawAll', 'as' => 'withdrawAll']);
     Route::any('partReview', ['uses' => 'OrderController@partReview', 'as' => 'partReview']);
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
@@ -704,6 +714,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
     Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);
     Route::post('refundUpdate/{id}', ['uses' => 'OrderController@refundUpdate', 'as' => 'refundUpdate']);
+    Route::any('ajaxAddRefund', ['uses' => 'OrderController@ajaxAddRefund', 'as' => 'ajaxAddRefund']);
     Route::get('getBlacklist', ['uses' => 'Order\BlacklistController@getBlacklist', 'as' => 'getBlacklist']);
     Route::any('exportAll', ['uses' => 'Order\BlacklistController@exportAll', 'as' => 'exportAll']);
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
@@ -716,6 +727,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //物流报表
     Route::get('package/logisticsDelivery',
         ['uses' => 'PackageController@logisticsDelivery', 'as' => 'package.logisticsDelivery']);
+
+    //sku报表
+    Route::get('sku/saleReport',
+        ['uses' => 'OrderController@saleReport', 'as' => 'sku.saleReport']);
+    Route::get('sku/amountStatistics',
+        ['uses' => 'OrderController@amountStatistics', 'as' => 'sku.amountStatistics']);
 
     //包裹报表
     Route::get('allReport/createData',
@@ -894,6 +911,11 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('ebayDetail/getEbaySite',
         ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
     Route::resource('ebayDetail', 'Publish\Ebay\EbayDetailController');
+
+
+    Route::get('ebayProduct/ajaxGetLog',
+        ['uses' => 'Publish\Ebay\EbayDataMonitorController@ajaxGetLog', 'as' => 'ebayProduct.ajaxGetLog']);
+
     Route::any('ebay/batchUpdate',
         ['uses' => 'Publish\Ebay\EbayDataMonitorController@batchUpdate', 'as' => 'ebay.batchUpdate']);
     Route::any('ebay/productBatchEdit',
@@ -1223,6 +1245,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('message_log', 'Message\Messages_logController');
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
+    //消息自动回复规则
+    Route::resource('autoReply', 'Message\AutoReplyController');
+
     Route::any('ajaxGetTranInfo',
         ['as' => 'ajaxGetTranInfo', 'uses' => 'MessageController@ajaxGetTranInfo']);
     Route::any('aliexpressReturnOrderMessages',
@@ -1301,6 +1326,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //接口路由
     Route::resource('syncApi', 'SyncApiController');
     Route::resource('importSyncApi', 'SyncSellmoreDataController');
+    //系统模块
+    Route::resource('mail_push', 'MailPushController');
 });
 
 
@@ -1319,6 +1346,7 @@ Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm', ['uses' => 'TestController@jdtestCrm']);
+Route::any('testAutoReply', ['uses' => 'TestController@testAutoReply']);
 Route::any('testEbayCases', ['uses' => 'TestController@testEbayCases']);
 Route::any('getSmtIssue', ['uses' => 'TestController@getSmtIssue']);
 Route::any('getjoomproduct', ['uses' => 'TestController@getJoomProduct']);

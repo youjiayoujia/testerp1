@@ -792,6 +792,7 @@ class OrderModel extends BaseModel
         $package['shipping_phone'] = $this->shipping_phone ? $this->shipping_phone : '';
         $package['status'] = 'NEW';
         $package['is_oversea'] = $this->is_oversea;
+        $package['queue_name'] = 'assignStocks';
         $package = $this->packages()->create($package);
         if ($package) {
             foreach ($this->items->toArray() as $packageItem) {
@@ -804,7 +805,6 @@ class OrderModel extends BaseModel
                 }
             }
         }
-        $package->order->update(['status' => 'PACKED']);
 
         return $package;
     }

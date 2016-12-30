@@ -170,7 +170,7 @@ class SmtAdapter extends BasicAdapter
             $data['declareProductDTOs']         = json_encode([$productData]);  //二维数组
             $data['addressDTOs']                = json_encode($addressArray);
             echo '<pre>';
-            print_t($data);
+            print_r($data);
             $api = 'api.createWarehouseOrder';
             $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
             

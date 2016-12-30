@@ -18,6 +18,7 @@ use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\LogisticsModel;
 use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
@@ -120,6 +121,80 @@ class OrderController extends Controller
         }
 
         return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));
+    }
+
+    /**
+     * EbaySku销量报表
+     */
+    public function saleReport()
+    {
+        $sku = request()->input('sku');
+        $site = request()->input('site');
+        $status = request()->input('status');
+
+        $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
+        $items = orderItem::where('channel_id', $channelId)->groupBy('item_id')->get();
+        $data = [];
+        foreach ($items as $key => $item) {
+            $order = $this->model->find($item->order_id);
+            if ($order) {
+                if ($order->status != 'UNPAID' || $order->status != 'CANCEL') {
+                    $createdAt = date('Y-m-d') . ' 00:00:00';
+                    $productItem = ItemModel::find($item->item_id);
+                    if ($productItem) {
+                        $createdAt = $productItem->created_at;
+                    }
+                    $site = $order->shipping_country;
+                    $oneCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d') . ' 00:00:00', date('Y-m-d', strtotime('+1 day', strtotime(date('Y-m-d')))) . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $sevenCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-7 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $fourteenCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-14 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $thirtyCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-30 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $ninetyCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-90 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $data[$key]['sku'] = $item->sku;
+                    $data[$key]['channel_name'] = 'EBay';
+                    $data[$key]['site'] = $site;
+                    $data[$key]['one_sale'] = $oneCount;
+                    $data[$key]['seven_sale'] = $sevenCount;
+                    $data[$key]['fourteen_sale'] = $fourteenCount;
+                    $data[$key]['thirty_sale'] = $thirtyCount;
+                    $data[$key]['ninety_sale'] = $ninetyCount;
+                    $data[$key]['created_at'] = $createdAt;
+                }
+            }
+        }
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'datas' => $data,
+        ];
+
+        return view($this->viewPath . 'saleReport', $response);
+    }
+
+    /**
+     * EB销量额统计
+     */
+    public function amountStatistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view($this->viewPath . 'amountStatistics', $response);
     }
 
     /**

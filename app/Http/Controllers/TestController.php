@@ -312,7 +312,7 @@ class TestController extends Controller
 
     public function test1()
     {
-        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1470, 1660])->get();
+        $orders = OrderModel::whereBetween('id', [2979, 3081])->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }
@@ -321,7 +321,7 @@ class TestController extends Controller
 
     public function test3()
     {
-        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
+        $orders = OrderModel::whereBetween('id', [3081, 3189])->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }
@@ -330,9 +330,13 @@ class TestController extends Controller
 
     public function test4()
     {
-        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
+        $orders = OrderModel::where('channel_id', 4)->get();
         foreach ($orders as $order) {
-            $order->calculateOrderChannelFee();
+            if ($order->items) {
+                foreach ($order->items as $item) {
+                    $item->update(['channel_id' => 4]);
+                }
+            }
         }
         return 1;
     }
@@ -1128,6 +1132,8 @@ class TestController extends Controller
 
     public function jdtestCrm()
     {
+        dd('结束');
+
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
 

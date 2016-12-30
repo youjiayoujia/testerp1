@@ -196,6 +196,10 @@ return [
         'spuMultiOption.it_description' => '意大利语',
         'spuMultiOption.zh_description' => '中文',
         'catalog.catalogCategory.cn_name' => '一级分类',
+        'is_second' => '状态',
         'catalog.second' => '二级分类',
+        'mail_push.name' => '变量名称',
+        'mail_push.code' => '变量代码',
+
     ],
 ];

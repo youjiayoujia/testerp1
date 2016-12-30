@@ -37,10 +37,11 @@ use App\Models\StockModel;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder, PurchaseItemModel $purchaseItem, ItemModel $item,PurchaseOrderConfirmModel $purchaseOrderConfirm)
+    public function __construct(PurchaseOrderModel $purchaseOrder, PurchaseItemModel $purchaseItem, ItemModel $item,PurchaseOrderConfirmModel $purchaseOrderConfirm,PurchaseItemArrivalLogModel $arrival)
     {
         //$this->middleware('roleCheck');
         $this->model = $purchaseOrder;
+        $this->arrival = $arrival;
         $this->item = $item;
         $this->purchaseOrderConfirm = $purchaseOrderConfirm;
         $this->purchaseItem = $purchaseItem;
@@ -677,10 +678,12 @@ class PurchaseOrderController extends Controller
     {
         $data = request()->input("data");
         $p_id = request()->input("p_id");
-
+        $is_second = 0;
         if ($data != '') {
             $data = substr($data, 0, strlen($data) - 1);
             $arr = explode(',', $data);
+            $count_num = PurchaseItemArrivalLogModel::where('purchase_order_id',$p_id)->count();
+            if($count_num)$is_second = 1;
             foreach ($arr as $value) {
                 $update_data = explode(':', $value);
                 $purchase_item = PurchaseItemModel::find($update_data[0]);
@@ -693,13 +696,18 @@ class PurchaseOrderController extends Controller
                     $filed['arrival_time'] = date('Y-m-d H:i:s', time());
                     $filed['status'] = 2;
                     $purchase_item->update($filed);
+                    $filed['purchase_order_id'] = $p_id;
+                    $filed['user_id'] = request()->user()->id;
                     $filed['arrival_num'] = $update_data[1];
+                    $filed['is_second'] = $is_second;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
                 $purchase_item->purchaseOrder->update(['status' => 2]);
             }
         } else {
             $purchaseOrderModel = $this->model->find($p_id);
+            $count_num = PurchaseItemArrivalLogModel::where('purchase_order_id',$p_id)->count();
+            if($count_num)$is_second = 1;
             foreach ($purchaseOrderModel->purchaseItem as $p_item) {
                 if ($p_item->purchase_num != $p_item->arrival_num) {
                     $arrival_num = $p_item->lack_num;
@@ -707,7 +715,10 @@ class PurchaseOrderController extends Controller
                     $filed['purchase_item_id'] = $p_item->id;
                     $filed['sku'] = $p_item->sku;
                     $filed['status'] = 2;
+                    $filed['purchase_order_id'] = $p_id;
+                    $filed['user_id'] = request()->user()->id;
                     $filed['arrival_num'] = $arrival_num;
+                    $filed['is_second'] = $is_second;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
             }
@@ -1175,6 +1186,27 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+     * 到货记录报表
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function recieveReport()
+    {
+        $model = new PurchaseItemArrivalLogModel();
+        $this->mainIndex = route('purchaseOrder.recieveReport');
+        $this->mainTitle = '到货记录';
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($model),
+            'mixedSearchFields' => $model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'recieveReport', $response);
+    }
+
+    /**
      * 缺货报表
      *
      * @param none
@@ -1306,7 +1338,7 @@ class PurchaseOrderController extends Controller
      * 导出采购单
      *
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return csv
      */
     public function purchaseOrdersOut()
     {
@@ -1331,6 +1363,37 @@ class PurchaseOrderController extends Controller
                 '订单总金额' => $model->total_purchase_cost,
                 '供应商编号' => $model->supplier_id,
                 '下单时间' => $model->created_at,
+            ];
+        }
+        $name = 'export_exception';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    /**
+     * 导出到货记录
+     *
+     * @param $id
+     * @return csv
+     */
+    public function purchaseArrivalLogOut()
+    {
+        $purchaseItemArrivalLogModel = $this->autoList($this->arrival, null, $fields = ['*'], $pageSize = 10000);
+        $rows = [];
+        
+        foreach ($purchaseItemArrivalLogModel as $recieve) {
+            $rows[] = [
+                '采购单号' => $recieve->purchase_order_id,
+                'sku' => $recieve->purchaseItem->productItem->sku,
+                '库位' => $recieve->purchaseItem->warehouse_position_name,
+                '到货数量' => $recieve->arrival_num,
+                '入库数量' => $recieve->good_num,
+                '名称' => $recieve->purchaseItem->productItem->c_name,
+                '到货时间' => $recieve->created_at,
+                '收货人' => $recieve->user?$recieve->user->name:'',
             ];
         }
         $name = 'export_exception';

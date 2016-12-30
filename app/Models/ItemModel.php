@@ -95,7 +95,7 @@ class ItemModel extends BaseModel
                 'new_status' => config('item.new_status'),
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
-            'selectRelatedSearchs' => ['supplier' => ['name' => SupplierModel::all()->pluck('name', 'name')],],
+            'selectRelatedSearchs' => ['supplier' => ['name' => SupplierModel::all()->pluck('name', 'id')],],
             'doubleRelatedSelectedFields' => [],
             'sectionSelect' => [],
             'sectionGangedDouble' => [

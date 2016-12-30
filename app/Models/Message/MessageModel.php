@@ -695,7 +695,7 @@ class MessageModel extends BaseModel{
                 ->whereIn('account_id',$account_ids);
             })
             ->take($entry)
-            ->orderBy('id', 'DESC');
+            ->orderBy('id', 'ACS');
     }
 
     public function contentTemplate ()

@@ -77,7 +77,10 @@ class ItemModel extends BaseModel
         'html_mod',
         'default_keywords',
         'default_name',
-        'recieve_wrap_id'
+        'recieve_wrap_id',
+        'us_rate',
+        'uk_rate',
+        'eu_rate',
     ];
 
     public function getMixedSearchAttribute()
@@ -88,16 +91,20 @@ class ItemModel extends BaseModel
             $arr[$single->id] = $single->c_name;
         }
         return [
-            'relatedSearchFields' => ['supplier' => ['name']],
+            'relatedSearchFields' => [],
             'filterFields' => ['html_mod'],
             'filterSelects' => [
                 'status' => config('item.status'),
                 'new_status' => config('item.new_status'),
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
-            'selectRelatedSearchs' => ['catalog' => ['id' => $arr]],
-            'doubleRelatedSelectedFields' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
+            'selectRelatedSearchs' => ['supplier' => ['name' => SupplierModel::all()->pluck('name', 'id')],],
+            'doubleRelatedSelectedFields' => [],
             'sectionSelect' => [],
+            'sectionGangedDouble' => [
+                'first' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
+                'second' => ['catalog' => ['c_name' => CatalogModel::all()->pluck('c_name', 'c_name')]]
+            ],
         ];
     }
 

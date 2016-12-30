@@ -18,6 +18,7 @@ use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\LogisticsModel;
 use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
@@ -120,6 +121,80 @@ class OrderController extends Controller
         }
 
         return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));
+    }
+
+    /**
+     * EbaySku销量报表
+     */
+    public function saleReport()
+    {
+        $sku = request()->input('sku');
+        $site = request()->input('site');
+        $status = request()->input('status');
+
+        $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
+        $items = orderItem::where('channel_id', $channelId)->groupBy('item_id')->get();
+        $data = [];
+        foreach ($items as $key => $item) {
+            $order = $this->model->find($item->order_id);
+            if ($order) {
+                if ($order->status != 'UNPAID' || $order->status != 'CANCEL') {
+                    $createdAt = date('Y-m-d') . ' 00:00:00';
+                    $productItem = ItemModel::find($item->item_id);
+                    if ($productItem) {
+                        $createdAt = $productItem->created_at;
+                    }
+                    $site = $order->shipping_country;
+                    $oneCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d') . ' 00:00:00', date('Y-m-d', strtotime('+1 day', strtotime(date('Y-m-d')))) . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $sevenCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-7 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $fourteenCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-14 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $thirtyCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-30 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $ninetyCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-90 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $data[$key]['sku'] = $item->sku;
+                    $data[$key]['channel_name'] = 'EBay';
+                    $data[$key]['site'] = $site;
+                    $data[$key]['one_sale'] = $oneCount;
+                    $data[$key]['seven_sale'] = $sevenCount;
+                    $data[$key]['fourteen_sale'] = $fourteenCount;
+                    $data[$key]['thirty_sale'] = $thirtyCount;
+                    $data[$key]['ninety_sale'] = $ninetyCount;
+                    $data[$key]['created_at'] = $createdAt;
+                }
+            }
+        }
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'datas' => $data,
+        ];
+
+        return view($this->viewPath . 'saleReport', $response);
+    }
+
+    /**
+     * EB销量额统计
+     */
+    public function amountStatistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view($this->viewPath . 'amountStatistics', $response);
     }
 
     /**
@@ -334,6 +409,27 @@ class OrderController extends Controller
         $to = json_encode($model);
         $this->eventLog($userName->name, '退款新增,id=' . $id, $to, $from);
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
+    }
+
+    /**
+     * ajax 创建退款记录
+     */
+    public function ajaxAddRefund(){
+        $data = request()->input();
+        $model = $this->model->find($data['order_id']);
+        $data['order_id'] = $model->id;
+        $data['channel_id'] = $model->channel_id;
+        $data['account_id'] = $model->channel_account_id;
+        if(! empty($data['tribute_id'])){
+            $data['tribute_id'] = array_unique($data['tribute_id']);
+        }
+        if(!empty($model->refundCreate($data, request()->file('image')))){
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
+            return config('status.ajax.success');
+        }else{
+            return conifg('status.ajax.fail');
+        }
+
     }
 
     /**

@@ -35,4 +35,9 @@ class CatalogCategoryModel extends BaseModel{
         ]
     ];
 
+    public function catalogs()
+    {
+        return $this->hasMany('App\Models\CatalogModel', 'catalog_category_id', 'id');
+    }
+
 }

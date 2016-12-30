@@ -26,6 +26,7 @@ use App\Models\ChannelModel;
 use App\Models\Item\SkuMessageModel;
 use App\Models\SyncApiModel;
 use App\Models\Channel\CatalogRatesModel;
+use App\Models\product\CatalogCategoryModel;
 
 class ItemController extends Controller
 {
@@ -175,6 +176,20 @@ class ItemController extends Controller
         $to = json_encode($model);
         $this->eventLog($userName->name, 'item信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex);
+    }
+
+    public function sectionGangedDouble()
+    {
+        $val = trim(request('val'));
+        $model = CatalogCategoryModel::where('cn_name', $val)->first();
+        if (!$model) {
+            return false;
+        }
+        $str = "<option value=''>二级分类</option>";
+        foreach ($model->catalogs as $catalog) {
+            $str .= "<option value='" . $catalog->id . "'>" . $catalog->c_name . "</option>";
+        }
+        return $str;
     }
 
     public function skuHandleApi()

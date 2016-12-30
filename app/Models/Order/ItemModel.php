@@ -21,6 +21,7 @@ class ItemModel extends BaseModel
     public $searchFields = [
         'order_id',
         'item_id',
+        'channel_id',
         'sku',
         'status',
         'item_status',

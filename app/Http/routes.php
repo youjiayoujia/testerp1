@@ -331,6 +331,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
+    //到货记录报表
+    Route::get('purchaseOrder/recieveReport',
+        ['uses' => 'Purchase\PurchaseOrderController@recieveReport', 'as' => 'purchaseOrder.recieveReport']);
     //缺货报表
     Route::get('purchaseOrder/outOfStock',
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
@@ -400,6 +403,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购单导出
     Route::any('purchaseOrder/purchaseOrdersOut',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
+    //到货记录
+    Route::any('purchaseOrder/purchaseArrivalLogOut',
+        ['uses' => 'Purchase\PurchaseOrderController@purchaseArrivalLogOut', 'as' => 'purchaseOrder.purchaseArrivalLogOut']);
     //采购单核销格式导出
     Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
     //采购单付款格式导出
@@ -470,6 +476,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('addLotsOfCatalogs', ['uses' => 'CatalogController@addLotsOfCatalogs', 'as' => 'addLotsOfCatalogs']);
 
     //item路由
+    Route::get('item/sectionGangedDouble', ['uses' => 'ItemController@sectionGangedDouble', 'as' => 'item.sectionGangedDouble']);
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('itemUser/ajaxSupplierUser',
@@ -707,6 +714,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
     Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);
     Route::post('refundUpdate/{id}', ['uses' => 'OrderController@refundUpdate', 'as' => 'refundUpdate']);
+    Route::any('ajaxAddRefund', ['uses' => 'OrderController@ajaxAddRefund', 'as' => 'ajaxAddRefund']);
     Route::get('getBlacklist', ['uses' => 'Order\BlacklistController@getBlacklist', 'as' => 'getBlacklist']);
     Route::any('exportAll', ['uses' => 'Order\BlacklistController@exportAll', 'as' => 'exportAll']);
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
@@ -719,6 +727,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //物流报表
     Route::get('package/logisticsDelivery',
         ['uses' => 'PackageController@logisticsDelivery', 'as' => 'package.logisticsDelivery']);
+
+    //sku报表
+    Route::get('sku/saleReport',
+        ['uses' => 'OrderController@saleReport', 'as' => 'sku.saleReport']);
+    Route::get('sku/amountStatistics',
+        ['uses' => 'OrderController@amountStatistics', 'as' => 'sku.amountStatistics']);
 
     //包裹报表
     Route::get('allReport/createData',
@@ -1312,6 +1326,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //接口路由
     Route::resource('syncApi', 'SyncApiController');
     Route::resource('importSyncApi', 'SyncSellmoreDataController');
+    //系统模块
+    Route::resource('mail_push', 'MailPushController');
 });
 
 

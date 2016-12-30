@@ -139,7 +139,11 @@ class OrderController extends Controller
             $order = $this->model->find($item->order_id);
             if ($order) {
                 if ($order->status != 'UNPAID' || $order->status != 'CANCEL') {
-                    $createdAt = ItemModel::find($item->item_id)->created_at;
+                    $createdAt = date('Y-m-d') . ' 00:00:00';
+                    $productItem = ItemModel::find($item->item_id);
+                    if ($productItem) {
+                        $createdAt = $productItem->created_at;
+                    }
                     $site = $order->shipping_country;
                     $oneCount = orderItem::where('channel_id', $channelId)
                         ->whereBetween('created_at', [date('Y-m-d') . ' 00:00:00', date('Y-m-d', strtotime('+1 day', strtotime(date('Y-m-d')))) . ' 00:00:00'])

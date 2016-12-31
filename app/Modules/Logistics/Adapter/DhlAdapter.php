@@ -371,7 +371,8 @@ class DhlAdapter extends BasicAdapter
             $customer_id = explode(',',$customer_id);
             $customer_id[2] = $res[1];
             $customer_id = implode(',',$customer_id);
-            $res = $model->update(['customer_id' => $customer_id,'secret_key'=>$this->token]);
+            //$res = $model->update(['customer_id' => $customer_id,'secret_key'=>$this->token]);
+            $res = $model->update(['secret_key'=>$this->token]);
         }
         return $orderInfo;
     }

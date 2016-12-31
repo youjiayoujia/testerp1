@@ -226,9 +226,14 @@ class TestController extends Controller
 
     public function test2()
     {
-        $order = PackageModel::find('40423');
-        $order->createpackageitems();
-        var_dump('123');
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
     }
 
     // public function test2()

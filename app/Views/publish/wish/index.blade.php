@@ -43,7 +43,7 @@
             </td>
             <td>
                 @if(isset($wishProduct->channelAccount->account))
-                {{  $wishProduct->channelAccount->account }}
+                {{  $wishProduct->channelAccount->alias }}
                 @endif
             </td>
 {{--

@@ -22,6 +22,7 @@ use App\Models\LogisticsModel;
 use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
+use App\Models\Publish\Ebay\EbaySiteModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 use App\Models\Order\ItemModel as orderItem;
@@ -181,6 +182,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'datas' => $data,
+            'sites' => EbaySiteModel::all(),
         ];
 
         return view($this->viewPath . 'saleReport', $response);

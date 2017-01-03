@@ -956,6 +956,7 @@ class EbayAdapter implements AdapterInterface
             }
         }else{
             $return['is_success'] =false;
+            $errorInfo = [];
             foreach($response->Errors as $error){
                 if((string)$error->SeverityCode =='Error'){
                     $info_String = (string)$error->LongMessage;
@@ -967,9 +968,8 @@ class EbayAdapter implements AdapterInterface
             }
             $errorInfo=  array_unique($errorInfo);
             $errorInfo =implode(',',$errorInfo);
-            $return['info'] =$errorInfo;
+            $return['info'] =strip_tags($errorInfo);
             //$return['info'] ='测试错误情况下';
-
         }
         $return['info_all'] =var_export($response,true);
         return $return;

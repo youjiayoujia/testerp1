@@ -942,15 +942,7 @@ class EbayAdapter implements AdapterInterface
         $xml .= '<Description><![CDATA[' . (trim(($data['description']))) .']]></Description>';  //将描述部分 设置完了再传进来
         $xml .= '<OutOfStockControl>true</OutOfStockControl>'; //无货在线
         $xml .= '</Item>';
-        //var_dump($xml);
-        if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){
-            $response = $this->buildEbayBody($xml, $api, $site);
-
-        }else{
-            $response =  (object)array();
-          //  $response->ItemID = rand(1000000000, 10000000000);
-        }
-
+        $response = $this->buildEbayBody($xml, $api, $site);
         if(isset($response->ItemID)){
             $return['is_success'] =true;
             if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){

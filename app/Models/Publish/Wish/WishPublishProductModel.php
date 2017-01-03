@@ -84,7 +84,7 @@ class WishPublishProductModel extends BaseModel
         $return=[];
         $result =  AccountModel::where(['channel_id'=>$channel_id,'is_available'=>'1'])->get();
         foreach($result as $account){
-            $return[$account->id]=$account->account;
+            $return[$account->id]=$account->alias;
         }
         return $return;
     }

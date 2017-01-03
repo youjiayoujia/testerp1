@@ -33,7 +33,7 @@
                 <select name="token_id" id="token_id" class="form-control">
                      <option>--请选择--</option>
                      @foreach($accoutList as $account)
-                        <option value="{{$account['id']}}" <?php if($account['id'] == $data->token_id) echo "selected='selecred'";?>>{{$account['account']}}</option>
+                        <option value="{{$account['id']}}" <?php if($account['id'] == $data->token_id) echo "selected='selecred'";?>>{{$account['alias']}}</option>
                      @endforeach
                 </select>
             </div>

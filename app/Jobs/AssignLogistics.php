@@ -36,7 +36,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if(in_array($this->package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
+        if (in_array($this->package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
             $order = $this->package->order;
             $this->package->assignLogistics();
             if (!$order->is_review) { //审核通过的订单无需再审核
@@ -91,7 +91,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                         break;
                 }
             }
-            if($this->package->order->status != 'REVIEW') {
+            if ($this->package->order->status != 'REVIEW') {
                 if ($this->package->status == 'ASSIGNED') {
                     $this->package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($this->package);
@@ -127,5 +127,8 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
     public function failed()
     {
         $this->package->update(['queue_name' => '']);
+        $this->result['status'] = 'fail';
+        $this->result['remark'] = '队列执行失败，程序错误或响应超时.';
+        $this->log('AssignLogistics');
     }
 }

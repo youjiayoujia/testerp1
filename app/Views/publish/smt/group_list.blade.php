@@ -14,7 +14,7 @@
     <?php foreach($group as $g):?>
     	<tr>
     		<td><?php echo $g['id'];?></td>
-    		<td><?php echo $token[$g['token_id']]['account']?></td>
+    		<td><?php echo $token[$g['token_id']]['alias']?></td>
     		<td><?php echo $g['group_id']?></td>
     		<td><?php echo $g['group_name']?></td>
     	</tr>
@@ -22,7 +22,7 @@
     		<?php foreach($g['child'] as $c):?>
     			<tr>
     				<td><?php echo $c['id'];?></td>
-    				<td><?php echo $token[$c['token_id']]['account']?></td>
+    				<td><?php echo $token[$c['token_id']]['alias']?></td>
     				<td><?php echo '&nbsp;|--'.$c['group_id']?></td>
     				<td><?php echo '&nbsp;|--'.$c['group_name']?></td>
     			</tr>
@@ -35,7 +35,7 @@
         <select class="form-control sx" name="token_id" id="token_id">
             <option value="">--全选--</option>
             @foreach($token as $row)
-            <option value="{{$row['id']}}">{{$row['account']}}</option>
+            <option value="{{$row['id']}}">{{$row['alias']}}</option>
             @endforeach
         </select>
     </div>

@@ -39,7 +39,7 @@ class smtProductSku extends BaseModel
         return [                       
             'selectRelatedSearchs' => [              
                 'product' => [
-                    'token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','account'),
+                    'token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','alias'),
                     'multiattribute' => config('smt_product.multiattribute'),
                     'productStatusType' => config('smt_product.productStatusType'),     
                     'user_id' => $this->getArray('App\Models\UserModel','name'),

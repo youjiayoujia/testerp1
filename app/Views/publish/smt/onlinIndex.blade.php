@@ -26,7 +26,7 @@
                 ?>
                   <a target="_blank" href="{{ $firstImageURL}}"><img style="width:50px;height:50px;" src="{{ $firstImageURL}}"></a>
             </td>
-            <td>{{ $smtProductList->accounts ? $smtProductList->accounts->account : ''}}</td>
+            <td>{{ $smtProductList->accounts ? $smtProductList->accounts->alias : ''}}</td>
             <td>{{ $smtProductList->productId }}</td>
             <td>
                 <?php 

@@ -22,18 +22,16 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     @foreach($navigation['subnavigations'] as $key => $subnavigations)
-                                        <li class="disabled"><a href="#">{{ $key }}</a></li>
+                                        <li class="disabled nav-title"><a href="#">{{ $key }}</a></li>
                                         @foreach($subnavigations as $subnavigation)
-                                            <li>
-
+                                            <li class="nav-li">
                                                 <a href="{{ route($subnavigation['url']) }}">
-
                                                     <span class="glyphicon glyphicon-{{ $subnavigation['icon'] }}"></span>
                                                     {{ $subnavigation['name'] }}
                                                 </a>
                                             </li>
                                         @endforeach
-                                        <li role="separator" class="divider"></li>
+                                        <li role="separator" class="divider" style="clear: both;"></li>
                                     @endforeach
                                 </ul>
                             </li>

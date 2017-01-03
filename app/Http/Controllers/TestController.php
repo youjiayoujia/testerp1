@@ -226,9 +226,14 @@ class TestController extends Controller
 
     public function test2()
     {
-        $order = PackageModel::find('40423');
-        $order->createpackageitems();
-        var_dump('123');
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
     }
 
     // public function test2()
@@ -285,10 +290,8 @@ class TestController extends Controller
 
     public function test1()
     {
-        $orders = OrderModel::whereBetween('id', [2979, 3081])->get();
-        foreach ($orders as $order) {
-            $order->calculateProfitProcess();
-        }
+        $orders = OrderModel::find(3319);
+        $orders->calculateProfitProcess();
         return 1;
     }
 

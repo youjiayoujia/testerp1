@@ -19,6 +19,15 @@
 
         <div class="panel-body">
             <div class="col-lg-3">
+                <strong>us税率</strong>: {{ $model->us_rate }}
+            </div>
+            <div class="col-lg-3">
+                <strong>uk税率</strong>: {{ $model->uk_rate }}
+            </div>
+            <div class="col-lg-3">
+                <strong>eu税率</strong>: {{ $model->eu_rate }}
+            </div>
+            <div class="col-lg-3">
                 <strong>创建时间</strong>: {{ $model->created_at }}
             </div>
         </div>

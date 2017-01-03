@@ -131,56 +131,56 @@ class OrderController extends Controller
         $sku = request()->input('sku');
         $site = request()->input('site');
         $status = request()->input('status');
+
         $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
-        $orders = OrderModel::where('channel_id', $channelId)->get();
-        if ($orders) {
-            foreach ($orders->items as $item) {
-                dd($orders->items->groupBy('item_id')->toArray());
-            }
-        }
-
-        if (!$sku && !$site && !$status) {
-
-        }
-        $items = ItemModel::where('sku', $sku)->get();
+        $items = orderItem::where('channel_id', $channelId)->groupBy('item_id')->get();
         $data = [];
-        $count = $this->model->where('logistics_id', '!=', 0)
-//            ->where('shipped_at', '>=', $start . ' 00:00:00')
-//            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00')
-            ->count();
-        $totalWeight = 0;
-        $logisticses = LogisticsModel::where('is_enable', 1)->get();
-        foreach ($logisticses as $key => $logistics) {
-            $data[$key]['logisticsName'] = $logistics->name;
-            $data[$key]['logisticsId'] = $logistics->id;
-            $data[$key]['logisticsPriority'] = $logistics->priority;
-            $data[$key]['weight'] = 0;
-            $data[$key]['percent'] = 0 . '%';
-            $packages = $this->model
-                ->where('logistics_id', $logistics->id);
-//                ->where('shipped_at', '>=', $start . ' 00:00:00')
-//                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($end))) . ' 00:00:00');
-            foreach ($packages->get() as $package) {
-                $data[$key]['weight'] += $package->weight;
-            }
-            $data[$key]['quantity'] = $packages->count();
-            $totalWeight += $data[$key]['weight'];
-            if ($count) {
-                $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
+        foreach ($items as $key => $item) {
+            $order = $this->model->find($item->order_id);
+            if ($order) {
+                if ($order->status != 'UNPAID' || $order->status != 'CANCEL') {
+                    $createdAt = date('Y-m-d') . ' 00:00:00';
+                    $productItem = ItemModel::find($item->item_id);
+                    if ($productItem) {
+                        $createdAt = $productItem->created_at;
+                    }
+                    $site = $order->shipping_country;
+                    $oneCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d') . ' 00:00:00', date('Y-m-d', strtotime('+1 day', strtotime(date('Y-m-d')))) . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $sevenCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-7 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $fourteenCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-14 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $thirtyCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-30 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $ninetyCount = orderItem::where('channel_id', $channelId)
+                        ->whereBetween('created_at', [date('Y-m-d', strtotime('-90 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                        ->where('item_id', $item->item_id)
+                        ->count();
+                    $data[$key]['sku'] = $item->sku;
+                    $data[$key]['channel_name'] = 'EBay';
+                    $data[$key]['site'] = $site;
+                    $data[$key]['one_sale'] = $oneCount;
+                    $data[$key]['seven_sale'] = $sevenCount;
+                    $data[$key]['fourteen_sale'] = $fourteenCount;
+                    $data[$key]['thirty_sale'] = $thirtyCount;
+                    $data[$key]['ninety_sale'] = $ninetyCount;
+                    $data[$key]['created_at'] = $createdAt;
+                }
             }
         }
-        $arr = array();
-        foreach ($data as $value) {
-            $arr[] = $value['logisticsPriority'];
-        }
-        array_multisort($arr, SORT_ASC, $data);
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'datas' => $data,
-            'count' => $count,
-//            'start' => $start,
-//            'end' => $end,
-            'totalWeight' => $totalWeight,
         ];
 
         return view($this->viewPath . 'saleReport', $response);

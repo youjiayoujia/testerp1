@@ -39,7 +39,7 @@
             <td><input type='checkbox' name='tribute_id' value="{{ $detail->id }}"></td>
             <td>{{ $detail->id }}</td>
             <td>{{ $detail->ebayProduct->site_name}}</td>
-            <td>{{ $detail->ebayProduct->channelAccount->account}}</td>
+            <td>{{ $detail->ebayProduct->channelAccount->alias}}</td>
             <td><a target=_blank href="{{$detail->ebayProduct->view_item_url}}">{{ $detail->item_id}}</a></td>
             <td>{{ $detail->ebayProduct->title}}</td>
             <td>{{$detail->ebayProduct->EbayOutControl}}</td>

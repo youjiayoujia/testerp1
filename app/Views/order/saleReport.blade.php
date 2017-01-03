@@ -22,30 +22,31 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
+                    <th>SKU</th>
+                    <th>平台</th>
+                    <th>站点</th>
+                    <th>1天销量</th>
+                    <th>7天销量</th>
+                    <th>14天销量</th>
+                    <th>30天销量</th>
+                    <th>90天销量</th>
+                    <th>SKU创建时间</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($datas as $data)
                     <tr>
-                        <td>{{ $data['logisticsName'] }}</td>
-                        <td>{{ $data['logisticsId'] }}</td>
-                        <td>{{ $data['logisticsPriority'] }}</td>
-                        <td>{{ $data['quantity'] }}</td>
-                        <td>{{ $data['weight'] }}</td>
-                        <td>{{ $data['percent'] }}</td>
+                        <td>{{ $data['sku'] }}</td>
+                        <td>{{ $data['channel_name'] }}</td>
+                        <td>{{ $data['site'] }}</td>
+                        <td>{{ $data['one_sale'] }}</td>
+                        <td>{{ $data['seven_sale'] }}</td>
+                        <td>{{ $data['fourteen_sale'] }}</td>
+                        <td>{{ $data['thirty_sale'] }}</td>
+                        <td>{{ $data['ninety_sale'] }}</td>
+                        <td>{{ $data['created_at'] }}</td>
                     </tr>
                 @endforeach
-                <tr>
-                    <td class="text-center" colspan="6">
-                        {{ '当前包裹数:' . $count . ' 当前总重:' . $totalWeight . 'Kg' }}
-                    </td>
-                </tr>
                 </tbody>
             </table>
         </div>

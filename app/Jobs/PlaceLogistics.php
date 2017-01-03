@@ -38,7 +38,9 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if(!$this->package->is_oversea && $this->package->order->status != 'REVIEW' && in_array($this->package->status, ['ASSIGNED', 'TRACKINGFAILED'])) {
+        if (!$this->package->is_oversea && $this->package->order->status != 'REVIEW' && in_array($this->package->status,
+                ['ASSIGNED', 'TRACKINGFAILED'])
+        ) {
             $result = $this->package->placeLogistics($this->type);
             if ($result['status'] == 'success') {
                 $this->package->update(['queue_name' => '']);
@@ -72,5 +74,8 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
     public function failed()
     {
         $this->package->update(['queue_name' => '']);
+        $this->result['status'] = 'fail';
+        $this->result['remark'] = '队列执行失败，程序错误或响应超时.';
+        $this->log('PlaceLogistics');
     }
 }

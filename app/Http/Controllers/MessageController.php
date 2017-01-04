@@ -638,8 +638,18 @@ class MessageController extends Controller
     public function statistics()
     {
 
+        $metas = [
+            'mainIndex' => route('feeback.feedBackStatistics'),
+            'mainTitle' => '报表',
+            'title'     => '消息回复统计',
+        ];
+        $response = [
+            'metas' => $metas,
+            //'model' => $model,
+            //'data'  => $total,
+        ];
 
-
+     return view($this->viewPath . 'statistics')->with($response);
     }
 
 

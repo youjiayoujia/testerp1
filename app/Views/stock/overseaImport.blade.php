@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('stock.overseaImportStore') }} @stop
+@section('formAction')@stop
 @section('formBody')
     <div class='row'>
         <div class="form-group col-lg-2">
@@ -40,7 +40,4 @@
     @endif
     @endforeach
 @stop
-@section('formButton')
-    <button type="submit" name='result' value='1' class="btn btn-success">审核通过</button>
-    <button type="submit" name='result' value='0' class="btn btn-default">审核未通过</button>
-@stop
+@section('formButton')@stop

@@ -50,7 +50,7 @@
             <tr>
                 <td>
                     <div style="width:73mm;float:left;font-size:12px;line-height:14px;margin-left:5px;">
-                        <p>SF No:{{ $model->tracking_no }}</p>
+                        <p>SF No:{{ $model->logistics_order_number }}</p>
                         <p>TEL:{{ $model->shipping_phone }}</p>
                         <p>【7550001183】 Ref No:{{ $model->id }}【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</p>
                         <p>{{ date('Y-m-d H:i:s') }}</p>

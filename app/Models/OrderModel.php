@@ -105,7 +105,7 @@ class OrderModel extends BaseModel
     private $canPackageStatus = ['PREPARED'];
     private $canCancelStatus = ['SHIPPED', 'COMPLETE'];
 
-    public $searchFields = ['id' => '内单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
+    public $searchFields = ['id' => '内单号'];
 
     //退款rules
     public $rules = [

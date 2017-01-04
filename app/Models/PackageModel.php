@@ -35,7 +35,7 @@ class PackageModel extends BaseModel
     ];
 
     // 用于查询
-    public $searchFields = ['id' => 'ID'];
+    public $searchFields = ['id' => '包裹号'];
 
     public $fillable = [
         'channel_id',

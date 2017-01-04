@@ -8,7 +8,14 @@
                     <input class="form-control" id="sku" placeholder="SKU" value="" name="sku">
                 </div>
                 <div class="col-lg-2">
-                    <input class="form-control" id="site" placeholder="站点" value="" name="site">
+                    <select class="form-control" name="site" id="site">
+                        <option value="NULL">站点</option>
+                        @foreach($sites as $site)
+                            <option value="{{ $site->site }}" {{ Tool::isSelected('site', $site->site) }}>
+                                {{ $site->site }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-lg-1">
                     <button class="filter">查询</button>
@@ -60,10 +67,10 @@
     });
 
     $(document).on('click', '.filter', function () {
-        var start = $('#start').val();
-        var end = $('#end').val();
-        if (start && end) {
-            location.href="{{route('package.logisticsDelivery')}}/?start="+start+"&end="+end;
+        var sku = $('#sku').val();
+        var site = $('#site').val();
+        if (sku || site) {
+            location.href="{{route('sku.saleReport')}}/?sku="+sku+"&site="+site;
         }
     });
 </script>

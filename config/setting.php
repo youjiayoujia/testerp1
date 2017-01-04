@@ -67,7 +67,7 @@ return [
         'item.sku' => 'SKU',
         'items.sku' => 'SKU',
         'ordernum' => '订单号',
-        'channel_ordernum' => '渠道订单号',
+        'channel_ordernum' => '平台订单号',
         'channelAccount.alias' => '渠道账号',
         'userOperator.name' => '运营人员',
         'email' => '邮箱',

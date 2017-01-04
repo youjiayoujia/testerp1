@@ -87,7 +87,7 @@ class StockController extends Controller
         $item->in(request('warehouse_position_id'), request()->input('all_quantity'), request()->input('all_quantity') * ($item->cost ? $item->cost : $item->purchase_price), 'MAKE_ACCOUNT');
         if(!empty(request('oversea_sku'))) {
             $stock = $this->model->where(['item_id' => request('item_id'), 'warehouse_position_id' => request('warehouse_position_id')])->first();
-            $stock->update(['oversea_sku' => request('oversea_sku')]);
+            $stock->update(['oversea_sku' => request('oversea_sku'), 'oversea_cost' => request('oversea_cost')]);
         }
         
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
@@ -523,7 +523,8 @@ class StockController extends Controller
                      'sku'=>'',
                      'position'=>'',
                      'all_quantity'=>'',
-                     'oversea_sku' => ''
+                     'oversea_sku' => '',
+                     'oversea_cost' => '',
                     ]
             ];
         $name = 'stock';

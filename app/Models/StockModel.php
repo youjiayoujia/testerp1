@@ -37,7 +37,7 @@ class StockModel extends BaseModel
         'hold_quantity',
         'created_at',
         'oversea_sku',
-        'oversea_cost'
+        'oversea_cost',
     ];
 
     // 用于查询
@@ -410,7 +410,12 @@ class StockModel extends BaseModel
                 $item->in($position->id, (int)$buf['quantity'], ((int)$buf['quantity'] * ($item->cost ? $item->cost : $item->purchase_price)), 'ADJUSTMENT');
                 $stock = $this->where(['item_id' => $item->id, 'warehouse_position_id' => $position->id])->first();
                 if($stock) {
-                    $stock->update(['oversea_sku' => $arr[$buf['key']]['oversea_sku']]);
+                    if(isset($arr[$buf['key']]['oversea_cost'])) {
+                        $stock->update(['oversea_sku' => $arr[$buf['key']]['oversea_sku'], 'oversea_cost' => $arr[$buf['key']]['oversea_cost']]);
+                    } else {
+                        $stock->update(['oversea_sku' => $arr[$buf['key']]['oversea_sku']]);
+                    }
+                    
                 }
             }
             if($buf['quantity'] < 0) {

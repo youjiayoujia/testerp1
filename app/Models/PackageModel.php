@@ -35,7 +35,7 @@ class PackageModel extends BaseModel
     ];
 
     // 用于查询
-    public $searchFields = ['id' => '包裹号'];
+    public $searchFields = ['id' => 'ID'];
 
     public $fillable = [
         'channel_id',
@@ -763,7 +763,7 @@ class PackageModel extends BaseModel
                             }
                         }
                         if (count($arr) > 1 || count($arr) == 0) {
-                            $warehouse_id = $fItem->item->warehouse_id ? $fItem->item->warehouse_id : '3';
+                            $warehouse_id = $fItem->item->warehouse_id ? ($fItem->item->warehouse_id == '1' ? '3' : $fItem->item->warehouse_id) : '3';
                         } else {
                             foreach ($arr as $key => $value) {
                                 $warehouse_id = $key;

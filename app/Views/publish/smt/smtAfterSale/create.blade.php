@@ -99,7 +99,7 @@
                                 '<select name="token_id" id="token_id" class="form-control">';
                             var options = '<option>--请选择--</option>'; //选项可以公用
                             $.each(data.data, function (index, el) {                              
-                                options += '<option value="' + el.id + '">' + el.id + '-' + el.account + '</option>';
+                                options += '<option value="' + el.id + '">' + el.id + '-' + el.alias + '</option>';
                                 
                             });
 

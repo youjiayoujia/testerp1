@@ -265,6 +265,23 @@ class TestController extends Controller
 
     // public function test2()
     // {
+
+    // }
+
+    public function test2()
+    {
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
+    }
+
+    // public function test2()
+    // {
     //     $orders_arr = OrderModel::all()->chunk(200);
     //     foreach($orders_arr as $orders) {
     //         var_dump($orders->toarray());exit;
@@ -313,10 +330,8 @@ class TestController extends Controller
 
     public function test1()
     {
-        $orders = OrderModel::whereBetween('id', [2979, 3081])->get();
-        foreach ($orders as $order) {
-            $order->calculateProfitProcess();
-        }
+        $orders = OrderModel::find(3319);
+        $orders->calculateProfitProcess();
         return 1;
     }
 

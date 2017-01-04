@@ -42,11 +42,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '留言板',
-                    'url' => 'item.questionIndex',
-                    'icon' => '',
-                ],
-                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',
@@ -54,6 +49,11 @@ return [
                 [
                     'name' => '图片标签',
                     'url' => 'label.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '留言板',
+                    'url' => 'item.questionIndex',
                     'icon' => '',
                 ],
             ],
@@ -198,8 +198,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '出入库',
+                    'name' => '出入库记录',
                     'url' => 'stockInOut.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存调整',
+                    'url' => 'stockAdjustment.index',
                     'icon' => '',
                 ],
                 [
@@ -210,11 +215,6 @@ return [
                 [
                     'name' => 'unhold库存',
                     'url' => 'stockUnhold.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '库存调整',
-                    'url' => 'stockAdjustment.index',
                     'icon' => '',
                 ],
                 [
@@ -249,6 +249,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '物流方式',
+                    'url' => 'logistics.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '回邮模版',
                     'url' => 'logisticsEmailTemplate.index',
                     'icon' => '',
@@ -259,18 +264,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '收款信息',
-                    'url' => 'logisticsCollectionInfo.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '物流方式',
-                    'url' => 'logistics.index',
+                    'name' => '收款信息',
+                    'url' => 'logisticsCollectionInfo.index',
                     'icon' => '',
                 ],
 //                [
@@ -620,7 +620,7 @@ return [
                     'url' => 'package.logisticsDelivery',
                     'icon' => '',
                 ],
-                
+
             ],
             'SKU报表' => [
                 [
@@ -761,11 +761,6 @@ return [
             ],
             '设置' => [
                 [
-                    'name' => '汇率',
-                    'url' => 'currency.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '物流限制',
                     'url' => 'logisticsLimits.index',
                     'icon' => '',
@@ -781,7 +776,17 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '国家Number信息',
+                    'name' => '汇率',
+                    'url' => 'currency.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '国家分区',
+                    'url' => 'countriesSort.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '国家信息',
                     'url' => 'countries.index',
                     'icon' => '',
                 ],
@@ -791,17 +796,12 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '国家地区信息',
-                    'url' => 'countriesSort.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => 'paypal列表',
                     'url' => 'paypal.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => 'paypal固定税率',
+                    'name' => 'paypal固定费率',
                     'url' => 'paypal.ShowPaypalRate',
                     'icon' => '',
                 ],

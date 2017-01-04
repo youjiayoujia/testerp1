@@ -363,7 +363,7 @@
                                 <option value="">==请选择==</option>
                                 @foreach($model->ebayShipping as $ship)
                                     @if(($ship->international_service==2&&$ship->valid_for_selling_flow==1))
-                                        <option value="{{$ship->shipping_service}}" @if($shipping_details['Shipping'][$i]['ShippingService']==$ship->shipping_service){{'selected="selected'}}@endif>{{$ship->description}}</option>
+                                        <option value="{{$ship->shipping_service}}" @if(isset($shipping_details['Shipping'][$i]['ShippingService'])&&$shipping_details['Shipping'][$i]['ShippingService']==$ship->shipping_service){{'selected="selected'}}@endif>{{$ship->description}}</option>
                                     @endif
                                 @endforeach
                             </select>
@@ -376,7 +376,10 @@
                         </div>
                         <div class="form-group col-sm-2">
                             <input class="form-control" type="text" name="shipping[{{$i}}][ShippingServiceCost]"
-                                   value="{{$shipping_details['Shipping'][$i]['ShippingServiceCost']}}">
+                                  @if(isset($shipping_details['Shipping'][$i]['ShippingServiceCost']))
+                                   value="{{$shipping_details['Shipping'][$i]['ShippingServiceCost']}}"
+                                  @endif
+                                    >
 
                         </div>
                     </div>
@@ -387,7 +390,10 @@
                         <div class="form-group col-sm-2">
                             <input class="form-control" type="text"
                                    name="shipping[{{$i}}][ShippingServiceAdditionalCost]"
-                                   value="{{$shipping_details['Shipping'][$i]['ShippingServiceAdditionalCost']}}">
+                                   @if(isset($shipping_details['Shipping'][$i]['ShippingServiceAdditionalCost']))
+                                   value="{{$shipping_details['Shipping'][$i]['ShippingServiceAdditionalCost']}}"
+                                   @endif
+                                   >
                         </div>
                     </div>
 
@@ -420,7 +426,7 @@
                                 <option value="">==请选择==</option>
                                 @foreach($model->ebayShipping as $ship)
                                     @if(($ship->international_service==1&&$ship->valid_for_selling_flow==1))
-                                        <option value="{{$ship->shipping_service}}" @if($shipping_details['InternationalShipping'][$i]['ShippingService']==$ship->shipping_service){{'selected="selected"'}}@endif>{{$ship->description}}</option>
+                                        <option value="{{$ship->shipping_service}}" @if(isset($shipping_details['InternationalShipping'][$i]['ShippingService'])&&$shipping_details['InternationalShipping'][$i]['ShippingService']==$ship->shipping_service){{'selected="selected"'}}@endif>{{$ship->description}}</option>
                                     @endif
                                 @endforeach
 
@@ -435,7 +441,10 @@
                         <div class="form-group col-sm-2">
                             <input class="form-control" type="text"
                                    name="InternationalShipping[{{$i}}][ShippingServiceCost]"
-                                   value="{{$shipping_details['InternationalShipping'][$i]['ShippingServiceCost']}}">
+                                   @if(isset($shipping_details['InternationalShipping'][$i]['ShippingServiceCost']))
+                                   value="{{$shipping_details['InternationalShipping'][$i]['ShippingServiceCost']}}"
+                                   @endif
+                                  >
 
                         </div>
                     </div>
@@ -446,7 +455,10 @@
                         <div class="form-group col-sm-2">
                             <input class="form-control" type="text"
                                    name="InternationalShipping[{{$i}}][ShippingServiceAdditionalCost]"
-                                   value="{{$shipping_details['InternationalShipping'][$i]['ShippingServiceAdditionalCost']}}">
+                                   @if(isset($shipping_details['InternationalShipping'][$i]['ShippingServiceAdditionalCost']))
+                                   value="{{$shipping_details['InternationalShipping'][$i]['ShippingServiceAdditionalCost']}}"
+                                   @endif
+                                   >
                         </div>
                     </div>
 
@@ -458,7 +470,7 @@
                             <select class="form-control select_select0 col-sm-1"
                                     name="InternationalShipping[{{$i}}][ShipToLocation][]" multiple>
                                 @foreach(config('ebaysite.ebay_country') as $key=> $v)
-                                    <option value="{{$key}}" @if(in_array($key,$shipping_details['InternationalShipping'][$i]['ShipToLocation'])){{'selected="selected"'}}  @endif  >{{$v}}</option>
+                                    <option value="{{$key}}" @if(isset($shipping_details['InternationalShipping'][$i]['ShipToLocation'])&&in_array($key,$shipping_details['InternationalShipping'][$i]['ShipToLocation'])){{'selected="selected"'}}  @endif  >{{$v}}</option>
                                 @endforeach
                             </select>
                         </div>

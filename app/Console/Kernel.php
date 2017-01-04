@@ -146,7 +146,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('pick:report')->hourly();
         $schedule->command('all:report')->daily();
         //CRM
-        $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');
+        $schedule->command('AutoMessageAliexpress:get')->cron('40 8,15 * * *');
         $schedule->command('AutoEbayMessage:get')->everyFiveMinutes();
         $schedule->command('AutoWishMessage:get')->cron('30 8,12,13,14,16,17 * * *');
         $schedule->command('getEbayCases')->cron('30 8,12,13,14,16,17 * * *');

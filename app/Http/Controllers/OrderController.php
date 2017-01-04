@@ -135,6 +135,9 @@ class OrderController extends Controller
 
         $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
         $items = orderItem::where('channel_id', $channelId)->groupBy('item_id')->get();
+        if ($sku) {
+            $items = orderItem::where('channel_id', $channelId)->where('sku', $sku)->groupBy('item_id')->get();
+        }
         $data = [];
         foreach ($items as $key => $item) {
             $order = $this->model->find($item->order_id);

@@ -205,6 +205,8 @@ return [
         'catalog.second' => '二级分类',
         'mail_push.name' => '变量名称',
         'mail_push.code' => '变量代码',
+        'message_statistics.compute_time' => '统计时间',
+        'message_statistics.user_id' => '客服名称',
 
     ],
 ];

@@ -43,6 +43,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ImitationOrders::class,
         \App\Console\Commands\UpdateUsers::class,
         //邮件
+        \App\Console\Commands\ComputeCrmSatistics::class,
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
         \App\Console\Commands\SetMessageRead::class,
@@ -145,10 +146,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('pick:report')->hourly();
         $schedule->command('all:report')->daily();
         //CRM
-        $schedule->command('AutoMessageAliexpress:get')->cron('8,40 15 * * *');
+        $schedule->command('AutoMessageAliexpress:get')->cron('40 8,15 * * *');
         $schedule->command('AutoEbayMessage:get')->everyFiveMinutes();
-        $schedule->command('AutoWishMessage:get')->cron('8,12,13,14,16,30 17 * * *');
-        $schedule->command('getEbayCases')->cron('8,12,13,14,16,30 17 * * *');
+        $schedule->command('AutoWishMessage:get')->cron('30 8,12,13,14,16,17 * * *');
+        $schedule->command('getEbayCases')->cron('30 8,12,13,14,16,17 * * *');
         $schedule->command('getFeedBack:account')->everyTenMinutes();
         //采购
         $schedule->command('aliShipmentName:get')->hourly();
@@ -159,11 +160,12 @@ class Kernel extends ConsoleKernel
         //半小时一次将包裹放入队列
         $schedule->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')->everyThirtyMinutes();
         //财务
-        $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
+        $schedule->command('aliexpressRefundStatus:change')->cron('0 21 * * *');//速卖通退款小于15美金  21：00 执行
         //DHL
         $schedule->command('dhl:sureShip')->daily();
         //匹配paypal
         $schedule->command('match:account all')->cron('*/20 * * * *');
-
+        //邮件回复统计
+        $schedule->command('compute:start')->cron('0 01 * * *'); //凌晨一点
     }
 }

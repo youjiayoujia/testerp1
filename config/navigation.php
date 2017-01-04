@@ -609,7 +609,12 @@ return [
             ],
             'CRM报表' => [
                 [
-                    'name' => '差评统计',
+                    'name' => 'CRM消息回复统计',
+                    'url' => 'crmStatistics.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'ebay差评统计',
                     'url' => 'feeback.feedBackStatistics',
                     'icon' => '',
                 ],

@@ -173,7 +173,7 @@ return [
         'catalog.id' => '品类',
         'spu_id' => 'SPU',
         'logistics.catalog.name' => '物流分类',
-        'order.channel_ordernum' => '渠道订单号',
+        'order.channel_ordernum' => '平台订单号',
         'purchaseItem.productItem.sku' => 'sku',
         'new_status' => '是否为新品',
         'html_mod'=>'英文描述',

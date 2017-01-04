@@ -1,6 +1,5 @@
 <?php
 $tracking_no = $model->tracking_no;
-$tracking_no='0B0437995000008492054';
 $url = "http://120.55.205.164/api/RmlLabelcn?productBarcode=".$tracking_no."";
 $headers = array(                                //Token生成规则  base64_encode('xxx:xxx');  账号：密码0B0437995000008492054
         "Content-type: application/json;charset=utf-8",

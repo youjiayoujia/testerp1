@@ -51,7 +51,7 @@ class GetFeedBack extends Command
                     $result = $driver->GetFeedback();
 
                     foreach ($result as $re){
-                        $re['channel_account_id'] = $account;
+                        $re['channel_account_id'] = $account->id;
                         $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$account])->first();
                         if(empty($feedback)){
                             EbayFeedBackModel::create($re);

@@ -8,6 +8,7 @@
 namespace App\Models\Publish\Ebay;
 
 use App\Base\BaseModel;
+use App\Models\Channel\AccountModel as Channel_Accounts;
 class EbayFeedBackModel extends BaseModel
 {
     protected $table = 'ebay_feedback';
@@ -36,6 +37,38 @@ class EbayFeedBackModel extends BaseModel
         return $this->hasOne('App\Models\Channel\AccountModel', 'id', 'channel_account_id');
 
     }
+
+    public function sku()
+    {
+        return $this->hasOne('APP\Models\Order\ItemModel', 'transaction_id', 'transaction_id');
+    }
+
+
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        //dd(Channel_Accounts::all()->pluck('account', 'account'));
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [
+                'ebay_feedback.transaction_id',
+                'ebay_feedback.ebay_item_id',
+                'ebay_feedback.commenting_user',
+            ],
+            'filterSelects' => [
+                'ebay_feedback.comment_type' => config('crm.ebay.feedback'),
+                'ebay_feedback.channel_account_id' =>  Channel_Accounts::all()->pluck('alias', 'id'),
+                //'sku'
+            ],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
+
 
     /**
      * 退款统计
@@ -73,6 +106,15 @@ class EbayFeedBackModel extends BaseModel
        }
 
         return compact('Positive','Neutral','Negative','Percentage');
+    }
+
+    /**
+     * 账号名称
+     */
+    public function getChannelAccountAliasAttribute()
+    {
+        $account = $this->channelAccount;
+        return  ! empty($account) ? $account->alias : '未知';
     }
 
 }

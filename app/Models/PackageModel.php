@@ -1124,12 +1124,12 @@ class PackageModel extends BaseModel
                 $newPackage->items()->create($v);
             }
             $arr = '';
-            if($newPackage->items->count() == 1) {
+            if ($newPackage->items->count() == 1) {
                 $arr = $newPackage->oversea_setSinglePackageItem($code);
             } elseif ($newPackage->items->count() > 1) {
                 $arr = $newPackage->oversea_setMultiPackageItem($code);
             }
-            if($arr) {
+            if ($arr) {
                 $newPackage->oversea_createPackageDetail($arr);
             } else {
                 $newPackage->update(['status' => 'NEED', 'queue_name' => '']);
@@ -1289,6 +1289,7 @@ class PackageModel extends BaseModel
 
         return $packageItem;
     }
+
     /*********************************************************************************/
 
     public function createPackageDetail($items)
@@ -1553,14 +1554,14 @@ class PackageModel extends BaseModel
     {
         $weight = $this->weight; //包裹重量
         $amount = $this->order ? $this->order->amount : ''; //订单金额
-        $amountShipping = $this->order ? $this->order->amount_shipping : ''; //订单运费
-        $celeAdmin = $this->order ? $this->order->cele_admin : '';
+//        $amountShipping = $this->order ? $this->order->amount_shipping : ''; //订单运费
+//        $celeAdmin = $this->order ? $this->order->cele_admin : '';
         //是否通关
-        if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
-            $isClearance = 1;
-        } else {
-            $isClearance = 0;
-        }
+//        if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
+//            $isClearance = 1;
+//        } else {
+//            $isClearance = 0;
+//        }
         if ($this->warehouse) {
             $rules = $this->warehouse->logisticsRules()
                 ->where(function ($query) use ($weight) {
@@ -1571,7 +1572,7 @@ class PackageModel extends BaseModel
                     $query->where('order_amount_from', '<=', $amount)
                         ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
                 })
-                ->where(['is_clearance' => $isClearance])
+//                ->where(['is_clearance' => $isClearance])
                 ->with([
                     'logistics',
                     'rule_catalogs',

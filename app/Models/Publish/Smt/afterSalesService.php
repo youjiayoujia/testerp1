@@ -20,7 +20,7 @@ class afterSalesService extends BaseModel
     {
         return [        
             'filterSelects' => [
-                'token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','account'),
+                'token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','alias'),
             ],          
         ];
     }

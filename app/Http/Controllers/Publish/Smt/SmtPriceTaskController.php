@@ -38,7 +38,7 @@ class SmtPriceTaskController extends Controller
        
        $accountInfoArr = array();
        foreach($accountInfo as $account){
-           $accountInfoArr[$account->id] = $account->account;
+           $accountInfoArr[$account->id] = $account->alias;
        }       
        
        $response = [

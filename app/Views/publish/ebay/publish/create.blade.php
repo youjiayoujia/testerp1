@@ -1621,43 +1621,42 @@
                         var i=0;
                         $(".shipping").each(function(){
                             i++;
-                            if (typeof(result.data.shipping_details.Shipping[i]['ShippingService']) != "undefined"){
+                            if (typeof(result.data.shipping_details.Shipping[i]) != "undefined"){
                                 $(this).val(result.data.shipping_details.Shipping[i]['ShippingService']).trigger("change")
                             }
-
                         });
                         var i=0;
                         $(".international ").each(function(){
                             i++;
-                            if (typeof(result.data.shipping_details.InternationalShipping[i]['ShippingService']) != "undefined"){
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
                                 $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingService']).trigger("change")
                             }
                         });
                         var i=0;
                         $(".shipping_cost ").each(function(){
                             i++;
-                            if (typeof(result.data.shipping_details.Shipping[i]['ShippingServiceCost']) != "undefined"){
+                            if (typeof(result.data.shipping_details.Shipping[i]) != "undefined"){
                                 $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceCost']);
                             }
                         });
                         var i=0;
                         $(".shipping_addcost ").each(function(){
                             i++;
-                            if (typeof(result.data.shipping_details.Shipping[i]['ShippingServiceAdditionalCost']) != "undefined"){
+                            if (typeof(result.data.shipping_details.Shipping[i]) != "undefined"){
                                 $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceAdditionalCost']);
                             }
                         });
                         var i=0;
                         $(".international_cost ").each(function(){
                             i++;
-                            if (typeof(result.data.shipping_details.InternationalShipping[i]['ShippingServiceCost']) != "undefined"){
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
                                 $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceCost']);
                             }
                         });
                         var i=0;
                         $(".international_addcost ").each(function(){
                             i++;
-                            if (typeof(result.data.shipping_details.InternationalShipping[i]['ShippingServiceAdditionalCost']) != "undefined"){
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
                                 $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceAdditionalCost']);
                             }
                         });
@@ -1665,7 +1664,7 @@
                         var i=0;
                         $(".international_ship ").each(function(){
                             i++;
-                            if (typeof(result.data.shipping_details.InternationalShipping[i]['ShipToLocation']) != "undefined"){
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
                                 $(this).val(result.data.shipping_details.InternationalShipping[i]['ShipToLocation']).trigger("change");
                             }
                         });

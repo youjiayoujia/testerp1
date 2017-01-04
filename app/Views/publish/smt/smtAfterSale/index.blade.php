@@ -17,7 +17,7 @@
                                                  速卖通
               @endif
          </td>
-         <td>{{$item->account->account}}</td>
+         <td>{{$item->account->alias}}</td>
          <td>{{$item->name}}</td>
          <td>
             <a href="{{ route('smtAfterSale.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">

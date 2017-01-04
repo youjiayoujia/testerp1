@@ -1,33 +1,6 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i>
-            渠道账号
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($status as $item)
-                <li>
-                    <a href="{{ DataList::filtersEncode(['channel_account_id','=',$item->channel_account_id]) }}">{{ $item->channelAccount->account }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i>
-            类别(Comment type)
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($types as $item)
-                <li>
-                    <a href="{{ DataList::filtersEncode(['comment_type','=',$item->comment_type]) }}">{{ $item->comment_type }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
+
 @stop
 
 @section('tableHeader')
@@ -58,12 +31,11 @@
                 @else
                     <span class="label label-warning">{{$item->comment_type}}</span>
                 @endif
-
             </td>
             <td>{{$item->comment_text}}</td>
             <td>{{$item->commenting_user}}</td>
             <td>{{$item->comment_time}}</td>
-            <td>{{$item->channelAccount->account}}</td>
+            <td>{{$item->ChannelAccountAlias}}</td>
             <td>{{$item->created_at}}</td>
             <td></td>
         </tr>

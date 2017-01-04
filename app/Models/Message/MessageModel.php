@@ -50,10 +50,12 @@ class MessageModel extends BaseModel{
         'msg_time'
     ];
 
-  public function account()
+    public function account()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel');
     }
+
+
     public function assigner()
     {
         return $this->belongsTo('App\Models\UserModel', 'assign_id' , 'id');
@@ -125,7 +127,6 @@ class MessageModel extends BaseModel{
      */
     public function getMixedSearchAttribute()
     {
-        //dd(UserModel::all()->pluck('name','name'));
         return [
             'relatedSearchFields' => [],
             'filterFields' => [
@@ -139,7 +140,7 @@ class MessageModel extends BaseModel{
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
-                'account' => ['account' => Channel_Accounts::all()->pluck('account', 'account')],
+                'account' => ['account' => Channel_Accounts::all()->pluck('alias', 'account')],
                 //'assigner' => ['name' => UserModel::all()->pluck('name','name')],
             ],
             'sectionSelect' => ['time'=>['created_at']],
@@ -696,6 +697,16 @@ class MessageModel extends BaseModel{
             })
             ->take($entry)
             ->orderBy('id', 'ACS');
+    }
+
+    public function scopeSent($query)
+    {
+        return $query->where('status', '=', 'COMPLETE');
+    }
+    public function scopeNotRequiredSent($query)
+    {
+        return $query->where('status', '=', 'COMPLETE')->where('required', '=', '0');
+
     }
 
     public function contentTemplate ()

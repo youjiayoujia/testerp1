@@ -1748,39 +1748,53 @@
                         var i=0;
                         $(".shipping").each(function(){
                             i++;
-                            $(this).val(result.data.shipping_details.Shipping[i]['ShippingService']).trigger("change")
+                            if (typeof(result.data.shipping_details.Shipping[i]) != "undefined"){
+                                $(this).val(result.data.shipping_details.Shipping[i]['ShippingService']).trigger("change")
+                            }
 
                         });
                         var i=0;
                         $(".international ").each(function(){
                             i++;
-                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingService']).trigger("change")
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
+                                $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingService']).trigger("change")
+                            }
                         });
                         var i=0;
                         $(".shipping_cost ").each(function(){
                             i++;
-                            $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceCost']);
+                            if (typeof(result.data.shipping_details.Shipping[i]) != "undefined"){
+                                $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceCost']);
+                            }
                         });
                         var i=0;
                         $(".shipping_addcost ").each(function(){
                             i++;
-                            $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceAdditionalCost']);
+                            if (typeof(result.data.shipping_details.Shipping[i]) != "undefined"){
+                                $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceAdditionalCost']);
+                            }
                         });
                         var i=0;
                         $(".international_cost ").each(function(){
                             i++;
-                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceCost']);
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
+                                $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceCost']);
+                            }
                         });
                         var i=0;
                         $(".international_addcost ").each(function(){
                             i++;
-                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceAdditionalCost']);
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
+                                $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceAdditionalCost']);
+                            }
                         });
 
                         var i=0;
                         $(".international_ship ").each(function(){
                             i++;
-                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShipToLocation']).trigger("change");
+                            if (typeof(result.data.shipping_details.InternationalShipping[i]) != "undefined"){
+                                $(this).val(result.data.shipping_details.InternationalShipping[i]['ShipToLocation']).trigger("change");
+                            }
                         });
 
                         $("#un_ship").val(result.data.shipping_details.ExcludeShipToLocation).trigger("change");

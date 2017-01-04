@@ -35,7 +35,7 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th>渠道</th>
-    <th>账号</th>
+    <th>账号别名</th>
     <th>主题</th>
     <th>标签</th>
     <th>平台订单号</th>
@@ -56,7 +56,7 @@
         <tr>
             <td>{{ $message->id }}</td>
             <td>{{ $message->ChannelName}}</td>
-            <td>{{ $message->account->account }}</td>
+            <td>{{ $message->account->alias }}</td>
             <td>
                {{ str_limit($message->subject,30) }}
             </td>

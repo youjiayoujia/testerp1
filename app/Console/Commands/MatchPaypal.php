@@ -49,7 +49,7 @@ class MatchPaypal extends Command
         $channel = ChannelModel::where('name', 'Ebay')->first();
         $list = OrderModel::where([
             'channel_id'=>$channel->id,
-        ])->where('status','!=','UNPAID')->where('order_is_alert','!=','2')->where('transaction_number','!=','')->where('created_at','>=',date('Y-m-d', strtotime('-4 day')));
+        ])->where('status','!=','UNPAID')->where('order_is_alert','!=','2')->where('transaction_number','!=','')->where('created_at','>=',date('Y-m-d', strtotime('-30 day')));
         if($accounts !='all'){
             $accountsArr = explode(',',$accounts);
             $list->whereIn('channel_account_id',$accountsArr);

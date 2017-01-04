@@ -22,7 +22,7 @@
         <tr>
             <td>{{ $v->id }}</td>
             <td>{{ $v->name}}</td>
-            <td>{{  $v->channelAccount->account }}</td>
+            <td>{{  $v->channelAccount->alias }}</td>
             <td>{{array_search($v->site, config('ebaysite.site_name_id'))}}</td>
             <td>{{config('ebaysite.warehouse')[$v->warehouse]}}</td>
             <td>{{ $v->start_time}}-{{ $v->end_time}}</td>

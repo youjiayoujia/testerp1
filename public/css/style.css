@@ -172,3 +172,13 @@ th:hover:not([data-sort=false]) {
 .btn {
     margin-bottom: 2px;
 }
+
+.nav-title {
+    width: 330px;
+}
+
+.nav-li {
+    width: 160px;
+    float: left;
+    display: block;
+}

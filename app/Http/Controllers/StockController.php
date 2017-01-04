@@ -523,6 +523,7 @@ class StockController extends Controller
                      'sku'=>'',
                      'position'=>'',
                      'all_quantity'=>'',
+                     'oversea_sku' => ''
                     ]
             ];
         $name = 'stock';
@@ -556,45 +557,12 @@ class StockController extends Controller
             $file = request()->file('excel');
             $arr = $this->model->overseaExcelProcess($file);
             $response = [
-                'metas' => $this->metas(__FUNCTION__),
+                'metas' => $this->metas(__FUNCTION__, '库存变动调整单'),
                 'arr' => $arr,
             ];
 
             return view($this->viewPath.'overseaImport', $response);
         }
-    }
-
-    public function overseaImportStore()
-    {
-        $arr = request('arr');
-        $result = request('result');
-        if(!$result) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('fail', '变更失败...'));
-        }
-        foreach($arr['quantity'] as $key => $value) {
-            if($value) {
-                $item = ItemModel::where('sku', $arr['sku'][$key])->first();
-                if(!$item) {
-                    continue;
-                }
-                $position = PositionModel::where('name', $arr['position'][$key])->first();
-                if(!$position) {
-                    continue;
-                }
-                if($value > 0) {
-                    $item->in($position->id, (int)$value, ((int)$value * ($item->cost ? $item->cost : $item->purchase_price)), 'ADJUSTMENT');
-                    $stock = $this->model->where(['item_id' => $item->id, 'warehouse_position_id' => $position->id])->first();
-                    if($stock) {
-                        $stock->update(['oversea_sku' => $arr['oversea_sku'][$key]]);
-                    }
-                }
-                if($value < 0) {
-                    $item->out($position->id, -(int)$value, 'ADJUSTMENT');
-                }
-            }
-        }
-
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '库存变更成功...'));
     }
 
     /**

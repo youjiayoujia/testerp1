@@ -38,10 +38,6 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
         $start = microtime(true);
         if ($this->order && $this->order->status != 'REVIEW') {
             if ($this->order->status == 'PREPARED') {
-                $oldPackages = $this->order->packages;
-                foreach ($oldPackages as $oldPackage) {
-                    $oldPackage->cancelPackage();
-                }
                 if ($this->order->channel->driver == 'ebay' and $this->order->order_is_alert != 2) {
                     if ($this->order->order_is_alert == 1) {
                         $this->order->update(['status' => 'REVIEW']);
@@ -58,6 +54,7 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                         $job = new AssignStocks($package);
                         $job->onQueue('assignStocks');
                         $this->dispatch($job);
+                        $this->order->update(['status' => 'PACKED']);
                         $this->relation_id = $this->order->id;
                         $this->result['status'] = 'success';
                         $this->result['remark'] = 'Success.';

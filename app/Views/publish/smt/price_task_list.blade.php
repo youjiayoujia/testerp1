@@ -74,7 +74,7 @@
                             <select name="token_id" class="form-control">
                                 <option value="">请选择账号</option>
                                 @foreach($accountInfo as $val)
-                                    <option value="{{$val['id']}}">{{$val['account']}}</option>
+                                    <option value="{{$val['id']}}">{{$val['alias']}}</option>
                                 @endforeach                                                        
                             </select>                              
                          </div>

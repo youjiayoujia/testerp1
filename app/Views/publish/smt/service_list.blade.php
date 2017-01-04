@@ -9,7 +9,7 @@
     @foreach($data as $item)
     <tr>
         <td>{{$item->id}}</td>
-        <td><?php echo $token[$item['token_id']]['account'];?></td>
+        <td><?php echo $token[$item['token_id']]['alias'];?></td>
         <td>{{$item->serviceID}}</td>
         <td>{{$item->serviceName}}</td>
     </tr>
@@ -20,7 +20,7 @@
         <select class="form-control sx" name="token_id" id="token_id">
             <option value="">--全选--</option>
             @foreach($token as $row)
-            <option value="{{$row['id']}}">{{$row['account']}}</option>
+            <option value="{{$row['id']}}">{{$row['alias']}}</option>
             @endforeach
         </select>
     </div>

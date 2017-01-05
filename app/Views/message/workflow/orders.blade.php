@@ -77,7 +77,7 @@
                                     <tr>
                                         <td>
 
-                                            <a href="{{ route('item.show', $item->sku ) }}" target="_blank">{{$item->sku}}</a>
+                                            <a href="{{ route('item.show', $item->id ) }}" target="_blank">{{$item->sku}}</a>
                                         </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>{{ $item->price }}</td>

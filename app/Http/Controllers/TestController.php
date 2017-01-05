@@ -1108,8 +1108,8 @@ class TestController extends Controller
 
     public function jdtestCrm()
     {
-        dd('结束');
 
+        dd('end');
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
 

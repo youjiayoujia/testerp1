@@ -277,7 +277,7 @@ class MessageController extends Controller
             $message->status="COMPLETE";
             $message->save();
         }
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '批量无需回复处理成功.'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '无需回复处理成功.'));
     }
 
     /**
@@ -652,29 +652,19 @@ class MessageController extends Controller
      return view($this->viewPath . 'statistics')->with($response);
     }
 
+    public function changeMultipleStatus(){
+        $ids = request()->input('ids');
+        if(empty($ids)){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '操作失败，请先勾选需要操作的消息.'));
+        }
+        $is_modify = $this->model->whereIn('id', explode(',', $ids))
+            ->update(['status' => 'COMPLETE', 'required' => '0', 'assign_id' => request()->user()->id]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if($is_modify){
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功'));
+        }else{
+            return redirect($this->mainIndex)->with('danger', $this->alert('success', '操作成功'));
+        }
+    }
 
 }

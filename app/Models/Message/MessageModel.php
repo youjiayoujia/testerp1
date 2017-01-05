@@ -699,6 +699,16 @@ class MessageModel extends BaseModel{
             ->orderBy('id', 'ACS');
     }
 
+    public function scopeSent($query)
+    {
+        return $query->where('status', '=', 'COMPLETE');
+    }
+    public function scopeNotRequiredSent($query)
+    {
+        return $query->where('status', '=', 'COMPLETE')->where('required', '=', '0');
+
+    }
+
     public function contentTemplate ()
     {
         if($this->channel_diver_name){

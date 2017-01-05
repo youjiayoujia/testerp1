@@ -2,15 +2,21 @@
 @section('formAction') {{ route('stock.store') }} @stop
 @section('formBody')
     <div class='row'>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-4">
             <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='item_id' class='form-control sku'></select>
         </div>
-        <div class="form-group col-sm-3">
+        <div class="form-group col-sm-4">
             <label for="oversea_sku">海外仓sku</label>
-            <input type='text' class="form-control oversea_sku" placeholder="海外仓sku" name='oversea_sku' value="{{ old('oversea_sku') }}">
+            <input type='text' class="form-control" placeholder="海外仓sku" name='oversea_sku' value="{{ old('oversea_sku') }}">
         </div>
-        <div class="form-group col-sm-3">
+        <div class="form-group col-sm-4">
+            <label for="oversea_cost">海外仓sku单价</label>
+            <input type='text' class="form-control" placeholder="海外仓sku单价" name='oversea_cost' value="{{ old('oversea_cost') }}">
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-sm-4">
             <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouse_id' id='warehouse_id' class='form-control'>
                 <option>请选择仓库</option>
@@ -19,13 +25,11 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-sm-3">
+        <div class="form-group col-sm-4">
             <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouse_position_id' class='form-control warehouse_position_id'></select>
         </div>
-    </div>
-    <div class='row'>
-        <div class="form-group col-sm-3">
+        <div class="form-group col-sm-4">
             <label for="all_quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control all_quantity" id="all_quantity" placeholder="总数量" name='all_quantity' value="{{ old('all_quantity') }}">
         </div>

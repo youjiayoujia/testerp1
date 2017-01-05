@@ -805,6 +805,7 @@ class OrderModel extends BaseModel
         $package['shipping_phone'] = $this->shipping_phone ? $this->shipping_phone : '';
         $package['status'] = 'NEW';
         $package['is_oversea'] = $this->is_oversea;
+        $package['queue_name'] = 'assignStocks';
         $package = $this->packages()->create($package);
         if ($package) {
             foreach ($this->items->toArray() as $packageItem) {
@@ -817,7 +818,6 @@ class OrderModel extends BaseModel
                 }
             }
         }
-        $package->order->update(['status' => 'PACKED']);
 
         return $package;
     }
@@ -825,8 +825,9 @@ class OrderModel extends BaseModel
     //计算利润率
     public function calculateProfitProcess()
     {
-        $rate = CurrencyModel::where('code', $this->currency)->first()->rate;
-        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
+        $currencyArr = CurrencyModel::whereIn('code', [$this->currency, 'RMB'])->get()->pluck('rate', 'code');
+        $rate = $currencyArr[$this->currency];
+        $rmbRate = $currencyArr['RMB'];
         $orderAmount = $this->amount * $rate;
         $itemCost = $this->all_item_cost * $rmbRate;
         $logisticsCost = $this->logistics_fee * $rmbRate;
@@ -876,7 +877,7 @@ class OrderModel extends BaseModel
                 $sum = $counterFee + $dealFee;
                 break;
             default:
-                foreach ($this->items as $item) {
+                foreach ($this->items()->with('item.catalog.channels')->get() as $item) {
                     if ($item->item and $item->item->catalog) {
                         $channelRate = $item->item->catalog->channels->find($this->channelAccount->catalog_rates_channel_id);
                         if ($channelRate) {
@@ -895,7 +896,7 @@ class OrderModel extends BaseModel
     //黑名单验证
     public function checkBlack()
     {
-        $channel = $this->channel->find($this->channel_id);
+        $channel = ChannelModel::find($this->channel_id);
         $count = 0;
         $blackList = BlacklistModel::whereIN('type', ['CONFIRMED', 'SUSPECTED']);
         if ($channel) {

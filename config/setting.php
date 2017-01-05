@@ -205,8 +205,15 @@ return [
         'catalog.second' => '二级分类',
         'mail_push.name' => '变量名称',
         'mail_push.code' => '变量代码',
+        'pro_id' => '产品ID',
+        'complainant' => '投诉人',
+        'trademark' => '商标名',
+        'violatos_number' => '知识产权编号',
+        'time.import_time' => '导入时间',
+        'plat' => '平台',
         'message_statistics.compute_time' => '统计时间',
         'message_statistics.user_id' => '客服名称',
+
 
     ],
 ];

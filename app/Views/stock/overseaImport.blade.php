@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('stock.overseaImportStore') }} @stop
+@section('formAction')@stop
 @section('formBody')
     <div class='row'>
         <div class="form-group col-lg-2">
@@ -7,6 +7,9 @@
         </div>
         <div class="form-group col-sm-2">
             <label>海外仓sku</label>
+        </div>
+        <div class="form-group col-sm-2">
+            <label>海外仓sku单价</label>
         </div>
         <div class="form-group col-sm-2">
             <label>库位</label>
@@ -28,6 +31,9 @@
             <input type='text' class='form-control' name='arr[oversea_sku][]' value="{{ $arr[0][$single['key']]['oversea_sku']}}">
         </div>
         <div class="form-group col-sm-2">
+            <input type='text' class='form-control' name='arr[oversea_sku][]' value="{{ $arr[0][$single['key']]['oversea_cost']}}">
+        </div>
+        <div class="form-group col-sm-2">
             <input type='text' class='form-control' name='arr[position][]' value="{{ $arr[0][$single['key']]['position']}}">
         </div>
         <div class="form-group col-sm-2">
@@ -40,7 +46,4 @@
     @endif
     @endforeach
 @stop
-@section('formButton')
-    <button type="submit" name='result' value='1' class="btn btn-success">审核通过</button>
-    <button type="submit" name='result' value='0' class="btn btn-default">审核未通过</button>
-@stop
+@section('formButton')@stop

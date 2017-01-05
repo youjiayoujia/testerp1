@@ -28,7 +28,7 @@
             <td>{{$item->created_at}}</td>
             <td>
                 <a href="{{ route(request()->segment(1).'.show', ['id'=>$item->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 查看
+                    <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
                 <a href="{{ route(request()->segment(1).'.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑

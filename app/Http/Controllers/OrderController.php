@@ -22,6 +22,7 @@ use App\Models\LogisticsModel;
 use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
+use App\Models\Publish\Ebay\EbaySiteModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 use App\Models\Order\ItemModel as orderItem;
@@ -134,6 +135,9 @@ class OrderController extends Controller
 
         $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
         $items = orderItem::where('channel_id', $channelId)->groupBy('item_id')->get();
+        if ($sku) {
+            $items = orderItem::where('channel_id', $channelId)->where('sku', $sku)->groupBy('item_id')->get();
+        }
         $data = [];
         foreach ($items as $key => $item) {
             $order = $this->model->find($item->order_id);
@@ -181,6 +185,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'datas' => $data,
+            'sites' => EbaySiteModel::all(),
         ];
 
         return view($this->viewPath . 'saleReport', $response);
@@ -635,7 +640,9 @@ class OrderController extends Controller
                         if ($remark->type == 'PAYPAL') {
                             $model->update(['order_is_alert' => 2]);
                         }
-                        $remark->delete();
+                        if ($remark->type != 'DEFAULT') {
+                            $remark->delete();
+                        }
                     }
                 }
             }
@@ -711,7 +718,9 @@ class OrderController extends Controller
                                 if ($remark->type == 'PAYPAL') {
                                     $model->update(['order_is_alert' => 2]);
                                 }
-                                $remark->delete();
+                                if ($remark->type != 'DEFAULT') {
+                                    $remark->delete();
+                                }
                             }
                         }
                         $from = json_encode($model);

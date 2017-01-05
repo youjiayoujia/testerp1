@@ -1215,7 +1215,6 @@ class PurchaseOrderController extends Controller
      */
     public function outOfStock()
     {
-
         $user_id = request()->input('user_id');
         $sku = request()->input('sku');
         $status = request()->input('status');

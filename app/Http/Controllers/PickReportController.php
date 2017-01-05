@@ -12,6 +12,7 @@ use App\Models\PickReportModel;
 use App\Models\PickListModel;
 use App\Models\WarehouseModel;
 use Excel;
+use App\Models\UserModel;
 
 class PickReportController extends Controller
 {
@@ -31,17 +32,19 @@ class PickReportController extends Controller
     public function index()
     {
         request()->flash();
-        $model = $this->model->orderBy('day_time', 'desc')->first();
+        $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
+        $model = $this->model->where('warehouse_id', $warehouse_id)->orderBy('day_time', 'desc')->first();
         $last_time = '';
-        $monthModel = $this->model->whereBetween('day_time',[date('Y-m-d', strtotime(date('Y-m', strtotime('now')))), date('Y-m-d', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
+        $monthModel = $this->model->where('warehouse_id', $warehouse_id)->whereBetween('day_time',[date('Y-m-d', strtotime(date('Y-m', strtotime('now')))), date('Y-m-d', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
         if($model) {
             $last_time = $model->day_time;
-            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            $model = $this->model->where('warehouse_id', $warehouse_id)->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
         }
         if(request()->has('date') && !empty(request('date'))) {
             $last_time = '';
             $model = $this->model;
             if(request()->has('warehouseid') && !empty(request('warehouseid'))) {
+                $warehouse_id = request('warehouseid');
                 $model = $model->where('warehouse_id', request('warehouseid'));
             }
             $model = $model->orderBy('day_time', 'desc')->get()->groupBy('day_time');
@@ -50,8 +53,8 @@ class PickReportController extends Controller
                     $last_time = $time;
                 }
             }
-            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
-            $monthModel = $this->model->whereBetween('day_time', [
+            $model = $model->get($last_time);
+            $monthModel = $this->model->where('warehouse_id', $warehouse_id)->whereBetween('day_time', [
                 date('Y-m-d', strtotime(date('Y-m', strtotime($last_time)))),
                 date('Y-m-d', strtotime(date('Y-m', strtotime($last_time) + strtotime('now') - strtotime('-1 month'))))])->get()->groupBy('user_id');
         }
@@ -60,7 +63,9 @@ class PickReportController extends Controller
             'data' => $model,
             'mixedSearchFields' => $this->model->mixed_search,
             'monthModel' => $monthModel,
-            'warehouses' => WarehouseModel::all(),
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'warehouseid' => request()->has('warehouseid') ? request('warehouseid') : '',
+            'date' => request()->has('date') ? request('date') : '',
         ];
 
         return view($this->viewPath . 'index', $response);
@@ -135,6 +140,7 @@ class PickReportController extends Controller
                         return in_array($single->status, ['PICKING', 'INBOXED', 'PACKAGEING']);
                     })->count(),
                     'more_than_twenty_four' => isset($errors[$userId]) ? $errors->get($userId)->count() : 0,
+                    'warehouse_id' => $block->first()->warehouse_id,
                 ]);
             }
         }

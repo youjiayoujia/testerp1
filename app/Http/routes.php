@@ -80,6 +80,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //入库
     Route::resource('stockIn', 'Stock\InController');
 
+
+    //海外仓库存调整
+    Route::resource('overseaStockAdjustment', 'Oversea\StockAdjustmentController');
     //海外仓调拨  
     Route::get('overseaAllotment/inboxOver/{str}/{id}', ['uses' => 'Oversea\AllotmentController@inboxOver', 'as' => 'overseaAllotment.inboxOver']);
     Route::get('overseaAllotment/allotmentInStock/{id}', ['uses' => 'Oversea\AllotmentController@allotmentInStock', 'as' => 'overseaAllotment.allotmentInStock']); 
@@ -1268,6 +1271,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('SendEbayMessage', ['uses' => 'MessageController@SendEbayMessage', 'as' => 'message.sendEbayMessage']);
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
     Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
+    Route::any('changeMultipleStatus', 'MessageController@changeMultipleStatus')->name('changeMultipleStatus');
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
@@ -1316,7 +1320,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('AliexpressIssue', 'Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',
         ['uses' => 'Message\Dispute\AliexpressIssueController@doRefuseIssues', 'as' => 'aliexpress.doRefuseIssues']);
-    Route::any('crm/statistics', 'MessageController@statistics')->name('crm.statistics');
+    Route::resource('crmStatistics', 'Message\StatisticsController');
     //spu
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
     Route::get('spu/checkPrivacy', ['uses' => 'SpuController@checkPrivacy', 'as' => 'spu.checkPrivacy']);

@@ -67,7 +67,7 @@ return [
         'item.sku' => 'SKU',
         'items.sku' => 'SKU',
         'ordernum' => '订单号',
-        'channel_ordernum' => '渠道订单号',
+        'channel_ordernum' => '平台订单号',
         'channelAccount.alias' => '渠道账号',
         'userOperator.name' => '运营人员',
         'email' => '邮箱',
@@ -173,7 +173,7 @@ return [
         'catalog.id' => '品类',
         'spu_id' => 'SPU',
         'logistics.catalog.name' => '物流分类',
-        'order.channel_ordernum' => '渠道订单号',
+        'order.channel_ordernum' => '平台订单号',
         'purchaseItem.productItem.sku' => 'sku',
         'new_status' => '是否为新品',
         'html_mod'=>'英文描述',
@@ -211,6 +211,9 @@ return [
         'violatos_number' => '知识产权编号',
         'time.import_time' => '导入时间',
         'plat' => '平台',
+        'message_statistics.compute_time' => '统计时间',
+        'message_statistics.user_id' => '客服名称',
+
 
     ],
 ];

@@ -12,11 +12,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Oversea\Allotment\AllotmentModel;
 use App\Models\Oversea\Allotment\AllotmentFormModel;
 use App\Models\WarehouseModel;
-use App\Models\Oversea\FirstLeg\FirstLegModel;;
+use App\Models\Oversea\FirstLeg\FirstLegModel;
 use App\Models\UserModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\LogisticsModel;
+use App\Models\Oversea\ItemCostModel;
 
 class AllotmentController extends Controller
 {
@@ -193,12 +194,22 @@ class AllotmentController extends Controller
         foreach($model->boxes as $box) {
             foreach($box->forms as $single) {
                 $item = $single->item;
-                $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $item->id])->first();
-                if($stock) {
-                    $item->in($stock->warehouse_position_id, $single->quantity, $single->quantity * ($single->item->cost ? $single->item->cost : $single->item->purchase_price),
-                    'OVERSEA_IN');
+                $position = WarehouseModel::find($warehouse_id)->positions()->first();
+                if(!$position) {
+                    continue;
                 }
-                $item->update(['volumn_rate' => round($box->length * $box->height * $box->width / 5000 / $box->weight, 4)]);
+                $item->in($position->id, $single->quantity, $single->quantity * ($single->item->cost ? $single->item->cost : $single->item->purchase_price),
+                'OVERSEA_IN');
+                $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $item->id])->first();
+                $volumn_rate = round($box->length * $box->height * $box->width / 5000 / $box->weight, 4);
+                $item->update(['volumn_rate' => $volumn_rate]);
+                $oversea_cost = round(($stock->oversea_cost * $stock->all_quantity + $volumn_rate * $box->fee * $single->quantity)/($stock->all_quantity + $single->quantity), 2);
+                $itemCost = $stock->warehouse->overseaItemCost()->where('item_id', $stock->item_id)->first();
+                if($itemCost) {
+                    $itemCost->update(['cost' => $oversea_cost]);
+                } else {
+                    ItemCostModel::create(['cost' => $oversea_cost, 'item_id' => $stock->item_id, 'code' => $stock->warehouse->code]);
+                }
             }
         }
         $model->update(['status' => 'over']);

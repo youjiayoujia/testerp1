@@ -9,6 +9,9 @@
             <label>海外仓sku</label>
         </div>
         <div class="form-group col-sm-2">
+            <label>海外仓sku单价</label>
+        </div>
+        <div class="form-group col-sm-2">
             <label>库位</label>
         </div>
         <div class="form-group col-sm-2">
@@ -26,6 +29,9 @@
         </div>
         <div class="form-group col-sm-2">
             <input type='text' class='form-control' name='arr[oversea_sku][]' value="{{ $arr[0][$single['key']]['oversea_sku']}}">
+        </div>
+        <div class="form-group col-sm-2">
+            <input type='text' class='form-control' name='arr[oversea_sku][]' value="{{ $arr[0][$single['key']]['oversea_cost']}}">
         </div>
         <div class="form-group col-sm-2">
             <input type='text' class='form-control' name='arr[position][]' value="{{ $arr[0][$single['key']]['position']}}">

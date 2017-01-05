@@ -640,7 +640,9 @@ class OrderController extends Controller
                         if ($remark->type == 'PAYPAL') {
                             $model->update(['order_is_alert' => 2]);
                         }
-                        $remark->delete();
+                        if ($remark->type != 'DEFAULT') {
+                            $remark->delete();
+                        }
                     }
                 }
             }
@@ -716,7 +718,9 @@ class OrderController extends Controller
                                 if ($remark->type == 'PAYPAL') {
                                     $model->update(['order_is_alert' => 2]);
                                 }
-                                $remark->delete();
+                                if ($remark->type != 'DEFAULT') {
+                                    $remark->delete();
+                                }
                             }
                         }
                         $from = json_encode($model);

@@ -6,12 +6,12 @@
         <select name='warehouse_id' class='warehouse_id form-control'>
             <option value=''>仓库</option>
             @foreach($warehouses as $warehouse)
-                <option value="{{ $warehouse->id}}">{{ $warehouse->name }}</option>
+                <option value="{{ $warehouse->id}}" {{ isset($warehouseid) ? ($warehouseid == $warehouse->id ? 'selected' : '') : ''}}>{{ $warehouse->name }}</option>
             @endforeach
         </select>
     </div>
     <div class='form-group col-lg-3'>
-        <input id="expected_date" class='form-control' name='expected_date' type="text" placeholder='期望上传日期' value="{{ old('expected_date') }}">
+        <input id="expected_date" class='form-control' name='expected_date' type="text" placeholder='日期查询' value="{{ isset($date) ? $date : ''}}">
     </div>
     <button type='button' class='btn btn-info search'>查找</button>
 </div>

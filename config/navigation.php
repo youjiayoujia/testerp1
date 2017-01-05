@@ -584,7 +584,11 @@ return [
                     'url' => 'overseaAllotment.index',
                     'icon' => '',
                 ],
-
+                [
+                    'name' => '库存调整单',
+                    'url' => 'overseaStockAdjustment.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

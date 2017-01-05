@@ -80,6 +80,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //入库
     Route::resource('stockIn', 'Stock\InController');
 
+
+    //海外仓库存调整
+    Route::resource('overseaStockAdjustment', 'Oversea\StockAdjustmentController');
     //海外仓调拨  
     Route::get('overseaAllotment/inboxOver/{str}/{id}', ['uses' => 'Oversea\AllotmentController@inboxOver', 'as' => 'overseaAllotment.inboxOver']);
     Route::get('overseaAllotment/allotmentInStock/{id}', ['uses' => 'Oversea\AllotmentController@allotmentInStock', 'as' => 'overseaAllotment.allotmentInStock']); 

@@ -26,7 +26,7 @@
                 <td>{{$item_order['Order']['state']}}</td>
                 <td>{{$item_order['Order']['cost']}}</td>
                 <td>{{$item_order['Order']['tracking_number']}}</td>
-                <td>{{$item_order['Order']['shipped_date']}}</td>
+                <td>{{ !empty($item_order['Order']['shipped_date']) ? $item_order['Order']['shipped_date'] : ''}}</td>
                 <td></td>
                 <td><a class="btn btn-danger" >退款</a></td>
             </tr>

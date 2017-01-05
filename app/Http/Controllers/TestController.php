@@ -268,7 +268,7 @@ class TestController extends Controller
 
     // }
 
-    public function test2()
+    /*public function test2()
     {
         $id = request()->get('id');
         $package = PackageModel::where('id', $id)->first();
@@ -278,7 +278,7 @@ class TestController extends Controller
             $result = $package->placeLogistics();
         }
         dd($result);
-    }
+    }*/
 
     // public function test2()
     // {

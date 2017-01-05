@@ -1126,6 +1126,15 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::post('smtPriceTask/getSmtPriceTask',
         ['uses' => 'Publish\Smt\SmtPriceTaskController@getSmtPriceTask', 'as' => 'smtPriceTask.getSmtPriceTask']);
     Route::resource('smtPriceTask', 'Publish\Smt\SmtPriceTaskController');
+    
+    Route::any('downloadTemplate', ['uses' => 'Publish\Smt\CopyrightController@downloadTemplate', 'as' => 'downloadTemplate']);
+    Route::any('exportAllData', ['uses' => 'Publish\Smt\CopyrightController@exportAllData', 'as' => 'exportAllData']);
+    Route::any('exportPartData', ['uses' => 'Publish\Smt\CopyrightController@exportPartData', 'as' => 'exportPartData']);
+    Route::any('deletePartData', ['uses' => 'Publish\Smt\CopyrightController@deletePartData', 'as' => 'deletePartData']);
+    Route::post('getAllAccountByPlatID', ['uses' => 'Publish\Smt\CopyrightController@getAllAccountByPlatID', 'as' => 'copyright.getAllAccountByPlatID']);
+    
+    Route::any('importCopyrightData', ['uses' => 'Publish\Smt\CopyrightController@importCopyrightData', 'as' => 'importCopyrightData']);
+    Route::resource('copyright', 'Publish\Smt\CopyrightController');
 
     Route::any('upload',
         ['uses' => 'KindeditorController@upload', 'as' => 'upload']);

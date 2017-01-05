@@ -1429,8 +1429,7 @@ class TestController extends Controller
         } else {
             $result = $package->placeLogistics();
         }
-        var_dump($result);
-        
+        var_dump($result);        
         exit;
         $page = 2;
         $pageSize = 2000;

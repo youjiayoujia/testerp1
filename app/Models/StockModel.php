@@ -392,7 +392,7 @@ class StockModel extends BaseModel
                 continue;
             }
             $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
-            $tmp_stock = StockModel::where(['oversea_sku' => $stock['oversea_sku']])->first();
+            $tmp_stock = StockModel::where(['warehouse_position_id' => $tmp_position->id, 'oversea_sku' => $stock['oversea_sku']])->first();
             if (!$tmp_stock) {
                 $error[$i]['key'] = $key;
                 $error[$i]['remark'] = '该对应Oversea没有库存,入库';

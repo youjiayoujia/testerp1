@@ -428,13 +428,26 @@ class MessageModel extends BaseModel{
                                    }else{
 
                                    }
-
+                                   if(! empty($item['Reply']['image_urls'])){
+                                       $img_urls = $item['Reply']['image_urls'];
+                                       $img_urls = str_replace('[', '', $img_urls);
+                                       $img_urls = str_replace(']', '', $img_urls);
+                                       $img_urls = explode(',', $img_urls);
+                                       foreach($img_urls as $url){
+                                           $tmp_url = explode('\'', $url);
+                                           if(! empty($tmp_url[1])){
+                                               $html .= '<img width="200px" src="'.$tmp_url[1].'" /> <br/>';
+                                           }
+                                       }
+                                   }
                                    $html .= '</div>';
                                }else{
                                    $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>用户名：</strong>'.$item['Reply']['sender'].':</p><strong>Content: </strong>'.$item['Reply']['message'];
                                    $html .= '<p class="time"><strong>Time：</strong>'.$item['Reply']['date'].'</p>';
                                    $html .= '</div>';
                                }
+
+
                            }
                         }
                         break;
@@ -691,6 +704,7 @@ class MessageModel extends BaseModel{
                     ->where('assign_id','=',$user_id)
                     ->where('required','=',1)
                     ->where('dont_reply','=',0)
+                    ->where('read','=',0)
                     ->where('is_auto_reply', '=', 0)
                 ->whereIn('account_id',$account_ids);
             })

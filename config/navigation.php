@@ -635,7 +635,7 @@ return [
                 ],
                 [
                     'name' => 'EbaySku销量报表',
-                    'url' => 'sku.saleReport',
+                    'url' => 'ebaySkuSaleReport.index',
                     'icon' => '',
                 ],
                 [

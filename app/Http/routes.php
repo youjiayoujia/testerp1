@@ -695,6 +695,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('order/ajaxSku', ['uses' => 'OrderController@ajaxSku', 'as' => 'order.ajaxSku']);
     Route::get('orderStatistics', ['uses' => 'OrderController@orderStatistics', 'as' => 'orderStatistics']);
     Route::resource('order', 'OrderController');
+    Route::resource('ebaySkuSaleReport', 'Order\EbaySkuSaleReportController');
     Route::resource('orderItem', 'Order\ItemController');
     Route::resource('unpaidOrder', 'Order\UnpaidOrderController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);

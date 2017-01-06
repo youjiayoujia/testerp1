@@ -201,9 +201,10 @@ class AllotmentController extends Controller
                 $item->in($position->id, $single->quantity, $single->quantity * ($single->item->cost ? $single->item->cost : $single->item->purchase_price),
                 'OVERSEA_IN');
                 $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $item->id])->first();
-                $volumn_rate = round($box->length * $box->height * $box->width / 5000 / $box->weight, 4);
+                $volumn_rate = round($box->length * $box->height * $box->width / 6000 / $box->weight, 4);
+                $volumn_rate = ($volumn_rate < 1 ? 1 : $volumn_rate);
                 $item->update(['volumn_rate' => $volumn_rate]);
-                $oversea_cost = round(($stock->oversea_cost * $stock->all_quantity + $volumn_rate * $box->fee * $single->quantity)/($stock->all_quantity + $single->quantity), 2);
+                $oversea_cost = round(($stock->oversea_cost * $stock->all_quantity + $volumn_rate * $item->weight * $box->logistics->cost * $single->quantity + $single->quantity * $stock->item->cost)/($stock->all_quantity + $single->quantity), 2);
                 $itemCost = $stock->warehouse->overseaItemCost()->where('item_id', $stock->item_id)->first();
                 if($itemCost) {
                     $itemCost->update(['cost' => $oversea_cost]);
@@ -281,7 +282,7 @@ class AllotmentController extends Controller
                 $sum += $form->item->weight * $form->quantity;
             }
             $arr[] = $sum;
-            $volumn += ($box->length * $box->width * $box->height)/5000;
+            $volumn += ($box->length * $box->width * $box->height)/6000;
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),

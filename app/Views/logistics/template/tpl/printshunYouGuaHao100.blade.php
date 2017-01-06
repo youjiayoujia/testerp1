@@ -18,7 +18,7 @@
 <div id="main">
     <div style="width:100%;height:1mm;"></div>
     <div style="width:100%;height:42mm;">
-        <p style="width:68mm;height:42mm;float:left;margin-left:5px;overflow:hidden;font-size:7px;">
+        <p style="width:68mm;height:40mm;float:left;margin-left:5px;overflow:hidden;font-size:7px;">
             If underliverable return to : <br/>
             Locked bag No      <br/>
             Special Project Unit    <br/>
@@ -33,8 +33,8 @@
                     ({{ $model->country ? $model->country->cn_name : '' }})
                 </span>
         </p>
-        <p style="width:30mm;height:42mm;float:left;overflow:hidden;">
-		        <span style="width:98%;height:24mm;border:1px solid #000;display:inline-block;">
+        <p style="width:30mm;height:40mm;float:left;overflow:hidden;">
+		        <span style="width:98%;height:20mm;border:1px solid #000;display:inline-block;">
 		        	BAYARAN POS JELAS<br/>
 					POSTAGE PAID<br/>
 					POS MALAYSIA<br/>
@@ -50,11 +50,11 @@
 		        </span>
         </p>
     </div>
-    <div style="width:100%;height:16mm;">
+    <div style="width:100%;height:18mm;">
         <p style="width:30%;height:12mm;float:left;font-weight:bold;font-size:30px;text-align:right;"></p>
-        <p style="width:45%;height:12mm;float:left;text-align:center;">
+        <p style="width:45%;height:14mm;float:left;text-align:center;">
             <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
-            <br/><span style="font-size:12px;">{{$model->tracking_no}}</span>
+            <span style="font-size:12px;">{{$model->tracking_no}}</span>
         </p>
     </div>
     <div style="width:100%;height:44mm;overflow:hidden;">

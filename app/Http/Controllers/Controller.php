@@ -356,8 +356,8 @@ abstract class Controller extends BaseController
                                     foreach ($value1 as $key => $value2) {
                                         $value2 = trim($value2);
                                         if ($value2||$value2=='0') {
-                                            $list = $list->whereHas($relation_ship1, function($single) use ($value2){
-                                                $query->where('c_name', 'like', '%'.$value.'%');
+                                            $list = $list->whereHas($relation_ship1, function($query) use ($value2){
+                                                $query->where('c_name', 'like', '%'.$value2.'%');
                                             });
                                         }
                                     }

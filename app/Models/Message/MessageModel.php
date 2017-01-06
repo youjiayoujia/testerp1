@@ -38,8 +38,8 @@ class MessageModel extends BaseModel{
     public $searchFields = [
         'id'=>'ID',
         'subject'=>'主题',
-        'from'=>'发件邮箱' ,
-        'label' => '消息类型',
+/*        'from'=>'发件邮箱' ,
+        'label' => '消息类型',*/
         'channel_order_number' => '平台订单号'
     ];
 
@@ -691,7 +691,6 @@ class MessageModel extends BaseModel{
                     ->where('assign_id','=',$user_id)
                     ->where('required','=',1)
                     ->where('dont_reply','=',0)
-                    ->where('read','=',0)
                     ->where('is_auto_reply', '=', 0)
                 ->whereIn('account_id',$account_ids);
             })

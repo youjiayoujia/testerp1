@@ -80,6 +80,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //入库
     Route::resource('stockIn', 'Stock\InController');
 
+
+    //海外仓库存调整
+    Route::resource('overseaStockAdjustment', 'Oversea\StockAdjustmentController');
     //海外仓调拨  
     Route::get('overseaAllotment/inboxOver/{str}/{id}', ['uses' => 'Oversea\AllotmentController@inboxOver', 'as' => 'overseaAllotment.inboxOver']);
     Route::get('overseaAllotment/allotmentInStock/{id}', ['uses' => 'Oversea\AllotmentController@allotmentInStock', 'as' => 'overseaAllotment.allotmentInStock']); 
@@ -1127,6 +1130,15 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::post('smtPriceTask/getSmtPriceTask',
         ['uses' => 'Publish\Smt\SmtPriceTaskController@getSmtPriceTask', 'as' => 'smtPriceTask.getSmtPriceTask']);
     Route::resource('smtPriceTask', 'Publish\Smt\SmtPriceTaskController');
+    
+    Route::any('downloadTemplate', ['uses' => 'Publish\Smt\CopyrightController@downloadTemplate', 'as' => 'downloadTemplate']);
+    Route::any('exportAllData', ['uses' => 'Publish\Smt\CopyrightController@exportAllData', 'as' => 'exportAllData']);
+    Route::any('exportPartData', ['uses' => 'Publish\Smt\CopyrightController@exportPartData', 'as' => 'exportPartData']);
+    Route::any('deletePartData', ['uses' => 'Publish\Smt\CopyrightController@deletePartData', 'as' => 'deletePartData']);
+    Route::post('getAllAccountByPlatID', ['uses' => 'Publish\Smt\CopyrightController@getAllAccountByPlatID', 'as' => 'copyright.getAllAccountByPlatID']);
+    
+    Route::any('importCopyrightData', ['uses' => 'Publish\Smt\CopyrightController@importCopyrightData', 'as' => 'importCopyrightData']);
+    Route::resource('copyright', 'Publish\Smt\CopyrightController');
 
     Route::any('upload',
         ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
@@ -1260,6 +1272,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('SendEbayMessage', ['uses' => 'MessageController@SendEbayMessage', 'as' => 'message.sendEbayMessage']);
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
     Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
+    Route::any('changeMultipleStatus', 'MessageController@changeMultipleStatus')->name('changeMultipleStatus');
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);

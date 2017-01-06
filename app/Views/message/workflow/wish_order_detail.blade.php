@@ -20,18 +20,19 @@
                     @foreach($message->MessageFieldsDecodeBase64['order_items'] as $item_order)
                         <tr>
                             <td><input type="checkbox"></td>
-                            <td><img src="{{$item_order['Order']['product_image_url']}}" width="80px" height="80px"/></td>
-                            <td>{{$item_order['Order']['product_id']}}</td>
-                            <td>{{$item_order['Order']['order_id']}}</td>
-                            <td>{{$item_order['Order']['sku']}}</td>
-                            <td>{{$item_order['Order']['state']}}</td>
-                            <td>{{$item_order['Order']['cost']}}</td>
+                            <td><img src="{{ !empty($item_order['Order']['product_image_url']) ? $item_order['Order']['product_image_url'] : ''}}" width="80px" height="80px"/></td>
+                            <td>{{ !empty($item_order['Order']['product_id']) ? $item_order['Order']['product_id'] : ''}}</td>
+                            <td>{{ !empty($item_order['Order']['order_id']) ? $item_order['Order']['order_id'] : ''}}</td>
+                            <td>{{ !empty($item_order['Order']['sku']) ? $item_order['Order']['sku'] : ''}}</td>
+                            <td>{{ !empty($item_order['Order']['state']) ? $item_order['Order']['state'] : ''}}</td>
+                            <td>{{ !empty($item_order['Order']['cost']) ? $item_order['Order']['cost'] : ''}}</td>
+
                             <td>
                                 @if(!empty($item_order['Order']['tracking_number']))
                                 {{$item_order['Order']['tracking_number']}}
                                 @endif
                             </td>
-                            <td>{{$item_order['Order']['shipped_date']}}</td>
+                            <td>{{ !empty($item_order['Order']['shipped_date']) ? $item_order['Order']['shipped_date'] : ''}}</td>
                             <td></td>
                             {{--<td><a class="btn btn-danger" >退款</a></td>--}}
                         </tr>

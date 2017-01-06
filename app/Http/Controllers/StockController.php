@@ -198,13 +198,11 @@ class StockController extends Controller
         $str .= "</thead><tbody>";
         foreach($stocks as $stock)
         {
-            if($stock->available_quantity || $stock->hold_quantity) {
-                $str .= "<tr><td data-id='".$stock->id."' data-warehouseId='".$stock->warehouse_id."'>".($stock->warehouse ? $stock->warehouse->name : '')."</td><td class='col-lg-2'>".($stock->position ? $stock->position->name : '')."</td><td data-itemId='".$stock->item_id."'>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td><td>".($stock->item ? $stock->item->logistics_limit : '')."</td>";
-                if(!request()->has('type')) {
-                    $str .= "<td><button type='button' class='btn btn-info change_position'>修改库位</button></td>";
-                }
-                $str .= "</tr>";
+            $str .= "<tr><td data-id='".$stock->id."' data-warehouseId='".$stock->warehouse_id."'>".($stock->warehouse ? $stock->warehouse->name : '')."</td><td class='col-lg-2'>".($stock->position ? $stock->position->name : '')."</td><td data-itemId='".$stock->item_id."'>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td><td>".($stock->item ? $stock->item->logistics_limit : '')."</td>";
+            if(!request()->has('type')) {
+                $str .= "<td><button type='button' class='btn btn-info change_position'>修改库位</button></td>";
             }
+            $str .= "</tr>";
         }
         $str .= "</tbody>";
 
@@ -223,9 +221,7 @@ class StockController extends Controller
         $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
         foreach($stocks as $stock)
         {
-            if($stock->available_quantity || $stock->hold_quantity) {
             $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
-            }
         }
         $str .= "</tbody>";
 

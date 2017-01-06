@@ -15,6 +15,10 @@
         <input type='text' name='name' class='form-control' value="{{ old('name') }}">
     </div>
     <div class="form-group col-lg-2">
+        <label class='control-label'>单价</label>
+        <input type='text' name='cost' class='form-control' value="{{ old('cost') }}">
+    </div>
+    <div class="form-group col-lg-2">
         <label class='control-label'>运输方式</label>
         <select name='transport' class='form-control'>
             <option value='0' {{ old('transport') ? (old('transport') == '0' ? 'selected' : '') : ''}}>海运</option>

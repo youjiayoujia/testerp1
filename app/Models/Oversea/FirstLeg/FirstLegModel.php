@@ -19,7 +19,7 @@ class FirstLegModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['warehouse_id', 'name', 'transport', 'formula', 'created_at'];
+    protected $fillable = ['warehouse_id', 'name', 'transport', 'formula', 'created_at', 'cost'];
 
     // 规则验证
     public $rules = [

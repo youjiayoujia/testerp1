@@ -27,6 +27,7 @@ use App\Models\Order\BlacklistModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Oversea\ChannelSaleModel;
 use App\Models\WarehouseModel;
+use App\Models\Oversea\ItemCostModel;
 
 class OrderModel extends BaseModel
 {
@@ -188,6 +189,21 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
+    public function getOverseaCostAttribute()
+    {
+        $num = 0;
+        foreach($this->packages as $package) {
+            foreach($package->items as $packageItem) {
+                $buf = ItemCostModel::where(['item_id' => $packageItem->item_id, 'code' => $package->warehouse->code])->first();
+                if($buf) {
+                    $num += $buf->cost * $packageItem->quantity;
+                }
+            }
+        }
+
+        return $num;
+    }
+
     //更新rules
     public function updateRule($request)
     {
@@ -344,6 +360,16 @@ class OrderModel extends BaseModel
         }
 
         return $weight;
+    }
+
+    public function getOverseaDeclaredAttribute()
+    {
+        $num = 0;
+        foreach($this->items as $single) {
+            $num += $single->declared_value * $single->quantity;
+        }
+
+        return $num;
     }
 
     //多重查询
@@ -833,6 +859,20 @@ class OrderModel extends BaseModel
         $logisticsCost = $this->logistics_fee * $rmbRate;
         $orderChannelFee = $this->calculateOrderChannelFee();
         $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $orderChannelFee, 4);
+        $orderProfitRate = $orderProfit / $orderAmount;
+        $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);
+        return $orderProfitRate;
+    }
+
+    public function overseaCalculateProfit()
+    {
+        $currencyArr = CurrencyModel::whereIn('code', [$this->currency, 'RMB'])->get()->pluck('rate', 'code');
+        $rate = $currencyArr[$this->currency];
+        $rmbRate = $currencyArr['RMB'];
+        $orderAmount = $this->amount * $rate;
+        $itemCost = $this->oversea_cost * $rmbRate;
+        $logisticsCost = $this->logistics_fee * $rmbRate;
+        $orderProfit = round($orderAmount - $itemCost - $logisticsCost - $this->oversea_declared * 0.25, 4);
         $orderProfitRate = $orderProfit / $orderAmount;
         $this->update(['profit' => $orderProfit, 'profit_rate' => $orderProfitRate]);
         return $orderProfitRate;

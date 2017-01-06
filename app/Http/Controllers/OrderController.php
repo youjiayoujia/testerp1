@@ -22,6 +22,7 @@ use App\Models\LogisticsModel;
 use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
+use App\Models\Publish\Ebay\EbayPublishProductModel;
 use App\Models\Publish\Ebay\EbaySiteModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
@@ -129,10 +130,11 @@ class OrderController extends Controller
      */
     public function saleReport()
     {
-        $sku = request()->input('sku');
-        $site = request()->input('site');
-        $status = request()->input('status');
-
+        $ebayPublishProducts = EbayPublishProductModel::all();
+        foreach ($ebayPublishProducts as $ebayPublishProduct) {
+            $sku = substr(strstr(strstr($ebayPublishProduct->sku, '*'), '[', true), 1);
+            dd($sku);
+        }
         $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
         $items = orderItem::where('channel_id', $channelId)->groupBy('item_id')->get();
         if ($sku) {

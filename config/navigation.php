@@ -420,7 +420,8 @@ return [
                     'name' => 'SMT帐号管理',
                     'url' => 'smtAccountManage.index',
                     'icon' => '',
-                ],
+                ],            
+                
             ],
             'Ebay刊登' => [
                 [
@@ -470,6 +471,13 @@ return [
                     'icon' => '',
                 ],
 
+            ],
+            '侵权管理' => [
+                [
+                'name' => '侵权列表',
+                'url' => 'copyright.index',
+                'icon' => '',
+                ],
             ],
             '数据监控' => [
                 [
@@ -639,7 +647,7 @@ return [
                 ],
                 [
                     'name' => 'EbaySku销量报表',
-                    'url' => 'sku.saleReport',
+                    'url' => 'ebaySkuSaleReport.index',
                     'icon' => '',
                 ],
                 [

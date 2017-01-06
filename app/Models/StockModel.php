@@ -392,19 +392,19 @@ class StockModel extends BaseModel
                 continue;
             }
             $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
-            $tmp_stock = StockModel::where(['oversea_sku' => $stock['oversea_sku']])->first();
+            $tmp_stock = StockModel::where(['warehouse_position_id' => $tmp_position->id, 'oversea_sku' => $stock['oversea_sku']])->first();
             if (!$tmp_stock) {
                 $error[$i]['key'] = $key;
                 $error[$i]['remark'] = '该对应Oversea没有库存,入库';
                 $error[$i]['quantity'] = (int)$stock['all_quantity'];
-                $adjustment->forms()->create(['sku' => $stock['sku'], 'warehouse_position' => $stock['position'], 'quantity' => $error[$i]['quantity'], 'type' => 'in', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $stock['oversea_cost'], 'remark' => '该对应Oversea没有库存,入库']);
+                $adjustment->forms()->create(['sku' => $stock['sku'], 'warehouse_position' => $stock['position'], 'quantity' => $error[$i]['quantity'], 'type' => 'in', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $tmp_item->cost, 'remark' => '该对应Oversea没有库存,入库']);
             } else {
                 $error[$i]['key'] = $key;
                 $error[$i]['quantity'] = (int)$stock['all_quantity'] - $tmp_stock->all_quantity;
                 if($error[$i]['quantity'] > 0) {
-                    $adjustment->forms()->create(['sku' => $stock['sku'],'quantity' => $error[$i]['quantity'],  'warehouse_position' => $stock['position'], 'type' => 'in', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $stock['oversea_cost'], 'remark' => '该对应Oversea没有库存,入库']);
+                    $adjustment->forms()->create(['sku' => $stock['sku'],'quantity' => $error[$i]['quantity'],  'warehouse_position' => $stock['position'], 'type' => 'in', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $tmp_item->cost, 'remark' => '该对应Oversea没有库存,入库']);
                 } else {
-                    $adjustment->forms()->create(['sku' => $stock['sku'],'quantity' => -$error[$i]['quantity'], 'warehouse_position' => $stock['position'], 'type' => 'out', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $stock['oversea_cost'], 'remark' => '该对应Oversea没有库存,入库']);
+                    $adjustment->forms()->create(['sku' => $stock['sku'],'quantity' => -$error[$i]['quantity'], 'warehouse_position' => $stock['position'], 'type' => 'out', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $tmp_item->cost, 'remark' => '该对应Oversea没有库存,入库']);
                 }
             }
             $this->oversea_importStock($arr, $error[$i]);
@@ -424,23 +424,23 @@ class StockModel extends BaseModel
         if(!$position) {
             return false;
         }
-        $stock = $this->where(['item_id' => $item->id, 'warehouse_position_id' => $position->id])->first();
         if($buf['quantity'] > 0) {
             $item->in($position->id, (int)$buf['quantity'], ((int)$buf['quantity'] * ($item->cost ? $item->cost : $item->purchase_price)), 'ADJUSTMENT');
         }
         if($buf['quantity'] < 0) {
             $item->out($position->id, -(int)$buf['quantity'], 'ADJUSTMENT');
         }
+        $stock = $this->where(['item_id' => $item->id, 'warehouse_position_id' => $position->id])->first();
         if($stock) {
             $stock->update(['oversea_sku' => $arr[$buf['key']]['oversea_sku']]);
-            if(isset($arr[$buf['key']]['oversea_cost'])) {
+            // if(isset($arr[$buf['key']]['oversea_cost'])) {
                 $itemCost = $stock->warehouse->overseaItemCost()->where('item_id', $stock->item_id)->first();
                 if($itemCost) {
                     $itemCost->update(['cost' => $arr[$buf['key']]['oversea_cost']]);
                 } else {
-                    ItemCostModel::create(['item_id' => $stock->item_id, 'cost' => $arr[$buf['key']]['oversea_cost'], 'code' => $stock->warehouse->code]);
+                    ItemCostModel::create(['item_id' => $stock->item_id, 'cost' => $stock->item->cost, 'code' => $stock->warehouse->code]);
                 }
-            }
+            // }
         }
     }
 

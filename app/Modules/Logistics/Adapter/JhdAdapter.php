@@ -41,7 +41,7 @@ class JhdAdapter extends BasicAdapter
         $url=$this->url;
         $resx = $this->postCurlHttpsData($url,$str);
         $res = (array)simplexml_load_string($resx);
-        if($res['is_success'] == 'T' && $res['jobno']){
+        if(@$res['is_success'] == 'T' && @$res['jobno']){
             //success
             $result = [
                 'code' => 'success',

@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Storage;
 $Storage = new Storage();
 $tracking_no=$model->tracking_no;//追踪号
-$tracking_no='0B0437995000008492054';
 $url = "http://120.55.205.164/api/RmlDatamatrixPic?productbarcode=".$tracking_no."";
 $headers = array(                                //Token生成规则  base64_encode('xxx:xxx');  账号：密码
     "Content-type: application/json;charset=utf-8",
@@ -25,7 +24,6 @@ $data = curl_exec($ch);
 curl_close($ch);
 $filename = '/ost/'.$tracking_no.'.jpg';
 @$Storage::put($filename,$data);//保存图片
-
 $ship_code = '';
 $ship_arr = array();
 $ship_arr = str_split($tracking_no,1);

@@ -150,7 +150,11 @@ class OrderController extends Controller
                 ->where('sku', $data['sku'])
                 ->count();
             $data['sale_different'] = $data['seven_sale'] - ($data['fourteen_sale'] - $data['seven_sale']);
-            $data['sale_different_proportion'] = $data['sale_different'] / ($data['fourteen_sale'] - $data['seven_sale']);
+            if ($data['fourteen_sale'] - $data['seven_sale'] == 0) {
+                $data['sale_different_proportion'] = 0;
+            } else {
+                $data['sale_different_proportion'] = $data['sale_different'] / ($data['fourteen_sale'] - $data['seven_sale']);
+            }
             $data['thirty_sale'] = orderItem::where('channel_id', $channelId)
                 ->whereBetween('created_at', [date('Y-m-d', strtotime('-30 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
                 ->where('sku', $data['sku'])

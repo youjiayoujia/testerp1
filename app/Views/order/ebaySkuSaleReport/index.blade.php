@@ -21,15 +21,19 @@
             <td>{{ $ebaySkuSaleReport->channel_name }}</td>
             <td>{{ $ebaySkuSaleReport->site }}</td>
             <td>{{ $ebaySkuSaleReport->sale_different }}</td>
-            <td>{{ $ebaySkuSaleReport->sale_different_proportion }}</td>
+            <td>{{ $ebaySkuSaleReport->sale_different_proportion * 100 . '%' }}</td>
             <td>{{ $ebaySkuSaleReport->one_sale }}</td>
             <td>{{ $ebaySkuSaleReport->seven_sale }}</td>
             <td>{{ $ebaySkuSaleReport->fourteen_sale }}</td>
             <td>{{ $ebaySkuSaleReport->thirty_sale }}</td>
             <td>{{ $ebaySkuSaleReport->ninety_sale }}</td>
             <td>{{ $ebaySkuSaleReport->created_time }}</td>
-            <td>{{ $ebaySkuSaleReport->status }}</td>
-            <td>{{ $ebaySkuSaleReport->is_warning }}</td>
+            <td>{{ $ebaySkuSaleReport->status_name }}</td>
+            <td>
+                @if($ebaySkuSaleReport->is_warning == '1')
+                    <strong class="text-danger">预警</strong>
+                @endif
+            </td>
         </tr>
     @endforeach
 @stop

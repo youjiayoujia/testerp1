@@ -62,4 +62,11 @@ class EbaySkuSaleReportModel extends BaseModel
         ],
     ];
 
+    //sku状态
+    public function getStatusNameAttribute()
+    {
+        $config = config('item.status');
+        return $config[$this->status];
+    }
+
 }

@@ -137,8 +137,6 @@ class OrderController extends Controller
             $data['sku'] = substr(strstr(strstr($ebayPublishProduct->sku, '*'), '[', true), 1);
             $data['channel_name'] = 'Ebay';
             $data['site'] = $ebayPublishProduct->site_name;
-            $data['sale_different'] = 0;
-            $data['sale_different_proportion'] = 0;
             $data['one_sale'] = orderItem::where('channel_id', $channelId)
                 ->whereBetween('created_at', [date('Y-m-d') . ' 00:00:00', date('Y-m-d', strtotime('+1 day', strtotime(date('Y-m-d')))) . ' 00:00:00'])
                 ->where('sku', $data['sku'])
@@ -151,6 +149,8 @@ class OrderController extends Controller
                 ->whereBetween('created_at', [date('Y-m-d', strtotime('-14 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
                 ->where('sku', $data['sku'])
                 ->count();
+            $data['sale_different'] = $data['seven_sale'] - ($data['fourteen_sale'] - $data['seven_sale']);
+            $data['sale_different_proportion'] = $data['sale_different'] / ($data['fourteen_sale'] - $data['seven_sale']);
             $data['thirty_sale'] = orderItem::where('channel_id', $channelId)
                 ->whereBetween('created_at', [date('Y-m-d', strtotime('-30 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
                 ->where('sku', $data['sku'])

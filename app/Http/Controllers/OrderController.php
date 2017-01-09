@@ -172,7 +172,18 @@ class OrderController extends Controller
             }
             $ebaySkuSaleReports = EbaySkuSaleReportModel::where('sku', $data['sku'])->where('site', $data['site']);
             if ($ebaySkuSaleReports->count()) {
-                $ebaySkuSaleReports->update(['status' => $data['status'], 'created_time' => $data['created_time'], 'is_warning' => $data['is_warning']]);
+                $ebaySkuSaleReports->update([
+                    'sale_different' => $data['sale_different'],
+                    'sale_different_proportion' => $data['sale_different_proportion'],
+                    'one_sale' => $data['one_sale'],
+                    'seven_sale' => $data['seven_sale'],
+                    'fourteen_sale' => $data['fourteen_sale'],
+                    'thirty_sale' => $data['thirty_sale'],
+                    'ninety_sale' => $data['ninety_sale'],
+                    'created_time' => $data['created_time'],
+                    'status' => $data['status'],
+                    'is_warning' => $data['is_warning']
+                ]);
             } else {
                 EbaySkuSaleReportModel::create($data);
             }

@@ -39,6 +39,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AllReport::class,
         \App\Console\Commands\GetBlacklists::class,
         \App\Console\Commands\UpdateBlacklists::class,
+        \App\Console\Commands\UpdateEbaySkuSaleReport::class,
         \App\Console\Commands\AutoRunPackages::class,
         \App\Console\Commands\ImitationOrders::class,
         \App\Console\Commands\UpdateUsers::class,
@@ -99,6 +100,9 @@ class Kernel extends ConsoleKernel
         //黑名单定时任务
         $schedule->command('blacklists:get')->dailyAt('2:00');
         $schedule->command('blacklists:update')->dailyAt('3:00');
+
+        //EbaySku销量报表定时任务
+        $schedule->command('ebaySkuSaleReport:update')->cron('0 16 * * *');
         //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {

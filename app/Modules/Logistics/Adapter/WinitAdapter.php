@@ -69,8 +69,8 @@ class WinitAdapter extends BasicAdapter
         $creatOrder = array();
         
         list($name, $channel) = explode(',', $package->logistics->type);
-        $creatOrder['buyerAddress1'] = $package->shipping_address;
-        $creatOrder['buyerAddress2'] = $package->shipping_address1;
+        $creatOrder['buyerAddress1'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_address);
+        $creatOrder['buyerAddress2'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_address1);
         $creatOrder['buyerCity'] = $package->shipping_city;
         $creatOrder['buyerContactNo'] = $package->shipping_phone;
         $creatOrder['buyerCountry'] = $package->shipping_country;

@@ -1168,6 +1168,19 @@ class TestController extends Controller
     public function jdtestCrm()
     {
 
+        $tmp ="[u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/cbc4768ccda711e6bcf102c49158406c.jpg', u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/dd5f9e6ccda711e6bfeb02465360c040.jpg', u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/e490e222cda711e6ae1c02762614c162.jpg']";
+
+        $tmp = str_replace('[', '', $tmp);
+        $tmp = str_replace(']', '', $tmp);
+        $tmp_array = explode(',', $tmp);
+        $urls = [];
+        foreach($tmp_array as $url){
+            $tmp_url = explode('\'', $url);
+            $urls[] = $tmp_url[1];
+
+        }
+        dd($urls);
+
         dd('end');
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver

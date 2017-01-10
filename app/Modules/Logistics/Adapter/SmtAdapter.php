@@ -93,6 +93,7 @@ class SmtAdapter extends BasicAdapter
         $channel_account_id = $package->channel_account_id;
         list($name, $channel) = explode(',', $package->logistics->type);
         $warehouseCarrierService = $channel;    //物流方式
+        echo $package->logistics_order_number;
         if(!$package->logistics_order_number){           
             //获取渠道帐号资料
             $account = AccountModel::findOrFail($channel_account_id);

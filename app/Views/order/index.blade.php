@@ -467,11 +467,6 @@
                                     <label for="channel_account_id">渠道账号</label>
                                     <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : ($order->channelAccount ? $order->channelAccount->alias : '') }}" readonly>
                                 </div>
-                                {{--<div class="form-group col-lg-2" id="payment">--}}
-                                {{--<label for="payment_date" class='control-label'>支付时间</label>--}}
-                                {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
-                                {{--<input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">--}}
-                                {{--</div>--}}
                                 <div class="form-group col-lg-4">
                                     <label for="refund_amount" class='control-label'>退款金额</label>
                                     <input class="form-control" id="refund_amount{{ $order->id }}" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">

@@ -121,8 +121,7 @@ class SmtAdapter extends BasicAdapter
                 'categoryCnDesc'       => $package->items ? $package->items->first()->item->product->declared_cn : '连衣裙',
                 'categoryEnDesc'       => $package->items ? $package->items->first()->item->product->declared_en : 'dress',
                 'productDeclareAmount' => $package->items->first()->item->declared_value,
-                //'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,
-                'productId'              => $package->order ? $package->order->channel_ordernum : 0,
+                'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,               
                 'productNum'           => $productNum,
                 'productWeight'        => $package->total_weight,
                 'isContainsBattery'    => $package->is_battery ? 1 : 0,    
@@ -162,8 +161,7 @@ class SmtAdapter extends BasicAdapter
             );
             $address_result = $smtApi->getJsonDataUsePostMethod($address_api, $address_smt);
             $address_result = json_decode($address_result, true);
-            echo '<pre>';
-            print_r($address_result);
+            echo '<pre>';   
             $addressArray = array_merge($addressArray, $this->_senderAddress[$package->warehouse_id]);
             $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
             $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];

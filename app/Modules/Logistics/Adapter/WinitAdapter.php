@@ -69,8 +69,8 @@ class WinitAdapter extends BasicAdapter
         $creatOrder = array();
         
         list($name, $channel) = explode(',', $package->logistics->type);
-        $creatOrder['buyerAddress1'] = $package->shipping_address;
-        $creatOrder['buyerAddress2'] = $package->shipping_address1;
+        $creatOrder['buyerAddress1'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_address);
+        $creatOrder['buyerAddress2'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_address1);
         $creatOrder['buyerCity'] = $package->shipping_city;
         $creatOrder['buyerContactNo'] = $package->shipping_phone;
         $creatOrder['buyerCountry'] = $package->shipping_country;
@@ -119,9 +119,10 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['shipperAddrCode'] = $new_shipperAddrCode;        
         $creatOrder['warehouseCode'] = $new_warehouseCode;
         $creatOrder['winitProductCode'] = $channel;
-
-        $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
         echo "<pre>";
+        print_r($creatOrder);
+        $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
+        
         print_r($result);
         $result = json_decode($result,true);
         if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))        {   

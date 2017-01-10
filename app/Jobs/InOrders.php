@@ -103,4 +103,11 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('InOrders', json_encode($this->order));
     }
+
+    public function failed()
+    {
+        $this->result['status'] = 'fail';
+        $this->result['remark'] = '队列执行失败，程序错误或响应超时.';
+        $this->log('InOrders', json_encode($this->order));
+    }
 }

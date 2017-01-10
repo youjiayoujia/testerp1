@@ -77,7 +77,7 @@
                                     <tr>
                                         <td>
 
-                                            <a href="{{ route('item.show', $item->sku ) }}" target="_blank">{{$item->sku}}</a>
+                                            <a href="{{ route('item.show', $item->id ) }}" target="_blank">{{$item->sku}}</a>
                                         </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>{{ $item->price }}</td>
@@ -323,12 +323,11 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>物流网址</strong>
-                                    <a target="_blank" href="{{$package->ThisPackageLogistic}}"><span class="glyphicon glyphicon-paperclip"></span>
+                                    <a target="_blank" href="{{$package->ThisPackageLogistic}}">
+                                        {{$package->ThisPackageLogistic}}
                                     </a>
                                 </div>
-                                <div class="col-lg-6">
-                                    <strong>追踪号</strong>: {{ $package->tracking_no }}
-                                </div>
+
                             </div>
                             @endif
                                 <div class="row form-group">
@@ -353,6 +352,16 @@
                                     @endif
                                 </div>
                             </div>
+                                <div class="row form-group">
+                                    <div class="col-lg-6">
+                                        <strong>是否标记发货</strong>:
+                                        {{ $package->is_mark== 1 ?  '是' : '否' }}
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <strong>追踪号</strong>: {{ $package->tracking_no }}
+                                    </div>
+
+                                </div>
                             <div class="row">
                                 <div class="col-lg-12">
                                     <table class="table table-bordered">

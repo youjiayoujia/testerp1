@@ -48,7 +48,16 @@ class GetFeedBack extends Command
             if(!$accounts->isEmpty()){
                 foreach($accounts as $account){
                     $driver = Channel::driver($account->channel->driver, $account->api_config);
-                    $driver->GetFeedback();
+                    $result = $driver->GetFeedback();
+
+                    foreach ($result as $re){
+                        $re['channel_account_id'] = $account->id;
+                        $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$account])->first();
+                        if(empty($feedback)){
+                            EbayFeedBackModel::create($re);
+                            $this->info('#the feedback -'. $re['feedback_id'] . 'added.');
+                        }
+                    }
                 }
             }
         }else{

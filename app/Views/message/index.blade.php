@@ -1,5 +1,7 @@
 @extends('common.table')
 @section('tableToolButtons')
+    <script src="{{ asset('plugins/pace/pace.min.js') }}"></script>
+    <link href="{{ asset('plugins/pace/dataurl.css') }}" rel="stylesheet" />
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route('message.startWorkflow') }}">
             <i class="glyphicon glyphicon-play"></i> 开始工作流
@@ -33,9 +35,10 @@
     </div>
 @stop
 @section('tableHeader')
+    <th><input type='checkbox' name='select_all' class='select_all'> </th>
     <th class="sort" data-field="id">ID</th>
     <th>渠道</th>
-    <th>账号</th>
+    <th>账号别名</th>
     <th>主题</th>
     <th>标签</th>
     <th>平台订单号</th>
@@ -49,14 +52,17 @@
     <th>延迟</th>
     <th>AutoReply</th>
     <th>操作</th>
-{{--    <th>无需回复</th>--}}
+    <th>无需回复</th>
 @stop
 @section('tableBody')
     @foreach($data as $message)
         <tr>
+            <td>
+                <input type="checkbox" name="check-message" value="{{$message->id}}" class="checked-message">
+            </td>
             <td>{{ $message->id }}</td>
             <td>{{ $message->ChannelName}}</td>
-            <td>{{ $message->account->account }}</td>
+            <td>{{ $message->account->alias }}</td>
             <td>
                {{ str_limit($message->subject,30) }}
             </td>
@@ -85,8 +91,6 @@
                 <?php
                 }
                 ?>
-
-
             </td>
             <td>
                 {{$message->AutoReplyStatus}}
@@ -109,21 +113,32 @@
                     </a>
                 @endif
             </td>
-{{--            <td>
+            <td>
                 @if($message->status == 'PROCESS' and $message->assign_id == request()->user()->id)
                     <button class="btn btn-warning btn-xs" style="background-color: #88775A;border-color: #FFFFFF;" type="button" onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply_1', ['id'=>$message->id]) }}'}">
-                        <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
+                        <span class="glyphicon glyphicon-minus-sign"></span>
                     </button>
                 @endif
                 @if($message->status == 'UNREAD')
                     <button class="btn btn-warning btn-xs" style="background-color: #88775A;border-color: #FFFFFF;" type="button" onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply_1', ['id'=>$message->id]) }}'}">
-                        <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
+                        <span class="glyphicon glyphicon-minus-sign"></span>
                     </button>
                 @endif
-            </td>--}}
+            </td>
         </tr>
-
     @endforeach
+@section('doAction')
+    <div class="btn-group dropup">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            批量操作
+            <span class="caret"></span>
+        </button>
+
+        <ul class="dropdown-menu">
+            <li><a href="javascript:void(0)" class="examine" onclick="doNotRequire()" >无需回复</a></li>
+        </ul>
+    </div>
+@stop
     <link href="{{ asset('css/multiple-select.css') }}" rel="stylesheet">
     <script src="{{ asset('js/multiple-select.js') }}"></script>
     <script>
@@ -134,6 +149,21 @@
              if(accountid.val() != 'none'){
                  window.location.href=accountid.val();
              }
+        }
+        function doNotRequire() {
+            var ids = '';
+            $.each($('.checked-message:checked'), function () {
+                 ids += ',' + $(this).val();
+            });
+
+            if(_.isEmpty(ids)){
+                alert('请先选中需要操作的消息')
+                return;
+            }
+            ids = _.trimLeft(ids, ',');
+            if(confirm('你确认需要把选中的批量改为：无需回复状态吗？')){
+                location.href = '{{route('changeMultipleStatus')}}?ids='+ids;
+            }
         }
     </script>
 @stop

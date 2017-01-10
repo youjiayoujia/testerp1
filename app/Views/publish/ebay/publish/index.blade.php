@@ -35,7 +35,7 @@
             <td><input type='checkbox' name='tribute_id'  value="{{ $v->id }}"></td>
             <td>{{$v->id }}</td>
             <td>{{$v->site_name }}</td>
-            <td>{{$v->channelAccount->account }}</td>
+            <td>{{$v->channelAccount->alias }}</td>
             <td>{{$v->listing_type }}</td>
             <td>{{$v->title }}</td>
             <td>{{$v->sku }}</td>

@@ -62,8 +62,9 @@
     <tbody>
     <tr class='success'><td>ERP总重量</td><td>{{$all_weight}}kg</td><td>ERP总重量=erp重量x商品实发数 ，累加</td></tr>
     <tr class='success'><td>实测总重量</td><td>{{$model->boxes ? $model->boxes->sum('weight') : ''}}kg</td><td>实测总重量=各箱重量之和</td></tr>
-    <tr class='success'><td>实测体积</td><td>{{$volumn}}</td><td>实测体积=各箱体积重之和体积重=（长*宽*高）÷5000</td></tr>
-    <tr class='success'><td>实际总运费</td><td>{{$model->boxes ? $model->boxes->sum('fee') : ''}}kg</td><td>人工手动输入</td></tr>
+    <tr class='success'><td>实测体积</td><td>{{$volumn}}</td><td>实测体积=各箱体积重之和体积重=（长*宽*高）÷6000</td></tr>
+    <tr class='success'><td>实际总运费</td><td>{{$model->boxes ? $model->boxes->sum('fee') : ''}}￥</td><td>人工手动输入</td></tr>
+    <tr class='success'><td>预测总运费</td><td>{{ $model->boxes ? $model->boxes->sum('expected_fee') : ''}}￥</td><td>各箱之和</td></tr>
     </tbody>
 </table>
 

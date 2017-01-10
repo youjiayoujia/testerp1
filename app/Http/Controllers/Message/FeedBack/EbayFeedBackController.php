@@ -31,7 +31,7 @@ class EbayFeedBackController extends Controller
             'data'   => $this->autoList($this->model),
             'status' => $this->model->distinct()->get(['channel_account_id']),
             'types'  => $this->model->distinct()->get(['comment_type']),
-
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index',$response);
     }

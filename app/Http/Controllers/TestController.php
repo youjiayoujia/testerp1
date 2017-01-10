@@ -131,7 +131,7 @@ class TestController extends Controller
 
     // public function test2()
     // {
-    //     $package = PackageModel::find('60417');
+    //     $package = PackageModel::find('42990');
     //     if(in_array($package->status, ['WAITASSIGN', 'ASSIGNFAILED'])) {
     //         $order = $package->order;
     //         $package->assignLogistics();
@@ -158,34 +158,34 @@ class TestController extends Controller
     //             }
     //             //分渠道审核
     //             $profitRate = $order->calculateProfitProcess();
-    //             // switch ($order->channel->driver) {
-    //             //     case 'amazon':
-    //             //         break;
-    //             //     case 'aliexpress':
-    //             //         if ($profitRate <= 0 or $profitRate >= 0.4) {
-    //             //             $order->update(['status' => 'REVIEW']);
-    //             //             $order->remark('速卖通订单利润率小于0或大于40%.', 'PROFIT');
-    //             //         }
-    //             //         break;
-    //             //     case 'wish':
-    //             //         if ($profitRate < 0.08) {
-    //             //             $order->update(['status' => 'REVIEW']);
-    //             //             $order->remark('WISH订单利润率小于8%.', 'PROFIT');
-    //             //         }
-    //             //         break;
-    //             //     case 'ebay':
-    //             //         if ($profitRate <= 0.05) {
-    //             //             $order->update(['status' => 'REVIEW']);
-    //             //             $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
-    //             //         }
-    //             //         break;
-    //             //     case 'lazada':
-    //             //         break;
-    //             //     case 'cdiscount':
-    //             //         break;
-    //             //     case 'joom':
-    //             //         break;
-    //             // }
+    //             switch ($order->channel->driver) {
+    //                 case 'amazon':
+    //                     break;
+    //                 case 'aliexpress':
+    //                     if ($profitRate <= 0 or $profitRate >= 0.4) {
+    //                         $order->update(['status' => 'REVIEW']);
+    //                         $order->remark('速卖通订单利润率小于0或大于40%.', 'PROFIT');
+    //                     }
+    //                     break;
+    //                 case 'wish':
+    //                     if ($profitRate < 0.08) {
+    //                         $order->update(['status' => 'REVIEW']);
+    //                         $order->remark('WISH订单利润率小于8%.', 'PROFIT');
+    //                     }
+    //                     break;
+    //                 case 'ebay':
+    //                     if ($profitRate <= 0.05) {
+    //                         $order->update(['status' => 'REVIEW']);
+    //                         $order->remark('EBAY订单利润率小于或等于5%.', 'PROFIT');
+    //                     }
+    //                     break;
+    //                 case 'lazada':
+    //                     break;
+    //                 case 'cdiscount':
+    //                     break;
+    //                 case 'joom':
+    //                     break;
+    //             }
     //         }
     //         if($package->order->status != 'REVIEW') {
     //             if ($package->status == 'ASSIGNED') {
@@ -219,17 +219,85 @@ class TestController extends Controller
     //     var_dump('123');
     // }
 
+    public function test2()
+    {
+        $order = OrderModel::find(3637);
+        $buf = $order->overseaCalculateProfit();
+        var_dump($buf);exit;
+    }
+
+    // public function test2()
+    // {
+    //     $package = PackageModel::where('id', '40893')->first(['warehouse_id', 'channel_id']);
+    //     var_dump($package);exit;
+    // }
+
+    // public function test2()
+    // {
+    //     $package = PackageModel::find('40890');
+    //     if($package->order->status != 'REVIEW' && in_array($package->status, ['NEW', 'NEED'])) {
+    //         if($package->is_oversea) {
+    //             $flag = $package->oversea_createPackageItems();
+    //         } else {
+    //             $flag = $package->createPackageItems();
+    //         }
+    //         if ($flag) {
+    //             if ($package->status == 'WAITASSIGN') {
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success to assign stock.';
+    //                 $package->eventLog('队列', '已匹配到库存,待分配', json_encode($package));
+    //             } elseif ($package->status == 'PROCESSING') { //todo:如果缺货订单匹配到了库存，不是原匹配仓库，需要匹配物流下单
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success to assign stock.';
+    //                 $package->eventLog('队列', '已匹配到库存,待拣货', json_encode($package));
+    //             } elseif ($package->status == 'ASSIGNED') {
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success to assign stock.';
+    //                 $package->eventLog('队列', '已匹配到库存,待下单', json_encode($package));
+    //             }
+    //         } else {
+    //             if($package->status == 'NEED') {
+    //                 $package->update(['queue_name' => '']);
+    //             }
+    //             $this->result['status'] = 'success';
+    //             $this->result['remark'] = 'have no enough stocks or can\'t assign stocks.';
+    //             $package->eventLog('队列', 'have no enough stocks or can\'t assign stocks.',
+    //                 json_encode($package));
+    //         }
+    //     } else {
+    //         $package->update(['queue_name' => '']);
+    //     }
+    //     var_dump('123');
+    // }
+
     // public function test2()
     // {
 
     // }
 
-    public function test2()
+    // public function test2()
+    // {
+    //     $id = request()->get('id');
+    //     $package = PackageModel::where('id', $id)->first();
+    //     if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+    //         $result = $package->placeLogistics('UPDATE');
+    //     } else {
+    //         $result = $package->placeLogistics();
+    //     }
+    //     dd($result);
+    // }
+
+    /*public function test2()
     {
-        $order = PackageModel::find('40423');
-        $order->createpackageitems();
-        var_dump('123');
-    }
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
+    }*/
 
     // public function test2()
     // {
@@ -241,13 +309,9 @@ class TestController extends Controller
 
     // public function test2()
     // {
-    //     $order = OrderModel::find(60201);
+    //     $order = OrderModel::find(60191);
     //     if ($order && $order->status != 'REVIEW') {
     //         if ($order->status == 'PREPARED') {
-    //             $oldPackages = $order->packages;
-    //             foreach ($oldPackages as $oldPackage) {
-    //                 $oldPackage->cancelPackage();
-    //             }
     //             if ($order->channel->driver == 'ebay' and $order->order_is_alert != 2) {
     //                 if ($order->order_is_alert == 1) {
     //                     $order->update(['status' => 'REVIEW']);
@@ -260,10 +324,10 @@ class TestController extends Controller
     //             } else {
     //                 $package = $order->createPackage();
     //                 if ($package) {
-    //                     $package->update(['queue_name' => 'assignStocks']);
     //                     $job = new AssignStocks($package);
     //                     $job->onQueue('assignStocks');
     //                     $this->dispatch($job);
+    //                     $order->update(['status' => 'PACKED']);
     //                     $this->relation_id = $order->id;
     //                     $this->result['status'] = 'success';
     //                     $this->result['remark'] = 'Success.';
@@ -285,16 +349,14 @@ class TestController extends Controller
 
     public function test1()
     {
-        $orders = OrderModel::where('profit', 0)->whereBetween('id', [1470, 1660])->get();
-        foreach ($orders as $order) {
-            $order->calculateProfitProcess();
-        }
+        $orders = OrderModel::find(3319);
+        $orders->calculateProfitProcess();
         return 1;
     }
 
     public function test3()
     {
-        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
+        $orders = OrderModel::whereBetween('id', [3081, 3189])->get();
         foreach ($orders as $order) {
             $order->calculateProfitProcess();
         }
@@ -303,9 +365,13 @@ class TestController extends Controller
 
     public function test4()
     {
-        $orders = OrderModel::where('channel_id', 2)->where('status', 'NEED')->get();
+        $orders = OrderModel::where('channel_id', 4)->get();
         foreach ($orders as $order) {
-            $order->calculateOrderChannelFee();
+            if ($order->items) {
+                foreach ($order->items as $item) {
+                    $item->update(['channel_id' => 4]);
+                }
+            }
         }
         return 1;
     }
@@ -1101,6 +1167,8 @@ class TestController extends Controller
 
     public function jdtestCrm()
     {
+
+        dd('end');
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
 
@@ -1420,7 +1488,7 @@ class TestController extends Controller
         } else {
             $result = $package->placeLogistics();
         }
-        var_dump($result);
+        var_dump($result);        
         exit;
         $page = 2;
         $pageSize = 2000;

@@ -61,7 +61,11 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                     $order->remark('包裹重量大于2kg.', 'WEIGHT');
                 }
                 //分渠道审核
-                $profitRate = $order->calculateProfitProcess();
+                if($order->is_oversea) {
+                    $profitRate = $order->overseaCalculateProfit();
+                } else {
+                    $profitRate = $order->calculateProfitProcess();
+                }
                 switch ($order->channel->driver) {
                     case 'amazon':
                         break;
@@ -91,7 +95,10 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                         break;
                 }
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> a103e6d89e0a826006d2ab15084ee9ed230f4ecf
             if ($this->package->order->status != 'REVIEW') {
                 if ($this->package->status == 'ASSIGNED') {
                     $this->package->update(['queue_name' => 'placeLogistics']);
@@ -122,6 +129,14 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
             $this->package->update(['queue_name' => '']);
         }
         $this->lasting = round(microtime(true) - $start, 2);
+        $this->log('AssignLogistics');
+    }
+
+    public function failed()
+    {
+        $this->package->update(['queue_name' => '']);
+        $this->result['status'] = 'fail';
+        $this->result['remark'] = '队列执行失败，程序错误或响应超时.';
         $this->log('AssignLogistics');
     }
 }

@@ -87,7 +87,7 @@ class StockController extends Controller
         $item->in(request('warehouse_position_id'), request()->input('all_quantity'), request()->input('all_quantity') * ($item->cost ? $item->cost : $item->purchase_price), 'MAKE_ACCOUNT');
         if(!empty(request('oversea_sku'))) {
             $stock = $this->model->where(['item_id' => request('item_id'), 'warehouse_position_id' => request('warehouse_position_id')])->first();
-            $stock->update(['oversea_sku' => request('oversea_sku')]);
+            $stock->update(['oversea_sku' => request('oversea_sku'), 'oversea_cost' => request('oversea_cost')]);
         }
         
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
@@ -198,13 +198,11 @@ class StockController extends Controller
         $str .= "</thead><tbody>";
         foreach($stocks as $stock)
         {
-            if($stock->available_quantity || $stock->hold_quantity) {
-                $str .= "<tr><td data-id='".$stock->id."' data-warehouseId='".$stock->warehouse_id."'>".($stock->warehouse ? $stock->warehouse->name : '')."</td><td class='col-lg-2'>".($stock->position ? $stock->position->name : '')."</td><td data-itemId='".$stock->item_id."'>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td><td>".($stock->item ? $stock->item->logistics_limit : '')."</td>";
-                if(!request()->has('type')) {
-                    $str .= "<td><button type='button' class='btn btn-info change_position'>修改库位</button></td>";
-                }
-                $str .= "</tr>";
+            $str .= "<tr><td data-id='".$stock->id."' data-warehouseId='".$stock->warehouse_id."'>".($stock->warehouse ? $stock->warehouse->name : '')."</td><td class='col-lg-2'>".($stock->position ? $stock->position->name : '')."</td><td data-itemId='".$stock->item_id."'>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td><td>".($stock->item ? $stock->item->logistics_limit : '')."</td>";
+            if(!request()->has('type')) {
+                $str .= "<td><button type='button' class='btn btn-info change_position'>修改库位</button></td>";
             }
+            $str .= "</tr>";
         }
         $str .= "</tbody>";
 
@@ -223,9 +221,7 @@ class StockController extends Controller
         $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
         foreach($stocks as $stock)
         {
-            if($stock->available_quantity || $stock->hold_quantity) {
             $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
-            }
         }
         $str .= "</tbody>";
 
@@ -523,6 +519,8 @@ class StockController extends Controller
                      'sku'=>'',
                      'position'=>'',
                      'all_quantity'=>'',
+                     'oversea_sku' => '',
+                     'oversea_cost' => '',
                     ]
             ];
         $name = 'stock';
@@ -556,45 +554,12 @@ class StockController extends Controller
             $file = request()->file('excel');
             $arr = $this->model->overseaExcelProcess($file);
             $response = [
-                'metas' => $this->metas(__FUNCTION__),
+                'metas' => $this->metas(__FUNCTION__, '库存变动调整单'),
                 'arr' => $arr,
             ];
 
             return view($this->viewPath.'overseaImport', $response);
         }
-    }
-
-    public function overseaImportStore()
-    {
-        $arr = request('arr');
-        $result = request('result');
-        if(!$result) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('fail', '变更失败...'));
-        }
-        foreach($arr['quantity'] as $key => $value) {
-            if($value) {
-                $item = ItemModel::where('sku', $arr['sku'][$key])->first();
-                if(!$item) {
-                    continue;
-                }
-                $position = PositionModel::where('name', $arr['position'][$key])->first();
-                if(!$position) {
-                    continue;
-                }
-                if($value > 0) {
-                    $item->in($position->id, (int)$value, ((int)$value * ($item->cost ? $item->cost : $item->purchase_price)), 'ADJUSTMENT');
-                    $stock = $this->model->where(['item_id' => $item->id, 'warehouse_position_id' => $position->id])->first();
-                    if($stock) {
-                        $stock->update(['oversea_sku' => $arr['oversea_sku'][$key]]);
-                    }
-                }
-                if($value < 0) {
-                    $item->out($position->id, -(int)$value, 'ADJUSTMENT');
-                }
-            }
-        }
-
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '库存变更成功...'));
     }
 
     /**

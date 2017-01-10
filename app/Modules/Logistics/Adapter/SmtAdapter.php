@@ -93,6 +93,7 @@ class SmtAdapter extends BasicAdapter
         $channel_account_id = $package->channel_account_id;
         list($name, $channel) = explode(',', $package->logistics->type);
         $warehouseCarrierService = $channel;    //物流方式
+        echo $package->logistics_order_number;
         if(!$package->logistics_order_number){           
             //获取渠道帐号资料
             $account = AccountModel::findOrFail($channel_account_id);
@@ -121,12 +122,10 @@ class SmtAdapter extends BasicAdapter
                 'categoryCnDesc'       => $package->items ? $package->items->first()->item->product->declared_cn : '连衣裙',
                 'categoryEnDesc'       => $package->items ? $package->items->first()->item->product->declared_en : 'dress',
                 'productDeclareAmount' => $package->items->first()->item->declared_value,
-                'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,
+                'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,               
                 'productNum'           => $productNum,
                 'productWeight'        => $package->total_weight,
-                'isContainsBattery'    => $package->is_battery ? 1 : 0,
-                /*'isAneroidMarkup'      => 0,
-                 'isOnlyBattery'        => 0,*/
+                'isContainsBattery'    => $package->is_battery ? 1 : 0,    
             );
             
             $addressArray = array(
@@ -163,17 +162,19 @@ class SmtAdapter extends BasicAdapter
             );
             $address_result = $smtApi->getJsonDataUsePostMethod($address_api, $address_smt);
             $address_result = json_decode($address_result, true);
+            echo '<pre>';   
             $addressArray = array_merge($addressArray, $this->_senderAddress[$package->warehouse_id]);
             $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
             $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
             
             $data['declareProductDTOs']         = json_encode([$productData]);  //二维数组
             $data['addressDTOs']                = json_encode($addressArray);
-             
+            
+            print_r($data);
             $api = 'api.createWarehouseOrder';
             $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
-            $result = json_decode($rs,true);
-            echo '<pre>';
+            
+            $result = json_decode($rs,true);            
             print_r($result);
             if(array_key_exists('success', $result) && $result['result']['success']){
                 if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取

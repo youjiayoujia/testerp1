@@ -80,6 +80,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //入库
     Route::resource('stockIn', 'Stock\InController');
 
+
+    //海外仓库存调整
+    Route::resource('overseaStockAdjustment', 'Oversea\StockAdjustmentController');
     //海外仓调拨  
     Route::get('overseaAllotment/inboxOver/{str}/{id}', ['uses' => 'Oversea\AllotmentController@inboxOver', 'as' => 'overseaAllotment.inboxOver']);
     Route::get('overseaAllotment/allotmentInStock/{id}', ['uses' => 'Oversea\AllotmentController@allotmentInStock', 'as' => 'overseaAllotment.allotmentInStock']); 
@@ -331,6 +334,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购统计报表
     Route::get('purchaseOrder/purchaseStaticstics',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
+    //到货记录报表
+    Route::get('purchaseOrder/recieveReport',
+        ['uses' => 'Purchase\PurchaseOrderController@recieveReport', 'as' => 'purchaseOrder.recieveReport']);
     //缺货报表
     Route::get('purchaseOrder/outOfStock',
         ['uses' => 'Purchase\PurchaseOrderController@outOfStock', 'as' => 'purchase.outOfStock']);
@@ -400,6 +406,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //采购单导出
     Route::any('purchaseOrder/purchaseOrdersOut',
         ['uses' => 'Purchase\PurchaseOrderController@purchaseOrdersOut', 'as' => 'purchaseOrder.purchaseOrdersOut']);
+    //到货记录
+    Route::any('purchaseOrder/purchaseArrivalLogOut',
+        ['uses' => 'Purchase\PurchaseOrderController@purchaseArrivalLogOut', 'as' => 'purchaseOrder.purchaseArrivalLogOut']);
     //采购单核销格式导出
     Route::any('purchaseOrderConfirmCsvFormat', ['uses' => 'Purchase\PurchaseOrderController@purchaseOrderConfirmCsvFormat', 'as' => 'purchaseOrderConfirmCsvFormat']);
     //采购单付款格式导出
@@ -689,6 +698,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('order/ajaxSku', ['uses' => 'OrderController@ajaxSku', 'as' => 'order.ajaxSku']);
     Route::get('orderStatistics', ['uses' => 'OrderController@orderStatistics', 'as' => 'orderStatistics']);
     Route::resource('order', 'OrderController');
+    Route::resource('ebaySkuSaleReport', 'Order\EbaySkuSaleReportController');
     Route::resource('orderItem', 'Order\ItemController');
     Route::resource('unpaidOrder', 'Order\UnpaidOrderController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
@@ -721,6 +731,12 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //物流报表
     Route::get('package/logisticsDelivery',
         ['uses' => 'PackageController@logisticsDelivery', 'as' => 'package.logisticsDelivery']);
+
+    //sku报表
+    Route::get('sku/saleReport',
+        ['uses' => 'OrderController@saleReport', 'as' => 'sku.saleReport']);
+    Route::get('sku/amountStatistics',
+        ['uses' => 'OrderController@amountStatistics', 'as' => 'sku.amountStatistics']);
 
     //包裹报表
     Route::get('allReport/createData',
@@ -1114,6 +1130,15 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::post('smtPriceTask/getSmtPriceTask',
         ['uses' => 'Publish\Smt\SmtPriceTaskController@getSmtPriceTask', 'as' => 'smtPriceTask.getSmtPriceTask']);
     Route::resource('smtPriceTask', 'Publish\Smt\SmtPriceTaskController');
+    
+    Route::any('downloadTemplate', ['uses' => 'Publish\Smt\CopyrightController@downloadTemplate', 'as' => 'downloadTemplate']);
+    Route::any('exportAllData', ['uses' => 'Publish\Smt\CopyrightController@exportAllData', 'as' => 'exportAllData']);
+    Route::any('exportPartData', ['uses' => 'Publish\Smt\CopyrightController@exportPartData', 'as' => 'exportPartData']);
+    Route::any('deletePartData', ['uses' => 'Publish\Smt\CopyrightController@deletePartData', 'as' => 'deletePartData']);
+    Route::post('getAllAccountByPlatID', ['uses' => 'Publish\Smt\CopyrightController@getAllAccountByPlatID', 'as' => 'copyright.getAllAccountByPlatID']);
+    
+    Route::any('importCopyrightData', ['uses' => 'Publish\Smt\CopyrightController@importCopyrightData', 'as' => 'importCopyrightData']);
+    Route::resource('copyright', 'Publish\Smt\CopyrightController');
 
     Route::any('upload',
         ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
@@ -1247,6 +1272,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('SendEbayMessage', ['uses' => 'MessageController@SendEbayMessage', 'as' => 'message.sendEbayMessage']);
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
     Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
+    Route::any('changeMultipleStatus', 'MessageController@changeMultipleStatus')->name('changeMultipleStatus');
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
@@ -1295,6 +1321,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('AliexpressIssue', 'Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',
         ['uses' => 'Message\Dispute\AliexpressIssueController@doRefuseIssues', 'as' => 'aliexpress.doRefuseIssues']);
+    Route::resource('crmStatistics', 'Message\StatisticsController');
     //spu
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
     Route::get('spu/checkPrivacy', ['uses' => 'SpuController@checkPrivacy', 'as' => 'spu.checkPrivacy']);

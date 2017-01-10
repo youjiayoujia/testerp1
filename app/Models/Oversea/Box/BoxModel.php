@@ -41,4 +41,13 @@ class BoxModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Oversea\FirstLeg\FirstLegModel', 'logistics_id', 'id');
     }
+
+    public function getExpectedFeeAttribute()
+    {
+        if($this->logistics && $this->weight) {
+            return $this->weight * $this->logistics->cost;
+        } else {
+            return 0;
+        }
+    }
 }

@@ -51,7 +51,7 @@ class smtProductList extends BaseModel
         return [
             'relatedSearchFields' => ['productSku' => ['skuCode']],
             'filterFields' => [],
-            'filterSelects' => ['token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','account')],
+            'filterSelects' => ['token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','alias')],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];

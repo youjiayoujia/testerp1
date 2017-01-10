@@ -84,6 +84,11 @@ class WarehouseModel extends BaseModel
             'warehouse_id', 'type_id');
     }
 
+    public function overseaItemCost()
+    {
+        return $this->hasMany('App\Models\Oversea\ItemCostModel', 'code', 'code');
+    }
+
     public function logisticsIn($id)
     {
         $logisticses = $this->logistics;

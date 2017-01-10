@@ -353,14 +353,6 @@
                             <span class="glyphicon glyphicon-pencil"></span> 恢复正常
                         </a>
                     @endif
-                    @if(count($order->packages) > 0)
-                        <button class="btn btn-primary btn-xs"
-                                data-toggle="modal"
-                                data-target="#package{{ $order->id }}"
-                                title="包裹">
-                            <span class="glyphicon glyphicon-link"></span> 包裹
-                        </button>
-                    @endif
                     @if($order->status == 'CANCEL')
                         <a href="javascript:" class="btn btn-primary btn-xs recover" data-id="{{ $order->id }}">
                             <span class="glyphicon glyphicon-pencil"></span> 恢复订单
@@ -657,59 +649,6 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="package{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel">包裹信息</h4>
-                    </div>
-                    <div class="modal-body">
-                        @if($order->packages->toArray())
-                            @foreach($order->packages as $package)
-                                <div class="row">
-                                    <div class="col-lg-3">
-                                        <strong>包裹ID</strong> :
-                                        <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>物流方式</strong>
-                                        : {{ $package->logistics ? $package->logistics->name : '' }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>追踪号</strong> :
-                                        <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>包裹状态</strong> : {{ $package->status_name }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>打印面单时间</strong> : {{ $package->printed_at }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>发货时间</strong> : {{ $package->shipped_at }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>交付时间</strong> : {{ $package->delivered_at }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>备注</strong> : {{ $package->remark }}
-                                    </div>
-                                </div>
-                                <div class="divider"></div>
-                            @endforeach
-                        @else
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="modal fade" id="send_ebay_message_{{ $order->id }}" role="dialog">
             <div class="modal-dialog" role="document" style="width:800px;">
                 <div class="modal-content">

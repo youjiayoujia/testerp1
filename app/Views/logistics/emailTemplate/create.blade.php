@@ -3,7 +3,7 @@
 @section('formBody')
     <div class='row'>
         <div class="form-group col-lg-2">
-            <label for="name" class="control-label">回邮名称</label>
+            <label for="name" class="control-label">回邮类型</label>
             <select class='type form-control' name='type'>
                 <option value="default">默认</option>
                 <option value="eub">EUB</option>

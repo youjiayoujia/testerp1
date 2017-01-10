@@ -10,9 +10,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\Job;
 use App\Jobs\DoPackages;
-use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CountriesModel;
@@ -20,9 +18,7 @@ use App\Models\CurrencyModel;
 use App\Models\ItemModel;
 use App\Models\Order\EbaySkuSaleReportModel;
 use App\Models\OrderModel;
-use App\Models\product\ImageModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
-use App\Models\Publish\Ebay\EbaySiteModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 use App\Models\Order\ItemModel as orderItem;

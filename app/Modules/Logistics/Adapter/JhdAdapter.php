@@ -19,6 +19,7 @@ class JhdAdapter extends BasicAdapter
     {
         $this->_express_type =!empty($config['type'])?$config['type']:'香港平邮';
         $this->url = !empty($config['url'])?$config['url']:'http://114.119.9.156:8012/Order.aspx';
+        $this->prefix = 'ERP3';
     }
     public function getTracking($orderInfo){
         $totalWeight = 0;
@@ -29,7 +30,7 @@ class JhdAdapter extends BasicAdapter
         }
         $orderno=$orderInfo->id;
         $content = '<request>
-                    <orderno>'.$orderno.'</orderno>
+                    <orderno>'.$this->prefix.$orderno.'</orderno>
                     <Clno>J-SLME</Clno>
                     <HubIn>'.$this->_express_type.'</HubIn>
                     <DestNO>'.$orderInfo->shipping_country.'</DestNO>
@@ -38,9 +39,9 @@ class JhdAdapter extends BasicAdapter
                 </request>';
         $str = 'service=tms_order_notify&content='.$content.'&sign='.md5($content.'123456');
         $url=$this->url;
-        $res = $this->postCurlHttpsData($url,$str);
-        $res = (array)simplexml_load_string($res);
-        if($res['is_success'] == 'T' && $res['jobno']){
+        $resx = $this->postCurlHttpsData($url,$str);
+        $res = (array)simplexml_load_string($resx);
+        if(@$res['is_success'] == 'T' && @$res['jobno']){
             //success
             $result = [
                 'code' => 'success',
@@ -48,8 +49,10 @@ class JhdAdapter extends BasicAdapter
             ];
         }else{
             $error = '';
-            if($res['error']){
+            if(@$res['error']){
                 $error=$res['error'];
+            }else{
+                $error=$resx;
             }
             $result =[
                 'code' => 'error',

@@ -257,9 +257,7 @@ class SzPostXBAdapter extends BasicAdapter
 </logisticsEventsRequest>";*/ 
 //         $obj = simplexml_load_string($str);
 //         print_r($obj);
-        $str=preg_replace("/&|’|'/",' ',$str);
-        echo $str.$this->scret;
-        echo "<br/>";
+        $str=preg_replace("/&|’|'/",' ',$str);     
         $newdata =  base64_encode(pack('H*', md5($str.$this->scret)));
         $url = $this->ServerUrl;
         $postD = 'logistics_interface='.$str.'&data_digest='.$newdata.'&msg_type=B2C_TRADE&ecCompanyId='.$this->ecCompanyId.'&version=2.0';     

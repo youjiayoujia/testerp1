@@ -28,7 +28,7 @@ class JhdAdapter extends BasicAdapter
             $totalWeight += $item->quantity * $item->item->weight;
             $sku_count += $item->quantity;
         }
-        $orderno=$orderInfo->id;
+        $orderno=$orderInfo->id;$orderInfo->shipping_country='RU';
         $content = '<request>
                     <orderno>'.$this->prefix.$orderno.'</orderno>
                     <Clno>J-SLME</Clno>
@@ -36,6 +36,13 @@ class JhdAdapter extends BasicAdapter
                     <DestNO>'.$orderInfo->shipping_country.'</DestNO>
                     <Weig>'.$totalWeight.'</Weig>
                     <Pcs>'.$sku_count.'</Pcs>
+                    <ReCompany>'.$orderInfo->shipping_firstname.' '.$orderInfo->shipping_lastname.'</ReCompany>
+                    <ReTel>'.$orderInfo->shipping_phone.'</ReTel>
+                    <ReAddr>'.$orderInfo->shipping_address.' '.$orderInfo->shipping_address1.'</ReAddr>
+                    <ReCity>'.$orderInfo->shipping_city.'</ReCity>
+                    <ReZip>'.$orderInfo->shipping_zipcode.'</ReZip>
+                    <ReState>'.$orderInfo->shipping_state.'</ReState>
+                    <ReConsinee>'.$orderInfo->shipping_firstname.' '.$orderInfo->shipping_lastname.'</ReConsinee>
                 </request>';
         $str = 'service=tms_order_notify&content='.$content.'&sign='.md5($content.'123456');
         $url=$this->url;
@@ -58,7 +65,7 @@ class JhdAdapter extends BasicAdapter
                 'code' => 'error',
                 'result' => $error
             ];
-        }
+        }echo "<pre/>";var_dump($result);exit;
         return $result;
 
     }

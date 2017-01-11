@@ -28,7 +28,7 @@ class JhdAdapter extends BasicAdapter
             $totalWeight += $item->quantity * $item->item->weight;
             $sku_count += $item->quantity;
         }
-        $orderno=$orderInfo->id;$orderInfo->shipping_country='RU';
+        $orderno=$orderInfo->id;
         $content = '<request>
                     <orderno>'.$this->prefix.$orderno.'</orderno>
                     <Clno>J-SLME</Clno>
@@ -65,7 +65,7 @@ class JhdAdapter extends BasicAdapter
                 'code' => 'error',
                 'result' => $error
             ];
-        }echo "<pre/>";var_dump($result);exit;
+        }
         return $result;
 
     }

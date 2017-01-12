@@ -57,6 +57,7 @@ class EventChildController extends Controller
         $table = request('table');
         $id = request('id');
         $rate = request('rate');
+        $next_rate = (int)$rate + 1;
         $len = 20;
         $start = (int)$rate * $len;
         $category = CategoryModel::where('model_name', $table)->first();
@@ -181,6 +182,6 @@ class EventChildController extends Controller
             }
             $html .= '</div></div></div>';
         }
-        return $html;
+        return [$html, $next_rate];
     }
 }

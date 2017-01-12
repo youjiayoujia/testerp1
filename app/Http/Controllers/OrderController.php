@@ -279,6 +279,26 @@ class OrderController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    //运费
+    public function logisticsFee()
+    {
+        $arr = request('arr');
+        $buf = [];
+        if (!empty($arr)) {
+            foreach ($arr as $key => $id) {
+                $order = $this->model->find($id);
+                if (!$order) {
+                    $buf[$key][0] = '订单未找到';
+                    $buf[$key][1] = 0;
+                    continue;
+                }
+                $buf[$key][1] = ($order->logistics_fee ? $order->logistics_fee : 0) . 'RMB';
+            }
+        }
+
+        return $buf;
+    }
+
     //订单统计
     public function orderStatistics()
     {

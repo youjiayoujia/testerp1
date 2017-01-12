@@ -56,11 +56,14 @@ class EventChildController extends Controller
     {
         $table = request('table');
         $id = request('id');
+        $rate = request('rate');
+        $len = 20;
+        $start = (int)$rate * $len;
         $category = CategoryModel::where('model_name', $table)->first();
         if (!$category) {
             return false;
         }
-        $models = $category->child()->where('type_id', $id)->get()->sortByDesc('when');
+        $models = $category->child()->where('type_id', $id)->skip($start)->take($len)->get()->sortByDesc('when');
         $html = '';
         foreach ($models as $key1 => $model) {
             $to = json_decode($model->to_arr);

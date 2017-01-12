@@ -485,7 +485,8 @@ class PickListController extends Controller
     }
 
     public function createNewPickStore()
-    {
+    {   
+        set_time_limit(0);
         $sum = 0;
         $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
         if(!$warehouse_id) {
@@ -686,6 +687,8 @@ class PickListController extends Controller
      */
     public function createPickStore()
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '128M');
         $sum = 0;
         $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
         if(!$warehouse_id) {
@@ -697,7 +700,7 @@ class PickListController extends Controller
                     $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
                     ->where(function($query){
                         if(request()->has('channel')) {
-                            $query =$query->whereIn('channel_id', request('channel'));
+                            $query->whereIn('channel_id', request('channel'));
                         }
                     })->get();
                     $sum += $packages->count();

@@ -696,6 +696,12 @@ class OrderModel extends BaseModel
         if ($data['shipping_country'] == 'PR') {
             $data['shipping_country'] = 'US';
         }
+        if ($data['shipping_country'] == 'UK') {
+            $data['shipping_country'] = 'GB';
+        }
+        if ($data['shipping_country'] == 'FR' && substr($data['shipping_zipcode'], 0, 3) == '974') {
+            $data['shipping_country'] = 'RE';
+        }
         //判断是否有订单产品
         if (!isset($data['items']) or empty($data['items'])) {
             DB::rollBack();

@@ -156,7 +156,7 @@ class PickListModel extends BaseModel
     {
         foreach($package->items as $packageitem)
         {
-            $query = ListItemModel::where(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'picklist_id'=>'0'])->first();
+            $query = ListItemModel::where(['item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'type'=>$package->type, 'picklist_id'=>'0'])->first();
             if(!$query) {
                 $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'sku'=>$packageitem->item->sku, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'quantity'=>$packageitem->quantity]);
                 $obj->pickListItemPackages()->create(['package_id' => $package->id]);
@@ -180,9 +180,12 @@ class PickListModel extends BaseModel
         $buf = [];
         foreach($package->items as $packageitem)
         {
-            $name = PositionModel::find($packageitem->warehouse_position_id)->name;
-            $tmp = substr($name,4,2);
-            $buf[] = (int)$tmp;
+            $position = PositionModel::find($packageitem->warehouse_position_id);
+            if($position) {
+                $name = $position->name;
+                $tmp = substr($name,4,2);
+                $buf[] = (int)$tmp;
+            }
         }
         $buf = array_unique($buf);
         $num = 0;
@@ -223,6 +226,7 @@ class PickListModel extends BaseModel
                     }
                 }
             }
+            unset($picklists);
         }
         $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLEMULTI']);
         if($query->count()) {
@@ -242,6 +246,7 @@ class PickListModel extends BaseModel
                     }
                 }
             }
+            unset($picklists);
         }
         $query = PackageScoreModel::where(['picklist_id'=>'0']);
         if($query->count()) {            
@@ -294,6 +299,7 @@ class PickListModel extends BaseModel
                     }
                 }
             }
+            unset($picklists);
          }
         $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLEMULTI']);
         if($query->count()) {
@@ -313,6 +319,7 @@ class PickListModel extends BaseModel
                     }
                 }
             }
+            unset($picklists);
         }
         $query = PackageScoreModel::where(['picklist_id'=>'0']);
         if($query->count()) {            

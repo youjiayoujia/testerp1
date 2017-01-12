@@ -235,7 +235,7 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
-        $order = $this->model;
+        $order = $this->model->with('items')->with('packages');
         $orderStatistics = '';
 //        if ($this->allList($order)->count()) {
 //            $totalAmount = 0;

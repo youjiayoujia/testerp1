@@ -97,6 +97,16 @@ class TestController extends Controller
         }
         dd($result);
     }
+    public function test_3(){
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
+    }
 
     // public function test2()
     // {

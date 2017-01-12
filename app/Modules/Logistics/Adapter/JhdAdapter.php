@@ -36,6 +36,13 @@ class JhdAdapter extends BasicAdapter
                     <DestNO>'.$orderInfo->shipping_country.'</DestNO>
                     <Weig>'.$totalWeight.'</Weig>
                     <Pcs>'.$sku_count.'</Pcs>
+                    <ReCompany>'.$orderInfo->shipping_firstname.' '.$orderInfo->shipping_lastname.'</ReCompany>
+                    <ReTel>'.$orderInfo->shipping_phone.'</ReTel>
+                    <ReAddr>'.$orderInfo->shipping_address.' '.$orderInfo->shipping_address1.'</ReAddr>
+                    <ReCity>'.$orderInfo->shipping_city.'</ReCity>
+                    <ReZip>'.$orderInfo->shipping_zipcode.'</ReZip>
+                    <ReState>'.$orderInfo->shipping_state.'</ReState>
+                    <ReConsinee>'.$orderInfo->shipping_firstname.' '.$orderInfo->shipping_lastname.'</ReConsinee>
                 </request>';
         $str = 'service=tms_order_notify&content='.$content.'&sign='.md5($content.'123456');
         $url=$this->url;

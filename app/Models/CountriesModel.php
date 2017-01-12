@@ -30,7 +30,7 @@ class CountriesModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['name' => '国家名', 'cn_name' => '中文名'];
+    public $searchFields=['cn_name' => '中文名', 'code' => '简码'];
 
     public function countriesSort()
     {

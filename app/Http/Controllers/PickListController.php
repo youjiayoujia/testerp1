@@ -177,24 +177,25 @@ class PickListController extends Controller
 
     public function confirmPickBy()
     {
+        $url = $_SERVER['HTTP_REFERER'];
         $model = $this->model->find(request('pickId'));
         $from = json_encode($model);
         $name = UserModel::find(request()->user()->id)->name;
         if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            return redirect($url)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $pickBy = request('pickBy');
         $single = $this->model->where('pick_by', $pickBy)->orderBy('created_at')->first();
         if($single) {
             if($single->status == 'PICKING') {
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '上次拣货未完成,不可分配新的'));
+                return redirect($url)->with('alert', $this->alert('danger', '上次拣货未完成,不可分配新的'));
             }
         }
         $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time()), 'status' => 'PICKING']);
         $to = json_encode($model);
         $this->eventLog($name, '修改拣货人员,id='.$model->id, $to, $from);
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
+        return redirect($url)->with('alert', $this->alert('success', '拣货人员修改成功'));
     }
 
     public function printPackageDetails($id, $status)
@@ -485,7 +486,8 @@ class PickListController extends Controller
     }
 
     public function createNewPickStore()
-    {
+    {   
+        set_time_limit(0);
         $sum = 0;
         $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
         if(!$warehouse_id) {
@@ -686,6 +688,8 @@ class PickListController extends Controller
      */
     public function createPickStore()
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '128M');
         $sum = 0;
         $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
         if(!$warehouse_id) {
@@ -697,7 +701,7 @@ class PickListController extends Controller
                     $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
                     ->where(function($query){
                         if(request()->has('channel')) {
-                            $query =$query->whereIn('channel_id', request('channel'));
+                            $query->whereIn('channel_id', request('channel'));
                         }
                     })->get();
                     $sum += $packages->count();

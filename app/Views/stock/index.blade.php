@@ -9,8 +9,8 @@
     <th class='sort' data-field='all_quantity'>总数量</th>
     <th class='sort' data-field='available_quantity'>可用数量</th>
     <th class='sort' data-field='hold_quantity'>hold数量</th>
-    <th class='sort'>普采在途</th>
-    <th class='sort'>特采在途</th>
+    <th>普采在途</th>
+    <th>特采在途</th>
     <th class='sort' data-field='unit_cost'>单价</th>
     <th class='sort' data-field='amount'>总金额</th>
     <th class='sort' data-field='created_at'>创建时间</th>

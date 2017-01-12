@@ -25,7 +25,7 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td><strong>{{ $order->id }}</strong></td>
+            <td class='orderId' data-id="{{ $order->id }}"><strong>{{ $order->id }}</strong></td>
             <td>
                 {{ $order->channel_ordernum }}
             </td>
@@ -39,7 +39,7 @@
             <td>
                 <div>{{ round($order->profit_rate ,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
-                <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
+                运费成本: <div class='logisticsFee'></div>
                 <div>平台费: {{ sprintf("%.2f", $order->channel_fee) }} USD</div>
                 <div>
                     毛利润: {{ round($order->profit, 2) }} USD
@@ -903,6 +903,26 @@
                     $('.fb').show();
                 }
             });
+
+            //加载运费
+            arr = new Array();
+            i = 0;
+            $.each($('.orderId'), function () {
+                arr[i] = $(this).data('id');
+                i++;
+            });
+            $.get(
+                    "{{ route('order.logisticsFee')}}",
+                    {'arr': arr},
+                    function (result) {
+                        j = 0;
+                        $.each($('.orderId'), function () {
+                            block = $(this).parent();
+                            block.find('.logisticsFee').text(result[j][1]);
+                            j++;
+                        })
+                    }
+            );
 
             //备注是否为空
             $(document).on('click', '.confirm_remark', function () {

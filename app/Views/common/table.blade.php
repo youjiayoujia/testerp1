@@ -10,8 +10,8 @@
                     <div class='panel panel-default'>
                         <div class='panel-heading'>日志记录</div>
                         <div style='overflow:scroll; width:590px; height:600px;' class='scrollDown'>
+                            <input type='hidden' class='scroll_rate' value='0'>
                             <div class='panel-body info_buf'>
-                                <input type='hidden' class='scroll_rate' value='0'>
                             </div>
                         </div>
                     </div>
@@ -308,17 +308,18 @@
         $(document).on('click', '.dialog', function () {
             table = $(this).data('table');
             id = $(this).data('id');
-            $('.info_buf').append('');
+            $('.info_buf').html('');
             $.get(
                     "{{ route('eventChild.getInfo')}}",
                     {table: table, id: id, rate: 0},
                     function (result) {
-                        if (result) {
-                            $('.info_buf').append(result);
+                        if (result[0]) {
+                            $('.info_buf').html(result[0]);
+                            $('.scroll_rate').val(1);
                         } else {
                             $('.info_buf').append('该记录暂无日志');
                         }
-                    }, 'html'
+                    }
             );
         });
 
@@ -335,13 +336,14 @@
                         "{{ route('eventChild.getInfo')}}",
                         {table: table, id: id, rate: rate},
                         function (result) {
-                            $('.info_buf').append('');
-                            if (result) {
-                                $('.info_buf').append(result);
+                            if (result[0]) {
+                                $('.info_buf').append(result[0]);
+                                $('.scroll_rate').val(result[1]);
+                                scroll_flag = true;
                             } else {
                                 $('.info_buf').append('该记录暂无日志');
                             }
-                        }, 'html'
+                        }
                     );
                 }
             }

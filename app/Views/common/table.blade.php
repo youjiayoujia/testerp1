@@ -9,8 +9,9 @@
                 <div class="modal-content">
                     <div class='panel panel-default'>
                         <div class='panel-heading'>日志记录</div>
-                        <div style='overflow:scroll; width:590px; height:600px;'>
+                        <div style='overflow:scroll; width:590px; height:600px;' class='scrollDown'>
                             <div class='panel-body info_buf'>
+                                <input type='hidden' class='scroll_rate' value='0'>
                             </div>
                         </div>
                     </div>
@@ -307,19 +308,44 @@
         $(document).on('click', '.dialog', function () {
             table = $(this).data('table');
             id = $(this).data('id');
+            $('.info_buf').append('');
             $.get(
                     "{{ route('eventChild.getInfo')}}",
-                    {table: table, id: id},
+                    {table: table, id: id, rate: 0},
                     function (result) {
-                        $('.info_buf').html('');
                         if (result) {
-                            $('.info_buf').html(result);
+                            $('.info_buf').append(result);
                         } else {
-                            $('.info_buf').html('该记录暂无日志');
+                            $('.info_buf').append('该记录暂无日志');
                         }
                     }, 'html'
             );
         });
+
+        scroll_flag = true;
+        $('.scrollDown').scroll(function(){
+            contentHeight = $(this).get(0).scrollHeight;
+            scrollHeight = $(this).scrollTop();
+            height = $(this).height();
+            if(contentHeight - scrollHeight - height <= 0) {
+                if(scroll_flag == true) {
+                    scroll_flag = false;
+                    rate = $('.scroll_rate').val();
+                    $.get(
+                        "{{ route('eventChild.getInfo')}}",
+                        {table: table, id: id, rate: rate},
+                        function (result) {
+                            $('.info_buf').append('');
+                            if (result) {
+                                $('.info_buf').append(result);
+                            } else {
+                                $('.info_buf').append('该记录暂无日志');
+                            }
+                        }, 'html'
+                    );
+                }
+            }
+        })
 
         {{-- 排序 --}}
         $('.sort').click(function () {

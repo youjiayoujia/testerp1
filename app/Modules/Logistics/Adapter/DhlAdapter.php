@@ -314,7 +314,7 @@ class DhlAdapter extends BasicAdapter
             //return $result;
         }
         $url = $this->GetShipHost;
-        $result = $this->postCurlHttpsData($url,$data);
+        $result = $this->postCurlHttpsData($url,$data);echo "<pre/>";var_dump($result);
         @$result = json_decode($result);
         @$status = $result->labelResponse->bd->responseStatus->code;//200时为成功
         if($status == '200'){
@@ -343,7 +343,7 @@ class DhlAdapter extends BasicAdapter
             if(@$result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
-                $msg =  $result->labelResponse->bd->responseStatus->messageDetails;
+                @$msg =  $result->labelResponse->bd->responseStatus->messageDetails;
             }
             if(@$msg){
                 $res = array('status'=>false,'info'=>'请求信息失败:'.$msg);

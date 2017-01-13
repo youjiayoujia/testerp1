@@ -303,7 +303,7 @@ class DhlAdapter extends BasicAdapter
 				 }
 				}';
         $data = str_replace("\\","",$data);
-        echo "<pre/>";var_dump($data);echo "<hr/>";exit;
+        $data = str_replace("\r\n","",$data);
         $data_obj = json_decode($data);
         if(!$data_obj){
             $result = [

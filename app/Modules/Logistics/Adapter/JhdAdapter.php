@@ -29,7 +29,7 @@ class JhdAdapter extends BasicAdapter
             $sku_count += $item->quantity;
         }
         $orderno=$orderInfo->id;
-        $orderInfo->shipping_state?$orderInfo->shipping_state:'.';
+        $orderInfo->shipping_state=$orderInfo->shipping_state?$orderInfo->shipping_state:'.';
         $content = '<request>
                     <orderno>'.$this->prefix.$orderno.'</orderno>
                     <Clno>J-SLME</Clno>

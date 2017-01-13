@@ -332,15 +332,18 @@
                 if(scroll_flag == true) {
                     scroll_flag = false;
                     rate = $('.scroll_rate').val();
+                    $('.info_buf').append("<div class='text-center loadMore'><h3>load more...</h3></div>");
                     $.get(
                         "{{ route('eventChild.getInfo')}}",
                         {table: table, id: id, rate: rate},
                         function (result) {
                             if (result[0]) {
+                                $('.loadMore').remove();
                                 $('.info_buf').append(result[0]);
                                 $('.scroll_rate').val(result[1]);
                                 scroll_flag = true;
                             } else {
+                                $('.loadMore').remove();
                                 $('.info_buf').append('该记录暂无日志');
                             }
                         }

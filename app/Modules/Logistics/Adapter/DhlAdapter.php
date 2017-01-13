@@ -304,14 +304,14 @@ class DhlAdapter extends BasicAdapter
 				}';
         $data = str_replace("\\","",$data);
         $data = str_replace("\r\n","",$data);
-        echo $data;exit;
+        echo strip_tages($data);echo "<hr/>";
         $data_obj = json_decode($data);
         if(!$data_obj){
             $result = [
                 'code' => 'error',
                 'result' =>'数据组装出现错误，请联系IT'
             ];
-            return $result;
+            //return $result;
         }
         $url = $this->GetShipHost;
         $result = $this->postCurlHttpsData($url,$data);

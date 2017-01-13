@@ -29,6 +29,12 @@
                 <strong>hold数量</strong>: {{ $model->hold_quantity }}
             </div>
             <div class="col-lg-2">
+                <strong>普采在途数量</strong>: {{ $model->item->transit_quantity[$model->warehouse_id]['normal'] }}
+            </div>
+            <div class="col-lg-2">
+                <strong>特采在途数量</strong>: {{ $model->item->transit_quantity[$model->warehouse_id]['special'] }}
+            </div>
+            <div class="col-lg-2">
                 <strong>单价(￥)</strong>: {{ $model->unit_cost }}
             </div>
             <div class="col-lg-2">

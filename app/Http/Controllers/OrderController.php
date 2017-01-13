@@ -10,21 +10,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\Job;
 use App\Jobs\DoPackages;
-use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
-use App\Models\LogisticsModel;
 use App\Models\Order\EbaySkuSaleReportModel;
-use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
-use App\Models\product\ImageModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
-use App\Models\Publish\Ebay\EbaySiteModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 use App\Models\Order\ItemModel as orderItem;
@@ -241,26 +235,26 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
-        $order = $this->model;
+        $order = $this->model->with('items')->with('packages');
         $orderStatistics = '';
-        if ($this->allList($order)->count()) {
-            $totalAmount = 0;
-            $totalPlatform = 0;
-            $profit = 0;
-            foreach ($this->allList($order)->get() as $value) {
-                $totalAmount += $value->amount * $value->rate;
-                $profit += $value->profit;
-                $totalPlatform += $value->channel_fee;
-            }
-            $totalAmount = sprintf("%.2f", $totalAmount);
-            $averageProfit = sprintf("%.4f", $profit / $totalAmount) * 100;
-            $totalPlatform = sprintf("%.2f", $totalPlatform);
-            $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
-        }
+//        if ($this->allList($order)->count()) {
+//            $totalAmount = 0;
+//            $totalPlatform = 0;
+//            $profit = 0;
+//            foreach ($this->allList($order)->get() as $value) {
+//                $totalAmount += $value->amount * $value->rate;
+//                $profit += $value->profit;
+//                $totalPlatform += $value->channel_fee;
+//            }
+//            $totalAmount = sprintf("%.2f", $totalAmount);
+//            $averageProfit = sprintf("%.4f", $profit / $totalAmount) * 100;
+//            $totalPlatform = sprintf("%.2f", $totalPlatform);
+//            $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
+//        }
         $subtotal = 0;
-        foreach ($this->autoList($order) as $value) {
-            $subtotal += $value->amount * $value->rate;
-        }
+//        foreach ($this->autoList($order) as $value) {
+//            $subtotal += $value->amount * $value->rate;
+//        }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         //订单首页不显示数据
         $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -283,6 +277,26 @@ class OrderController extends Controller
             'orderStatistics' => $orderStatistics,
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    //运费
+    public function logisticsFee()
+    {
+        $arr = request('arr');
+        $buf = [];
+        if (!empty($arr)) {
+            foreach ($arr as $key => $id) {
+                $order = $this->model->find($id);
+                if (!$order) {
+                    $buf[$key][0] = '订单未找到';
+                    $buf[$key][1] = 0;
+                    continue;
+                }
+                $buf[$key][1] = ($order->logistics_fee ? $order->logistics_fee : 0) . 'RMB';
+            }
+        }
+
+        return $buf;
     }
 
     //订单统计

@@ -20,6 +20,8 @@ class ExportModel extends BaseModel
         'name'
     ];
 
+    public $searchFields = ['id' => 'ID', 'name' => '模板名'];
+
     public function items()
     {
         return $this->hasMany('App\Models\Package\ExportItemModel', 'parent_id', 'id');

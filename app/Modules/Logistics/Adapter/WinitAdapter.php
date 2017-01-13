@@ -76,7 +76,7 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['buyerCountry'] = $package->shipping_country;
         $creatOrder['buyerEmail'] = $package->order->email;
         $creatOrder['buyerHouseNo'] = "";
-        $creatOrder['buyerName'] = $package->shipping_firstname . " " . $package->shipping_lastname;
+        $creatOrder['buyerName'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_firstname . " " . $package->shipping_lastname);
         $creatOrder['buyerState'] = $package->shipping_state;
         $creatOrder['buyerZipCode'] = $package->shipping_zipcode;
         $creatOrder['dispatchType'] = 'P';

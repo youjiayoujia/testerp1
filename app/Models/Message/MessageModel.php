@@ -499,8 +499,7 @@ class MessageModel extends BaseModel{
                             $content = str_replace("&amp;iquest;", ' ', $content);
                             $content = str_replace("\n", "<br />", $content);
                             $content = preg_replace("'<br \/>[\t]*?<br \/>'", '', $content);
-                            $content = str_replace("/:000", '<img src="http://i02.i.aliimg.com/wimg/feedback/emotions/0.gif" />', $content);
-                            $content = preg_replace("'\/\:0+([1-9]+0*)'", "<img src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
+                            $content = preg_replace("'\/\:0+([0-9]+0*)'", "<img style='width:25px' src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
                             $content = (stripslashes(stripslashes($content)));
 
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
@@ -512,7 +511,7 @@ class MessageModel extends BaseModel{
                                 }else{
                                     $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                     $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
-                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
+                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'. preg_replace("'\/\:0+([0-9]+0*)'", '',$content) .'" content-key="'.$k.'">
                                     翻译
                                 </button>
                                 <p id="content-'.$k.'" style="color:green"></p>';

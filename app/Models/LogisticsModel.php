@@ -41,6 +41,18 @@ class LogisticsModel extends BaseModel
         'is_confirm',
     ];
 
+    //多重查询
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterFields' => [
+                'code',
+                'name',
+                'logistics_code',
+            ],
+        ];
+    }
+
     public $rules = [
         'create' => [
             'code' => 'required',

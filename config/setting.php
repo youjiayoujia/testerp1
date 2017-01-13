@@ -160,6 +160,8 @@ return [
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',
+        'code' => '物流方式简码',
+        'logistics_code' => '物流编码',
 
         'parent.shipmentCostNum' => '批次号',
         'questionUser.name' => '提问人',

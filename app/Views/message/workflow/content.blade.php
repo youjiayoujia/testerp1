@@ -1,6 +1,6 @@
 <div class="panel panel-info">
     <div class="panel-heading">
-        <strong>#{{$message->id}}描述：{{ $message->subject }}</strong><br/>
+        <strong>#{{$message->id}}描述：{!! $message->subject !!}</strong><br/>
         <small>
             {{ $message->date }} by <i>{{ $message->from_name }}</i> from {{ '<'.$message->from.'>' }}
         </small>
@@ -49,7 +49,7 @@
                         <div class="panel-body">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <strong>{{ $history->subject }}</strong><br/>
+                                    <strong>{!! $history->subject !!}</strong><br/>
                                 </div>
                                 <div class="panel-body">
                                     <div class="row">

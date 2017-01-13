@@ -70,8 +70,7 @@ class GetMessages extends Command
                 $messageList = $channel->getMessages();
                 if(is_array($messageList)){
                     foreach ($messageList as $message) {
-                        $messageNew = MessageModel::
-                        firstOrNew(['message_id' => $message['message_id']]);
+                        $messageNew = MessageModel::firstOrNew(['message_id' => $message['message_id']]);
                         if($messageNew->id == null){
                             $messageNew->account_id = $account->id;
                             $messageNew->channel_id = $account->channel_id;

@@ -560,7 +560,8 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['from'] = $item['otherLoginId'];
                         $message_list[$j]['to'] = '客服';
                         $message_list[$j]['date'] = $this->changetime($item['messageTime']);
-                        $message_list[$j]['subject'] = $item['lastMessageContent'];
+                        $message_list[$j]['subject'] = preg_replace("'\/\:0+([0-9]+0*)'", "<img style='width:25px' src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $item['lastMessageContent']);
+
                         $message_list[$j]['attachment'] = ''; //附件
                         $message_list[$j]['labels'] = '' ;
                         //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息

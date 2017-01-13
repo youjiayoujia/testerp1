@@ -47,14 +47,14 @@ class MessageController extends Controller
     {
         request()->flash();
         //$userarr=config('user.staff');
-        $users=UserModel::all();
+        //$users=UserModel::all();
         $response = [
             'metas'             => $this->metas(__FUNCTION__),
             'data'              => $this->autoList($this->model,$this->model),
             'mixedSearchFields' => $this->model->mixed_search,
-            'channel_accounts'  => Channel_account::all(),
-            'users'             => $users,
-            'channels'          => ChannelModel::All(),
+            //'channel_accounts'  => Channel_account::all(),
+            //'users'             => $users,
+            //'channels'          => ChannelModel::All(),
         ];
         return view($this->viewPath . 'index', $response);
     }

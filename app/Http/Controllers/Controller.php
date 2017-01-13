@@ -203,7 +203,7 @@ abstract class Controller extends BaseController
             $searchFields = $model->searchFields;
             $list = $list->where(function ($query) use ($keywords, $searchFields) {
                 foreach ($searchFields as $key => $searchField) {
-                    $query = $query->orWhere($key, 'like', '%' . trim($keywords) . '%');
+                    $query = $query->orWhere($key, trim($keywords));
                 }
             });
         }

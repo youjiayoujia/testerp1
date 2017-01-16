@@ -165,7 +165,8 @@ class SmtAdapter extends BasicAdapter
             );
             $address_result = $smtApi->getJsonDataUsePostMethod($address_api, $address_smt);
             $address_result = json_decode($address_result, true);
-            echo '<pre>';   
+            echo '<pre>';
+            print_r($productData);
             $addressArray = array_merge($addressArray, $this->_senderAddress[$package->warehouse_id]);
             $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
             $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];

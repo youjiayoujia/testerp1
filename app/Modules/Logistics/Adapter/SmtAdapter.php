@@ -123,7 +123,7 @@ class SmtAdapter extends BasicAdapter
             }
             $productData = array(
                 'categoryCnDesc'       => $package->items ? $package->items->first()->item->product->declared_cn : '连衣裙',
-                'categoryEnDesc'       => trim($package->items ? $package->items->first()->item->product->declared_en : 'dress'),
+                'categoryEnDesc'       => str_replace([" ","　","\n","\r","\t"], '',$package->items ? $package->items->first()->item->product->declared_en : 'dress'), //过滤所有不可见字符
                 'productDeclareAmount' => $package->items->first()->item->declared_value,
                 'productId'            => $productId,             
                 'productNum'           => $productNum,

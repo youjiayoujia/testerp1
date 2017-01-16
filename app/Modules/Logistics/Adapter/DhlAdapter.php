@@ -144,12 +144,12 @@ class DhlAdapter extends BasicAdapter
             $thePro = $item->quantity * $item->item->weight;
             $thePro = $thePro *1000;
             $item->item->product->declared_value = sprintf("%.2f",$item->item->product->declared_value);
-            $products_declared_en = $item->item->product->declared_en;
+            $products_declared_en = $item->item->product->declared_en?$item->item->product->declared_en:'Dress';
             //产品字符串
 
             $proStr.='{
 					 "skuNumber": "'.$item->item->product->model.'",
-					 "description": "'.$item->item->product->declared_en.'",
+					 "description": "'.$products_declared_en.'",
 					 "descriptionImport": null,
 					 "descriptionExport": "连衣裙",
 					 "itemValue": '.$item->item->product->declared_value.',
@@ -303,15 +303,19 @@ class DhlAdapter extends BasicAdapter
 				 }
 				}';
         $data = str_replace("\\","",$data);
+        $data = str_replace("\r\n","",$data);
         $data_obj = json_decode($data);
         if(!$data_obj){
-            $res = array('status'=>false,'info'=>'数据组装出现错误，请联系IT');
-            return $res;
+            $result = [
+                'code' => 'error',
+                'result' =>'数据组装出现错误，请联系IT'
+            ];
+            return $result;
         }
         $url = $this->GetShipHost;
-        $result = $this->postCurlHttpsData($url,$data);
-        $result = json_decode($result);
-        $status = $result->labelResponse->bd->responseStatus->code;//200时为成功
+        $result = $this->postCurlHttpsData($url,$data);echo "<pre/>";var_dump($result);
+        @$result = json_decode($result);
+        @$status = $result->labelResponse->bd->responseStatus->code;//200时为成功
         if($status == '200'){
             $shipmentID = $result->labelResponse->bd->labels[0]->shipmentID;
 
@@ -338,7 +342,7 @@ class DhlAdapter extends BasicAdapter
             if(@$result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
-                $msg =  $result->labelResponse->bd->responseStatus->messageDetails;
+                @$msg =  $result->labelResponse->bd->responseStatus->messageDetails;
             }
             if(@$msg){
                 $res = array('status'=>false,'info'=>'请求信息失败:'.$msg);

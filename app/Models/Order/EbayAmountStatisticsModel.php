@@ -48,7 +48,7 @@ class EbayAmountStatisticsModel extends BaseModel
 
         return [
             'filterFields' => [
-
+                'created_date',
             ],
             'filterSelects' => [
                 'user_id' => $arr,

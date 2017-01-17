@@ -30,7 +30,7 @@ class CurrencyModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['code'];
+    public $searchFields=['code' => '货币简称'];
 
     public function getRate($code)
     {

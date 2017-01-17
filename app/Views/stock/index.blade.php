@@ -9,6 +9,8 @@
     <th class='sort' data-field='all_quantity'>总数量</th>
     <th class='sort' data-field='available_quantity'>可用数量</th>
     <th class='sort' data-field='hold_quantity'>hold数量</th>
+    <th>普采在途</th>
+    <th>特采在途</th>
     <th class='sort' data-field='unit_cost'>单价</th>
     <th class='sort' data-field='amount'>总金额</th>
     <th class='sort' data-field='created_at'>创建时间</th>
@@ -26,6 +28,8 @@
             <td>{{ $stock->all_quantity}}</td>
             <td>{{ $stock->available_quantity}}</td>
             <td>{{ $stock->hold_quantity}}</td>
+            <td>{{ $stock->item->transit_quantity[$stock->warehouse_id]['normal'] }}</td>
+            <td>{{ $stock->item->transit_quantity[$stock->warehouse_id]['special'] }}</td>
             <td>{{ $stock->unit_cost }}</td>
             <td>{{ round($stock->all_quantity * $stock->unit_cost, 3) }}</td>
             <td>{{ $stock->created_at }}</td>

@@ -97,6 +97,16 @@ class TestController extends Controller
         }
         dd($result);
     }
+    public function test_3(){
+        $id = request()->get('id');
+        $package = PackageModel::where('id', $id)->first();
+        if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {
+            $result = $package->placeLogistics('UPDATE');
+        } else {
+            $result = $package->placeLogistics();
+        }
+        dd($result);
+    }
 
     // public function test2()
     // {
@@ -221,8 +231,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $order = OrderModel::find(3637);
-        $buf = $order->overseaCalculateProfit();
+        $test = 'abcdef';
+        $buf = substr($test, 0, 3);
         var_dump($buf);exit;
     }
 
@@ -1168,12 +1178,27 @@ class TestController extends Controller
     public function jdtestCrm()
     {
 
-        dd('end');
+/*        $tmp ="[u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/cbc4768ccda711e6bcf102c49158406c.jpg', u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/dd5f9e6ccda711e6bfeb02465360c040.jpg', u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/e490e222cda711e6ae1c02762614c162.jpg']";
+
+        $tmp = str_replace('[', '', $tmp);
+        $tmp = str_replace(']', '', $tmp);
+        $tmp_array = explode(',', $tmp);
+        $urls = [];
+        foreach($tmp_array as $url){
+            $tmp_url = explode('\'', $url);
+            $urls[] = $tmp_url[1];
+
+        }
+        dd($urls);
+
+        dd('end');*/
         foreach (AccountModel::all() as $account) {
             if ($account->account == 'Coolcoola04@126.com') { //测试diver
 
                 //$reply = ReplyModel::find(13);
+                dd($account->api_config);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
+                dd($channel);
 
                 $data = $channel->getMessages();
                 dd(json_decode($data,true));

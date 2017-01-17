@@ -690,6 +690,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
             'as' => 'cancelExamineAmazonProduct'
         ]);
     //订单管理路由
+    Route::get('order/logisticsFee',
+        ['uses' => 'OrderController@logisticsFee', 'as' => 'order.logisticsFee']);
     Route::get('order/createVirtualPackage',
         ['uses' => 'OrderController@createVirtualPackage', 'as' => 'order.createVirtualPackage']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);

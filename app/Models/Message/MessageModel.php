@@ -420,21 +420,34 @@ class MessageModel extends BaseModel{
                                    if($item['Reply']['sender'] == 'wish support'){
                                        $this->from_name = $item['Reply']['sender'];
                                    }
-                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender：</strong>'.$this->from_name.':</p><strong>Content: </strong>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>Time：</strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>发件人：</strong>'.$this->from_name.':</p><strong>内容: </strong>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
 
                                    if(isset($item['Reply']['translated_message']) && isset($item['Reply']['translated_message_zh'])){
                                        $html .= '<div class="alert-danger"><strong>Wish翻译: </strong><p>'.$item['Reply']['translated_message'].'</p><p>'. $item['Reply']['translated_message_zh'].'</p></div>';
                                    }else{
 
                                    }
-
+                                   if(! empty($item['Reply']['image_urls'])){
+                                       $img_urls = $item['Reply']['image_urls'];
+                                       $img_urls = str_replace('[', '', $img_urls);
+                                       $img_urls = str_replace(']', '', $img_urls);
+                                       $img_urls = explode(',', $img_urls);
+                                       foreach($img_urls as $url){
+                                           $tmp_url = explode('\'', $url);
+                                           if(! empty($tmp_url[1])){
+                                               $html .= '附图：<img width="500px" src="'.$tmp_url[1].'" /> <br/>';
+                                           }
+                                       }
+                                   }
                                    $html .= '</div>';
                                }else{
-                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>用户名：</strong>'.$item['Reply']['sender'].':</p><strong>Content: </strong>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>Time：</strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>发件人：</strong>'.$item['Reply']['sender'].':</p><strong>内容: </strong>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
                                    $html .= '</div>';
                                }
+
+
                            }
                         }
                         break;
@@ -486,8 +499,7 @@ class MessageModel extends BaseModel{
                             $content = str_replace("&amp;iquest;", ' ', $content);
                             $content = str_replace("\n", "<br />", $content);
                             $content = preg_replace("'<br \/>[\t]*?<br \/>'", '', $content);
-                            $content = str_replace("/:000", '<img src="http://i02.i.aliimg.com/wimg/feedback/emotions/0.gif" />', $content);
-                            $content = preg_replace("'\/\:0+([1-9]+0*)'", "<img src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
+                            $content = preg_replace("'\/\:0+([0-9]+0*)'", "<img style='width:25px' src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
                             $content = (stripslashes(stripslashes($content)));
 
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
@@ -499,7 +511,7 @@ class MessageModel extends BaseModel{
                                 }else{
                                     $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                     $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
-                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
+                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'. preg_replace("'\/\:0+([0-9]+0*)'", '',$content) .'" content-key="'.$k.'">
                                     翻译
                                 </button>
                                 <p id="content-'.$k.'" style="color:green"></p>';
@@ -691,6 +703,7 @@ class MessageModel extends BaseModel{
                     ->where('assign_id','=',$user_id)
                     ->where('required','=',1)
                     ->where('dont_reply','=',0)
+                    ->where('read','=',0)
                     ->where('is_auto_reply', '=', 0)
                 ->whereIn('account_id',$account_ids);
             })

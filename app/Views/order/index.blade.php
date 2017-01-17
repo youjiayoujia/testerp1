@@ -25,7 +25,7 @@
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>
-            <td><strong>{{ $order->id }}</strong></td>
+            <td class='orderId' data-id="{{ $order->id }}"><strong>{{ $order->id }}</strong></td>
             <td>
                 {{ $order->channel_ordernum }}
             </td>
@@ -39,7 +39,7 @@
             <td>
                 <div>{{ round($order->profit_rate ,4)*100 }}%</div>
                 <div>产品成本: {{ $order->all_item_cost }} RMB</div>
-                <div>运费成本: {{ sprintf("%.3f", $order->logistics_fee) }} RMB</div>
+                运费成本: <div class='logisticsFee'></div>
                 <div>平台费: {{ sprintf("%.2f", $order->channel_fee) }} USD</div>
                 <div>
                     毛利润: {{ round($order->profit, 2) }} USD
@@ -353,14 +353,6 @@
                             <span class="glyphicon glyphicon-pencil"></span> 恢复正常
                         </a>
                     @endif
-                    @if(count($order->packages) > 0)
-                        <button class="btn btn-primary btn-xs"
-                                data-toggle="modal"
-                                data-target="#package{{ $order->id }}"
-                                title="包裹">
-                            <span class="glyphicon glyphicon-link"></span> 包裹
-                        </button>
-                    @endif
                     @if($order->status == 'CANCEL')
                         <a href="javascript:" class="btn btn-primary btn-xs recover" data-id="{{ $order->id }}">
                             <span class="glyphicon glyphicon-pencil"></span> 恢复订单
@@ -475,11 +467,6 @@
                                     <label for="channel_account_id">渠道账号</label>
                                     <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : ($order->channelAccount ? $order->channelAccount->alias : '') }}" readonly>
                                 </div>
-                                {{--<div class="form-group col-lg-2" id="payment">--}}
-                                {{--<label for="payment_date" class='control-label'>支付时间</label>--}}
-                                {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
-                                {{--<input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">--}}
-                                {{--</div>--}}
                                 <div class="form-group col-lg-4">
                                     <label for="refund_amount" class='control-label'>退款金额</label>
                                     <input class="form-control" id="refund_amount{{ $order->id }}" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
@@ -657,59 +644,6 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="package{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel">包裹信息</h4>
-                    </div>
-                    <div class="modal-body">
-                        @if($order->packages->toArray())
-                            @foreach($order->packages as $package)
-                                <div class="row">
-                                    <div class="col-lg-3">
-                                        <strong>包裹ID</strong> :
-                                        <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>物流方式</strong>
-                                        : {{ $package->logistics ? $package->logistics->name : '' }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>追踪号</strong> :
-                                        <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>包裹状态</strong> : {{ $package->status_name }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>打印面单时间</strong> : {{ $package->printed_at }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>发货时间</strong> : {{ $package->shipped_at }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>交付时间</strong> : {{ $package->delivered_at }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <strong>备注</strong> : {{ $package->remark }}
-                                    </div>
-                                </div>
-                                <div class="divider"></div>
-                            @endforeach
-                        @else
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="modal fade" id="send_ebay_message_{{ $order->id }}" role="dialog">
             <div class="modal-dialog" role="document" style="width:800px;">
                 <div class="modal-content">
@@ -969,6 +903,26 @@
                     $('.fb').show();
                 }
             });
+
+            //加载运费
+            arr = new Array();
+            i = 0;
+            $.each($('.orderId'), function () {
+                arr[i] = $(this).data('id');
+                i++;
+            });
+            $.get(
+                    "{{ route('order.logisticsFee')}}",
+                    {'arr': arr},
+                    function (result) {
+                        j = 0;
+                        $.each($('.orderId'), function () {
+                            block = $(this).parent();
+                            block.find('.logisticsFee').text(result[j][1]);
+                            j++;
+                        })
+                    }
+            );
 
             //备注是否为空
             $(document).on('click', '.confirm_remark', function () {

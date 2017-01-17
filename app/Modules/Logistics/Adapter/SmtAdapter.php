@@ -92,8 +92,7 @@ class SmtAdapter extends BasicAdapter
         $shipId = $package->logistics_id; //物流
         $channel_account_id = $package->channel_account_id;
         list($name, $channel) = explode(',', $package->logistics->type);
-        $warehouseCarrierService = $channel;    //物流方式
-        echo $package->logistics_order_number;
+        $warehouseCarrierService = $channel;    //物流方式 
         if(!$package->logistics_order_number){           
             //获取渠道帐号资料
             $account = AccountModel::findOrFail($channel_account_id);
@@ -118,11 +117,15 @@ class SmtAdapter extends BasicAdapter
             foreach ($package->items as $packageItem) {
                 $productNum += $packageItem->quantity;
             }
+            $productId = $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0;
+            if(!$productId){
+                $productId = 0;
+            }
             $productData = array(
                 'categoryCnDesc'       => $package->items ? $package->items->first()->item->product->declared_cn : '连衣裙',
-                'categoryEnDesc'       => $package->items ? $package->items->first()->item->product->declared_en : 'dress',
+                'categoryEnDesc'       => str_replace([" ","　","\n","\r","\t"], '',$package->items ? $package->items->first()->item->product->declared_en : 'dress'), //过滤所有不可见字符
                 'productDeclareAmount' => $package->items->first()->item->declared_value,
-                'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,               
+                'productId'            => $productId,             
                 'productNum'           => $productNum,
                 'productWeight'        => $package->total_weight,
                 'isContainsBattery'    => $package->is_battery ? 1 : 0,    
@@ -162,7 +165,8 @@ class SmtAdapter extends BasicAdapter
             );
             $address_result = $smtApi->getJsonDataUsePostMethod($address_api, $address_smt);
             $address_result = json_decode($address_result, true);
-            echo '<pre>';   
+            echo '<pre>';
+            print_r($productData);
             $addressArray = array_merge($addressArray, $this->_senderAddress[$package->warehouse_id]);
             $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
             $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];

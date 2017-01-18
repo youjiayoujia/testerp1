@@ -16,9 +16,12 @@ use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\Order\EbayAmountStatisticsModel;
 use App\Models\Order\EbaySkuSaleReportModel;
 use App\Models\OrderModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
+use App\Models\RoleModel;
+use App\Models\User\UserRoleModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 use App\Models\Order\ItemModel as orderItem;
@@ -191,14 +194,39 @@ class OrderController extends Controller
     }
 
     /**
-     * EB销量额统计
+     * EBAY销售额统计
      */
     public function amountStatistics()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-        return view($this->viewPath . 'amountStatistics', $response);
+        $roleId = RoleModel::where('role', 'ebay_staff')->first()->id;
+        $userRoles = UserRoleModel::where('role_id', $roleId)->get();
+        $data['channel_name'] = 'Ebay';
+        foreach ($userRoles as $userRole) {
+            $data['user_id'] = $userRole->user_id;
+            $data['prefix'] = 0;
+            $ebayPublishProducts = EbayPublishProductModel::where('seller_id', $data['user_id']);
+            if ($ebayPublishProducts->count()) {
+                $data['prefix'] = explode('*', $ebayPublishProducts->first()->sku)[0];
+            }
+            foreach ($ebayPublishProducts->get() as $ebayPublishProduct) {
+
+            }
+            $data['yesterday_publish'] = EbayPublishProductModel::where('seller_id', $data['user_id'])
+                ->whereBetween('created_at', [date('Y-m-d', strtotime('-1 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                ->count();
+            $data['created_date'] = date('Y-m');
+            $ebayAmountStatistics = EbayAmountStatisticsModel::where('user_id', $data['user_id'])->where('created_date', date('Y-m'));
+            if ($ebayAmountStatistics->count()) {
+                $ebayAmountStatistics->update([
+                    'yesterday_publish' => $data['yesterday_publish'],
+                    'created_date' => $data['created_date'],
+                ]);
+            } else {
+                EbayAmountStatisticsModel::create($data);
+            }
+        }
+
+        return 1;
     }
 
     /**

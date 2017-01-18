@@ -231,9 +231,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        $test = 'abcdef';
-        $buf = substr($test, 0, 3);
-        var_dump($buf);exit;
+       
     }
 
     // public function test2()

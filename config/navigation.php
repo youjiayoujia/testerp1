@@ -651,8 +651,8 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => 'EB销量额统计',
-                    'url' => 'sku.amountStatistics',
+                    'name' => 'EBAY销量额统计',
+                    'url' => 'ebayAmountStatistics.index',
                     'icon' => '',
                 ],
             ],

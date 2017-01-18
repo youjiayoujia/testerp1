@@ -162,6 +162,7 @@ return [
         'account' => '=帐号=',
         'code' => '物流方式简码',
         'logistics_code' => '物流编码',
+        'user_id' => 'EBAY业务组',
 
         'parent.shipmentCostNum' => '批次号',
         'questionUser.name' => '提问人',

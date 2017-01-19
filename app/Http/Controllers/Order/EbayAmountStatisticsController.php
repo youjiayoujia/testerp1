@@ -22,4 +22,16 @@ class EbayAmountStatisticsController extends Controller
         $this->mainTitle = 'EBAY销量额统计';
         $this->viewPath = 'order.ebayAmountStatistics.';
     }
+
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model->orderBy('created_date', 'desc')),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+    
 }

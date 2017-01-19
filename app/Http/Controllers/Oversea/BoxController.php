@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Oversea;
 
 use App\Http\Controllers\Controller;
 use App\Models\Oversea\Box\BoxModel;
+use App\Models\Oversea\Allotment\AllotmentModel;
 
 class BoxController extends Controller
 {
@@ -24,7 +25,9 @@ class BoxController extends Controller
     public function createbox()
     {
         $id = request('id');
-        $model = $this->model->create(['parent_id' => $id, 'boxnum' => 'box'.time()]);
+        $model = $this->model->create(['parent_id' => $id]);
+        $allotment = AllotmentModel::find($id);
+        $model->update(['boxnum' => $allotment->allotment_num.'_box'.$model->id]);
         if($model) {
             return $model->boxnum;
         } else {

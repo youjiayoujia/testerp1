@@ -221,6 +221,7 @@ class OrderController extends Controller
             $ebayAmountStatistics = EbayAmountStatisticsModel::where('user_id', $data['user_id'])->where('created_date', date('Y-m'));
             if ($ebayAmountStatistics->count()) {
                 $ebayAmountStatistics->update([
+                    'january_publish' => $data['january_publish'],
                     'yesterday_publish' => $data['yesterday_publish'],
                     'created_date' => $data['created_date'],
                 ]);

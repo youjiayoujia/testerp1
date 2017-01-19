@@ -33,5 +33,5 @@ class EbayAmountStatisticsController extends Controller
         ];
         return view($this->viewPath . 'index', $response);
     }
-    
+
 }

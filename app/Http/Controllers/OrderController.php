@@ -211,6 +211,9 @@ class OrderController extends Controller
             foreach ($ebayPublishProducts->get() as $ebayPublishProduct) {
 
             }
+            $data['january_publish'] = EbayPublishProductModel::where('seller_id', $data['user_id'])
+                ->whereBetween('created_at', [date('Y-m-01', strtotime(date('Y-m-d'))) . ' 00:00:00', date('Y-m-d', strtotime('+1 month', strtotime(date('Y-m-01')))) . ' 00:00:00'])
+                ->count();
             $data['yesterday_publish'] = EbayPublishProductModel::where('seller_id', $data['user_id'])
                 ->whereBetween('created_at', [date('Y-m-d', strtotime('-1 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
                 ->count();

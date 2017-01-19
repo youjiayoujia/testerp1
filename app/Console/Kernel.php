@@ -40,6 +40,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetBlacklists::class,
         \App\Console\Commands\UpdateBlacklists::class,
         \App\Console\Commands\UpdateEbaySkuSaleReport::class,
+        \App\Console\Commands\UpdateEbayAmountStatistics::class,
         \App\Console\Commands\AutoRunPackages::class,
         \App\Console\Commands\ImitationOrders::class,
         \App\Console\Commands\UpdateUsers::class,
@@ -103,6 +104,10 @@ class Kernel extends ConsoleKernel
 
         //EbaySku销量报表定时任务
         $schedule->command('ebaySkuSaleReport:update')->cron('0 16 * * *');
+
+        //EBAY销售额统计定时任务
+        $schedule->command('ebayAmountStatistics:update')->cron('0 17 * * *');
+
         //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {

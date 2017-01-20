@@ -54,13 +54,6 @@
                         <span class="glyphicon glyphicon-folder-close"></span>
                     </a>
                 @endif
-                @if(in_array($overseaAllotment->status, ['new', 'pick']))
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $overseaAllotment->id }}"
-                   data-url="{{ route('overseaAllotment.destroy', ['id' => $overseaAllotment->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </a>
-                @endif
                 @if($overseaAllotment->status == 'out')
                     <a href="{{route('overseaAllotment.allotmentInStock', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='调拨单已入库'>
                         <span class="glyphicon glyphicon-sort-by-attributes"></span>

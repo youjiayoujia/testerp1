@@ -73,7 +73,7 @@ class AllotmentController extends Controller
             $item = ItemModel::find($arr['item_id']);
             $item->hold($arr['warehouse_position_id'], $arr['quantity'], 'ALLOTMENT', $obj->id);
         }
-        $obj->update(['allotment_num' => 'Oversea'.$obj->id]);
+        $obj->update(['allotment_num' => str_pad($obj->id, '6', '0', STR_PAD_LEFT)]);
         $to = $this->model->with('allotmentForms')->find($obj->id);
         $to = json_encode($to);
         $this->eventLog($name, '新增调拨记录,id='.$obj->id, $to);
@@ -179,7 +179,7 @@ class AllotmentController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $this->validate(request(), $model->getLimits()['create']);
-        $boxInfo = request('boxInfo');
+        $boxInfo = request('boxinfo');
         if(count($boxInfo)) {
             foreach($boxInfo as $key => $single) {
                 $box = $model->boxes()->where('id', $key)->first();
@@ -240,10 +240,10 @@ class AllotmentController extends Controller
                 $item->in($position->id, $single->quantity, $single->quantity * ($single->item->cost ? $single->item->cost : $single->item->purchase_price),
                 'OVERSEA_IN');
                 $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $item->id])->first();
-                $volumn_rate = round($box->length * $box->height * $box->width / 6000 / $box->weight, 4);
+                $volumn_rate = $box->weight != 0 ? round($box->length * $box->height * $box->width / 6000 / $box->weight, 4) : 1;
                 $volumn_rate = ($volumn_rate < 1 ? 1 : $volumn_rate);
                 $item->update(['volumn_rate' => $volumn_rate]);
-                $oversea_cost = round(($stock->oversea_cost * $stock->all_quantity + $volumn_rate * $item->weight * $box->logistics->cost * $single->quantity + $single->quantity * $stock->item->cost)/($stock->all_quantity + $single->quantity), 2);
+                $oversea_cost = round(($stock->oversea_cost * $stock->all_quantity + $box->expected_fee + $single->quantity * $stock->item->cost)/($stock->all_quantity + $single->quantity), 2);
                 $itemCost = $stock->warehouse->overseaItemCost()->where('item_id', $stock->item_id)->first();
                 if($itemCost) {
                     $itemCost->update(['cost' => $oversea_cost]);

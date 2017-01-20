@@ -19,7 +19,7 @@ class BoxModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['boxnum','parent_id','length', 'width', 'height','logistics_id','tracking_no', 'fee', 'weight','created_at', 'shipped_at'];
+    protected $fillable = ['boxnum','parent_id','length', 'width', 'height','logistics_id','tracking_no', 'weight','created_at', 'shipped_at'];
 
     // 规则验证
     public $rules = [

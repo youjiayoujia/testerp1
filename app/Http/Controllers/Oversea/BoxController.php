@@ -27,7 +27,7 @@ class BoxController extends Controller
         $id = request('id');
         $model = $this->model->create(['parent_id' => $id]);
         $allotment = AllotmentModel::find($id);
-        $model->update(['boxnum' => $allotment->allotment_num.'_box'.$model->id]);
+        $model->update(['boxnum' => $allotment->allotment_num.'-'.$model->id]);
         if($model) {
             return $model->boxnum;
         } else {

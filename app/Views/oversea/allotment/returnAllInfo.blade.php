@@ -2,17 +2,21 @@
 @section('formAction') {{ route('overseaAllotment.returnAllInfoStore', ['id' => $model->id]) }} @stop
 @section('formBody')
     <div class='row'>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-3">
             <label class='control-label'>调拨单号</label> 
             <input type='text' class="form-control" name='allotment_num' value="{{ $model->allotment_num }}" readonly>
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-3">
             <label class='control-label'>实际总税金(￥)</label> 
             <input type='text' class="form-control" name='actual_rate_value' value="{{ $model->actual_rate_value }}">
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-3">
             <label class='control-label'>货代追踪码</label> 
             <input type='text' class="form-control" name='tracking_no' value="{{ $model->tracking_no }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label class='control-label'>期待到货日期</label> 
+            <input type='text' class="form-control" name='expected_date' value="{{ $model->expected_date }}" placeholder="2017-01-20">
         </div>
         <div class="form-group col-lg-12">
             <label class='control-label'>备注</label> 

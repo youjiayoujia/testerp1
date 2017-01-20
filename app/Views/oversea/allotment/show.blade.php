@@ -77,7 +77,10 @@
     <tr class='success'><td>实测总重量</td><td>{{$model->boxes ? $model->boxes->sum('weight') : ''}}kg</td><td>=∑各箱实际录入重量之和</td></tr>
     <tr class='success'><td>实测体积</td><td>{{$volumn}}</td><td>=∑每箱体积重（每箱子长*宽*高）÷6000</td></tr>
     <tr class='success'><td>实际总运费</td><td>{{$model->boxes ? $model->boxes->sum('fee') : ''}}￥</td><td>人工手动输入</td></tr>
-    <tr class='success'><td>预测总运费</td><td>{{ $model->boxes ? $model->boxes->sum('expected_fee') : ''}}￥</td><td>=头程物流单价xERP总重量</td></tr>
+    <tr class='success'><td>ERP总运费</td><td>{{ $model->boxes ? $model->boxes->sum('expected_fee') : ''}}￥</td><td>=头程物流单价xERP总重量</td></tr>
+    <tr class='success'><td>预计到货时间</td><td>{{ $model->expected_date }}</td><td></td></tr>
+    <tr class='success'><td>ERP总税金</td><td>{{ $model->virtual_rate }}</td><td></td></tr>
+    <tr class='success'><td>实际总税金</td><td>{{ $model->actual_rate_value }}</td><td></td></tr>
     </tbody>
 </table>
 

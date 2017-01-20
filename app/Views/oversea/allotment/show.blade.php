@@ -105,10 +105,10 @@
             <strong>实际重量(kg)</strong>: {{ $box->weight }}
         </div>
         <div class="form-group col-lg-3">
-            <strong>体积重(kg)</strong>: {{ round($box->length * $box->height * $box->width / 5000, 3) }}
+            <strong>体积重(kg)</strong>: {{ round($box->length * $box->height * $box->width / 6000, 3) }}
         </div>
         <div class="form-group col-lg-3">
-            <strong>体积系数</strong>: {{ $box->weight != 0 ? round($box->length * $box->height * $box->width / 5000 / $box->weight, 4) : '重量为0' }}
+            <strong>体积系数</strong>: {{ $box->weight != 0 ? round($box->length * $box->height * $box->width / 6000 / $box->weight, 3) : '重量为0' }}
         </div>
     </div>
 

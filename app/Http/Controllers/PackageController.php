@@ -12,6 +12,7 @@ use Illuminate\Routing\Route;
 use Tool;
 use Excel;
 use App\Models\StockModel;
+use App\Models\ChannelModel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\ItemModel;
@@ -831,6 +832,12 @@ class PackageController extends Controller
     public function actSplitPackage($arr, $id)
     {
         $model = $this->model->find($id);
+        $channelName = ChannelModel::find($model->channel_id)->name;
+        if($channelName == 'Wish') {
+            if($model->weight  <= 2) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'Wish包裹，重量小于2kg,不能拆单'));
+            }
+        }
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }

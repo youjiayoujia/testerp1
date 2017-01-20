@@ -22,6 +22,7 @@ use App\Models\LogisticsModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Product\ProductLogisticsLimitModel;
 use App\Models\Logistics\ChannelModel as LogisticChannel;
+use App\Models\ChannelModel;
 use Queue;
 use Cache;
 
@@ -706,6 +707,12 @@ class PackageModel extends BaseModel
         if ($this->canAssignStocks()) {
             $items = $this->setPackageItems();
             if ($items) {
+                $channel = ChannelModel::find($this->channel_id);
+                if($channel->name == 'Wish') {
+                    if(count($items) > 1) {
+                        return false;
+                    }
+                }
                 return $this->createPackageDetail($items);
             } else {
                 if ($this->status == 'NEW') {

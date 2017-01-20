@@ -231,6 +231,8 @@ class TestController extends Controller
 
     public function test2()
     {  
+        $package = PackageModel::find('4689');
+        $package->createPackageItems();
     }
 
     // public function test2()

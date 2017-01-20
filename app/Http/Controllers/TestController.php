@@ -230,10 +230,9 @@ class TestController extends Controller
     // }
 
     public function test2()
-    {
-        $test = 'abcdef';
-        $buf = substr($test, 0, 3);
-        var_dump($buf);exit;
+    {  
+        $package = PackageModel::find('4689');
+        $package->createPackageItems();
     }
 
     // public function test2()

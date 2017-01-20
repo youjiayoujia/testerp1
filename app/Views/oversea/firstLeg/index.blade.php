@@ -2,10 +2,9 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th>物流名</th>
-    <th>单价</th>
     <th>仓库</th>
     <th>运输方式</th>
-    <th>公式</th>
+    <th>时效(天)</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
 @stop
@@ -14,10 +13,9 @@
         <tr>
             <td>{{ $firstLeg->id }}</td>
             <td>{{ $firstLeg->name }}</td>
-            <td>{{ $firstLeg->cost }}</td>
             <td>{{ $firstLeg->warehouse ? $firstLeg->warehouse->name : ''}}</td>
             <td>{{ $firstLeg->transport == '0' ? '海运' : '空运' }}</td>
-            <td>{{ $firstLeg->formula }}</td>
+            <td>{{ $firstLeg->days }}</td>
             <td>{{ $firstLeg->created_at }}</td>
             <td>
                 <a href="{{ route('firstLeg.show', ['id'=>$firstLeg->id]) }}" class="btn btn-info btn-xs" title='查看'>

@@ -50,7 +50,7 @@
                     </a>
                 @endif
                 @if(in_array($overseaAllotment->status, ['inboxed', 'out']))
-                    <a href="{{route('overseaAllotment.returnBoxInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回填箱子信息并出库'>
+                    <a href="{{route('overseaAllotment.returnAllInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回填箱子信息并出库'>
                         <span class="glyphicon glyphicon-folder-close"></span>
                     </a>
                 @endif

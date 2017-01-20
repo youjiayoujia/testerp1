@@ -2,21 +2,25 @@
 @section('formAction') {{ route('overseaAllotment.returnAllInfoStore', ['id' => $model->id]) }} @stop
 @section('formBody')
     <div class='row'>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-4">
             <label class='control-label'>调拨单号</label> 
             <input type='text' class="form-control" name='allotment_num' value="{{ $model->allotment_num }}" readonly>
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-4">
             <label class='control-label'>实际总税金(￥)</label> 
-            <input type='text' class="form-control" name='actual_rate_value' value="{{ $model->actual_rate_value }}">
+            <input type='text' class="form-control" name='actual_rate_value' value="{{ old('actual_rate_value') ? old('actual_rate_value') : ($model->actual_rate_value != 0 ? $model->actual_rate_value : '') }}">
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-4">
             <label class='control-label'>货代追踪码</label> 
-            <input type='text' class="form-control" name='tracking_no' value="{{ $model->tracking_no }}">
+            <input type='text' class="form-control" name='tracking_no' value="{{ old('tracking_no') ? old('tracking_no') : ($model->tracking_no != 0 ? $model->tracking_no : '') }}">
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-4">
             <label class='control-label'>期待到货日期</label> 
-            <input type='text' class="form-control" name='expected_date' value="{{ $model->expected_date }}" placeholder="2017-01-20">
+            <input type='text' class="form-control" name='expected_date' value="{{ old('expected_date') ? old('expected_date') : $model->expected_date }}" placeholder="2017-01-20">
+        </div>
+        <div class="form-group col-lg-4">
+            <label class='control-label'>物流费(￥)</label> 
+            <input type='text' class="form-control" name='fee' value="{{ old('fee') ? old('fee') : ($model->fee != 0 ? $model->fee : '') }}">
         </div>
         <div class="form-group col-lg-12">
             <label class='control-label'>备注</label> 
@@ -33,9 +37,6 @@
                     <div class='form-group col-lg-2'>
                         <label>追踪号</label>
                     </div>
-                    <div class='form-group col-lg-2'>
-                        <label>物流费(￥)</label>
-                    </div>
                 </div>
             @foreach($model->boxes as $box)
                 <div class='row'>
@@ -43,10 +44,7 @@
                         <input type='text' class='form-control' value="{{ $box->boxnum}}" readonly>
                     </div>
                     <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][tracking_no]" class='form-control' placeholder="追踪号" value="{{ $box->tracking_no}}">
-                    </div>
-                    <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][fee]" class='form-control' placeholder="物流费" value="{{ ($box->fee != 0 ? $box->fee : '')}}">
+                        <input type='text' name="boxInfo[{{$box->id}}][tracking_no]" class='form-control' placeholder="追踪号" value="{{ old('boxInfo[$box->id][tracking_no]') ? old('boxInfo[$box->id][tracking_no]') : $box->tracking_no}}">
                     </div>
                 </div>
             @endforeach

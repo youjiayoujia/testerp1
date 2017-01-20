@@ -17,8 +17,8 @@
 
 <div id="main">
     <div style="width:100%;height:1mm;"></div>
-    <div style="width:100%;height:42mm;">
-        <p style="width:68mm;height:40mm;float:left;margin-left:5px;overflow:hidden;font-size:7px;">
+    <div style="width:100%;height:35mm;">
+        <p style="width:68mm;height:35mm;float:left;margin-left:5px;overflow:hidden;font-size:7px;">
             If underliverable return to : <br/>
             Locked bag No      <br/>
             Special Project Unit    <br/>
@@ -33,7 +33,7 @@
                     ({{ $model->country ? $model->country->cn_name : '' }})
                 </span>
         </p>
-        <p style="width:30mm;height:40mm;float:left;overflow:hidden;">
+        <p style="width:30mm;height:35mm;float:left;overflow:hidden;">
 		        <span style="width:98%;height:20mm;border:1px solid #000;display:inline-block;">
 		        	BAYARAN POS JELAS<br/>
 					POSTAGE PAID<br/>
@@ -42,10 +42,10 @@
 					MALAYSIA<br/>
 					PMK1348
 		        </span>
-		        <span style="width:98%;height:8mm;border:1px solid #000;display:inline-block;border-top:none;font-size:14px;font-weight:bold;line-height:8mm;">
+		        <span style="width:98%;height:6mm;border:1px solid #000;display:inline-block;border-top:none;font-size:14px;font-weight:bold;line-height:8mm;">
 		         &nbsp;Z&nbsp;:&nbsp;{{ $model->shunyou ? $model->shunyou->area_code : '' }}
 		        </span>
-		        <span style="width:98%;height:8mm;line-height:8mm;border:1px solid #000;display:inline-block;border-top:none;">
+		        <span style="width:98%;height:6mm;line-height:8mm;border:1px solid #000;display:inline-block;border-top:none;">
 		        {{$model->id}}<span style="font-size:14px;font-weight:bold;">【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</span>
 		        </span>
         </p>

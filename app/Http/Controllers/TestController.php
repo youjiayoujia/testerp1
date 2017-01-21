@@ -98,6 +98,7 @@ class TestController extends Controller
         dd($result);
     }
     public function test_3(){
+        echo "test开始：<br/>";
         $id = request()->get('id');
         $package = PackageModel::where('id', $id)->first();
         if (in_array($package->status, ['PROCESSING', 'PICKING', 'PACKED'])) {

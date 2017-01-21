@@ -36,12 +36,8 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if ($this->order) {
+        if ($this->order && $this->order->status != 'REVIEW') {
             if ($this->order->status == 'PREPARED') {
-                $oldPackages = $this->order->packages;
-                foreach ($oldPackages as $oldPackage) {
-                    $oldPackage->cancelPackage();
-                }
                 if ($this->order->channel->driver == 'ebay' and $this->order->order_is_alert != 2) {
                     if ($this->order->order_is_alert == 1) {
                         $this->order->update(['status' => 'REVIEW']);
@@ -54,9 +50,11 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
                 } else {
                     $package = $this->order->createPackage();
                     if ($package) {
+                        $package->update(['queue_name' => 'assignStocks']);
                         $job = new AssignStocks($package);
                         $job->onQueue('assignStocks');
                         $this->dispatch($job);
+                        $this->order->update(['status' => 'PACKED']);
                         $this->relation_id = $this->order->id;
                         $this->result['status'] = 'success';
                         $this->result['remark'] = 'Success.';
@@ -76,6 +74,13 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
             }
         }
         $this->lasting = round(microtime(true) - $start, 3);
+        $this->log('DoPackages', json_encode($this->order));
+    }
+
+    public function failed()
+    {
+        $this->result['status'] = 'fail';
+        $this->result['remark'] = '队列执行失败，程序错误或响应超时.';
         $this->log('DoPackages', json_encode($this->order));
     }
 }

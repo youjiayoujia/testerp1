@@ -554,13 +554,15 @@ Class AliexpressAdapter implements AdapterInterface
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+                        $detailArrJson = mb_convert_encoding($detailArrJson, "UTF-8","UTF-8");
                         $message_list[$j]['message_id'] = $item['lastMessageId'];
                         $message_list[$j]['list_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
                         $message_list[$j]['to'] = '客服';
                         $message_list[$j]['date'] = $this->changetime($item['messageTime']);
-                        $message_list[$j]['subject'] = $item['lastMessageContent'];
+                        $message_list[$j]['subject'] = preg_replace("'\/\:0+([0-9]+0*)'", "<img style='width:25px' src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $item['lastMessageContent']);
+
                         $message_list[$j]['attachment'] = ''; //附件
                         $message_list[$j]['labels'] = '' ;
                         //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
@@ -1485,8 +1487,11 @@ Class AliexpressAdapter implements AdapterInterface
      * compact('orderId','buyId','comments')
      */
     public function addMessageNew($paramAry){
+        $paramAry['orderId'] = rawurlencode($paramAry['orderId']);
+        $paramAry['buyId'] = rawurlencode($paramAry['buyId']);
+        $paramAry['comments'] = rawurlencode($paramAry['comments']);
         // $order_detail_ary = json_decode($this->getJsonData('api.findOrderById',"orderId=".$paramAry['orderId']),true);
-        $query =rawurlencode("channelId={$paramAry['orderId']}&buyerId={$paramAry['buyId']}&msgSources=order_msg&content={$paramAry['comments']}");
+        $query ="channelId={$paramAry['orderId']}&buyerId={$paramAry['buyId']}&msgSources=order_msg&content={$paramAry['comments']}";
         $respon_ary = json_decode($this->getJsonData('api.addMsg',$query));
         return $respon_ary['result']['isSuccess'] ? true : false;
     }

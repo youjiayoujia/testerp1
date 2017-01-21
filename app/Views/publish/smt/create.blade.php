@@ -139,7 +139,7 @@
             <div class="form-group col-sm-2">
                 <select name="token_id" id="token_id" class="form-control">
 		                  @foreach($account as $item)
-                         <option value="{{$item->id}}">{{$item->account}}
+                         <option value="{{$item->id}}">{{$item->alias}}
                          </option>
                         @endforeach			                 
 		         </select>

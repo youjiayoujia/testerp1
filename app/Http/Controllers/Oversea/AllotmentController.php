@@ -12,11 +12,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Oversea\Allotment\AllotmentModel;
 use App\Models\Oversea\Allotment\AllotmentFormModel;
 use App\Models\WarehouseModel;
-use App\Models\Oversea\FirstLeg\FirstLegModel;;
+use App\Models\Oversea\FirstLeg\FirstLegModel;
 use App\Models\UserModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\LogisticsModel;
+use App\Models\Oversea\ItemCostModel;
 
 class AllotmentController extends Controller
 {
@@ -72,6 +73,7 @@ class AllotmentController extends Controller
             $item = ItemModel::find($arr['item_id']);
             $item->hold($arr['warehouse_position_id'], $arr['quantity'], 'ALLOTMENT', $obj->id);
         }
+        $obj->update(['allotment_num' => str_pad($obj->id, '6', '0', STR_PAD_LEFT)]);
         $to = $this->model->with('allotmentForms')->find($obj->id);
         $to = json_encode($to);
         $this->eventLog($name, '新增调拨记录,id='.$obj->id, $to);
@@ -102,7 +104,14 @@ class AllotmentController extends Controller
             }
         }
         $model->update(['status' => 'inboxed']);
-        return redirect($this->mainIndex);
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'logisticses' => FirstLegModel::all(),
+        ];
+
+        return view($this->viewPath.'returnBoxInfo', $response);
     }
 
     public function inboxStore($str, $id)
@@ -136,12 +145,19 @@ class AllotmentController extends Controller
         }
         if($flag) {
             $model->update(['status' => 'inboxed']);
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'model' => $model,
+                'logisticses' => FirstLegModel::all(),
+            ];
+
+            return view($this->viewPath.'returnBoxInfo', $response);
         }
 
         return redirect($this->mainIndex);
     }
 
-    public function returnBoxInfo($id)
+    public function returnAllInfo($id)
     {
         $model = $this->model->find($id);
         if (!$model) {
@@ -153,7 +169,7 @@ class AllotmentController extends Controller
             'logisticses' => FirstLegModel::all(),
         ];
 
-        return view($this->viewPath.'returnBoxInfo', $response);
+        return view($this->viewPath.'returnAllInfo', $response);
     }
 
     public function returnBoxInfoStore($id)
@@ -162,8 +178,37 @@ class AllotmentController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        //var_dump($model->getLimits()['create']);exit;
         $this->validate(request(), $model->getLimits()['create']);
+        $boxInfo = request('boxinfo');
+        if(count($boxInfo)) {
+            foreach($boxInfo as $key => $single) {
+                $box = $model->boxes()->where('id', $key)->first();
+                if(!$box) {
+                    continue;
+                }
+                $single['shipped_at'] = date('Y-m-d H:i:s', time());
+                $box->update($single);
+            }
+        }
+        if($model->status == 'inboxed') {
+            foreach($model->allotmentForms as $single) {
+                $single->item->holdout($single->warehouse_position_id, $single->inboxed_quantity, 'OVERSEA_ALLOTMENT', $id);
+            } 
+        }
+        $model->update(['status' => 'out']);
+
+        return redirect($this->mainIndex);
+    }
+
+    public function returnAllInfoStore($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $arr = request()->all();
+        $arr['status'] = 'out';
+        $model->update($arr);
         $boxInfo = request('boxInfo');
         if(count($boxInfo)) {
             foreach($boxInfo as $key => $single) {
@@ -174,10 +219,6 @@ class AllotmentController extends Controller
                 $box->update($single);
             }
         }
-        foreach($model->allotmentForms as $single) {
-            $single->item->holdout($single->warehouse_position_id, $single->inboxed_quantity, 'OVERSEA_ALLOTMENT', $id);
-        }
-        $model->update(['status' => 'out']);
 
         return redirect($this->mainIndex);
     }
@@ -192,12 +233,23 @@ class AllotmentController extends Controller
         foreach($model->boxes as $box) {
             foreach($box->forms as $single) {
                 $item = $single->item;
-                $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $item->id])->first();
-                if($stock) {
-                    $item->in($stock->warehouse_position_id, $single->quantity, $single->quantity * ($single->item->cost ? $single->item->cost : $single->item->purchase_price),
-                    'OVERSEA_IN');
+                $position = WarehouseModel::find($warehouse_id)->positions()->first();
+                if(!$position) {
+                    continue;
                 }
-                $item->update(['volumn_rate' => round($box->length * $box->height * $box->width / 5000 / $box->weight, 4)]);
+                $item->in($position->id, $single->quantity, $single->quantity * ($single->item->cost ? $single->item->cost : $single->item->purchase_price),
+                'OVERSEA_IN');
+                $stock = StockModel::where(['warehouse_id' => $warehouse_id, 'item_id' => $item->id])->first();
+                $volumn_rate = $box->weight != 0 ? round($box->length * $box->height * $box->width / 6000 / $box->weight, 4) : 1;
+                $volumn_rate = ($volumn_rate < 1 ? 1 : $volumn_rate);
+                $item->update(['volumn_rate' => $volumn_rate]);
+                $oversea_cost = round(($stock->oversea_cost * $stock->all_quantity + $box->expected_fee + $single->quantity * $stock->item->cost)/($stock->all_quantity + $single->quantity), 2);
+                $itemCost = $stock->warehouse->overseaItemCost()->where('item_id', $stock->item_id)->first();
+                if($itemCost) {
+                    $itemCost->update(['cost' => $oversea_cost]);
+                } else {
+                    ItemCostModel::create(['cost' => $oversea_cost, 'item_id' => $stock->item_id, 'code' => $stock->warehouse->code]);
+                }
             }
         }
         $model->update(['status' => 'over']);
@@ -261,7 +313,7 @@ class AllotmentController extends Controller
         $volumn = 0;
         $arr = [];
         foreach($model->allotmentForms as $form) {
-            $all_weight += $form->inboxed_quantity * $form->item->cost;
+            $all_weight += $form->inboxed_quantity * $form->item->volumn_rate;
         }
         foreach($model->boxes as $box) {
             $sum = 0;
@@ -269,7 +321,7 @@ class AllotmentController extends Controller
                 $sum += $form->item->weight * $form->quantity;
             }
             $arr[] = $sum;
-            $volumn += ($box->length * $box->width * $box->height)/5000;
+            $volumn += ($box->length * $box->width * $box->height)/6000;
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),

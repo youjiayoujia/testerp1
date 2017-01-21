@@ -10,17 +10,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\Job;
 use App\Jobs\DoPackages;
-use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
-use App\Models\Order\RemarkModel;
+use App\Models\Order\EbayAmountStatisticsModel;
+use App\Models\Order\EbaySkuSaleReportModel;
 use App\Models\OrderModel;
-use App\Models\product\ImageModel;
+use App\Models\Publish\Ebay\EbayPublishProductModel;
+use App\Models\RoleModel;
+use App\Models\User\UserRoleModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 use App\Models\Order\ItemModel as orderItem;
@@ -106,14 +107,132 @@ class OrderController extends Controller
 
     public function createVirtualPackage()
     {
-        $model = $this->model->where('status', 'PREPARED')->get();
-        foreach ($model as $key => $single) {
-            $job = new DoPackages($single);
-            $job = $job->onQueue('doPackages');
-            $this->dispatch($job);
+        $len = 1000;
+        $start = 0;
+        $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();
+        while(count($model)) {
+            foreach ($model as $key => $single) {
+                $job = new DoPackages($single);
+                $job = $job->onQueue('doPackages');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();
         }
 
         return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));
+    }
+
+    /**
+     * EbaySku销量报表
+     */
+    public function saleReport()
+    {
+        $channelId = ChannelModel::where('driver', 'ebay')->first()->id;
+        $ebayPublishProducts = EbayPublishProductModel::all();
+        foreach ($ebayPublishProducts as $ebayPublishProduct) {
+            $data['sku'] = substr(strstr(strstr($ebayPublishProduct->sku, '*'), '[', true), 1);
+            $data['channel_name'] = 'Ebay';
+            $data['site'] = $ebayPublishProduct->site_name;
+            $data['one_sale'] = orderItem::where('channel_id', $channelId)
+                ->whereBetween('created_at', [date('Y-m-d') . ' 00:00:00', date('Y-m-d', strtotime('+1 day', strtotime(date('Y-m-d')))) . ' 00:00:00'])
+                ->where('sku', $data['sku'])
+                ->count();
+            $data['seven_sale'] = orderItem::where('channel_id', $channelId)
+                ->whereBetween('created_at', [date('Y-m-d', strtotime('-7 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                ->where('sku', $data['sku'])
+                ->count();
+            $data['fourteen_sale'] = orderItem::where('channel_id', $channelId)
+                ->whereBetween('created_at', [date('Y-m-d', strtotime('-14 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                ->where('sku', $data['sku'])
+                ->count();
+            $data['sale_different'] = $data['seven_sale'] - ($data['fourteen_sale'] - $data['seven_sale']);
+            if ($data['fourteen_sale'] - $data['seven_sale'] == 0) {
+                $data['sale_different_proportion'] = 0;
+            } else {
+                $data['sale_different_proportion'] = $data['sale_different'] / ($data['fourteen_sale'] - $data['seven_sale']);
+            }
+            $data['thirty_sale'] = orderItem::where('channel_id', $channelId)
+                ->whereBetween('created_at', [date('Y-m-d', strtotime('-30 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                ->where('sku', $data['sku'])
+                ->count();
+            $data['ninety_sale'] = orderItem::where('channel_id', $channelId)
+                ->whereBetween('created_at', [date('Y-m-d', strtotime('-90 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                ->where('sku', $data['sku'])
+                ->count();
+            $data['created_time'] = null;
+            $data['status'] = null;
+            $item = ItemModel::where('sku', $data['sku'])->first();
+            if ($item) {
+                $data['created_time'] = $item->created_at;
+                $data['status'] = $item->status;
+            }
+            $data['is_warning'] = '1';
+            if ($data['status'] == 'stopping') {
+                $data['is_warning'] = '0';
+            }
+            $ebaySkuSaleReports = EbaySkuSaleReportModel::where('sku', $data['sku'])->where('site', $data['site']);
+            if ($ebaySkuSaleReports->count()) {
+                $ebaySkuSaleReports->update([
+                    'sale_different' => $data['sale_different'],
+                    'sale_different_proportion' => $data['sale_different_proportion'],
+                    'one_sale' => $data['one_sale'],
+                    'seven_sale' => $data['seven_sale'],
+                    'fourteen_sale' => $data['fourteen_sale'],
+                    'thirty_sale' => $data['thirty_sale'],
+                    'ninety_sale' => $data['ninety_sale'],
+                    'created_time' => $data['created_time'],
+                    'status' => $data['status'],
+                    'is_warning' => $data['is_warning']
+                ]);
+            } else {
+                EbaySkuSaleReportModel::create($data);
+            }
+        }
+
+        return 1;
+    }
+
+    /**
+     * EBAY销售额统计
+     */
+    public function amountStatistics()
+    {
+        $roleId = RoleModel::where('role', 'ebay_staff')->first()->id;
+        $userRoles = UserRoleModel::where('role_id', $roleId)->get();
+        $data['channel_name'] = 'Ebay';
+        foreach ($userRoles as $userRole) {
+            $data['user_id'] = $userRole->user_id;
+            $data['prefix'] = 0;
+            $ebayPublishProducts = EbayPublishProductModel::where('seller_id', $data['user_id']);
+            if ($ebayPublishProducts->count()) {
+                $data['prefix'] = explode('*', $ebayPublishProducts->first()->sku)[0];
+            }
+            foreach ($ebayPublishProducts->get() as $ebayPublishProduct) {
+
+            }
+            $data['january_publish'] = EbayPublishProductModel::where('seller_id', $data['user_id'])
+                ->whereBetween('created_at', [date('Y-m-01', strtotime(date('Y-m-d'))) . ' 00:00:00', date('Y-m-d', strtotime('+1 month', strtotime(date('Y-m-01')))) . ' 00:00:00'])
+                ->where('listing_type', '!=', 'Chinese')
+                ->count();
+            $data['yesterday_publish'] = EbayPublishProductModel::where('seller_id', $data['user_id'])
+                ->whereBetween('created_at', [date('Y-m-d', strtotime('-1 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                ->where('listing_type', '!=', 'Chinese')
+                ->count();
+            $data['created_date'] = date('Y-m');
+            $ebayAmountStatistics = EbayAmountStatisticsModel::where('user_id', $data['user_id'])->where('created_date', date('Y-m'));
+            if ($ebayAmountStatistics->count()) {
+                $ebayAmountStatistics->update([
+                    'january_publish' => $data['january_publish'],
+                    'yesterday_publish' => $data['yesterday_publish'],
+                    'created_date' => $data['created_date'],
+                ]);
+            } else {
+                EbayAmountStatisticsModel::create($data);
+            }
+        }
+
+        return 1;
     }
 
     /**
@@ -150,26 +269,26 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
-        $order = $this->model;
+        $order = $this->model->with('items')->with('packages');
         $orderStatistics = '';
-        if ($this->allList($order)->count()) {
-            $totalAmount = 0;
-            $totalPlatform = 0;
-            $profit = 0;
-            foreach ($this->allList($order)->get() as $value) {
-                $totalAmount += $value->amount * $value->rate;
-                $profit += $value->profit_rate;
-                $totalPlatform += $value->channel_fee;
-            }
-            $totalAmount = sprintf("%.2f", $totalAmount);
-            $averageProfit = sprintf("%.2f", $profit / $this->allList($order)->count());
-            $totalPlatform = sprintf("%.2f", $totalPlatform);
-            $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
-        }
+//        if ($this->allList($order)->count()) {
+//            $totalAmount = 0;
+//            $totalPlatform = 0;
+//            $profit = 0;
+//            foreach ($this->allList($order)->get() as $value) {
+//                $totalAmount += $value->amount * $value->rate;
+//                $profit += $value->profit;
+//                $totalPlatform += $value->channel_fee;
+//            }
+//            $totalAmount = sprintf("%.2f", $totalAmount);
+//            $averageProfit = sprintf("%.4f", $profit / $totalAmount) * 100;
+//            $totalPlatform = sprintf("%.2f", $totalPlatform);
+//            $orderStatistics = '总计金额:$' . $totalAmount . '平均利润率:' . $averageProfit . '%' . '总平台费:$' . $totalPlatform;
+//        }
         $subtotal = 0;
-        foreach ($this->autoList($order) as $value) {
-            $subtotal += $value->amount * $value->rate;
-        }
+//        foreach ($this->autoList($order) as $value) {
+//            $subtotal += $value->amount * $value->rate;
+//        }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         //订单首页不显示数据
         $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -182,7 +301,7 @@ class OrderController extends Controller
         $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($order),
+            'data' => $this->autoList($this->model, $order),
             'mixedSearchFields' => $this->model->mixed_search,
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,
@@ -192,6 +311,26 @@ class OrderController extends Controller
             'orderStatistics' => $orderStatistics,
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    //运费
+    public function logisticsFee()
+    {
+        $arr = request('arr');
+        $buf = [];
+        if (!empty($arr)) {
+            foreach ($arr as $key => $id) {
+                $order = $this->model->find($id);
+                if (!$order) {
+                    $buf[$key][0] = '订单未找到';
+                    $buf[$key][1] = 0;
+                    continue;
+                }
+                $buf[$key][1] = ($order->logistics_fee ? $order->logistics_fee : 0) . 'RMB';
+            }
+        }
+
+        return $buf;
     }
 
     //订单统计
@@ -328,6 +467,27 @@ class OrderController extends Controller
         $to = json_encode($model);
         $this->eventLog($userName->name, '退款新增,id=' . $id, $to, $from);
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
+    }
+
+    /**
+     * ajax 创建退款记录
+     */
+    public function ajaxAddRefund(){
+        $data = request()->input();
+        $model = $this->model->find($data['order_id']);
+        $data['order_id'] = $model->id;
+        $data['channel_id'] = $model->channel_id;
+        $data['account_id'] = $model->channel_account_id;
+        if(! empty($data['tribute_id'])){
+            $data['tribute_id'] = array_unique($data['tribute_id']);
+        }
+        if(!empty($model->refundCreate($data, request()->file('image')))){
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '数据新增', json_encode($model));
+            return config('status.ajax.success');
+        }else{
+            return conifg('status.ajax.fail');
+        }
+
     }
 
     /**
@@ -513,19 +673,31 @@ class OrderController extends Controller
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($this->model->find($order_id));
         $model = $this->model->find($order_id);
-        $model->calculateOrderChannelFee();
-        if($model->packages->count()) {
-            $model->update(['status' => 'PICKING', 'is_review' => 1]);
-        } else {
-            $model->update(['status' => 'PREPARED', 'is_review' => 1]);
-        }
-        $model->packagesToQueue();
-        if ($model->remarks) {
-            foreach ($model->remarks as $remark) {
-                if ($remark->type == 'PAYPAL') {
-                    $model->update(['order_is_alert' => 2]);
+        if ($model->items) {
+            $count = 0;
+            foreach ($model->items as $item) {
+                if ($item->item) {
+                    $count++;
                 }
-                $remark->delete();
+            }
+            if ($count == $model->items->count()) {
+                $model->calculateOrderChannelFee();
+                if($model->packages->count()) {
+                    $model->update(['status' => 'PICKING', 'is_review' => 1]);
+                } else {
+                    $model->update(['status' => 'PREPARED', 'is_review' => 1]);
+                }
+                $model->packagesToQueue();
+                if ($model->remarks) {
+                    foreach ($model->remarks as $remark) {
+                        if ($remark->type == 'PAYPAL') {
+                            $model->update(['order_is_alert' => 2]);
+                        }
+                        if ($remark->type != 'DEFAULT') {
+                            $remark->delete();
+                        }
+                    }
+                }
             }
         }
         $to = json_encode($this->model->find($order_id));
@@ -584,27 +756,39 @@ class OrderController extends Controller
         $ids_arr = explode(',', $ids);
         foreach ($ids_arr as $id) {
             $model = $this->model->find($id);
-            $model->calculateOrderChannelFee();
-            if ($model) {
-                if ($model->remarks) {
-                    foreach ($model->remarks as $remark) {
-                        if ($remark->type == 'PAYPAL') {
-                            $model->update(['order_is_alert' => 2]);
+            if ($model->items) {
+                $count = 0;
+                foreach ($model->items as $item) {
+                    if ($item->item) {
+                        $count++;
+                    }
+                }
+                if ($count == $model->items->count()) {
+                    $model->calculateOrderChannelFee();
+                    if ($model) {
+                        if ($model->remarks) {
+                            foreach ($model->remarks as $remark) {
+                                if ($remark->type == 'PAYPAL') {
+                                    $model->update(['order_is_alert' => 2]);
+                                }
+                                if ($remark->type != 'DEFAULT') {
+                                    $remark->delete();
+                                }
+                            }
                         }
-                        $remark->delete();
+                        $from = json_encode($model);
+                        if ($model->status = 'REVIEW') {
+                            if($model->packages->count()) {
+                                $model->update(['status' => 'PICKING', 'is_review' => '1']);
+                            } else {
+                                $model->update(['status' => 'PREPARED', 'is_review' => '1']);
+                            }
+                            $model->packagesToQueue();
+                        }
+                        $to = json_encode($model);
+                        $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);
                     }
                 }
-                $from = json_encode($model);
-                if ($model->status = 'REVIEW') {
-                    if($model->packages->count()) {
-                        $model->update(['status' => 'PICKING', 'is_review' => '1']);
-                    } else {
-                        $model->update(['status' => 'PREPARED', 'is_review' => '1']);
-                    }
-                    $model->packagesToQueue();
-                }
-                $to = json_encode($model);
-                $this->eventLog($userName->name, '批量审核,id=' . $id, $to, $from);
             }
         }
         return 1;

@@ -96,7 +96,7 @@ class SmtController extends Controller{
        ];
        $response['mixedSearchFields']
        ['filterSelects'] = [
-           'token_id' => $this->model->getAccountNumber('App\Models\Channel\AccountModel','account'),
+           'token_id' => $this->model->getAccountNumber('App\Models\Channel\AccountModel','alias'),
            'productStatusType' => config('smt_product.productStatusType'),
        ];
       

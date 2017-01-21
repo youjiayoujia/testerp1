@@ -44,10 +44,12 @@ class RequireModel extends BaseModel
             'filterSelects' => [
                 'status' => ['0' => '新需求', '1' => '未找到', '2' => '已找到', '3' => '已创建']
             ],
-            'selectRelatedSearchs' => [
-                'catalog' => ['id' => $arr]
-            ],
+            'selectRelatedSearchs' => [],
             'sectionSelect' => [],
+            'sectionGangedDouble' => [
+                'first' => ['catalog' => ['catalogCategory' => ['cn_name'=>CatalogCategoryModel::all()->pluck('cn_name', 'cn_name')]]],
+                'second' => ['catalog' => ['c_name' => CatalogModel::all()->pluck('c_name', 'c_name')]]
+            ],
         ];
     }
 

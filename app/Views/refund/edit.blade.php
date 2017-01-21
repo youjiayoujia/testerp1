@@ -92,8 +92,8 @@
                     </div>
 
                     <div class="form-group col-lg-3">
-                        <label for="group_id" class="control-label">销售帐号</label>
-                        <label class="form-control">{{$refund->Order->channelAccount->account}}</label>
+                        <label for="group_id" class="control-label">销售帐号简称</label>
+                        <label class="form-control">{{$refund->Order->channelAccount->alias}}</label>
                     </div>
                     <div class="form-group col-lg-3">
                         <label for="group_id" class="control-label">交易号ID</label>
@@ -119,14 +119,6 @@
                         @else
                             <input type='file' class=" file" id="qualifications" placeholder="截图" name='image' value="" />
                         @endif
-
-
-
-
-
-{{--                    @if($refund->image)
-                        <a href="../../{{$refund->image}}"><span class="glyphicon glyphicon-paperclip"></span></a>
-                    @endif--}}
                     </div>
                 </div>
 

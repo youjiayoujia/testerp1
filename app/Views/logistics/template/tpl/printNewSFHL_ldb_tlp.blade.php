@@ -50,7 +50,7 @@
             <tr>
                 <td>
                     <div style="width:73mm;float:left;font-size:12px;line-height:14px;margin-left:5px;">
-                        <p>SF No:{{ $model->tracking_no }}</p>
+                        <p>SF No:{{ $model->logistics_order_number }}</p>
                         <p>TEL:{{ $model->shipping_phone }}</p>
                         <p>【7550001183】 Ref No:{{ $model->id }}【{{ $model->logistics ? $model->logistics->logistics_code : '' }}】</p>
                         <p>{{ date('Y-m-d H:i:s') }}</p>
@@ -124,8 +124,8 @@
             </tr>
         </table>
         <div style="width:80mm;float:left;line-height:18px;">
-            <p style="width:80mm;text-align:center;margin-right:7px;"><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height:40px;margin-top:5px;"></p>
-            <p style="width:80mm;text-align:center;margin-right:7px;font-size:14px;">{{ $model->tracking_no }}</p>
+            <p style="width:80mm;text-align:center;margin-right:7px;"><img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}" style="height:40px;margin-top:5px;"></p>
+            <p style="width:80mm;text-align:center;margin-right:7px;font-size:14px;">{{ $model->logistics_order_number }}</p>
 
         </div>
         <div style="width:16mm;float:right;"><img src="{{ asset('picture/start.png') }}" style="width:16mm;"></div>

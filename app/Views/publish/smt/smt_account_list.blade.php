@@ -9,7 +9,7 @@
     @foreach($data as $account_info)
         <tr>
             <td><input type='checkbox' name='single[]' class='single' value="{{$account_info->id}}"></td>
-            <td>{{$account_info->account}}</td>
+            <td>{{$account_info->alias}}</td>
             <td>{{$account_info->aliexpress_access_token}}</td>
             <td>
                 <button type="button" class="dosome check  btn btn-success btn-sm  " data-id="{{$account_info->id}}">

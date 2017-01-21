@@ -69,14 +69,14 @@ class WinitAdapter extends BasicAdapter
         $creatOrder = array();
         
         list($name, $channel) = explode(',', $package->logistics->type);
-        $creatOrder['buyerAddress1'] = $package->shipping_address;
-        $creatOrder['buyerAddress2'] = $package->shipping_address1;
+        $creatOrder['buyerAddress1'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_address);
+        $creatOrder['buyerAddress2'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_address1);
         $creatOrder['buyerCity'] = $package->shipping_city;
         $creatOrder['buyerContactNo'] = $package->shipping_phone;
         $creatOrder['buyerCountry'] = $package->shipping_country;
         $creatOrder['buyerEmail'] = $package->order->email;
         $creatOrder['buyerHouseNo'] = "";
-        $creatOrder['buyerName'] = $package->shipping_firstname . " " . $package->shipping_lastname;
+        $creatOrder['buyerName'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_firstname . " " . $package->shipping_lastname);
         $creatOrder['buyerState'] = $package->shipping_state;
         $creatOrder['buyerZipCode'] = $package->shipping_zipcode;
         $creatOrder['dispatchType'] = 'P';
@@ -119,10 +119,11 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['shipperAddrCode'] = $new_shipperAddrCode;        
         $creatOrder['warehouseCode'] = $new_warehouseCode;
         $creatOrder['winitProductCode'] = $channel;
-
+        echo "<pre>";
+        print_r($creatOrder);
         $result = $this->callWinitApi("isp.order.createOrder",$creatOrder);
-//         echo "<pre>";
-//         print_r($result);
+        
+        print_r($result);
         $result = json_decode($result,true);
         if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))        {   
               

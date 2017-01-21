@@ -44,7 +44,6 @@ Class PaypalApi
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 90);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq);
-        var_dump(curl_error($ch));
         $result = curl_exec($ch);
         var_dump($result);
         if ($result) {

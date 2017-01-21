@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
+use App\Models\Purchase\PurchaseOrderConfirmModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Purchase\PurchaseItemArrivalLogModel;
@@ -36,11 +37,13 @@ use App\Models\StockModel;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder, PurchaseItemModel $purchaseItem, ItemModel $item)
+    public function __construct(PurchaseOrderModel $purchaseOrder, PurchaseItemModel $purchaseItem, ItemModel $item,PurchaseOrderConfirmModel $purchaseOrderConfirm,PurchaseItemArrivalLogModel $arrival)
     {
         //$this->middleware('roleCheck');
         $this->model = $purchaseOrder;
+        $this->arrival = $arrival;
         $this->item = $item;
+        $this->purchaseOrderConfirm = $purchaseOrderConfirm;
         $this->purchaseItem = $purchaseItem;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
@@ -57,19 +60,6 @@ class PurchaseOrderController extends Controller
                     'purchaseItem.item', 'purchaseItem.item.product', 'purchaseItem.productItem')),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
-
-        // foreach($response['data'] as $key=>$vo){
-        //     $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
-        //     $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
-        //     $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
-        //     foreach($response['data'][$key]['purchase_items'] as $v){
-        //         $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
-        //         $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
-        //         $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
-        //         $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
-        //         $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
-        //     }
-        // }
 
         return view($this->viewPath . 'index', $response);
     }
@@ -688,10 +678,12 @@ class PurchaseOrderController extends Controller
     {
         $data = request()->input("data");
         $p_id = request()->input("p_id");
-
+        $is_second = 0;
         if ($data != '') {
             $data = substr($data, 0, strlen($data) - 1);
             $arr = explode(',', $data);
+            $count_num = PurchaseItemArrivalLogModel::where('purchase_order_id',$p_id)->count();
+            if($count_num)$is_second = 1;
             foreach ($arr as $value) {
                 $update_data = explode(':', $value);
                 $purchase_item = PurchaseItemModel::find($update_data[0]);
@@ -704,13 +696,18 @@ class PurchaseOrderController extends Controller
                     $filed['arrival_time'] = date('Y-m-d H:i:s', time());
                     $filed['status'] = 2;
                     $purchase_item->update($filed);
+                    $filed['purchase_order_id'] = $p_id;
+                    $filed['user_id'] = request()->user()->id;
                     $filed['arrival_num'] = $update_data[1];
+                    $filed['is_second'] = $is_second;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
                 $purchase_item->purchaseOrder->update(['status' => 2]);
             }
         } else {
             $purchaseOrderModel = $this->model->find($p_id);
+            $count_num = PurchaseItemArrivalLogModel::where('purchase_order_id',$p_id)->count();
+            if($count_num)$is_second = 1;
             foreach ($purchaseOrderModel->purchaseItem as $p_item) {
                 if ($p_item->purchase_num != $p_item->arrival_num) {
                     $arrival_num = $p_item->lack_num;
@@ -718,7 +715,10 @@ class PurchaseOrderController extends Controller
                     $filed['purchase_item_id'] = $p_item->id;
                     $filed['sku'] = $p_item->sku;
                     $filed['status'] = 2;
+                    $filed['purchase_order_id'] = $p_id;
+                    $filed['user_id'] = request()->user()->id;
                     $filed['arrival_num'] = $arrival_num;
+                    $filed['is_second'] = $is_second;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
             }
@@ -816,7 +816,8 @@ class PurchaseOrderController extends Controller
                 $packageItem = PackageItemModel::where('item_id', $purchase_item->item_id)->get();
                 if (count($packageItem) > 0) {
                     foreach ($packageItem as $_packageItem) {
-                        if ($_packageItem->package->status == 'NEED') {
+                        if ($_packageItem->package->status == 'NEED' && $_packageItem->package->queue_name != 'assignStocks') {
+                            $_packageItem->package->update(['queue_name' => 'assignStocks']);
                             $job = new AssignStocks($_packageItem->package);
                             $job = $job->onQueue('assignStocks');
                             $this->dispatch($job);
@@ -896,7 +897,8 @@ class PurchaseOrderController extends Controller
         $packageItem = PackageItemModel::where('item_id', $purchase_item->item_id)->get();
         if (count($packageItem) > 0) {
             foreach ($packageItem as $_packageItem) {
-                if ($_packageItem->package->status == 'NEED') {
+                if ($_packageItem->package->status == 'NEED' && $_packageItem->package->queue_name != 'assignStocks') {
+                    $_packageItem->package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($_packageItem->package);
                     $job = $job->onQueue('assignStocks');
                     $this->dispatch($job);
@@ -997,6 +999,48 @@ class PurchaseOrderController extends Controller
                     $this->model->find($id)->update(['close_status' => 1]);
                     foreach ($this->model->find($id)->purchaseItem as $purchaseitemModel) {
                         //$purchaseitemModel->update(['status'=>4]);
+                        $purchaseitemModel->productItem->createOnePurchaseNeedData();
+                    }
+                }
+                break;
+        }
+
+        return 1;
+    }
+
+    /**
+     * 批量核销和删除核销
+     *
+     * @param none
+     * @return 1
+     *
+     */
+    public function batchConfirm()
+    {
+        $type = request()->input('type');
+        $purchase_ids = request()->input("purchase_ids");
+        $arr = explode(',', $purchase_ids);
+        
+        $itemModel = new ItemModel();
+        switch ($type) {
+            case 'batchConfirm':
+                foreach ($arr as $id) {
+                    $purchaseOrderConfirmModel = $this->purchaseOrderConfirm->find($id);
+                    $purchaseOrderConfirmModel->update(['status' => 2]);
+                    $purchaseOrderConfirmModel->purchaseOrder->update(['write_off' => 2, 'status' => 4]);
+                    foreach ($purchaseOrderConfirmModel->purchaseOrder->purchaseItem as $purchaseitemModel) {
+                        $purchaseitemModel->update(['status' => 5]);
+                        $purchaseitemModel->productItem->createOnePurchaseNeedData();
+                    }
+                }
+                break;
+
+            case 'batchDelete':
+                foreach ($arr as $id) {
+                    $purchaseOrderConfirmModel = $this->purchaseOrderConfirm->find($id);
+                    $purchaseOrderConfirmModel->update(['status' => 3]);
+                    foreach ($purchaseOrderConfirmModel->purchaseOrder->purchaseItem as $purchaseitemModel) {
+                        $purchaseitemModel->update(['write_off' => 0]);
                         $purchaseitemModel->productItem->createOnePurchaseNeedData();
                     }
                 }
@@ -1142,6 +1186,27 @@ class PurchaseOrderController extends Controller
     }
 
     /**
+     * 到货记录报表
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function recieveReport()
+    {
+        $model = new PurchaseItemArrivalLogModel();
+        $this->mainIndex = route('purchaseOrder.recieveReport');
+        $this->mainTitle = '到货记录';
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($model),
+            'mixedSearchFields' => $model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'recieveReport', $response);
+    }
+
+    /**
      * 缺货报表
      *
      * @param none
@@ -1150,7 +1215,6 @@ class PurchaseOrderController extends Controller
      */
     public function outOfStock()
     {
-
         $user_id = request()->input('user_id');
         $sku = request()->input('sku');
         $status = request()->input('status');
@@ -1243,7 +1307,7 @@ class PurchaseOrderController extends Controller
 
         $rows = [];
         $warehouses = WarehouseModel::all();
-        //print_r($item_id_arr);exit;
+        
         foreach ($item_id_arr as $item_id) {
             $model = $this->item->find($item_id['item_id']);
             foreach ($warehouses as $warehouse) {
@@ -1273,16 +1337,13 @@ class PurchaseOrderController extends Controller
      * 导出采购单
      *
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return csv
      */
     public function purchaseOrdersOut()
     {
-        $purchase_ids = request()->input('purchase_ids');
-        $product_id_arr = explode(',', $purchase_ids);
-
-        $purchaseOrder = PurchaseOrderModel::whereIn('id', $product_id_arr)->get();
+        $purchaseOrder = $this->autoList($this->model,$this->model->with('supplier', 'purchaseUser', 'warehouse', 'purchaseItem', 
+            'purchasePostage','purchaseItem.item', 'purchaseItem.item.product', 'purchaseItem.productItem'),$fields = ['*'], $pageSize = 10000);
         $rows = [];
-
         foreach ($purchaseOrder as $model) {
             $total_num = 0;
             foreach ($model->purchaseItem as $purchase_item) {
@@ -1301,6 +1362,37 @@ class PurchaseOrderController extends Controller
                 '订单总金额' => $model->total_purchase_cost,
                 '供应商编号' => $model->supplier_id,
                 '下单时间' => $model->created_at,
+            ];
+        }
+        $name = 'export_exception';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    /**
+     * 导出到货记录
+     *
+     * @param $id
+     * @return csv
+     */
+    public function purchaseArrivalLogOut()
+    {
+        $purchaseItemArrivalLogModel = $this->autoList($this->arrival, null, $fields = ['*'], $pageSize = 10000);
+        $rows = [];
+        
+        foreach ($purchaseItemArrivalLogModel as $recieve) {
+            $rows[] = [
+                '采购单号' => $recieve->purchase_order_id,
+                'sku' => $recieve->purchaseItem->productItem->sku,
+                '库位' => $recieve->purchaseItem->warehouse_position_name,
+                '到货数量' => $recieve->arrival_num,
+                '入库数量' => $recieve->good_num,
+                '名称' => $recieve->purchaseItem->productItem->c_name,
+                '到货时间' => $recieve->created_at,
+                '收货人' => $recieve->user?$recieve->user->name:'',
             ];
         }
         $name = 'export_exception';
@@ -1347,6 +1439,153 @@ class PurchaseOrderController extends Controller
         Mail::send('purchase.purchaseOrder.mailPrintButNotWarehouseIn', $data, function ($message) use ($data) {
             $message->to($data['email'], $data['name'])->subject('已打印入库单,未入库采购单明细');
         });
+    }
+
+    /**
+     * 上传excel表格修改采购单付款状态付款
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function excelPayOff()
+    {
+        $this->mainTitle = '采购单批量付款';
+        $this->mainIndex = route('purchaseOrder.excelPayOff');
+        $data = [];
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $data,
+        ];
+
+        return view($this->viewPath . 'payOffIndex', $response);
+    }
+
+    /**
+     * 上传excel表格修改采购单付款状态付款
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function excelPayOffExecute()
+    {
+        if(empty($_FILES['upload']['tmp_name'])) {
+            return redirect(route('purchaseOrder.excelPayOff'))->with('alert', $this->alert('danger', '请上传表格!'));
+        }
+        $csv = Excel::load($_FILES['upload']['tmp_name'])->noHeading()->toArray();
+        $result = [];
+        foreach ($csv as $key => $value) {
+            if($key==0)continue;
+            $purchaseOrderModel = $this->model->find($value['1']);
+            if(count($purchaseOrderModel)){
+                $purchaseOrderModel->update(['close_status'=>'1']);
+                $result[$key]['status'] = '1';
+                $result[$key]['id'] = $value['1'];
+            }else{
+                $result[$key]['status'] = '2';
+                $result[$key]['id'] = $value['1'];
+            }
+        }
+      
+        $this->mainIndex = route('purchaseOrder.excelPayOff');
+        $this->mainTitle = '采购单批量付款';
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data'  => $result,
+        ];
+
+        return view($this->viewPath . 'payOffIndex', $response);
+    }
+
+    /**
+     * 采购单审核界面
+     *
+     * @param none
+     * @return obj
+     *
+     */
+    public function writeOffIndex()
+    {
+        $this->mainTitle = '采购单核销';
+        $this->mainIndex = route('purchaseOrder.writeOffIndex');
+        $data = [];
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data'  => $this->autoList($this->purchaseOrderConfirm),
+            'mixedSearchFields' => $this->purchaseOrderConfirm->mixed_search,
+        ];
+
+        return view($this->viewPath . 'writeOffIndex', $response);
+    }
+
+    public function purchaseOrderConfirmCsvFormat(){
+        $rows = [
+            [
+                '单据号'=>'94406',
+                '实际核销金额'=>'12.38',
+                '核销原因'=>'已打回支付宝',
+                '退款凭据' => '交易号 20150902200040011100220043025031',
+                '退款日期'=>'2015-09-01',
+            ]
+        ];
+
+        Excel::create('采购单核销CSV格式', function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    public function purchaseOrderPayOffCsvFormat(){
+        $rows = [
+            [
+                '采购单据号'=>'10001',
+            ],
+            [
+                '采购单据号'=>'10002',
+            ]
+        ];
+
+        Excel::create('采购单付款CSV格式', function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    public function purchaseOrderConfirmCsvFormatExecute(){
+        if(!isset($_FILES['excel']['tmp_name'])) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '请上传表格!'));
+        }
+        $csv = Excel::load($_FILES['excel']['tmp_name'],'gb2312')->noHeading()->toArray();
+        unset($csv[0]); //删除表头
+        foreach($csv as $data){
+            $purchaseOrderModel = $this->model->find($data['1']);
+            if(!$purchaseOrderModel){
+                return redirect(route('purchaseOrder.writeOffIndex'))->with('alert', $this->alert('danger', '采购单号'.$data['1'].'不存在,请重新查看并将此采购单号后的数据重新导入!'));
+            }
+            $purchaseOrderConfirmModel = $this->purchaseOrderConfirm->where('po_id',$data['1'])->get()->toArray();
+            if($purchaseOrderConfirmModel){
+                return redirect(route('purchaseOrder.writeOffIndex'))->with('alert', $this->alert('danger', '采购单号'.$data['1'].'已导入数据,请重新查看并将此采购单号后的数据重新导入!'));
+            }
+            $result = [];
+            $result['po_id'] = $data['1'];
+            $result['real_money'] = $data['2'];
+            $result['reason'] = $data['3'];
+            $result['credential'] = $data['4'];
+            $result['refund_time'] = $data['5'];
+            $result['create_user'] = request()->user()->id;
+            $result['po_user'] = $purchaseOrderModel->purchaseUser->id;
+            $result['status'] = 1;
+            $fee = 0;
+            foreach($purchaseOrderModel->purchaseItem as $purchaseItem){
+                $fee += $purchaseItem->storage_qty*$purchaseItem->purchase_cost;
+            }
+            $result['no_delivery_money'] = $purchaseOrderModel->total_purchase_cost+$purchaseOrderModel->total_postage-$fee;
+            $this->purchaseOrderConfirm->create($result);
+        }
+        return redirect(route('purchaseOrder.writeOffIndex'))->with('alert', $this->alert('success', '导入成功'));
     }
 
 }

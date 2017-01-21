@@ -92,7 +92,7 @@ class SmtAdapter extends BasicAdapter
         $shipId = $package->logistics_id; //物流
         $channel_account_id = $package->channel_account_id;
         list($name, $channel) = explode(',', $package->logistics->type);
-        $warehouseCarrierService = $channel;    //物流方式
+        $warehouseCarrierService = $channel;    //物流方式 
         if(!$package->logistics_order_number){           
             //获取渠道帐号资料
             $account = AccountModel::findOrFail($channel_account_id);
@@ -117,21 +117,23 @@ class SmtAdapter extends BasicAdapter
             foreach ($package->items as $packageItem) {
                 $productNum += $packageItem->quantity;
             }
+            $productId = $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0;
+            if(!$productId){
+                $productId = 0;
+            }
             $productData = array(
                 'categoryCnDesc'       => $package->items ? $package->items->first()->item->product->declared_cn : '连衣裙',
-                'categoryEnDesc'       => $package->items ? $package->items->first()->item->product->declared_en : 'dress',
+                'categoryEnDesc'       => str_replace([" ","　","\n","\r","\t"], '',$package->items ? $package->items->first()->item->product->declared_en : 'dress'), //过滤所有不可见字符
                 'productDeclareAmount' => $package->items->first()->item->declared_value,
-                'productId'            => $package->order ? ($package->order->items ? $package->order->items->first()->orders_item_number : 0) : 0,
+                'productId'            => $productId,             
                 'productNum'           => $productNum,
                 'productWeight'        => $package->total_weight,
-                'isContainsBattery'    => $package->is_battery ? 1 : 0,
-                /*'isAneroidMarkup'      => 0,
-                 'isOnlyBattery'        => 0,*/
+                'isContainsBattery'    => $package->is_battery ? 1 : 0,    
             );
             
             $addressArray = array(
                 'receiver' => array( //收件人地址
-                    'country' => $package->shipping_country,
+                    'country' => $package->shipping_country ? ($package->shipping_country == 'GB' ? 'UK' : $package->shipping_country) : '' ,
                     //国家简称, 速卖通下单下来应该就是吧
                     'province' => $package->shipping_state,
                     //省/州,（必填，长度限制1-48字节）
@@ -163,16 +165,21 @@ class SmtAdapter extends BasicAdapter
             );
             $address_result = $smtApi->getJsonDataUsePostMethod($address_api, $address_smt);
             $address_result = json_decode($address_result, true);
+            echo '<pre>';
+            print_r($productData);
             $addressArray = array_merge($addressArray, $this->_senderAddress[$package->warehouse_id]);
             $addressArray['sender']['addressId'] = $address_result['senderSellerAddressesList'][0]['addressId'];
             $addressArray['pickup']['addressId'] = $address_result['pickupSellerAddressesList'][0]['addressId'];
             
             $data['declareProductDTOs']         = json_encode([$productData]);  //二维数组
             $data['addressDTOs']                = json_encode($addressArray);
-             
+            
+            print_r($data);
             $api = 'api.createWarehouseOrder';
             $rs = $smtApi->getJsonDataUsePostMethod($api,$data);
-            $result = json_decode($rs,true); 
+            
+            $result = json_decode($rs,true);            
+            print_r($result);
             if(array_key_exists('success', $result) && $result['result']['success']){
                 if (array_key_exists('intlTracking', $result['result'])) { //有挂号码就要返回，不然还得再调用API获取
                     $data['channel_listnum'] = $result['result']['intlTracking'];
@@ -185,7 +192,9 @@ class SmtAdapter extends BasicAdapter
                 return array('code' => 'error', 'result' => $result['result']['errorDesc']);
             }
         }else{
-            $res = $this->getOnlineLogisticsInfo($channel_account_id,$orderId);       
+            $res = $this->getOnlineLogisticsInfo($channel_account_id,$orderId);
+            echo '<pre>';
+            print_r($res);
             $onlineLogisticsId = $package->logistics_order_number;
             if(array_key_exists('success', $res) && $res['success']){
                 if(!empty($res['result'])){

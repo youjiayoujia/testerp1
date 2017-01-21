@@ -1,6 +1,6 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group btn-info" role="group">
+    <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 批量修改属性
             <span class="caret"></span>
@@ -50,8 +50,9 @@
             </td>
             <td>{{ $item->c_name }}<br>物品分类：{{ $item->catalog?$item->catalog->all_name:'' }}<br>
                 @foreach($item->product->logisticsLimit as $logistics)
-                    @if($logistics->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}" />@else{{$logistics->name}} @endif<br>
+                    @if($logistics->ico)<img width="30px" src="{{config('logistics.limit_ico_src').$logistics->ico}}" />@else{{$logistics->name}} @endif
                 @endforeach
+                <br>
                 开发时间：{{ $item->created_at }}<br>
                 【包装方式：
                 <?php if($item->product){ ?>
@@ -289,6 +290,21 @@
             <td colspan='2'>{{$item->out_of_stock?$item->out_of_stock:0}}</td>
         </tr>
 
+        <tr>  
+            <th colspan='2'>渠道</th>
+            <th colspan='4'>7天销量</th>
+            <th colspan='4'>14天销量</th>
+            <th colspan='4'>28天销量</th>    
+        </tr>
+        @foreach($channels as $channel)
+            <tr>
+                <td colspan='2'>{{$channel->name}}</td>
+                <td colspan='4'>{{$item->getChannelSales('-7 day')[$channel->id]}}</td>
+                <td colspan='4'>{{$item->getChannelSales('-14 day')[$channel->id]}}</td>
+                <td colspan='4'>{{$item->getChannelSales('-28 day')[$channel->id]}}</td>
+            </tr>
+        @endforeach
+
         <!-- 图片模态框（Modal -->
         <div class="modal fade" id="imgModal_{{$item->id}}" role="dialog"
              aria-labelledby="myModalLabel" aria-hidden="true">
@@ -416,7 +432,7 @@
                             </div>
                             <br>
                             <div><textarea rows="3" cols="88" name='question_content'></textarea></div>
-                            <div><input type='file' name='uploadImage'></div>
+                            <div><input type='file' name='uploadImage'><span style="color:red">(文件为图片格式)</span></div>
                         </div>
 
                         <div class="modal-footer">
@@ -486,22 +502,34 @@
                         上传表格修改sku状态
                     </h4>
                 </div>
-                <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="file" name="upload">
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default"
-                                data-dismiss="modal">关闭
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            提交
-                        </button>
-                    </div>
-                </form>
+
+                <div class="modal-body">
+                    <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
+                        <div>
+                            <span>状态选择:</span>
+                            <select class="form-control" id="spu_status" style="width: 160px;" name="spu_status">
+                                <option value="none">请选择</option>
+                                @foreach(config('item.status') as $key=>$value)
+                                    <option value="{{$key}}">{{$value}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="file" name="upload">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                            data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                提交
+                            </button>
+                        </div>
+                    </form>
+                </div>             
             </div>
         </div>
     </div>
-
 
 @stop
 
@@ -518,7 +546,9 @@
                 item_ids += checkbox[i].value + ",";
             }
             item_ids = item_ids.substr(0, (item_ids.length) - 1);
-
+            if(item_ids==''){
+                alert('请选择sku');return;
+            }
             var url = "{{ route('batchEdit') }}";
             window.location.href = url + "?item_ids=" + item_ids + "&param=" + param;
         });
@@ -537,26 +567,29 @@
         }
 
         $('.batchdelete').click(function () {
+            if (confirm("确认删除?")) {
+                var url = "{{route('item.batchDelete')}}";
 
-            var url = "{{route('item.batchDelete')}}";
-
-            var checkbox = document.getElementsByName("tribute_id");
-            var item_ids = "";
-            for (var i = 0; i < checkbox.length; i++) {
-                if (!checkbox[i].checked)continue;
-                item_ids += checkbox[i].value + ",";
-            }
-            item_ids = item_ids.substr(0, (item_ids.length) - 1);
-
-            $.ajax({
-                url: url,
-                data: {item_ids: item_ids},
-                dataType: 'json',
-                type: 'get',
-                success: function (result) {
-                    window.location.reload();
+                var checkbox = document.getElementsByName("tribute_id");
+                var item_ids = "";
+                for (var i = 0; i < checkbox.length; i++) {
+                    if (!checkbox[i].checked)continue;
+                    item_ids += checkbox[i].value + ",";
                 }
-            })
+                item_ids = item_ids.substr(0, (item_ids.length) - 1);
+                if(item_ids==''){
+                    alert('请选择sku');return;
+                }
+                $.ajax({
+                    url: url,
+                    data: {item_ids: item_ids},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        window.location.reload();
+                    }
+                })
+            }
         });
 
         /*ajax调取采购负责人*/
@@ -593,6 +626,17 @@
                 }
             },
         });
+
+        $(document).on('change', '.sectiongangeddouble_first', function () {
+            val = $(this).val();
+            $.get(
+                "{{ route('item.sectionGangedDouble')}}",
+                {val: val},
+                function (result) {
+                    $('.sectiongangeddouble_second').html(result);
+                }
+            )
+        })
 
         function changeSelectVlaue(selected, type, productId) {
             var id = selected.val();

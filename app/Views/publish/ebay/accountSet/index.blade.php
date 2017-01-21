@@ -19,7 +19,7 @@
     @foreach($data as $v)
         <tr class="">
             <td>{{$v->id}}</td>
-            <td>{{$v->channelAccount->account}}</td>
+            <td>{{$v->channelAccount->alias}}</td>
             <td>{{$v->bigPaypal->paypal_email_address}}</td>
             <td>{{$v->smallPaypal->paypal_email_address}}</td>
             <td>

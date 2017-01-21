@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+
 use Tool;
 use Channel;
 use App\Jobs\Job;
@@ -15,7 +16,8 @@ use App\Models\Channel\AccountModel;
 class GetLazadaPackageId extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
-    private  $package;
+    private $package;
+
     /**
      * Create a new job instance.
      *
@@ -54,8 +56,8 @@ class GetLazadaPackageId extends Job implements SelfHandling, ShouldQueue
         if ($result) {
             if (isset($result[$OrderItemIds[0]])) { // 获取到了 最踪号 和 PackageId
                 $update_info = [
-                    'tracking_no'=>$result[$OrderItemIds[0]]['TrackingCode'],
-                    'lazada_package_id'=>$result[$OrderItemIds[0]]['PackageId'],
+                    'tracking_no' => $result[$OrderItemIds[0]]['TrackingCode'],
+                    'lazada_package_id' => $result[$OrderItemIds[0]]['PackageId'],
                 ];
                 $this->package->update($update_info);
 
@@ -74,7 +76,8 @@ class GetLazadaPackageId extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = '调用API失败';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('GetLazadaPackageId',isset($channel->apiResponse)?base64_encode(serialize($channel->apiResponse)):base64_encode(serialize(array('调用API失败'))));
+        $this->log('GetLazadaPackageId',
+            isset($channel->apiResponse) ? json_encode($channel->apiResponse) : json_encode(array('调用API失败')));
 
     }
 }

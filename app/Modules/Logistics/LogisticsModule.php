@@ -29,7 +29,8 @@ use App\Modules\Logistics\Adapter\MalaixiyaAdapter;
 use App\Modules\Logistics\Adapter\DiouAdapter;
 use App\Modules\Logistics\Adapter\SzPostXBAdapter;
 use App\Modules\Logistics\Adapter\DhlAdapter;
-
+use App\Modules\Logistics\Adapter\JhdAdapter;
+use App\Modules\Logistics\Adapter\OstAdapter;
 
 class LogisticsModule
 {
@@ -170,11 +171,32 @@ class LogisticsModule
     {
         return new DiouAdapter($config);
     }
-    
+
     public function createSzPostXBDriver($config){
         return new SzPostXBAdapter($config);
     }
+    /*
+	*DHL驱动
+	*@param $config
+    *@return BpostAdapter
+	*/
     public function createDhlDriver($config){
         return new DhlAdapter($config);
+    }
+    /*
+	*京华东驱动
+	*@param $config
+    *@return BpostAdapter
+	*/
+    public function createJhdDriver($config){
+        return new JhdAdapter($config);
+    }
+    /*
+	*欧速通
+	*@param $config
+    *@return OstAdapter
+	*/
+    public function createOstDriver($config){
+        return new OstAdapter($config);
     }
 }

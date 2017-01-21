@@ -94,6 +94,7 @@ return [
     'queues' => [
         'InOrders' => '存储订单',
         'DoPackages' => '打包',
+        'AssignStocks' => '分配库存',
         'AssignLogistics' => '分配物流',
         'PlaceLogistics' => '物流下单',
         'SendMessages' => '发送邮件',

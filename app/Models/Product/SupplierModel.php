@@ -5,6 +5,7 @@ namespace App\Models\Product;
 use App\Base\BaseModel;
 use Tool;
 use App\Models\SyncApiModel;
+use App\Models\Product\SupplierAttachmentModel;
 
 class SupplierModel extends BaseModel
 {
@@ -70,6 +71,23 @@ class SupplierModel extends BaseModel
 
         ]
     ];
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        //dd(UserModel::all()->pluck('name','name'));
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'product_suppliers.examine_status' => config('product.supplier.examine_status'),
+            ],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
 
     /**
      * return the relation between the two module
@@ -119,6 +137,10 @@ class SupplierModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierLevelModel', 'level_id', 'id');
     }
 
+    public function attachment(){
+        return $this->hasMany('App\Models\Product\SupplierAttachmentModel', 'supplier_id');
+    }
+
     public function getCreatedNameAttribute(){
         $user = $this->createdByName;
         return $user ? $user->name : '无';
@@ -129,25 +151,36 @@ class SupplierModel extends BaseModel
      *
      *
      */
-    public function supplierCreate($data, $file = null)
+    public function supplierCreate($data)
     {
-        if ($data['type'] == 0 && $file != null) {
-
-            $path = config('product.product_supplier.file_path');
-            if ($file->getClientOriginalName()) {
-                $originalExtension = $file->getClientOriginalExtension();
-                if ($originalExtension != 'php'){
-                    $data['qualifications'] = Tool::randString(16,false) . '.' . $file->getClientOriginalExtension();
-                    $file->move($path, $data['qualifications']);
-                } else {
-                    return 'imageError';
-                }
-            }
+        $files = false;
+        if(!empty($data['qualifications'])) {
+            $files = $data['qualifications'];
+            unset($data['qualifications']);
         }
         $data['examine_status'] = 'newData'; //新创建
         $create = $this->create($data);
+        $path = config('product.product_supplier.file_path');
 
-        $post = [];
+        if($files){
+            foreach ($files as $file){
+                if ($file->getClientOriginalName()) {
+                    //$originalExtension = $file->getClientOriginalExtension();
+                    $filename = Tool::randString(16,false) . '.' . $file->getClientOriginalExtension();
+                    $file->move($path, $filename);
+                    $supplier_id = $create->id;
+                    SupplierAttachmentModel::create(compact('supplier_id', 'filename'));
+                }
+            }
+        }
+
+
+
+
+
+
+
+/*        $post = [];
         //api同步sellmore 旧系统
         if(!empty($create->id)){
             $type_config =  array_flip(config('product.sellmore.pay_type'));
@@ -179,7 +212,7 @@ class SupplierModel extends BaseModel
             $sync->times = 0;
             $sync->save();
            // $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
-        }
+        }*/
         return $create;
     }
 
@@ -190,8 +223,28 @@ class SupplierModel extends BaseModel
      */
     public function updateSupplier($id, $data, $file = null)
     {
+        $files = false;
+        if(!empty($data['qualifications'])) {
+            $files = $data['qualifications'];
+            unset($data['qualifications']);
+        }
+        $supplier = $this->find($id);
+        $res = $supplier->update($data);
         $path = config('product.product_supplier.file_path');
-        if ($data['type'] == 0 && $file != null) { //线下类型
+
+        if($files){
+            foreach ($files as $item){
+                if ($item->getClientOriginalName()) {
+                    //$originalExtension = $file->getClientOriginalExtension();
+                    $filename = Tool::randString(16,false) . '.' . $item->getClientOriginalExtension();
+                    $item->move($path, $filename);
+                    $supplier_id = $supplier->id;
+                    SupplierAttachmentModel::create(compact('supplier_id', 'filename'));
+                }
+            }
+        }
+
+/*        if ($data['type'] == 0 && $file != null) { //线下类型
                 if ($file->getClientOriginalName()) {
                     $itemInfo = $this->where('id',$id)->first();
                     $originPath = $itemInfo['qualifications']; //原来文件路径
@@ -209,10 +262,9 @@ class SupplierModel extends BaseModel
                 }
         }else{
             $data['qualifications'] = '';
-        }
+        }*/
 
-        $res = $this->find($id)->update($data);
-
+/*
         if($res){//api同步sellmore 旧系统
             $suplier = $this->find($id);
             $type_config =  array_flip(config('product.sellmore.pay_type'));
@@ -245,7 +297,7 @@ class SupplierModel extends BaseModel
             $sync->save();
 
             //$result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
-        }
+        }*/
         return $res;
     }
 }

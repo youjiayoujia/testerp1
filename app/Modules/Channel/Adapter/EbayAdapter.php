@@ -942,15 +942,7 @@ class EbayAdapter implements AdapterInterface
         $xml .= '<Description><![CDATA[' . (trim(($data['description']))) .']]></Description>';  //将描述部分 设置完了再传进来
         $xml .= '<OutOfStockControl>true</OutOfStockControl>'; //无货在线
         $xml .= '</Item>';
-        //var_dump($xml);
-        if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){
-            $response = $this->buildEbayBody($xml, $api, $site);
-
-        }else{
-            $response =  (object)array();
-          //  $response->ItemID = rand(1000000000, 10000000000);
-        }
-
+        $response = $this->buildEbayBody($xml, $api, $site);
         if(isset($response->ItemID)){
             $return['is_success'] =true;
             if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){
@@ -964,6 +956,7 @@ class EbayAdapter implements AdapterInterface
             }
         }else{
             $return['is_success'] =false;
+            $errorInfo = [];
             foreach($response->Errors as $error){
                 if((string)$error->SeverityCode =='Error'){
                     $info_String = (string)$error->LongMessage;
@@ -975,9 +968,8 @@ class EbayAdapter implements AdapterInterface
             }
             $errorInfo=  array_unique($errorInfo);
             $errorInfo =implode(',',$errorInfo);
-            $return['info'] =$errorInfo;
+            $return['info'] =strip_tags($errorInfo);
             //$return['info'] ='测试错误情况下';
-
         }
         $return['info_all'] =var_export($response,true);
         return $return;
@@ -1974,6 +1966,15 @@ class EbayAdapter implements AdapterInterface
                               <RecipientID>' . $message_obj->from_name . '</RecipientID>
                               </MemberMessage>';
             $content = $this->buildEbayBody($reply_xml_dom,'AddMemberMessageRTQ');
+
+            if($content->Ack == 'Success'){
+                $replyMessage->status = 'SENT';
+
+            }else{
+                $replyMessage->status = 'FAIL';
+            }
+            $replyMessage->save();
+
             return $content->Ack == 'Success' ? true : false;
         }
     }
@@ -2190,9 +2191,8 @@ class EbayAdapter implements AdapterInterface
      */
     public function ebayOrderSendMessage($paramAry){
         $total = count($paramAry['itemids']);
-        $ItemIDXML = ($total == 1) ? "<ItemID>$paramAry[itemids][0]</ItemID>" : '' ;
+        $ItemIDXML = ($total == 1) ? '<ItemID>' .$paramAry['itemids'][0] . '</ItemID>' : '' ;
         $moreItem  = ($total > 1) ?  implode(',',$paramAry['itemids']) : '' ;
-
         $xml ='<WarningLevel>High</WarningLevel>
                ' . $ItemIDXML . '
               <MemberMessage>
@@ -2201,7 +2201,7 @@ class EbayAdapter implements AdapterInterface
                 <QuestionType>CustomizedSubject</QuestionType>
                 <RecipientID>' . addslashes($paramAry['buyer_id']) . '</RecipientID>
               </MemberMessage>';
-        $result = $this->buildcaseBody($xml,'AddMemberMessageAAQToPartner');
+        $result = $this->buildEbayBody($xml,'AddMemberMessageAAQToPartner');
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
             return true;
         }else{

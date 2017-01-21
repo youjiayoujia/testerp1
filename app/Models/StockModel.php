@@ -12,6 +12,8 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\ItemModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductEnglishValueModel;
+use App\Models\Oversea\ItemCostModel;
+use App\Models\Oversea\Stock\AdjustmentModel;
 
 class StockModel extends BaseModel
 {
@@ -37,7 +39,7 @@ class StockModel extends BaseModel
         'hold_quantity',
         'created_at',
         'oversea_sku',
-        'oversea_cost'
+        'oversea_cost',
     ];
 
     // 用于查询
@@ -88,6 +90,16 @@ class StockModel extends BaseModel
     public function position()
     {
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id', 'id');
+    }
+
+    public function getOverseaCostAttribute()
+    {
+        $itemCost = $this->warehouse->overseaItemCost()->where('item_id', $this->item_id)->first();
+        if(!$itemCost) {
+            return 0;
+        }
+
+        return $itemCost->cost;
     }
 
     /**
@@ -328,6 +340,8 @@ class StockModel extends BaseModel
      */
     public function excelProcess($file)
     {
+        ini_set('memory_limit', '128M');
+        set_time_limit('0');
         $path = config('setting.stockExcelPath');
         !file_exists($path . 'stockExcelProcess.csv') or unlink($path . 'stockExcelProcess.csv');
         $file->move($path, 'stockExcelProcess.csv');
@@ -336,6 +350,8 @@ class StockModel extends BaseModel
 
     public function overseaExcelProcess($file)
     {
+        ini_set('memory_limit', '128M');
+        set_time_limit('0');
         $path = config('setting.stockExcelPath');
         !file_exists($path . 'stockExcelProcess.csv') or unlink($path . 'stockExcelProcess.csv');
         $file->move($path, 'stockExcelProcess.csv');
@@ -357,6 +373,7 @@ class StockModel extends BaseModel
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
         $i = 1;
+        $adjustment = AdjustmentModel::create(['date' => date('Y-m-d H:i:s', time()), 'adjust_by' => request()->user()->id]);
         foreach ($arr as $key => $stock) {
             $stock['position'] = iconv('gb2312', 'utf-8', $stock['position']);
             if (!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
@@ -375,20 +392,56 @@ class StockModel extends BaseModel
                 continue;
             }
             $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
-            $tmp_stock = StockModel::where(['oversea_sku' => $stock['oversea_sku']])->first();
+            $tmp_stock = StockModel::where(['warehouse_position_id' => $tmp_position->id, 'oversea_sku' => $stock['oversea_sku']])->first();
             if (!$tmp_stock) {
                 $error[$i]['key'] = $key;
-                $error[$i]['remark'] = '该对应Oversea没有库存';
+                $error[$i]['remark'] = '该对应Oversea没有库存,入库';
                 $error[$i]['quantity'] = (int)$stock['all_quantity'];
-                $i++;
-                continue;
+                $adjustment->forms()->create(['sku' => $stock['sku'], 'warehouse_position' => $stock['position'], 'quantity' => $error[$i]['quantity'], 'type' => 'in', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $stock['oversea_cost'], 'remark' => '该对应Oversea没有库存,入库']);
+            } else {
+                $error[$i]['key'] = $key;
+                $error[$i]['quantity'] = (int)$stock['all_quantity'] - $tmp_stock->all_quantity;
+                if($error[$i]['quantity'] > 0) {
+                    $adjustment->forms()->create(['sku' => $stock['sku'],'quantity' => $error[$i]['quantity'],  'warehouse_position' => $stock['position'], 'type' => 'in', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $stock['oversea_cost'], 'remark' => '该对应Oversea没有库存,入库']);
+                } else {
+                    $adjustment->forms()->create(['sku' => $stock['sku'],'quantity' => -$error[$i]['quantity'], 'warehouse_position' => $stock['position'], 'type' => 'out', 'oversea_sku' => $stock['oversea_sku'], 'oversea_cost' => $stock['oversea_cost'], 'remark' => '该对应Oversea没有库存,入库']);
+                }
             }
-            $error[$i]['key'] = $key;
-            $error[$i]['quantity'] = (int)$stock['all_quantity'] - $tmp_stock->all_quantity;
+            $this->oversea_importStock($arr, $error[$i]);
             $i++;
         }
 
         return $error;
+    }
+
+    public function oversea_importStock($arr, $buf)
+    {
+        $item = ItemModel::where('sku', $arr[$buf['key']]['sku'])->first();
+        if(!$item) {
+            return false;
+        }
+        $position = PositionModel::where('name', $arr[$buf['key']]['position'])->first();
+        if(!$position) {
+            return false;
+        }
+        if($buf['quantity'] > 0) {
+            $item->in($position->id, (int)$buf['quantity'], ((int)$buf['quantity'] * ($item->cost ? $item->cost : $item->purchase_price)), 'ADJUSTMENT');
+        }
+        if($buf['quantity'] < 0) {
+            $item->out($position->id, -(int)$buf['quantity'], 'ADJUSTMENT');
+        }
+        $stock = $this->where(['item_id' => $item->id, 'warehouse_position_id' => $position->id])->first();
+        if($stock) {
+            $stock->update(['oversea_sku' => $arr[$buf['key']]['oversea_sku']]);
+            if(isset($arr[$buf['key']]['oversea_cost'])) {
+                $itemCost = $stock->warehouse->overseaItemCost()->where('item_id', $stock->item_id)->first();
+                if($itemCost) {
+                    $itemCost->update(['cost' => $arr[$buf['key']]['oversea_cost']]);
+                } else {
+                    ItemCostModel::create(['item_id' => $stock->item_id, 'cost' => $arr[$buf['key']]['oversea_cost'], 'code' => $stock->warehouse->code]);
+                }
+            }
+        }
     }
 
     /**
@@ -432,13 +485,8 @@ class StockModel extends BaseModel
             $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
             DB::beginTransaction();
             try {
-            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $tmp_item->purchase_price,
+            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $tmp_item->cost,
                 'MAKE_ACCOUNT');
-            $stock1 = $this->where(['item_id' => $tmp_item->id, 'warehouse_position_id' => $tmp_position->id])->first();
-            
-            if($stock1 && !empty($stock['oversea_sku'])) {
-                $stock1->update(['oversea_sku' => $stock['oversea_sku']]);
-            }
             } catch(Exception $e) {
                 DB::rollback();
                 $error[$i]['key'] = $key;

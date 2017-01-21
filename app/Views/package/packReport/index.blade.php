@@ -2,7 +2,7 @@
 @section('detailBody')
 <div class='row'>
     <div class='form-group col-lg-3'>
-        <input id="expected_date" class='form-control' name='expected_date' type="text" placeholder='期望上传日期' value="{{ old('expected_date') }}">
+        <input id="expected_date" class='form-control' name='expected_date' type="text" placeholder='日期查询' value="{{ isset($daytime) ? $daytime : '' }}">
     </div>
     <button type='button' class='btn btn-info search'>查找</button>
 </div>

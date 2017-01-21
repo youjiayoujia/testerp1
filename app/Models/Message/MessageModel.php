@@ -13,7 +13,9 @@ use Tool;
 use Translation;
 use App\Models\Channel\AccountModel as Channel_Accounts;
 use App\Models\ChannelModel;
+use App\Models\Logistics\ChannelModel as LogisticChannel;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -36,9 +38,8 @@ class MessageModel extends BaseModel{
     public $searchFields = [
         'id'=>'ID',
         'subject'=>'主题',
-        'from_name'=>'发信人',
-        'from'=>'发件邮箱' ,
-        'label' => '消息类型',
+/*        'from'=>'发件邮箱' ,
+        'label' => '消息类型',*/
         'channel_order_number' => '平台订单号'
     ];
 
@@ -49,10 +50,12 @@ class MessageModel extends BaseModel{
         'msg_time'
     ];
 
-  public function account()
+    public function account()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel');
     }
+
+
     public function assigner()
     {
         return $this->belongsTo('App\Models\UserModel', 'assign_id' , 'id');
@@ -104,22 +107,40 @@ class MessageModel extends BaseModel{
         }
     }
 
+    public function getAutoReplyStatusAttribute()
+    {
+        if($this->is_auto_reply == 2){
+            $status = '未检查';
+        }else if($this->is_auto_reply == 0){
+            $status = '已检查';
+        } else if($this->is_auto_reply == 1){
+            $status = '已回复';
+        } else {
+            $status = '未知';
+        }
+        return $status;
+    }
+
     /**
      * 更多搜索
      * @return array
      */
     public function getMixedSearchAttribute()
     {
-        //dd(UserModel::all()->pluck('name','name'));
         return [
             'relatedSearchFields' => [],
-            'filterFields' => [],
+            'filterFields' => [
+                'from_name',
+                'from',
+                'messages.labels'
+            ],
             'filterSelects' => [
                 'messages.status' => config('message.statusText'),
+                'assign_id' => UserModel::all()->pluck('name','id'),
             ],
             'selectRelatedSearchs' => [
                 'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
-                'account' => ['account' => Channel_Accounts::all()->pluck('account', 'account')],
+                'account' => ['account' => Channel_Accounts::all()->pluck('alias', 'account')],
                 //'assigner' => ['name' => UserModel::all()->pluck('name','name')],
             ],
             'sectionSelect' => ['time'=>['created_at']],
@@ -303,6 +324,90 @@ class MessageModel extends BaseModel{
     }
 
 
+    //获取用户所有提问内容
+    public function getUserMsgInfoAttribute(){
+        $content_string = false;
+        $message_info = $this->ContentDecodeBase64;
+        if(! empty($message_info)){
+            foreach ($message_info as $key => $content){
+                switch ($key) {
+                    case 'aliexpress':
+                        foreach($content->result as $item){
+                            if($this->from_name == $item->senderName){
+                                $content_string .= $item->content;
+                            }
+                        }
+
+                        break;
+                    case 'wish':
+                       foreach ($content as $k => $item){
+                            if($item['Reply']['sender'] == 'user') {
+                                $content_string .= $item['Reply']['message'];
+                            }
+                        }
+                        break;
+          /*          case 'ebay':
+                        print_r($message_info);*/
+                    default:
+                        $content_string = false;
+                }
+            }
+        }
+        return $content_string;
+    }
+
+    public function IsFristMsgForOrder(){
+        $message_info = $this->ContentDecodeBase64;
+        $result = false;
+        foreach ($message_info as $channel_name => $content){
+            switch ($channel_name){
+                case 'aliexpress':
+                    $content_group = Collection::make($content->result)->groupBy('senderName');
+                    if($content_group->count() == 1){ //只存在用户信息
+                        $result = true;
+                    } else {
+                        foreach ($content_group as $key => $item){
+                            if($key != $this->from_name){ //包含自动去信的第一个消息
+                                if($item->count() == 1){
+                                    $result = true;
+                                }
+                            }
+                        }
+
+                    }
+                    break;
+                case 'wish':
+                    $hasMerchant =  Collection::make($content)->flatten()->search('merchant');
+                    if(! $hasMerchant){
+                        $result = true;
+                    }
+                    break;
+
+                case 'ebay':
+
+                    break;
+                default:
+
+
+
+
+            }
+        }
+        return $result;
+    }
+
+    public function MsgOrderIsExpress(){
+        if($order = $this->relatedOrders()->first()){
+            $package = OrderModel::find($order->order_id)->packages()->first();
+            if(! empty($package)){
+                if($package->logistics->is_express == '0'){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public function getMessageInfoAttribute(){
         if($this->ContentDecodeBase64){
             $html = '';
@@ -315,21 +420,34 @@ class MessageModel extends BaseModel{
                                    if($item['Reply']['sender'] == 'wish support'){
                                        $this->from_name = $item['Reply']['sender'];
                                    }
-                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender：</strong>'.$this->from_name.':</p><strong>Content: </strong>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>Time：</strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>发件人：</strong>'.$this->from_name.':</p><strong>内容: </strong>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
 
                                    if(isset($item['Reply']['translated_message']) && isset($item['Reply']['translated_message_zh'])){
                                        $html .= '<div class="alert-danger"><strong>Wish翻译: </strong><p>'.$item['Reply']['translated_message'].'</p><p>'. $item['Reply']['translated_message_zh'].'</p></div>';
                                    }else{
 
                                    }
-
+                                   if(! empty($item['Reply']['image_urls'])){
+                                       $img_urls = $item['Reply']['image_urls'];
+                                       $img_urls = str_replace('[', '', $img_urls);
+                                       $img_urls = str_replace(']', '', $img_urls);
+                                       $img_urls = explode(',', $img_urls);
+                                       foreach($img_urls as $url){
+                                           $tmp_url = explode('\'', $url);
+                                           if(! empty($tmp_url[1])){
+                                               $html .= '附图：<img width="500px" src="'.$tmp_url[1].'" /> <br/>';
+                                           }
+                                       }
+                                   }
                                    $html .= '</div>';
                                }else{
-                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>用户名：</strong>'.$item['Reply']['sender'].':</p><strong>Content: </strong>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>Time：</strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>发件人：</strong>'.$item['Reply']['sender'].':</p><strong>内容: </strong>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
                                    $html .= '</div>';
                                }
+
+
                            }
                         }
                         break;
@@ -359,6 +477,11 @@ class MessageModel extends BaseModel{
                                 $product_html .= '</table>';
                                 $product_html .= '</div>';
 
+                            } else{
+                                if($k==0 && ! empty($item->summary->orderUrl)){
+                                    $product_html .= '<div class="col-lg-12" >渠道订单链接:<a target="_blank" href="' . $item->summary->orderUrl . '">'.$item->summary->orderUrl.'</a></div>';
+                                }
+
                             }
 
                             //dd($message_fields_ary);
@@ -376,8 +499,7 @@ class MessageModel extends BaseModel{
                             $content = str_replace("&amp;iquest;", ' ', $content);
                             $content = str_replace("\n", "<br />", $content);
                             $content = preg_replace("'<br \/>[\t]*?<br \/>'", '', $content);
-                            $content = str_replace("/:000", '<img src="http://i02.i.aliimg.com/wimg/feedback/emotions/0.gif" />', $content);
-                            $content = preg_replace("'\/\:0+([1-9]+0*)'", "<img src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
+                            $content = preg_replace("'\/\:0+([0-9]+0*)'", "<img style='width:25px' src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
                             $content = (stripslashes(stripslashes($content)));
 
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
@@ -389,7 +511,7 @@ class MessageModel extends BaseModel{
                                 }else{
                                     $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                     $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
-                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'" content-key="'.$k.'">
+                                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'. preg_replace("'\/\:0+([0-9]+0*)'", '',$content) .'" content-key="'.$k.'">
                                     翻译
                                 </button>
                                 <p id="content-'.$k.'" style="color:green"></p>';
@@ -450,57 +572,69 @@ class MessageModel extends BaseModel{
     }
 
     public function findOrderWithMessage(){
-        $order_id = $this->getChannelMessageOrderId(); //根据平台参数获取关联订单号
-        if(!empty($order_id)){
-            //$order_obj = OrderModel::where('channel_ordernum','=',$order_id)->first();
-            if(!empty($order_id)){
+        $order_id = false;
+        switch ($this->getChannelDiver()){
+            case 'ebay':
+                /**
+                 * 由于ebay 的api 没有返回渠道订单号
+                 * 关联规则：渠道用户ID 和 渠道订单的ItemID 进行关联
+                 * 如果由多个情况 同时关联
+                 *
+                 */
+                if(! empty($this->channel_order_number) && ! empty($this->from_name)){
+                    $orders = OrderModel::where('by_id','=', $this->from_name)->get();
+                    if(! $orders->isEmpty()){
+                        $orderByUser = false;
+                        foreach ($orders as $order){
+                            $item = $order->items()->where('orders_item_number', '=', $this->channel_order_number)->first();
+                            if($item){
+                                $orderByUser[$item->order_id] = $item->order_id;
+                            }
+                        }
+                        $order_id = $orderByUser;
+                    }
+                }
+                break;
+            case 'wish':
+                //wish交易号
+                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)->first();
+                $order_id = empty($order_obj) ? false : $order_obj->id;   //根据 orders 表 交易号
+                break;
+            case 'aliexpress':
+                $order_id = !empty($this->Order->id) ? $this->Order->id : false;
+                break;
+            default:
+                $order_id = false;
+
+        }
+        if($order_id){
+            if($this->getChannelDiver() != 'ebay'){
                 if($this->relatedOrders()->create(['order_id' => $order_id])){
                     $this->related = 1;
                     $this->save();
                 }
-            }
-        }
-
-    }
-
-    public function getChannelMessageOrderId(){
-        $fields_ary = $this->MessageFieldsDecodeBase64;
-        switch ($this->getChannelDiver()){
-            case 'ebay':
-                $order_id = $fields_ary['ItemID'];
-                if(!empty($order_id)){
-                    $order_obj = OrderModel::where('transaction_number','=',$order_id)->first();
-                    $order_id = empty($order_obj) ? '' : $order_obj->id;
-                }else{
-                    $order_id = '';
+            } else {
+                foreach($order_id as $item){
+                    $this->relatedOrders()->create(['order_id' => $item]);
                 }
-                break;
-            case 'wish':
-                 //wish交易号
-                $order_obj = OrderModel::where('transaction_number','=',$this->channel_order_number)
-                    ->where('channel_account_id',$this->account_id)
-                    ->first();
-                $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
-                break;
-            case 'aliexpress':
-                $order_id = !empty($this->Order->id) ? $this->Order->id : '';
-                break;
-            default:
-                $order_id = '';
+                $this->related = 1;
+                $this->save();
+            }
+
         }
 
-        return $order_id;
     }
 
     /**
      * 渠道参数信息
      */
     public function getChannelParamsAttribute(){
-        $html = '';
+        $html = '<ul class="list-group">';
         $channel = $this->getChannelDiver();
         switch ($channel){
             case 'aliexpress':
-                $html .= '<span class="label label-warning">'.$this->label.'</span>';
+                $html .= '<li class="list-group-item"><span class="label label-warning">'.$this->label.'</span></li>';
+                $html .= '<li class="list-group-item"><code>渠道单号：'.$this->channel_order_number.'</code></li>';
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;
@@ -508,17 +642,18 @@ class MessageModel extends BaseModel{
                 $language = ! empty(config('message.wish')['country'][$this->country]) ? config('message.wish')['country'][$this->country] : '未知';
 
                 if($files){
-                    $html .= '<p><strong>Transaction id</strong>:'.$files['order_items'][0]['Order']['transaction_id'].'</p>';
-                    $html .= '<p><strong>语言</strong>:'.$language.'</p>';
+                    $html .= '<li class="list-group-item"><p><strong>Transaction id</strong>:'.$files['order_items'][0]['Order']['transaction_id'].'</p></li>';
+                    $html .= '<li class="list-group-item"><p><strong>语言</strong>:'.$language.'</p></li>';
                 }else{
-                    $html .= '<p>暂无</p>';
+                    $html .= '<li class="list-group-item"><p>暂无</p></li>';
                 }
                 break;
             case 'ebay':
                 $files = $this->MessageFieldsDecodeBase64;
+                //dd($files);
                 if(!empty($files)){
-                    $html .= '<p><strong>ItemID</strong>:'.$files['ItemID'].'</p>';
-                    $html .= '<p><strong>Ebay链接</strong>:<a target="_blank" href="'.$files['ResponseDetails'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
+                    $html .= '<li class="list-group-item"><p><strong>ItemID</strong><a href="http://www.ebay.com/itm/'.$files['ItemID'].'" target="_blank">:'.$files['ItemID'].'</a></p></li>';
+                    $html .= '<li class="list-group-item"><p><strong>Ebay平台链接</strong>:<a target="_blank" href="'.$files['ResponseDetails'].'"><span class="glyphicon glyphicon-link"></span></a></p></li>';
 
                 }
 
@@ -527,6 +662,7 @@ class MessageModel extends BaseModel{
             default:
                 $html = '';
         }
+        $html .= '</ul>';
 
         return $html;
     }
@@ -559,7 +695,7 @@ class MessageModel extends BaseModel{
         $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id')->toArray(); //客服所属的账号
 
         return $query->where(function ($query) use ($account_ids){
-            $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0])
+            $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0 ,'is_auto_reply'=> 0])
                 ->whereIn('account_id',$account_ids);
             })
             ->orWhere(function($query) use ($user_id, $account_ids){
@@ -568,10 +704,21 @@ class MessageModel extends BaseModel{
                     ->where('required','=',1)
                     ->where('dont_reply','=',0)
                     ->where('read','=',0)
+                    ->where('is_auto_reply', '=', 0)
                 ->whereIn('account_id',$account_ids);
             })
             ->take($entry)
-            ->orderBy('id', 'DESC');
+            ->orderBy('id', 'ACS');
+    }
+
+    public function scopeSent($query)
+    {
+        return $query->where('status', '=', 'COMPLETE');
+    }
+    public function scopeNotRequiredSent($query)
+    {
+        return $query->where('status', '=', 'COMPLETE')->where('required', '=', '0');
+
     }
 
     public function contentTemplate ()

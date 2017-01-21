@@ -39,8 +39,6 @@
             <p style="font-size:19px;">{{ $model->shipping_city }}</p>
             <p style="font-size:22px;">{{ $model->country ? $model->country->name : '' }}</p>
         </div>
-        <br>
-        <br>
     </div>
     <div style="width:98mm;height:99mm;border:1px solid black;margin-top: 3mm">
         <div class="header2">

@@ -41,6 +41,18 @@ class LogisticsModel extends BaseModel
         'is_confirm',
     ];
 
+    //多重查询
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterFields' => [
+                'code',
+                'name',
+                'logistics_code',
+            ],
+        ];
+    }
+
     public $rules = [
         'create' => [
             'code' => 'required',
@@ -152,9 +164,9 @@ class LogisticsModel extends BaseModel
         return $config;
     }
 
-    public function belongsToWarehouse($id, $code)
+    public function belongsToWarehouse($id)
     {
-        $logistics = $this->where(['code' => $code, 'warehouse_id' => $id])->first();
+        $logistics = $this->where(['code' => $this->code, 'warehouse_id' => $id])->first();
         if($logistics) {
             return true;
         }

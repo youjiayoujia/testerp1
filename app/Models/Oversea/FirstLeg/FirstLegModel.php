@@ -19,7 +19,7 @@ class FirstLegModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['warehouse_id', 'name', 'transport', 'formula', 'created_at'];
+    protected $fillable = ['warehouse_id', 'name', 'transport', 'created_at', 'days'];
 
     // 规则验证
     public $rules = [
@@ -35,5 +35,10 @@ class FirstLegModel extends BaseModel
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
+    }
+
+    public function forms()
+    {
+        return $this->hasmany('App\Models\Oversea\FirstLeg\SectionPriceModel', 'parent_id', 'id');
     }
 }

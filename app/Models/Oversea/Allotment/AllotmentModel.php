@@ -2,6 +2,7 @@
 
 namespace App\Models\Oversea\Allotment;
 
+use App\Models\WarehouseModel;
 use App\Base\BaseModel;
 
 class AllotmentModel extends BaseModel
@@ -19,16 +20,17 @@ class AllotmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['allotment_num', 'out_warehouse_id', 'in_warehouse_id', 'logistics_id', 'allotment_by', 'status', 'check_by', 'check_status', 'created_at'];
+    protected $fillable = ['allotment_num', 'out_warehouse_id', 'in_warehouse_id', 'logistics_id', 'allotment_by', 'status', 'check_by', 'check_status', 'created_at', 'actual_rate_value', 'tracking_no', 'remark', 'expected_date', 'fee'];
 
     public function getLimits()
     {
         $arr = [];
         foreach($this->boxes as $box) {
-            $arr['create']['boxInfo.'.$box->id.'.length'] = 'required';
-            $arr['create']['boxInfo.'.$box->id.'.width'] = 'required';
-            $arr['create']['boxInfo.'.$box->id.'.height'] = 'required';
-            $arr['create']['boxInfo.'.$box->id.'.weight'] = 'required';
+            $arr['create']['boxinfo.'.$box->id.'.length'] = 'required';
+            $arr['create']['boxinfo.'.$box->id.'.width'] = 'required';
+            $arr['create']['boxinfo.'.$box->id.'.height'] = 'required';
+            $arr['create']['boxinfo.'.$box->id.'.weight'] = 'required';
+            $arr['create']['boxinfo.'.$box->id.'.logistics_id'] = 'required';
         }
 
         return $arr;
@@ -75,5 +77,35 @@ class AllotmentModel extends BaseModel
     public function logistics()
     {
         return $this->belongsTo('App\Models\Oversea\FirstLeg\FirstLegModel', 'logistics_id', 'id');
+    }
+
+    public function getVirtualRateAttribute()
+    {
+        $warehouse = WarehouseModel::find($this->in_warehouse_id);
+        switch($warehouse->code) {
+            case 'US':
+                $sum = 0;
+                foreach($this->allotmentForms as $form) {
+                    $sum += $form->item->declared_value * $form->item->us_rate * $form->inboxed_quantity;
+                }
+                return $sum;
+                break;
+            case 'UK':
+                $sum = 0;
+                foreach($this->allotmentForms as $form) {
+                    $sum += $form->item->declared_value * $form->item->uk_rate * $form->inboxed_quantity;
+                }
+                return $sum;
+                break;
+            case 'US':
+                $sum = 0;
+                foreach($this->allotmentForms as $form) {
+                    $sum += $form->item->declared_value * $form->item->us_rate * $form->inboxed_quantity;
+                }
+                return $sum;
+                break;
+            default:
+                return 0;
+        }
     }
 }

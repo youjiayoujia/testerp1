@@ -12,6 +12,8 @@ namespace App\Models\Order;
 
 use App\Base\BaseModel;
 use App\Models\ChannelModel;
+use App\Models\Channel\AccountModel;
+use App\Models\UserModel;
 
 class RefundModel extends BaseModel
 {
@@ -34,7 +36,8 @@ class RefundModel extends BaseModel
         'user_paypal_account',
         'customer_id',
         'channel_id',
-        'account_id'
+        'account_id',
+        'process_status'
     ];
 
     public $rules = [
@@ -95,6 +98,35 @@ class RefundModel extends BaseModel
 
     public function OrderItems(){
         return $this->hasMany('App\Models\Order\ItemModel','refund_id','id');
+    }
+    public function channel(){
+        return $this->belongsTo('App\Models\ChannelModel', 'channel_id' , 'id');
+    }
+
+
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        //dd(UserModel::all()->pluck('name','name'));
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [
+                'type' => config('refund.type'),
+                'refund' => config('refund.refund'),
+                'process_status' => config('refund.process'),
+                'customer_id' => UserModel::where('is_available', 1)->get()->pluck('name', 'id'),
+
+            ],
+            'selectRelatedSearchs' => [
+                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
+                //'assigner' => ['name' => UserModel::all()->pluck('name','name')],
+            ],
+            'sectionSelect' => ['time'=>['created_at']],
+        ];
     }
 
     public function getSKUsAttribute(){
@@ -166,9 +198,9 @@ class RefundModel extends BaseModel
 
     public function getRefundOrderLogisticsAttribute(){
         //$this->Order->packages;
-        if($this->Order->packages->first()->logistics_id != 0){
-            if(!empty($this->Order->packages->logistics)){
-                return  $this->Order->packages->logistics->name;
+        if($this->Order->packages->first()){
+            if(!empty($this->Order->packages->first()->logistics)){
+                return  $this->Order->packages->first()->name;
             }else{
                 return '无';
             }
@@ -199,6 +231,4 @@ class RefundModel extends BaseModel
     public function getAliexpressrefunds(){
         return $this->Aliexpress15Usd()->get();
     }
-
-
 }

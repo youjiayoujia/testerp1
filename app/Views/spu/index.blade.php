@@ -2,7 +2,7 @@
 @section('tableToolButtons')
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询当前状态
+            <i class="glyphicon glyphicon-filter"></i> @if($chose_status){{$chose_status}}（{{$chose_num}}）@else查询当前状态@endif
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
@@ -13,7 +13,7 @@
     </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
+    <th width=20><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> </th>
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
     <th>采购员</th>
@@ -50,9 +50,13 @@
                 <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-warning btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-envelope"></span>备注
                 </a>
-                <a href="" class="btn btn-info btn-xs">
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $spu->table }}" data-id="{{$spu->id}}" title='日志'>
+                <span class="glyphicon glyphicon-road"></span>
+                <!-- <a href="" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-road"></span> 日志
-                </a>
+                </a> -->
             </td>
         </tr>
 
@@ -71,8 +75,12 @@
                         <h4 class="modal-title" id="myModalLabel">
                            添加备注
                         </h4>
-                     </div>  
-                     <div><input type="text" value='' name='remark'></div>               
+                     </div> 
+                     <div class="modal-body">
+                        <textarea rows="3" cols="80" name='remark'></textarea>
+                         
+                     </div> 
+                                    
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default" 
                            data-dismiss="modal">关闭
@@ -95,7 +103,8 @@
                 <button class="doAction" value="edit">批量已建SKU维护资料</button>
                 <button class="doAction" value="image_edit">批量已编辑</button>
                 <button class="doAction" value="image_examine">批量已制图</button>
-                <button class="doAction" value="final_examine">批量已审图</button>
+                <button class="doAction" value="quality">批量已审图</button>
+                <button class="doAction" value="final_examine">批量质检</button>
                 <button class="doAction" value="pass">批量 终审</button>
                 <?php $condition = request()->input('filters')?explode('.',request()->input('filters'))[2]:''; ?>
                 <?php if($condition=='image_edit'||$condition=='edit'||$condition=='image_examine'||$condition=='final_examine'){ ?>

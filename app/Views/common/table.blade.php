@@ -9,7 +9,8 @@
                 <div class="modal-content">
                     <div class='panel panel-default'>
                         <div class='panel-heading'>日志记录</div>
-                        <div style='overflow:scroll; width:590px; height:600px;'>
+                        <div style='overflow:scroll; width:590px; height:600px;' class='scrollDown'>
+                            <input type='hidden' class='scroll_rate' value='0'>
                             <div class='panel-body info_buf'>
                             </div>
                         </div>
@@ -183,6 +184,41 @@
                                             @endif
                                         @endforeach
                                     @endif
+
+                                    @if($type == 'sectionGangedDouble')
+                                        @foreach($value as $kind => $contents)
+                                            @if($kind == 'first')
+                                                @foreach($contents as $relation_ship1 => $value1)
+                                                    @foreach($value1 as $relation_ship2 => $value2)
+                                                        @foreach($value2 as $key => $content)
+                                                            <div class="col-lg-2 form-group searchItem">
+                                                                <select name="mixedSearchFields[{{$type}}][first][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $key }}]" class='form-control select_select0 col-lg-2 sectiongangeddouble_first'>
+                                                                    <option value=''>{{config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$key]}}</option>
+                                                                    @foreach($content as $k => $v)
+                                                                        <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.first.'.$relation_ship1.'.'.$relation_ship2.'.'.$key) ? ($k==request('mixedSearchFields'.'.'.$type.'.first.'.$relation_ship1.'.'.$relation_ship2.'.'.$key)?'selected':'') : ''}} >{{$v}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+                                            @if($kind == 'second')
+                                                @foreach($contents as $relation_ship1 => $content)
+                                                    @foreach($content as $name => $content1)
+                                                        <div class="col-lg-2 form-group searchItem">
+                                                            <select name="mixedSearchFields[{{$type}}][second][{{$relation_ship1}}][{{ $name }}]" class='form-control select_select0 col-lg-2 sectiongangeddouble_second'>
+                                                                <option value=''>{{config('setting.transfer_search')[$relation_ship1.'.second']}}</option>
+                                                                @foreach($content1 as $k => $v)
+                                                                    <option value="{{ $k }}" {{request()->has('mixedSearchFields'.'.'.$type.'.second.'.$relation_ship1.'.'.$name) ? ($k==request('mixedSearchFields'.'.'.$type.'.second.'.$relation_ship1.'.'.$name)?'selected':'') : ''}} >{{$v}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 @endforeach
                                 <div class="col-lg-2">
                                     <button class="btn btn-success" type="submit">查询</button>
@@ -272,19 +308,49 @@
         $(document).on('click', '.dialog', function () {
             table = $(this).data('table');
             id = $(this).data('id');
+            $('.info_buf').html('');
             $.get(
                     "{{ route('eventChild.getInfo')}}",
-                    {table: table, id: id},
+                    {table: table, id: id, rate: 0},
                     function (result) {
-                        $('.info_buf').html('');
-                        if (result) {
-                            $('.info_buf').html(result);
+                        if (result[0]) {
+                            $('.info_buf').html(result[0]);
+                            $('.scroll_rate').val(1);
                         } else {
-                            $('.info_buf').html('该记录暂无日志');
+                            $('.info_buf').append('该记录暂无日志');
                         }
-                    }, 'html'
+                    }
             );
         });
+
+        scroll_flag = true;
+        $('.scrollDown').scroll(function(){
+            contentHeight = $(this).get(0).scrollHeight;
+            scrollHeight = $(this).scrollTop();
+            height = $(this).height();
+            if(contentHeight - scrollHeight - height <= 0) {
+                if(scroll_flag == true) {
+                    scroll_flag = false;
+                    rate = $('.scroll_rate').val();
+                    $('.info_buf').append("<div class='text-center loadMore'><h3>load more...</h3></div>");
+                    $.get(
+                        "{{ route('eventChild.getInfo')}}",
+                        {table: table, id: id, rate: rate},
+                        function (result) {
+                            if (result[0]) {
+                                $('.loadMore').remove();
+                                $('.info_buf').append(result[0]);
+                                $('.scroll_rate').val(result[1]);
+                                scroll_flag = true;
+                            } else {
+                                $('.loadMore').remove();
+                                $('.info_buf').append('该记录暂无日志');
+                            }
+                        }
+                    );
+                }
+            }
+        })
 
         {{-- 排序 --}}
         $('.sort').click(function () {
@@ -328,6 +394,14 @@
 
         $('.datetime_select').datetimepicker({theme: 'dark'});
         $('.select_select0').select2();
+        $( document ).ready(function () {
+            //列表页修改编辑rul
+            $('.index-a-edit').click(function (){
+                var edit_url = $(this).attr('href');
+                var url = edit_url+'?refer_url='+window.location.href;
+                $(this).attr('href', url);
+            });
+        });
     </script>
 @section('childJs')@show
 @stop

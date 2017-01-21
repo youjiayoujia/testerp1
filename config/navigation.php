@@ -42,11 +42,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '留言板',
-                    'url' => 'item.questionIndex',
-                    'icon' => '',
-                ],
-                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',
@@ -54,6 +49,11 @@ return [
                 [
                     'name' => '图片标签',
                     'url' => 'label.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '留言板',
+                    'url' => 'item.questionIndex',
                     'icon' => '',
                 ],
             ],
@@ -91,6 +91,11 @@ return [
             [
                 'name' => '风控订单',
                 'url' => 'orderBlacklist.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '风控订单地址验证',
+                'url' => 'blacklistAddress.index',
                 'icon' => '',
             ],
             [
@@ -193,8 +198,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '出入库',
+                    'name' => '出入库记录',
                     'url' => 'stockInOut.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存调整',
+                    'url' => 'stockAdjustment.index',
                     'icon' => '',
                 ],
                 [
@@ -205,11 +215,6 @@ return [
                 [
                     'name' => 'unhold库存',
                     'url' => 'stockUnhold.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '库存调整',
-                    'url' => 'stockAdjustment.index',
                     'icon' => '',
                 ],
                 [
@@ -244,6 +249,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '物流方式',
+                    'url' => 'logistics.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '回邮模版',
                     'url' => 'logisticsEmailTemplate.index',
                     'icon' => '',
@@ -254,18 +264,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '收款信息',
-                    'url' => 'logisticsCollectionInfo.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '物流方式',
-                    'url' => 'logistics.index',
+                    'name' => '收款信息',
+                    'url' => 'logisticsCollectionInfo.index',
                     'icon' => '',
                 ],
 //                [
@@ -309,11 +314,16 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                /*[
-                    'name' => '采购入库',
-                    'url' => 'inWarehouse',
+                [
+                    'name' => '采购单批量付款',
+                    'url' => 'purchaseOrder.excelPayOff',
                     'icon' => '',
-                ],*/
+                ],
+                [
+                    'name' => '采购单核销',
+                    'url' => 'purchaseOrder.writeOffIndex',
+                    'icon' => '',
+                ],
             ],
             '供应链' => [
                 [
@@ -410,7 +420,8 @@ return [
                     'name' => 'SMT帐号管理',
                     'url' => 'smtAccountManage.index',
                     'icon' => '',
-                ],
+                ],            
+                
             ],
             'Ebay刊登' => [
                 [
@@ -460,6 +471,13 @@ return [
                     'icon' => '',
                 ],
 
+            ],
+            '侵权管理' => [
+                [
+                'name' => '侵权列表',
+                'url' => 'copyright.index',
+                'icon' => '',
+                ],
             ],
             '数据监控' => [
                 [
@@ -548,6 +566,13 @@ return [
                     'icon' => '',
                 ]
             ],
+            '程序智能处理' => [
+                [
+                    'name' => '自动回复设置',
+                    'url' => 'autoReply.index',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     [
@@ -567,7 +592,11 @@ return [
                     'url' => 'overseaAllotment.index',
                     'icon' => '',
                 ],
-
+                [
+                    'name' => '库存调整单',
+                    'url' => 'overseaStockAdjustment.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],
@@ -584,10 +613,20 @@ return [
                     'url' => 'purchaseStaticstics',
                     'icon' => '',
                 ],
+                [
+                    'name' => '缺货报告',
+                    'url' => 'purchase.outOfStock',
+                    'icon' => '',
+                ],
             ],
             'CRM报表' => [
                 [
-                    'name' => '差评统计',
+                    'name' => 'CRM消息回复统计',
+                    'url' => 'crmStatistics.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'ebay差评统计',
                     'url' => 'feeback.feedBackStatistics',
                     'icon' => '',
                 ],
@@ -598,9 +637,22 @@ return [
                     'url' => 'package.logisticsDelivery',
                     'icon' => '',
                 ],
+
+            ],
+            'SKU报表' => [
                 [
-                    'name' => '缺货报告',
-                    'url' => 'purchase.outOfStock',
+                    'name' => '到货记录',
+                    'url' => 'purchaseOrder.recieveReport',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'EbaySku销量报表',
+                    'url' => 'ebaySkuSaleReport.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'EBAY销量额统计',
+                    'url' => 'ebayAmountStatistics.index',
                     'icon' => '',
                 ],
             ],
@@ -726,11 +778,6 @@ return [
             ],
             '设置' => [
                 [
-                    'name' => '汇率',
-                    'url' => 'currency.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '物流限制',
                     'url' => 'logisticsLimits.index',
                     'icon' => '',
@@ -746,7 +793,17 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '国家Number信息',
+                    'name' => '汇率',
+                    'url' => 'currency.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '国家分区',
+                    'url' => 'countriesSort.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '国家信息',
                     'url' => 'countries.index',
                     'icon' => '',
                 ],
@@ -756,18 +813,18 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '国家地区信息',
-                    'url' => 'countriesSort.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => 'paypal列表',
                     'url' => 'paypal.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => 'paypal固定税率',
+                    'name' => 'paypal固定费率',
                     'url' => 'paypal.ShowPaypalRate',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '邮件推送',
+                    'url' => 'mail_push.index',
                     'icon' => '',
                 ],
             ],

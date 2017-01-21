@@ -69,7 +69,7 @@ class WishPublishController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'account' => AccountModel::where(['channel_id'=>$this->channel_id,'is_available'=>1])->get()->lists('account', 'id'),
+            'account' => AccountModel::where(['channel_id'=>$this->channel_id,'is_available'=>1])->get()->lists('alias', 'id'),
 
         ];
         return view($this->viewPath . 'create', $response);
@@ -86,7 +86,7 @@ class WishPublishController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'account' => AccountModel::where('channel_id', $this->channel_id)->get()->lists('account', 'id'),
+            'account' => AccountModel::where('channel_id', $this->channel_id)->get()->lists('alias', 'id'),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -105,7 +105,7 @@ class WishPublishController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'account' => AccountModel::where('channel_id', $this->channel_id)->get()->lists('account', 'id'),
+            'account' => AccountModel::where('channel_id', $this->channel_id)->get()->lists('alias', 'id'),
         ];
         return view($this->viewPath . 'editOnlineProduct', $response);
     }
@@ -131,7 +131,7 @@ class WishPublishController extends Controller
     public function save($post, $exit = false)
     {
 
-        $accountInfo = AccountModel::where('channel_id', $this->channel_id)->get()->lists('account', 'id');
+        $accountInfo = AccountModel::where('channel_id', $this->channel_id)->get()->lists('alias', 'id');
         $result = [];
         foreach ($post['choose_account'] as $k => $account) {
             $channel_accounts = AccountModel::where('id', $account)->first();

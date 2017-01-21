@@ -29,13 +29,12 @@
 <div class="main">
 	<div style="border:1px solid black;border-top:none;border-right:none;width:96.5mm;height:22mm;float:right;">
 		<div style="width:10mm;height:22mm;float:left;text-align: center;">
-			
 			<p><img src="{{ asset('picture/ttp2.png') }}" style="width:30px;height:30px;margin-top:10mm;"/></p>
 		</div>
 		<div style="width:60mm;height:22mm;float:left;text-align: center;font-size:12px;line-height: 11px;">
-			<p><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="margin-top:5px;height: 10mm"/></p>
-			<p style="font-size:13px;font-weight: bold;margin-top: 1px;"> {{ $model->tracking_no }}</p>
-			<p style="margin-top: 2px;"> Return if undeliverable PO box 5001 istanbul-TURKEY</p>
+			<p><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" style="height: 50px"/></p>
+			<p style="font-size:10px;font-weight: bold;margin-top: 1px;"> {{ $model->tracking_no }}</p>
+			<p style="margin-top: 1px;"> Return if undeliverable PO box 5001 istanbul-TURKEY</p>
 		</div>
 		<div style="width:15.5mm;height:25mm;float:right;text-align: center;">
 			<p style="font-size:10px;border:1px solid black;width:35px;height:35px;float:left;margin-top:5px;">PP<br/>TR</p>

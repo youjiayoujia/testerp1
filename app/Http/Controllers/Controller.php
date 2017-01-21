@@ -203,7 +203,7 @@ abstract class Controller extends BaseController
             $searchFields = $model->searchFields;
             $list = $list->where(function ($query) use ($keywords, $searchFields) {
                 foreach ($searchFields as $key => $searchField) {
-                    $query = $query->orWhere($key, 'like', '%' . trim($keywords) . '%');
+                    $query = $query->orWhere($key, trim($keywords));
                 }
             });
         }
@@ -325,6 +325,41 @@ abstract class Controller extends BaseController
                                     $value2 = trim($value2);
                                     if ($value2||$value2=='0') {
                                         $list = $list->where($key, $value2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+
+                    case 'sectionGangedDouble':
+                        foreach ($related as $kind => $content) {
+                            if($kind == 'first') {
+                                foreach ($content as $relation_ship1 => $value1) {
+                                    foreach ($value1 as $relation_ship2 => $value2) {
+                                        foreach ($value2 as $key => $name) {
+                                            $name = trim($name);
+                                            if ($name != '') {
+                                                $list = $list->whereHas($relation_ship1,
+                                                    function ($query) use ($relation_ship2, $name, $key) {
+                                                        $query = $query->wherehas($relation_ship2,
+                                                            function ($query1) use ($name, $key) {
+                                                                $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                            });
+                                                    });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if($kind == 'second') {
+                                foreach ($content as $relation_ship1 => $value1) {
+                                    foreach ($value1 as $key => $value2) {
+                                        $value2 = trim($value2);
+                                        if ($value2||$value2=='0') {
+                                            $list = $list->whereHas($relation_ship1, function($query) use ($value2){
+                                                $query->where('c_name', 'like', '%'.$value2.'%');
+                                            });
+                                        }
                                     }
                                 }
                             }

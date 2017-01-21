@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Models\PackReportModel;
 use App\Models\PickListModel;
 use Excel;
+use App\Models\UserModel;
 
 class PackReportController extends Controller
 {
@@ -30,24 +31,25 @@ class PackReportController extends Controller
     public function index()
     {
         request()->flash();
-        $model = $this->model->orderBy('day_time', 'desc')->first();
+        $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
+        $model = $this->model->where('warehouse_id', $warehouse_id)->orderBy('day_time', 'desc')->first();
         $last_time = '';
-        $monthModel = $this->model->whereBetween('day_time', [date('Y-m-d', strtotime(date('Y-m', strtotime('now')))), date('Y-m-d', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
+        $monthModel = $this->model->where('warehouse_id', $warehouse_id)->whereBetween('day_time', [date('Y-m-d', strtotime(date('Y-m', strtotime('now')))), date('Y-m-d', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
         if($model) {
             $last_time = $model->day_time;
-            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
-            $monthModel = $this->model->whereBetween('day_time', [date('Y-m-d H:i:s', strtotime(date('Y-m', strtotime('-1 month')))), date('Y-m-d H:i:s', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
+            $model = $this->model->where('warehouse_id', $warehouse_id)->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            $monthModel = $this->model->where('warehouse_id', $warehouse_id)->whereBetween('day_time', [date('Y-m-d H:i:s', strtotime(date('Y-m', strtotime('-1 month')))), date('Y-m-d H:i:s', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
         }
         if(request()->has('report')) {
             $last_time = '';
-            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time');
+            $model = $this->model->where('warehouse_id', $warehouse_id)->orderBy('day_time', 'desc')->get()->groupBy('day_time');
             foreach($model as $time => $single) {
                 if(date('Y-m-d', strtotime($time)) == date('Y-m-d', strtotime(request('report')))) {
                     $last_time = $time;
                 }
             }
-            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
-            $monthModel = $this->model->whereBetween('day_time', [
+            $model = $model->get($last_time);
+            $monthModel = $this->model->where('warehouse_id', $warehouse_id)->whereBetween('day_time', [
                 date('Y-m-d H:i:s', strtotime(date('Y-m', strtotime($last_time) - strtotime('now') + strtotime('-1 month')))),
                 date('Y-m-d H:i:s', strtotime(date('Y-m', strtotime($last_time) + strtotime('now') - strtotime('-1 month'))))])->get()->groupBy('user_id');
         }
@@ -57,6 +59,7 @@ class PackReportController extends Controller
             'last_time' => $last_time,
             'monthModel' => $monthModel,
             'mixedSearchFields' => $this->model->mixed_search,
+            'daytime' => request()->has('report') ? request('report') : ''
         ];
 
         return view($this->viewPath . 'index', $response);
@@ -86,8 +89,9 @@ class PackReportController extends Controller
                 'multi' => $block->filter(function($single){
                     return $single->type == 'MULTI';
                 })->sum('account'),
-                'yesterday_send' => count($yesModel) ? $yesModel->get($userId)->sum('account') : 0,
+                'yesterday_send' => count($yesModel) ? ($yesModel->get($userId) ? $yesModel->get($userId)->sum('account') : 0) : 0,
                 'day_time' => date('Y-m-d H:i:s', time()),
+                'warehouse_id' => $block->first()->warehouse_id,
             ]);
         }
         

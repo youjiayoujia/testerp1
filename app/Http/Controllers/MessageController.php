@@ -23,6 +23,7 @@ use App\Models\Message\SendEbayMessageListModel;
 use App\Models\Order\ItemModel;
 use App\Models\ChannelModel;
 use Channel;
+use App\Models\CurrencyModel;
 
 
 class MessageController extends Controller
@@ -46,19 +47,20 @@ class MessageController extends Controller
     {
         request()->flash();
         //$userarr=config('user.staff');
-        $users=UserModel::all();
+        //$users=UserModel::all();
         $response = [
             'metas'             => $this->metas(__FUNCTION__),
             'data'              => $this->autoList($this->model,$this->model),
             'mixedSearchFields' => $this->model->mixed_search,
-            'channel_accounts'  => Channel_account::all(),
-            'users'             => $users,
-            'channels'          => ChannelModel::All(),
+            //'channel_accounts'  => Channel_account::all(),
+            //'users'             => $users,
+            //'channels'          => ChannelModel::All(),
         ];
         return view($this->viewPath . 'index', $response);
     }
 
     public function process(){
+        $currencys = CurrencyModel::all();
 
         if (request()->input('id')) {
             $message = $this->model->find(request()->input('id'));
@@ -70,6 +72,8 @@ class MessageController extends Controller
                 'metas' => $this->metas(__FUNCTION__),
                 //'parents' => TypeModel::where('parent_id', 0)->get(), //模版分类
                 'users' => UserModel::all(),
+                'currencys' => $currencys,
+
                 //'messages' => $messages,
             ];
 
@@ -105,7 +109,8 @@ class MessageController extends Controller
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
                 'driver' => $message->getChannelDiver(),
-                'is_ali_msg_option' => $IsOption
+                'is_ali_msg_option' => $IsOption,
+                'currencys' => $currencys,
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
 
@@ -272,7 +277,7 @@ class MessageController extends Controller
             $message->status="COMPLETE";
             $message->save();
         }
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '批量无需回复处理成功.'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '无需回复处理成功.'));
     }
 
     /**
@@ -589,6 +594,8 @@ class MessageController extends Controller
         $template = '';
 
         if(!$messages->isEmpty()){
+            $currencys = CurrencyModel::all();
+
             foreach($messages as $message){
                 //分配消息操作人
                 $message->assign(request()->user()->id);
@@ -603,6 +610,7 @@ class MessageController extends Controller
                     'is_ali_msg_option' => $IsOption,
                     'driver' => $message->getChannelDiver(),
                     'users' => UserModel::all(),
+                    'currencys' => $currencys,
                 ];
                 $template .= view($this->viewPath.'workflow.template')->with($response);
                 $message->read = 1;
@@ -627,29 +635,36 @@ class MessageController extends Controller
 
     }
 
+    public function statistics()
+    {
 
+        $metas = [
+            'mainIndex' => route('feeback.feedBackStatistics'),
+            'mainTitle' => '报表',
+            'title'     => '消息回复统计',
+        ];
+        $response = [
+            'metas' => $metas,
+            //'model' => $model,
+            //'data'  => $total,
+        ];
 
+     return view($this->viewPath . 'statistics')->with($response);
+    }
 
+    public function changeMultipleStatus(){
+        $ids = request()->input('ids');
+        if(empty($ids)){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '操作失败，请先勾选需要操作的消息.'));
+        }
+        $is_modify = $this->model->whereIn('id', explode(',', $ids))
+            ->update(['status' => 'COMPLETE', 'required' => '0', 'assign_id' => request()->user()->id]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if($is_modify){
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功'));
+        }else{
+            return redirect($this->mainIndex)->with('danger', $this->alert('success', '操作成功'));
+        }
+    }
 
 }

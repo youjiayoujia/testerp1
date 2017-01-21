@@ -12,6 +12,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\Order\ItemModel;
 use App\Models\Logistics\SupplierModel;
 use App\Models\PackageModel;
+use Illuminate\Support\Facades\Storage;
 class DhlAdapter extends BasicAdapter
 {
     public function __construct($config)
@@ -24,16 +25,17 @@ class DhlAdapter extends BasicAdapter
         $this->GetShipHost='https://api.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
         $this->CheckOutHost='https://api.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
         $this->getTokenUrl = "https://api.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
-       $this->account = '5243380896';//账号
+        $this->account = '5243380896';//账号
 
         ////////////////////////////////////////测试环境数据/////////////////////////////////////
 //		$this->GetShipHost='https://apitest.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
 //		$this->CheckOutHost='https://apitest.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
 //		$this->getTokenUrl = "https://apitest.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
-       // $this->account = '520285';//账号
+//        $this->account = '520285';//账号
 
-        $this->qz = 'CNAMMERP3'.rand(100,1000);//物流号前缀
+        $this->qz = 'CNAMMERP3';//物流号前缀
         $this->_express_type =!empty($config['type'])?$config['type']:'PKD';
+        $this->get_olderp_token =1;
     }
     public function checkToken($url){
         $result = $this->getCurlHttpsData($url);
@@ -50,17 +52,17 @@ class DhlAdapter extends BasicAdapter
         $customer_id = $orderInfo->logistics->supplier->customer_id;
         $model = SupplierModel::find($orderInfo->logistics->supplier->id);
         $this->token = $orderInfo->logistics->supplier->secret_key;
-        // $model->update(['secret_key' => '0']);
+
         $customer_id = explode(',',$customer_id);
         $this->account=$customer_id[0];//账号
         $clientId=$customer_id[1];//API账号
         $gqtime=@$customer_id[2]?$customer_id[2]:0;//过期时间
-        $lasttime = time()-25*24*60*60;
-        if($lasttime > $gqtime){echo 333;exit;
+        $lasttime = time()-24*60*60;
+        if($lasttime > $gqtime){
             //暂时关掉自动更新
             $result =[
                 'code' => 'error',
-                'result' => 'TOKEN过期'
+                'result' => 'TOKEN过期,暂时请到V1手动更新过了'
             ];
             return $result;
 
@@ -142,12 +144,12 @@ class DhlAdapter extends BasicAdapter
             $thePro = $item->quantity * $item->item->weight;
             $thePro = $thePro *1000;
             $item->item->product->declared_value = sprintf("%.2f",$item->item->product->declared_value);
-            $products_declared_en = $item->item->product->declared_en;
+            $products_declared_en = $item->item->product->declared_en?$item->item->product->declared_en:'Dress';
             //产品字符串
 
             $proStr.='{
 					 "skuNumber": "'.$item->item->product->model.'",
-					 "description": "'.$item->item->product->declared_en.'",
+					 "description": "'.$products_declared_en.'",
 					 "descriptionImport": null,
 					 "descriptionExport": "连衣裙",
 					 "itemValue": '.$item->item->product->declared_value.',
@@ -185,6 +187,16 @@ class DhlAdapter extends BasicAdapter
         }
         $orderInfo->shipping_phone = (int)$orderInfo->shipping_phone?$orderInfo->shipping_phone:'1111111';
         $shipmentID = $this->qz.$orderInfo->id;
+        if(!trim($orderInfo->shipping_state)){
+            $res = array('status'=>'error','info'=>'发货地址缺少省/州');
+            return $res;
+        }elseif(!trim($orderInfo->shipping_city)){
+            $res = array('status'=>'error','info'=>'发货地址缺少城市');
+            return $res;
+        }elseif(!trim($orderInfo->shipping_zipcode)){
+            $res = array('status'=>'error','info'=>'发货地址缺少邮编');
+            return $res;
+        }
         $data='{
 				 "labelRequest": {
 				 "hdr": {
@@ -291,15 +303,19 @@ class DhlAdapter extends BasicAdapter
 				 }
 				}';
         $data = str_replace("\\","",$data);
+        $data = str_replace("\r\n","",$data);
         $data_obj = json_decode($data);
         if(!$data_obj){
-            $res = array('status'=>false,'info'=>'数据组装出现错误，请联系IT');
-            return $res;
+            $result = [
+                'code' => 'error',
+                'result' =>'数据组装出现错误，请联系IT'
+            ];
+            return $result;
         }
         $url = $this->GetShipHost;
-        $result = $this->postCurlHttpsData($url,$data);
-        $result = json_decode($result);
-        $status = $result->labelResponse->bd->responseStatus->code;//200时为成功
+        $result = $this->postCurlHttpsData($url,$data);echo "<pre/>";var_dump($result);
+        @$result = json_decode($result);
+        @$status = $result->labelResponse->bd->responseStatus->code;//200时为成功
         if($status == '200'){
             $shipmentID = $result->labelResponse->bd->labels[0]->shipmentID;
 
@@ -313,9 +329,8 @@ class DhlAdapter extends BasicAdapter
                     $shipmentImg = $v->content;//面单二进制流
                     $shipmentImg=base64_decode($shipmentImg);
                     $filename = 'dhl_'.$orderInfo->id.'_'.$num;
-                    @$handle=fopen('./image/dhl_md_img/md/'.$filename.'.jpg',"w");
-                    @fwrite($handle,$shipmentImg);
-                    @fclose($handle);
+                    $uploads_file ='/dhl_md/md/'.$filename.'.jpg';
+                    Storage::put($uploads_file,$shipmentImg);
                     $num++;
                 }
             }
@@ -324,12 +339,12 @@ class DhlAdapter extends BasicAdapter
                 'result' =>$shipmentID //跟踪号
             ];
         }else{
-            if($result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
+            if(@$result->labelResponse->bd->labels[0]->responseStatus->messageDetails){
                 $msg =$result->labelResponse->bd->labels[0]->responseStatus->messageDetails;
             }else{
-                $msg =  $result->labelResponse->bd->responseStatus->messageDetails;
+                @$msg =  $result->labelResponse->bd->responseStatus->messageDetails;
             }
-            if($msg){
+            if(@$msg){
                 $res = array('status'=>false,'info'=>'请求信息失败:'.$msg);
                 $result =[
                     'code' => 'error',
@@ -341,9 +356,29 @@ class DhlAdapter extends BasicAdapter
                     'result' => '获取追踪号失败'
                 ];
             }
-
+        if($status==202 && $this->get_olderp_token ==1){
+            $orderInfo=$this->getolderpToken($orderInfo);
+            $this->get_olderp_token=2;
+            $result=$this->getTracking($orderInfo);
+        }
         }
         return $result;
+    }
+    public function getolderpToken($orderInfo){
+        $customer_id = $orderInfo->logistics->supplier->customer_id;
+        $model = SupplierModel::find($orderInfo->logistics->supplier->id);
+        $url = "http://erp.moonarstore.com/api/get_dhl_token.php";
+        $res = $this->getCurlHttpsData($url);
+        $res = @explode(',',$res);
+        if(@$res[1]){
+            $this->token=$orderInfo->logistics->supplier->secret_key=$res[0];
+            $customer_id = explode(',',$customer_id);
+            $customer_id[2] = $res[1];
+            $customer_id = implode(',',$customer_id);
+            //$res = $model->update(['customer_id' => $customer_id,'secret_key'=>$this->token]);
+            $res = $model->update(['secret_key'=>$this->token]);
+        }
+        return $orderInfo;
     }
     //创建确认订单的发送数据
     public function createSureShip($orderArray){
@@ -414,9 +449,8 @@ class DhlAdapter extends BasicAdapter
             $handoverID = $result->closeOutResponse->bd->handoverID;
             $shipmentImg=base64_decode($shipmentImg);
             $type = 'pdf';
-            @$handle=fopen('./image/dhl_md_img/checkOut/'.$handoverID.'.'.$type,"w");
-            @fwrite($handle,$shipmentImg);
-            @fclose($handle);
+            $uploads_file ='/dhl_md/checkOut/'.$handoverID.'.'.$type;
+            Storage::put($uploads_file,$shipmentImg);
             $res = array('status'=>true,'info'=>'此批次确定发货成功');
             return $res;
         }else{

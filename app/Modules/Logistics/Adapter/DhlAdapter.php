@@ -27,7 +27,7 @@ class DhlAdapter extends BasicAdapter
         $this->getTokenUrl = "https://api.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址
         $this->account = '5243380896';//账号
 
-        ////////////////////////////////////////测试环境数据/////////////////////////////////////
+        /////////////////////////////////////////测试环境数据/////////////////////////////////////
 //		$this->GetShipHost='https://apitest.dhlecommerce.asia/rest/v2/Label';//获取追踪号地址
 //		$this->CheckOutHost='https://apitest.dhlecommerce.asia/rest/v2/Order/Shipment/CloseOut';//确认发货地址
 //		$this->getTokenUrl = "https://apitest.dhlecommerce.asia/rest/v1/OAuth/AccessToken?returnFormat=json";//获取TOKEN地址

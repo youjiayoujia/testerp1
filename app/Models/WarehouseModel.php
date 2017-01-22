@@ -99,4 +99,18 @@ class WarehouseModel extends BaseModel
         }
         return false;
     }
+
+    /**
+     * 本地仓库id
+     * @return array
+     */
+    public function getLocalIds(){
+        $data = $this->select('id')->where('type', 'local')->get();
+        if(! $data->isEmpty()){
+            $data = $data->toArray();
+        }else{
+            $data = [];
+        }
+        return $data;
+    }
 }

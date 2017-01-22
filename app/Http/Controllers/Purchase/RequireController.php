@@ -46,7 +46,7 @@ class RequireController extends Controller
             'data' => $this->autoList($this->purchases),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
-        
+dd($response['data']);
         return view($this->viewPath . 'index', $response);
     }
 	

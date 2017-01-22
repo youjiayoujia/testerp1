@@ -50,16 +50,9 @@
                     </a>
                 @endif
                 @if(in_array($overseaAllotment->status, ['inboxed', 'out']))
-                    <a href="{{route('overseaAllotment.returnBoxInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回填箱子信息并出库'>
+                    <a href="{{route('overseaAllotment.returnAllInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回填箱子信息并出库'>
                         <span class="glyphicon glyphicon-folder-close"></span>
                     </a>
-                @endif
-                @if(in_array($overseaAllotment->status, ['new', 'pick']))
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $overseaAllotment->id }}"
-                   data-url="{{ route('overseaAllotment.destroy', ['id' => $overseaAllotment->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </a>
                 @endif
                 @if($overseaAllotment->status == 'out')
                     <a href="{{route('overseaAllotment.allotmentInStock', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='调拨单已入库'>

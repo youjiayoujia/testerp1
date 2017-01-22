@@ -234,6 +234,19 @@ class ItemModel extends BaseModel
         return $this->stocks->sum('all_quantity');
     }
 
+    //本地仓库实库存
+    public function getAllQuantityLocalAttribute()
+    {
+        $warehouse = new WarehouseModel;
+        return $this->stocks()->whereIn('warehouse_id',$warehouse->getLocalIds())->get()->sum('all_quantity');
+    }
+    //本地仓库实库存
+    public function getAvailableQuantityLocalAttribute()
+    {
+        $warehouse = new WarehouseModel;
+        return$this->stocks()->whereIn('warehouse_id',$warehouse->getLocalIds())->get()->sum('available_quantity');
+    }
+
     //虚库存
     public function getAvailableQuantityAttribute()
     {

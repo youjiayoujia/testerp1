@@ -12,6 +12,7 @@ use Illuminate\Routing\Route;
 use Tool;
 use Excel;
 use App\Models\StockModel;
+use App\Models\ChannelModel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\ItemModel;
@@ -176,8 +177,10 @@ class PackageController extends Controller
                 $buf[$key][1] = 0;
                 continue;
             }
-            $buf[$key][0] = $package->realTimeLogistics() ? $package->realTimeLogistics()->logistics->code : '无匹配';
-            $buf[$key][1] = '￥' . ($package->calculateLogisticsFee() ? $package->calculateLogisticsFee() : 0);
+            $realTimeLogistics = $package->realTimeLogistics();
+            $logisticsFee = $package->calculateLogisticsFee();
+            $buf[$key][0] =  $realTimeLogistics ? $realTimeLogistics->logistics->code : '无匹配';
+            $buf[$key][1] = '￥' . ($logisticsFee ? $logisticsFee : 0);
         }
 
         return $buf;
@@ -400,7 +403,7 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEW')->count(),
             'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
-            'weatherNum' => $this->model->where('status', 'NEED')->count(),
+            'weatherNum' => $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',
                 '1')->where('queue_name', '!=', 'placeLogistics')->whereHas('order', function($query){
@@ -829,6 +832,12 @@ class PackageController extends Controller
     public function actSplitPackage($arr, $id)
     {
         $model = $this->model->find($id);
+        $channelName = ChannelModel::find($model->channel_id)->name;
+        if($channelName == 'Wish') {
+            if($model->weight  <= 2) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'Wish包裹，重量小于2kg,不能拆单'));
+            }
+        }
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }

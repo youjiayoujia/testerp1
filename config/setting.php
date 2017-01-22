@@ -163,6 +163,7 @@ return [
         'code' => '物流方式简码',
         'logistics_code' => '物流编码',
         'user_id' => 'EBAY业务组',
+        'created_date' => '日期',
 
         'parent.shipmentCostNum' => '批次号',
         'questionUser.name' => '提问人',

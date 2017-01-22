@@ -19,15 +19,15 @@
         <tr>
             <td>{{ $ebayAmountStatistics->channel_name }}</td>
             <td>{{ $ebayAmountStatistics->user ? $ebayAmountStatistics->user->name : '' }}</td>
-            <td>{{ $ebayAmountStatistics->prefix }}</td>
+            <td>{{ $ebayAmountStatistics->prefix == 0 ? '无' : $ebayAmountStatistics->prefix }}</td>
             <td>{{ $ebayAmountStatistics->january_sales }}</td>
-            <td>{{ $ebayAmountStatistics->profit_rate }}</td>
+            <td>{{ $ebayAmountStatistics->profit_rate * 100 . '%' }}</td>
             <td>{{ $ebayAmountStatistics->january_publish }}</td>
             <td>{{ $ebayAmountStatistics->january_publish_quantity }}</td>
             <td>{{ $ebayAmountStatistics->january_publish_amount }}</td>
             <td>{{ $ebayAmountStatistics->january_publish_ratio }}</td>
-            <td>{{ $ebayAmountStatistics->january_advertisement_rate }}</td>
-            <td>{{ $ebayAmountStatistics->sku_sell_rate }}</td>
+            <td>{{ $ebayAmountStatistics->january_advertisement_rate * 100 . '%' }}</td>
+            <td>{{ $ebayAmountStatistics->sku_sell_rate * 100 . '%' }}</td>
             <td>{{ $ebayAmountStatistics->yesterday_publish }}</td>
             <td>{{ $ebayAmountStatistics->updated_at }}</td>
         </tr>

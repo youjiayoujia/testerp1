@@ -313,7 +313,7 @@ class AllotmentController extends Controller
         $volumn = 0;
         $arr = [];
         foreach($model->allotmentForms as $form) {
-            $all_weight += $form->inboxed_quantity * $form->item->volumn_rate;
+            $all_weight += $form->item->weight * $form->item->volumn_rate * $form->inboxed_quantity;
         }
         foreach($model->boxes as $box) {
             $sum = 0;

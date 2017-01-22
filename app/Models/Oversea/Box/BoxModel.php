@@ -55,7 +55,7 @@ class BoxModel extends BaseModel
     {
         $sum = 0;
         foreach($this->forms as $form) {
-            $sum += $form->item->volumn_rate * $form->quantity;
+            $sum += $form->item->volumn_rate * $form->quantity * $form->item->weight;
         }
         return $sum;
     }

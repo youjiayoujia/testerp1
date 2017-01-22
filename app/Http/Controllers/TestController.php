@@ -23,6 +23,7 @@ use App\Models\Publish\Ebay\EbayFeedBackModel;
 use App\Models\Publish\Ebay\EbaySpecificsModel;
 use App\Models\PackageModel;
 use App\Models\ItemModel;
+use App\Models\Oversea\Box\BoxModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\ChannelNameModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
@@ -231,8 +232,9 @@ class TestController extends Controller
 
     public function test2()
     {  
-        $package = PackageModel::find('4689');
-        $package->createPackageItems();
+        $package = BoxModel::find(25);
+        $test = $package->expected_fee;
+        var_dump($test);
     }
 
     // public function test2()

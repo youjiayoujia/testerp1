@@ -75,7 +75,7 @@
     <tbody>
     <tr class='success'><td>ERP总重量</td><td>{{$all_weight}}kg</td><td>=∑每个SKU的重量x实际发走的每个SKU体积系数</td></tr>
     <tr class='success'><td>实测总重量</td><td>{{$model->boxes ? $model->boxes->sum('weight') : ''}}kg</td><td>=∑各箱实际录入重量之和</td></tr>
-    <tr class='success'><td>实测体积(cm3)</td><td>{{round($volumn, 2)}}</td><td>=∑每箱体积重（每箱子长*宽*高）÷6000</td></tr>
+    <tr class='success'><td>体积重</td><td>{{round($volumn, 2)}}</td><td>=∑每箱体积重（每箱子长*宽*高）÷6000</td></tr>
     <tr class='success'><td>实际总运费</td><td>{{ $model->fee }}￥</td><td>人工手动输入</td></tr>
     <tr class='success'><td>ERP总运费</td><td>{{ $model->boxes ? $model->boxes->sum('expected_fee') : ''}}￥</td><td>=头程物流单价xERP总重量</td></tr>
     <tr class='success'><td>预计到货时间</td><td>{{ $model->expected_date }}</td><td></td></tr>
@@ -105,10 +105,10 @@
             <strong>实际重量(kg)</strong>: {{ $box->weight }}
         </div>
         <div class="form-group col-lg-3">
-            <strong>体积重(kg)</strong>: {{ round($box->length * $box->height * $box->width / 5000, 3) }}
+            <strong>体积重(kg)</strong>: {{ round($box->length * $box->height * $box->width / 6000, 3) }}
         </div>
         <div class="form-group col-lg-3">
-            <strong>体积系数</strong>: {{ $box->weight != 0 ? round($box->length * $box->height * $box->width / 5000 / $box->weight, 4) : '重量为0' }}
+            <strong>体积系数</strong>: {{ $box->weight != 0 ? round($box->length * $box->height * $box->width / 6000 / $box->weight, 3) : '重量为0' }}
         </div>
     </div>
 

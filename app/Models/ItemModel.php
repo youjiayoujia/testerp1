@@ -240,7 +240,7 @@ class ItemModel extends BaseModel
         $warehouse = new WarehouseModel;
         return $this->stocks()->whereIn('warehouse_id',$warehouse->getLocalIds())->get()->sum('all_quantity');
     }
-    //本地仓库实库存
+    //本地虚仓库虚库存
     public function getAvailableQuantityLocalAttribute()
     {
         $warehouse = new WarehouseModel;

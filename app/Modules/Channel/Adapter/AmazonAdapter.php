@@ -711,6 +711,7 @@ Class AmazonAdapter implements AdapterInterface
         $replyMessage->status = $result->id ? 'SENT' : 'FAIL';
         $replyMessage->save();
         if ($result->id) {
+
             return true;
         } else {
             return false;

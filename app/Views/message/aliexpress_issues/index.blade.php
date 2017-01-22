@@ -12,7 +12,7 @@
             <li><a href="javascript:" id="do_edit" data-status="notpass" >平台处理界面</a></li>
         </ul>
     </div>
-    <div class="btn-group" role="group">
+{{--    <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> ====账号====
             <span class="caret"></span>
@@ -22,8 +22,8 @@
                 <li><a href="{{ DataList::filtersEncode(['account_id','=',$account->id]) }}">{{$account->account}}</a></li>
             @endforeach
         </ul>
-    </div>
-    <div class="btn-group" role="group">
+    </div>--}}
+{{--    <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> =====纠纷原因=====
             <span class="caret"></span>
@@ -33,7 +33,7 @@
                 <li><a href="{{ DataList::filtersEncode(['reasonChinese','=',$reason->reasonChinese]) }}">{{$reason->reasonChinese}}</a></li>
             @endforeach
         </ul>
-    </div>
+    </div>--}}
 
 @stop
 @section('tableHeader')

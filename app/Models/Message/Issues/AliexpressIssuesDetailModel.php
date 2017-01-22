@@ -14,6 +14,11 @@ class AliexpressIssuesDetailModel extends BaseModel
     public $rules = [];
     public $searchFields =[];
     protected $guarded = [];
+
+    public function list()
+    {
+        return $this->belongsTo('App\Models\Message\Issues\AliexpressIssueListModel', 'issue_list_id', 'id');
+    }
     
     public function getProductInfoAttribute(){
 

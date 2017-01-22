@@ -1049,7 +1049,6 @@ class TestController extends Controller
         if(! is_object($package)){ //验证失败
             return $result;
         }
-        $send_time = Carbon::parse($message->date);
         $shipped_at = Carbon::parse($package->shipped_at);
         $diff_day = $send_time->diffInDays($shipped_at);  // 相差天数
 
@@ -1177,6 +1176,10 @@ class TestController extends Controller
 
     public function jdtestCrm()
     {
+
+        $date = Carbon::create('20170119144538');
+        dd($date);
+
 
 /*        $tmp ="[u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/cbc4768ccda711e6bcf102c49158406c.jpg', u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/dd5f9e6ccda711e6bfeb02465360c040.jpg', u'https://s3-us-west-1.amazonaws.com/sweeper-production-ticket-image-uploads/e490e222cda711e6ae1c02762614c162.jpg']";
 

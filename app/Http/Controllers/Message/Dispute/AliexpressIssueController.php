@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Message\Issues\AliexpressIssueListModel;
 use App\Models\Message\Issues\AliexpressIssuesDetailModel;
 use App\Models\Channel\AccountModel;
+use Carbon\Carbon;
 
 class AliexpressIssueController extends Controller
 {
@@ -29,16 +30,13 @@ class AliexpressIssueController extends Controller
      */
     public function index()
     {
-
-
-
-
-
         $response = [
             'metas'        => $this->metas(__FUNCTION__),
             'data'         => $this->autoList($this->model),
-            'reasonFilter' => $this->model->distinct()->get(['reasonChinese']),
-            'accounts'     => AccountModel::all(),
+            'mixedSearchFields' => $this->model->mixed_search,
+
+            //'reasonFilter' => $this->model->distinct()->get(['reasonChinese']),
+            //'accounts'     => AccountModel::all(),
         ];
         return view($this->viewPath . 'index',$response);
 
@@ -92,7 +90,6 @@ class AliexpressIssueController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'issue'  => $data,
-
         ];
         return view($this->viewPath . 'edit',$response);
     }

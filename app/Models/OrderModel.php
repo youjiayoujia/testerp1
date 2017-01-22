@@ -384,6 +384,7 @@ class OrderModel extends BaseModel
                 'currency',
             ],
             'filterSelects' => [
+                'is_oversea' => config('order.whether'),
                 'status' => config('order.status'),
                 'active' => config('order.active'),
                 'is_chinese' => config('order.is_chinese')

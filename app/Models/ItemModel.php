@@ -865,9 +865,9 @@ class ItemModel extends BaseModel
 
         $data['zaitu_num'] = $zaitu_num;
         //实库存
-        $data['all_quantity'] = $this->all_quantity;
+        $data['all_quantity'] = $this->all_quantity_local;
         //可用库存
-        $data['available_quantity'] = $this->available_quantity;
+        $data['available_quantity'] = $this->available_quantity_local;
         $xu_kucun = $this->available_quantity - $data['need_total_num'];
         //7天销量
         $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')

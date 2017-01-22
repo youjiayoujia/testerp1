@@ -1063,9 +1063,9 @@ class ItemModel extends BaseModel
 
             $data['zaitu_num'] = $zaitu_num;
             //实库存
-            $data['all_quantity'] = $item->all_quantity;
+            $data['all_quantity'] = $item->all_quantity_local;
             //可用库存
-            $data['available_quantity'] = $item->available_quantity;
+            $data['available_quantity'] = $item->available_quantity_local;
             //虚库存
             /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
                 $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',

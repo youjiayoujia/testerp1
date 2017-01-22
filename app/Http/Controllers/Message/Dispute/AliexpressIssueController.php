@@ -10,6 +10,7 @@ use App\Models\Message\Issues\AliexpressIssueListModel;
 use App\Models\Message\Issues\AliexpressIssuesDetailModel;
 use App\Models\Channel\AccountModel;
 use Carbon\Carbon;
+use Channel;
 
 class AliexpressIssueController extends Controller
 {
@@ -117,15 +118,30 @@ class AliexpressIssueController extends Controller
         //
     }
 
+    /**
+     * 批量留言
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function doRefuseIssues(){
         $form = request()->input();
+        $error_info = '';
         if(!empty($form['checked-ids']) && !empty($form['remark'])){
             $issue_ids = explode(',',$form['checked-ids']);
             foreach ($issue_ids as $id){
                 $issue = $this->model->find($id);
+                $adpter = Channel::driver($issue->account->channel->driver, $issue->account->api_config);
+                $result = $adpter->leaveOrderMessage($issue->orderId, trim($form['remark']));
+                if(! $result){
+                    $error_info .= $issue->id.',';
+                }
             }
         }else{
             return redirect($this->mainIndex)->with('alert', '参数不完整');
+        }
+        if(! empty($error_info)){
+            return redirect($this->mainIndex)->with('alert', $error_info.'发送失败');
+        }else{
+            return redirect($this->mainIndex)->with('success', '发送成功');
         }
     }
 

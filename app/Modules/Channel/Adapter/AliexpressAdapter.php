@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Channel\AccountModel;
 use App\models\Publish\Smt\smtCategoryAttribute;
 use App\Models\Message\MessageModel;
+use App\Models\Message\Issues\AliexpressIssueListModel;
 set_time_limit(1800);
 Class AliexpressAdapter implements AdapterInterface
 {
@@ -1465,7 +1466,20 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $issueAry;
     }
-    public function changetime($time){
+
+    /**
+     * api: 纠纷中卖家新增订单留言（试用）留言内容同订单留言。
+     */
+    public function leaveOrderMessage($orderId,$content)
+    {
+        $parameter = "orderId=$orderId&content=$content";
+        $result = json_decode($this->getJsonData('api.leaveOrderMessage', $parameter));
+        return $result['result']['isSuccess'] ? true : false;
+
+    }
+
+    public function changetime($time)
+    {
         $time = date('Y-m-d H:i:s', substr($time, 0, 10));
         return $time;
     }

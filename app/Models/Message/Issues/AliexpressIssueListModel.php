@@ -64,4 +64,12 @@ class AliexpressIssueListModel extends BaseModel
         }
     }
 
+    public function getIsPlatformProcessName(){
+        $name = '平台未处理';
+        if($this->is_platform_process != 0){
+            $name = '平台已处理';
+        }
+        return $name;
+    }
+
 }

@@ -102,6 +102,7 @@ class PackageModel extends BaseModel
             ],
             'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
+                'is_oversea' => config('order.whether'),
                 'status' => config('package'),
                 'warehouse_id' => WarehouseModel::where('is_available', '1')->get()->pluck('name', 'id'),
                 //'logistics_id' => LogisticsModel::all()->pluck('code', 'id')

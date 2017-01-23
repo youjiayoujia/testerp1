@@ -111,7 +111,7 @@ class PackageModel extends BaseModel
                 'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
                 'channelAccount' => ['account' => AccountModel::all()->pluck('account', 'account')]
             ],
-            'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
+            'sectionSelect' => ['time' => ['created_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
                 'items' => ['item' => ['sku']]
             ],

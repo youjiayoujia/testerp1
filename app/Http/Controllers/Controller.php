@@ -152,7 +152,7 @@ abstract class Controller extends BaseController
                         foreach ($related as $key => $value3) {
                             $value3 = trim($value3);
                             if ($value3) {
-                                $list = $list->where($key, 'like', '%' . $value3 . '%');
+                                $list = $list->where($key, $value3);
                             }
                         }
                         break;
@@ -192,6 +192,7 @@ abstract class Controller extends BaseController
                 }
             }
         }
+
         return $list;
     }
 
@@ -217,7 +218,7 @@ abstract class Controller extends BaseController
                                 $name = trim($name);
                                 if ($name != '') {
                                     $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
-                                        $query = $query->where($k, 'like', '%' . $name . '%');
+                                        $query = $query->where($k, $name);
                                     });
                                 }
                             }

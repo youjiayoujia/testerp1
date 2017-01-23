@@ -8,7 +8,7 @@ use App\Models\Event\CategoryModel;
 
 class BaseModel extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
     protected $dates = ['deleted_at'];
     protected $rules;
 

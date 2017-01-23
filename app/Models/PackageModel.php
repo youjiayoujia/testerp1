@@ -99,6 +99,7 @@ class PackageModel extends BaseModel
         return [
             'relatedSearchFields' => [
                 'order' => ['id', 'channel_ordernum'],
+                'items' => ['sku']
             ],
             'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
@@ -114,7 +115,6 @@ class PackageModel extends BaseModel
             ],
             'sectionSelect' => ['time' => ['created_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
-                'items' => ['item' => ['sku']]
             ],
             'doubleRelatedSelectedFields' => [
                 //'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],

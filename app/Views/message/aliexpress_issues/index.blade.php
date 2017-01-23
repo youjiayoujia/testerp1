@@ -7,9 +7,9 @@
         </button>
         <ul class="dropdown-menu">
             <li><a href="javascript:" data-toggle="modal" data-target="#myModal-refuse">批量留言</a></li>
-            <li><a href="javascript:" class="do_edit" data-status="notpass" >标记平台已处理</a></li>
-            <li><a href="javascript:" class="do_edit" data-status="delay" >平台延迟发货界面</a></li>
-            <li><a href="javascript:" class="do_edit" data-status="channel" >平台处理界面</a></li>
+            <li><a href="javascript:" class="do_edit" data-status="platform_process" >标记平台已处理</a></li>
+{{--            <li><a href="javascript:" class="do_edit" data-status="delay" >平台延迟发货界面</a></li>
+            <li><a href="javascript:" class="do_edit" data-status="channel" >平台处理界面</a></li>--}}
         </ul>
     </div>
 @stop
@@ -22,6 +22,7 @@
     <th>账号</th>
     <th>纠纷原因</th>
     <th>纠纷创建时间</th>
+    <th>纠纷剩余时间</th>
     <th>纠纷修改时间</th>
     <th>抓取时间</th>
     <th>处理状态</th>
@@ -41,9 +42,10 @@
             <td>{{$issue->accountName}}</td>
             <td>{{$issue->reasonChinese}}</td>
             <td>{{$issue->gmtCreate}}</td>
+            <td>{{$issue->TimeLimit}}</td>
             <td>{{$issue->gmtModified}}</td>
             <td>{{$issue->created_at}}</td>
-            <td>{{$issue->IsPlatformProcess}}</td>
+            <td>{{$issue->IsPlatformProcessName}}</td>
 
 
 
@@ -118,7 +120,7 @@ $(document).ready(function(){
         var ids = new Array();
         var i = 0;
         var order_id = '';
-
+        var suffix = ',';
 
         switch (status){
             case 'delay':
@@ -132,6 +134,32 @@ $(document).ready(function(){
                     order_id = $(this).attr('order_id');
                     //window.open("https://trade.aliexpress.com/orderDetail.htm?orderId="+order_id, "_blank");
                 });
+                break;
+            case 'platform_process':
+                $(".issue_ids:checked").each(function(index, value){
+                    if(index == 0){
+                        suffix = '';
+                    }else{
+                        suffix = ',';
+
+                    }
+                    ids += suffix + $(this).val();
+                    i++;
+                });
+                $.ajax({
+                    url : "{{route('aliexpress.MutiChangePlatform')}}",
+                    dataType:'json',
+                    type : 'GET',
+                    data: {ids:ids},
+                    success : function (data) {
+                        alert('修改成功，即将刷新页面');
+                        window.location.replace(window.location.href);
+                    },
+                    error : function () {
+                        alert('操作失败！');
+                    }
+                });
+
                 break;
         }
     });

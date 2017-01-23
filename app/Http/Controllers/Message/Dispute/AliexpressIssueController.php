@@ -18,7 +18,7 @@ class AliexpressIssueController extends Controller
     public function __construct(AliexpressIssueListModel $issueList)
     {
         $this->model = $issueList;
-        $this->mainIndex = route('ebayCases.index');
+        $this->mainIndex = route('AliexpressIssue.index');
         $this->mainTitle = 'Aliexpress Issues';
         $this->viewPath = 'message.aliexpress_issues.';
 
@@ -84,6 +84,8 @@ class AliexpressIssueController extends Controller
      */
     public function edit($id)
     {
+        $list = $this->model->find($id);
+
         $data = AliexpressIssuesDetailModel::where('issue_list_id',$id)->first();
         if(empty($data)){
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -143,6 +145,14 @@ class AliexpressIssueController extends Controller
         }else{
             return redirect($this->mainIndex)->with('success', '发送成功');
         }
+    }
+
+    public function MutiChangePlatformProcess()
+    {
+        $ids = request()->input('ids');
+        $ids = explode(',', $ids);
+        return $this->model->platformDeal($ids);
+
     }
 
 

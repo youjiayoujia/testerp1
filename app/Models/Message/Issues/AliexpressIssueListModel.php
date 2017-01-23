@@ -8,6 +8,7 @@
 namespace App\Models\Message\Issues;
 use App\Base\BaseModel;
 use App\Models\Channel\AccountModel;
+use Carbon\Carbon;
 
 class AliexpressIssueListModel extends BaseModel
 {
@@ -45,7 +46,6 @@ class AliexpressIssueListModel extends BaseModel
            'selectRelatedSearchs' => [
                'account' => ['account' => AccountModel::all()->pluck('alias', 'account')],
             ],
-            //'sectionSelect' => ['time'=>['created_at']],
         ];
     }
 
@@ -58,13 +58,13 @@ class AliexpressIssueListModel extends BaseModel
     }
     public function getaccountNameAttribute(){
         if($account = $this->account){
-            return  $account->account ? $account->account : '';
+            return  $account->alias ? $account->alias : '';
         }else{
             return '';
         }
     }
 
-    public function getIsPlatformProcessName(){
+    public function getIsPlatformProcessNameAttribute(){
         $name = '平台未处理';
         if($this->is_platform_process != 0){
             $name = '平台已处理';
@@ -72,4 +72,24 @@ class AliexpressIssueListModel extends BaseModel
         return $name;
     }
 
+    public function platformDeal($idsAry=null){
+        $result = false;
+        if(is_array($idsAry)){
+            $result = $this->whereIn('id', $idsAry)
+                           ->update(['is_platform_process' => 1]);
+        }
+        return ! empty($result) ? $result : false;
+    }
+
+    public function getTimeLimitAttribute()
+    {
+         $dt = Carbon::parse($this->gmtCreate);
+         $start = $dt->timestamp;
+         $now = Carbon::now()->timestamp;
+         $end = $dt->timestamp + 5*60*60*24;
+         $over = $end - $now;
+         return $dt->timestamp($over)->toTimeString();
+
+
+    }
 }

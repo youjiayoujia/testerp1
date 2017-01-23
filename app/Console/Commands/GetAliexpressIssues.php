@@ -16,14 +16,14 @@ class GetAliexpressIssues extends Command
      *
      * @var string
      */
-    protected $signature = 'issues:get  {accountName}';
+    protected $signature = 'issues:get {accountName}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '获取速卖通纠纷';
 
     /**
      * Create a new command instance.
@@ -46,7 +46,7 @@ class GetAliexpressIssues extends Command
         $account_name =  $this->argument('accountName');  //渠道名称
 
         $account = AccountModel::where('account',$account_name)->first();
-        if(is_object($account)){
+        if(! empty($account)){
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $getIssueLists = $channel->getIssues();
             if(!empty($getIssueLists)){
@@ -72,7 +72,7 @@ class GetAliexpressIssues extends Command
                                 $issue_detail->issue_list_id = $issue_list->id;
                                 $issue_detail->resultMemo    = $issue['issue_detail']->resultMemo;
                                 $issue_detail->orderId       = $issue['issue_detail']->resultObject->orderId;
-                                $issue_detail->gmtCreate     = $issue['issue_detail']->resultObject->gmtCreate;
+                                $issue_detail->gmtCreate     = date('Y-m-d H:i:s', substr($issue['issue_detail']->resultObject->gmtCreate, 0, 10));
                                 $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
                                 $issue_detail->buyerAliid    = $issue['issue_detail']->resultObject->buyerAliid;
                                 $issue_detail->issueStatus   = $issue['issue_detail']->resultObject->issueStatus;
@@ -100,5 +100,7 @@ class GetAliexpressIssues extends Command
             $this->comment('account num maybe worng.');
 
         }
+        $this->info('finsh.');
+
     }
 }

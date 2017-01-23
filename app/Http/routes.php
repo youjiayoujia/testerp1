@@ -1328,6 +1328,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('AliexpressIssue', 'Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',
         ['uses' => 'Message\Dispute\AliexpressIssueController@doRefuseIssues', 'as' => 'aliexpress.doRefuseIssues']);
+    Route::any('MutiChangePlatform', 'Message\Dispute\AliexpressIssueController@MutiChangePlatformProcess')->name('aliexpress.MutiChangePlatform');
     Route::resource('crmStatistics', 'Message\StatisticsController');
     //spu
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);

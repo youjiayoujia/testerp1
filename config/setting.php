@@ -218,6 +218,9 @@ return [
         'plat' => '平台',
         'message_statistics.compute_time' => '统计时间',
         'message_statistics.user_id' => '客服名称',
+        'aliexpress_issues_list.orderId' => '订单号',
+        'reasonChinese' => '纠纷原因',
+        'issueType' => '纠纷类型',
 
 
     ],

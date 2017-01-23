@@ -157,6 +157,7 @@ return [
         'packages.tracking_no' => '追踪号',
         'price.profit_rate' => '利润率',
         'packages.status' => '包裹状态',
+        'is_oversea' => '是否海外仓',
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',

@@ -239,7 +239,18 @@ class ItemModel extends BaseModel
     {
         return $this->stocks->sum('available_quantity');
     }
-
+    //本地仓库实库存
+    public function getAllQuantityLocalAttribute()
+    {
+        $warehouse = new WarehouseModel;
+        return $this->stocks()->whereIn('warehouse_id',$warehouse->getLocalIds())->get()->sum('all_quantity');
+    }
+    //本地虚仓库虚库存
+    public function getAvailableQuantityLocalAttribute()
+    {
+        $warehouse = new WarehouseModel;
+        return$this->stocks()->whereIn('warehouse_id',$warehouse->getLocalIds())->get()->sum('available_quantity');
+    }
     //普通在途库存
     public function getNormalTransitQuantityAttribute()
     {
@@ -854,9 +865,9 @@ class ItemModel extends BaseModel
 
         $data['zaitu_num'] = $zaitu_num;
         //实库存
-        $data['all_quantity'] = $this->all_quantity;
+        $data['all_quantity'] = $this->all_quantity_local;
         //可用库存
-        $data['available_quantity'] = $this->available_quantity;
+        $data['available_quantity'] = $this->available_quantity_local;
         $xu_kucun = $this->available_quantity - $data['need_total_num'];
         //7天销量
         $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -1052,9 +1063,9 @@ class ItemModel extends BaseModel
 
             $data['zaitu_num'] = $zaitu_num;
             //实库存
-            $data['all_quantity'] = $item->all_quantity;
+            $data['all_quantity'] = $item->all_quantity_local;
             //可用库存
-            $data['available_quantity'] = $item->available_quantity;
+            $data['available_quantity'] = $item->available_quantity_local;
             //虚库存
             /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
                 $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',

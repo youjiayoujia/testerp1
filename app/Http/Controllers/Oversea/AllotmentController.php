@@ -200,6 +200,24 @@ class AllotmentController extends Controller
         return redirect($this->mainIndex);
     }
 
+    public function printBox($id)
+    {
+        $model = $this->model->find($id);
+        $name = UserModel::find(request()->user()->id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'boxes' => $model->boxes,
+        ];
+        $to = json_encode($model);
+        $this->eventLog($name, '打印拣货单', $to, $to);
+        
+        return view($this->viewPath.'printBox', $response);
+    }
+
     public function returnAllInfoStore($id)
     {
         $model = $this->model->find($id);

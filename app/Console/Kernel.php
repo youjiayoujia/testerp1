@@ -83,6 +83,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AutoChangeAliOderRefund::class,
         //DHL确认发货
         \App\Console\Commands\AutoSureDHLShip::class,
+        \App\Console\Commands\TemplateWriteSku::class,
 
     ];
 

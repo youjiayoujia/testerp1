@@ -6,8 +6,11 @@
  * Time: 17:46
  */
 namespace App\Models\Message\Issues;
+
 use App\Base\BaseModel;
 use Tool;
+use Carbon\Carbon;
+
 class AliexpressIssuesDetailModel extends BaseModel
 {
     protected $table = 'aliexpress_issues_detail';
@@ -15,7 +18,24 @@ class AliexpressIssuesDetailModel extends BaseModel
     public $searchFields =[];
     protected $guarded = [];
 
-    public function list()
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [
+            ],
+            'filterSelects' => [
+            ],
+            'selectRelatedSearchs' => [
+            ],
+        ];
+    }
+
+    public function issueList()
     {
         return $this->belongsTo('App\Models\Message\Issues\AliexpressIssueListModel', 'issue_list_id', 'id');
     }

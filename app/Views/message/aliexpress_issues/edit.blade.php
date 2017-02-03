@@ -12,7 +12,7 @@
                     <div class="panel-body">
                         <div class='row'>
                             <div class="col-lg-2">
-                                <strong>纠纷原因</strong>: {{$issue->list->reasonChinese}}
+                                <strong>纠纷原因</strong>: {{$issue->issueList->reasonChinese}}
                             </div>
                             <div class="col-lg-2">
                                 <strong>纠纷状态</strong>: <font color="green">纠纷协商中</font>
@@ -38,7 +38,7 @@
                         <div class="panel-body">
                             <div class='row'>
                                 <div class="col-lg-4">
-                                    <strong>订单号</strong>: {{$issue->list->orderId}}
+                                    <strong>订单号</strong>: {{$issue->issueList->orderId}}
                                 </div>
                             </div>
                             <div class="row">

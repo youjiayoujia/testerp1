@@ -99,6 +99,7 @@ class PackageModel extends BaseModel
         return [
             'relatedSearchFields' => [
                 'order' => ['id', 'channel_ordernum'],
+                'items' => ['sku']
             ],
             'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
@@ -112,9 +113,8 @@ class PackageModel extends BaseModel
                 'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
                 'channelAccount' => ['account' => AccountModel::all()->pluck('account', 'account')]
             ],
-            'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
+            'sectionSelect' => ['time' => ['created_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
-                'items' => ['item' => ['sku']]
             ],
             'doubleRelatedSelectedFields' => [
                 //'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
@@ -123,6 +123,14 @@ class PackageModel extends BaseModel
                 'first' => ['logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]]],
                 'second' => ['logistics_id' => LogisticsModel::all()->pluck('code', 'id')]
             ],
+        ];
+    }
+
+    public function getRelationArrAttribute()
+    {
+        return [
+            'order' => ['orders', 'id', 'order_id'],
+            'items' => ['package_items', 'package_id', 'id']
         ];
     }
 

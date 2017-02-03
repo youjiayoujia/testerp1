@@ -846,6 +846,10 @@ class OrderModel extends BaseModel
                     $packageItem['remark'] = 'REMARK';
                 }
                 $packageItem['order_item_id'] = $packageItem['id'];
+                $item = ItemModel::find($packageItem['item_id']);
+                if($item) {
+                    $packageItem['sku'] = $item->sku;
+                }
                 if ($packageItem['is_active']) {
                     $newPackageItem = $package->items()->create($packageItem);
                 }

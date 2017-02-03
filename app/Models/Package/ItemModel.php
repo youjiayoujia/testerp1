@@ -25,6 +25,7 @@ class ItemModel extends BaseModel
         'remark',
         'code',
         'is_oversea',
+        'sku',
     ];
 
     public function package()

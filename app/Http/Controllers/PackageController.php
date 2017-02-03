@@ -112,7 +112,6 @@ class PackageController extends Controller
             'logisticses' => $logisticses,
             'pagetype' => $pagetype,
         ];
-        return 1;
         return view($this->viewPath . 'index', $response);
     }
 

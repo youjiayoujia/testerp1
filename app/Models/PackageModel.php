@@ -126,6 +126,14 @@ class PackageModel extends BaseModel
         ];
     }
 
+    public function getRelationArrAttribute()
+    {
+        return [
+            'order' => ['orders', 'id', 'order_id'],
+            'items' => ['package_items', 'package_id', 'id']
+        ];
+    }
+
     public function getPackageInfoAttribute()
     {
         $count = 0;

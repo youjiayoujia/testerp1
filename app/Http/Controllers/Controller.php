@@ -196,7 +196,7 @@ abstract class Controller extends BaseController
         return $list;
     }
 
-    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null)
+    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null, $level = '')
     {
         $list = $list ? $list : $model;
         if (request()->has('keywords')) {
@@ -217,9 +217,13 @@ abstract class Controller extends BaseController
                             foreach ($name_arr as $k => $name) {
                                 $name = trim($name);
                                 if ($name != '') {
-                                    $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
-                                        $query = $query->where($k, $name);
-                                    });
+                                    if(!$level) {
+                                        $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
+                                            $query = $query->where($k, $name);
+                                        }); 
+                                    } else {
+                                        $list = $list->relatedGet($list, $relation_ship, $k, $name);
+                                    }
                                 }
                             }
                         }
@@ -375,11 +379,15 @@ abstract class Controller extends BaseController
             }
         }
         if (request()->has('sorts')) {
-            foreach (DataList::sortsDecode(request()->input('sorts')) as $sort) {
-                $list = $list->orderBy($sort['field'], $sort['direction']);
+            if($list->first()) {
+                foreach (DataList::sortsDecode(request()->input('sorts')) as $sort) {
+                    $list = $list->orderBy($list->first()->table.'.'.$sort['field'], $sort['direction']);
+                }
             }
         } else {
-            $list = $list->orderBy('id', 'desc');
+            if($list->first()) {
+                $list = $list->orderBy($list->first()->table.'.id', 'desc');
+            }
         }
         if (!$pageSize) {
             $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');

@@ -107,11 +107,12 @@ class PackageController extends Controller
         $logisticses = LogisticsModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model, null, ['*'], null, 'restrict'),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
             'pagetype' => $pagetype,
         ];
+        
         return view($this->viewPath . 'index', $response);
     }
 

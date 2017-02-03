@@ -68,7 +68,7 @@ class GetAliexpressIssues extends Command
 
                         if(!empty($issue['issue_detail'])){
                             $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
-                            if(empty($issue_detail->id)){
+                            if(! $issue_detail->exists){
                                 $issue_detail->issue_list_id = $issue_list->id;
                                 $issue_detail->resultMemo    = $issue['issue_detail']->resultMemo;
                                 $issue_detail->orderId       = $issue['issue_detail']->resultObject->orderId;

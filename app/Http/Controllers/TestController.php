@@ -1620,7 +1620,7 @@ class TestController extends Controller
         if(! empty($account)){
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $getIssueLists = $channel->getIssues();
-            dd($getIssueLists);
+            //dd($getIssueLists);
             if(!empty($getIssueLists)){
                 foreach($getIssueLists as $issue){
                     $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
@@ -1673,7 +1673,8 @@ class TestController extends Controller
             dd('account num maybe worng.');
 
         }
-        $this->info('finsh.');
+        //$this->info('finsh.');
+        dd('finsh');
 
     }
     public function oneSku()

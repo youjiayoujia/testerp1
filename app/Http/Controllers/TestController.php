@@ -230,11 +230,17 @@ class TestController extends Controller
     //     var_dump('123');
     // }
 
+    // public function test2()
+    // {  
+    //     $package = BoxModel::find(25);
+    //     $test = $package->expected_fee;
+    //     var_dump($test);
+    // }
+
     public function test2()
-    {  
-        $package = BoxModel::find(25);
-        $test = $package->expected_fee;
-        var_dump($test);
+    {
+        $model = PackageModel::find(10);
+        $buf = $model->relatedGet($model, 'order', 'id', '1');
     }
 
     // public function test2()

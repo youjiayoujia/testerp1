@@ -345,7 +345,6 @@ class RefundCenterController extends Controller
 
     public function exportRefundDetail(){
         $form = request()->input();
-        dd($form);
         $items = new ItemModel;
         if(!empty($form['skus']))
             $items = $items->whereIn('sku',explode(',',$form['skus']));
@@ -373,9 +372,12 @@ class RefundCenterController extends Controller
 
         if(!empty($form['refund-statistics-reason']))
             $refunds = $refunds->whereIn('reason',explode(',',$form['refund-statistics-reason']));
-        if($form['time-type'] == 'refund'){
-            $refunds = $refunds->where('created_at','<=',$form['end']);
-            $refunds = $refunds->where('created_at','>=',$form['start']);
+
+        if(! empty($form['time-type'])) {
+            if ($form['time-type'] == 'refund') {
+                $refunds = $refunds->where('created_at', '<=', $form['end']);
+                $refunds = $refunds->where('created_at', '>=', $form['start']);
+            }
         }
 
         $result = $refunds->get();

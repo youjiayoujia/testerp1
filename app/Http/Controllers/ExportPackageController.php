@@ -211,7 +211,7 @@ class ExportPackageController extends Controller
      */
     public function exportPackageDetail()
     {
-        ini_set('memory_limit', '2G');
+        ini_set('memory_limit', '128M');
         $field = $this->model->find(request('field_id'));
         $fieldItems = $field->items;
         $arr = [];
@@ -221,11 +221,11 @@ class ExportPackageController extends Controller
             $arr[$fieldItem->level]['type'] = 'database';
         }
         $packages = '';
-        if (request()->has('channel_id')) {
-            $packages = PackageModel::where('channel_id', request('channel_id'));
-        }
         if (request()->has('warehouse_id')) {
-            $packages = $packages->where('warehouse_id', request('warehouse_id'));
+            $packages = PackageModel::where('warehouse_id', request('warehouse_id'));
+        }
+        if (request()->has('channel_id')) {
+            $packages = $packages->where('channel_id', request('channel_id'));
         }
         if (request()->has('logistics_id')) {
             $packages = $packages->where('logistics_id', request('logistics_id'));

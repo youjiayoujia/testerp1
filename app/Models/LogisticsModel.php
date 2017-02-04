@@ -18,7 +18,7 @@ class LogisticsModel extends BaseModel
 {
     public $table = 'logisticses';
 
-    public $searchFields = [];
+    public $searchFields = ['code' => '简码', 'name' => '物流方式名称', 'logistics_code' => '物流编码'];
 
     public $fillable = [
         'id',

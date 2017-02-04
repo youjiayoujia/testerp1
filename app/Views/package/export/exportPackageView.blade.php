@@ -15,6 +15,7 @@
             <label for="name" class='control-label'>渠道</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='channel_id' class='form-control channel_id'>
+                    <option value=''>请选择渠道</option>
                 @foreach($channels as $channel)
                     <option value="{{ $channel->id }}">{{ $channel->name }}</option>
                 @endforeach

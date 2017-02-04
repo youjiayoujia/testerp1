@@ -247,8 +247,8 @@ class ExportPackageController extends Controller
             $begin_shipped_at = date('Y-m-d H:i:s', strtotime(request('begin_shipped_at')));
             $over_shipped_at = date('Y-m-d H:i:s', strtotime(request('over_shipped_at')));
             $shipped_at = [$begin_shipped_at, $over_shipped_at];
-            $packages = $packages->whereRaw('shipped_at >=  ? and shipped_at <= ?',
-                [$over_shipped_at, $over_shipped_at]);
+            $packages = $packages->whereBetween('shipped_at',
+                [$begin_shipped_at, $over_shipped_at]);
         }
         if (request()->hasFile('accordingTracking')) {
             $file = request()->file('accordingTracking');
@@ -286,6 +286,7 @@ class ExportPackageController extends Controller
             if(!$rows) {
                 return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '导出信息有误，请查看模板是否有问题'));
             }
+            Session::forget('alert');
             Excel::create($name, function ($excel) use ($rows) {
                 $excel->sheet('', function ($sheet) use ($rows) {
                     $sheet->fromArray($rows);

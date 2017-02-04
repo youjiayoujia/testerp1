@@ -222,31 +222,28 @@ class ExportPackageController extends Controller
             $arr[$fieldItem->level]['type'] = 'database';
         }
         $packages = '';
-        $warehouse_id = '';
-        $channel_id = '';
-        $logistics_id = '';
-        $status = '';
-        $shipped_at = [];
+        Session::flash('warehouse_id', request('warehouse_id'));
+        Session::flash('logistics_id', request('logistics_id'));
+        Session::flash('channel_id', request('channel_id'));
+        Session::flash('status1', request('status'));
+        Session::flash('field_id', request('field_id'));
+        Session::flash('shipped_at', [date('Y-m-d H:i:s', strtotime(request('begin_shipped_at'))),
+                                      date('Y-m-d H:i:s', strtotime(request('over_shipped_at')))]);
         if (request()->has('warehouse_id')) {
-            $warehouse_id = request('warehouse_id');
             $packages = PackageModel::where('warehouse_id', request('warehouse_id'));
         }
         if (request()->has('channel_id')) {
-            $channel_id = request('channel_id');
             $packages = $packages->where('channel_id', request('channel_id'));
         }
         if (request()->has('logistics_id')) {
-            $logistics_id = request('logistics_id');
             $packages = $packages->where('logistics_id', request('logistics_id'));
         }
         if (request()->has('status')) {
-            $status = request('status');
             $packages = $packages->where('status', request('status'));
         }
         if (request()->has('begin_shipped_at') && request()->has('over_shipped_at')) {
             $begin_shipped_at = date('Y-m-d H:i:s', strtotime(request('begin_shipped_at')));
             $over_shipped_at = date('Y-m-d H:i:s', strtotime(request('over_shipped_at')));
-            $shipped_at = [$begin_shipped_at, $over_shipped_at];
             $packages = $packages->whereBetween('shipped_at',
                 [$begin_shipped_at, $over_shipped_at]);
         }
@@ -293,23 +290,9 @@ class ExportPackageController extends Controller
                 });
             })->download('csv');
         } else {
-            $response = [
-                'warehouse_id' => $warehouse_id,
-                'logistics_id' => $logistics_id,
-                'channel_id' => $channel_id,
-                'status1' => $status,
-                'shipped_at' => $shipped_at,
-                'field_id' => request('field_id'),
-                'metas' => $this->metas(__FUNCTION__),
-                'fields' => $this->model->all(),
-                'channels' => ChannelModel::all(),
-                'warehouses' => WarehouseModel::where('is_available', '1')->get(),
-                'statuses' => config('package'),
-                'logisticses' => LogisticsModel::all(),
-            ];
-
-            Session::flash('alert', $this->alert('danger', '根据条件找不到包裹信息'));
-            return view($this->viewPath.'exportPackageView', $response);
+            return redirect(route('exportPackage.exportPackageDetail'))->with('alert', $this->alert('danger', '根据条件找不到包裹信息'));
+            // Session::flash('alert', $this->alert('danger', '根据条件找不到包裹信息'));
+            // return view($this->viewPath.'exportPackageView', $response);
         }
     }
 

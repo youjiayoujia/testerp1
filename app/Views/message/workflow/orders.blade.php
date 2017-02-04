@@ -18,7 +18,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     ERP订单号:
-                    <a href="{{ route('order.index') }}?mixedSearchFields%5BfilterFields%5D%5Bchannel_ordernum%5D=500111276696299&mixedSearchFields%5BfilterFields%5D%5Bemail%5D=&mixedSearchFields%5BfilterFields%5D%5Bby_id%5D=&mixedSearchFields%5BfilterFields%5D%5Bshipping_firstname%5D=&mixedSearchFields%5BfilterFields%5D%5Bcurrency%5D=&mixedSearchFields%5BfilterSelects%5D%5Bstatus%5D=&mixedSearchFields%5BfilterSelects%5D%5Bactive%5D=&mixedSearchFields%5BfilterSelects%5D%5Bis_chinese%5D=&mixedSearchFields%5BsectionSelect%5D%5Bamount%5D%5Bbegin%5D=&mixedSearchFields%5BsectionSelect%5D%5Bamount%5D%5Bend%5D=&mixedSearchFields%5BsectionSelect%5D%5Bprofit%5D%5Bbegin%5D=&mixedSearchFields%5BsectionSelect%5D%5Bprofit%5D%5Bend%5D=&mixedSearchFields%5BsectionSelect%5D%5Bprofit_rate%5D%5Bbegin%5D=&mixedSearchFields%5BsectionSelect%5D%5Bprofit_rate%5D%5Bend%5D=&mixedSearchFields%5BsectionSelect%5D%5Bcreated_at%5D%5Bbegin%5D=&mixedSearchFields%5BsectionSelect%5D%5Bcreated_at%5D%5Bend%5D=&mixedSearchFields%5BrelatedSearchFields%5D%5Bcountry%5D%5Bcode%5D=&mixedSearchFields%5BrelatedSearchFields%5D%5Bitems%5D%5Bsku%5D=&mixedSearchFields%5BrelatedSearchFields%5D%5BchannelAccount%5D%5Balias%5D=&mixedSearchFields%5BrelatedSearchFields%5D%5BuserOperator%5D%5Bname%5D=&mixedSearchFields%5BrelatedSearchFields%5D%5Bpackages%5D%5Btracking_no%5D=&mixedSearchFields%5BselectRelatedSearchs%5D%5Bchannel%5D%5Bname%5D=&mixedSearchFields%5BselectRelatedSearchs%5D%5Bitems%5D%5Bitem_status%5D=&mixedSearchFields%5BselectRelatedSearchs%5D%5Bremarks%5D%5Btype%5D=&mixedSearchFields%5BselectRelatedSearchs%5D%5Bpackages%5D%5Bis_mark%5D=&mixedSearchFields%5BselectRelatedSearchs%5D%5Bpackages%5D%5Bstatus%5D=&mixedSearchFields%5BdoubleRelatedSelectedFields%5D%5Bpackages%5D%5Blogistics%5D%5Bcode%5D=" target="_blank">
+                    <a href="{{ route('order.index') }}?mixedSearchFields%5BfilterFields%5D%5Bchannel_ordernum%5D={{$relatedOrder->order->channel_ordernum}}" target="_blank">
                         <strong>{{ $relatedOrder->order->id }}</strong>
                     </a>
                     <small>{{ '<'.$relatedOrder->order->email.'>' }}</small>
@@ -77,7 +77,7 @@
                                     <tr>
                                         <td>
 
-                                            <a href="{{ route('item.show', $item->id ) }}" target="_blank">{{$item->sku}}</a>
+                                            <a href="{{ route('item.show', $item->item_id ) }}" target="_blank">{{$item->sku}}</a>
                                         </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>{{ $item->price }}</td>

@@ -266,7 +266,7 @@
                 <td colspan='2'>{{$item->getStockQuantity($warehouse->id)}}</td>
                 <td colspan='2'>{{$item->transit_quantity[$warehouse->id]['normal']}}</td>
                 <td colspan='2'>{{$item->transit_quantity[$warehouse->id]['special']}}</td>
-                <td colspan='2'>{{$item->getWarehouseOutOfStock([$warehouse->id])[$warehouse->id]['need']}}</td>
+                <td colspan='2'>{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</td>
             </tr>
         @endforeach
 

@@ -344,20 +344,19 @@ class ItemModel extends BaseModel
     }
 
     //分仓欠货数量
-    public function getWarehouseOutOfStock($warehouse_id_arr)
+    public function getWarehouseOutOfStockAttribute()
     {
         $item_id = $this->id;
         $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "' . $item_id . '" and
                 packages.id = package_items.package_id and packages.deleted_at is null group by packages.warehouse_id');
         $data = [];
-        foreach($warehouse_id_arr as $warehouse_id){
-            $data[$warehouse_id]['need'] = 0;
+        $warehouses = WarehouseModel::all();
+        foreach ($warehouses as $warehouse) {
+            $data[$warehouse->id]['need'] = 0;
         }
-
         foreach ($num as $key => $value) {
             $data[$value->warehouse_id]['need'] += $value->num;
         }
-
         return $data;
     }
 

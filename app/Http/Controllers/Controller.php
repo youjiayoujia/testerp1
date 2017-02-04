@@ -392,6 +392,7 @@ abstract class Controller extends BaseController
         if (!$pageSize) {
             $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
         }
+        
         return $list->paginate($pageSize, $fields);
     }
 

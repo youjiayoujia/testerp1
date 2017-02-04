@@ -345,6 +345,7 @@ class RefundCenterController extends Controller
 
     public function exportRefundDetail(){
         $form = request()->input();
+        dd($form);
         $items = new ItemModel;
         if(!empty($form['skus']))
             $items = $items->whereIn('sku',explode(',',$form['skus']));

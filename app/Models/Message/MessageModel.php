@@ -18,7 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
-    protected $table = 'messages';
+    public $table = 'messages';
 
     protected $fillable = [
         'account_id',

@@ -1448,9 +1448,9 @@ Class AliexpressAdapter implements AdapterInterface
                         }
                         $issueAry[] = [
                             'issue_id'      => $item->id,
-                            'gmtModified'   => $this->changetime($item->gmtModified),
+                            'gmtModified'   => $this->getIssueDate($item->gmtModified),
                             'issueStatus'   => $item->issueStatus,
-                            'gmtCreate'     => $this->changetime($item->gmtCreate),
+                            'gmtCreate'     => $this->getIssueDate($item->gmtCreate),
                             'reasonChinese' => $item->reasonChinese,
                             'orderId'       => $item->orderId,
                             'reasonEnglish' => $item->reasonEnglish,
@@ -1483,6 +1483,13 @@ Class AliexpressAdapter implements AdapterInterface
         $time = date('Y-m-d H:i:s', substr($time, 0, 10));
         return $time;
     }
+
+    public function getIssueDate($dateFormat)
+    {
+        $date = date('Y-m-d H:i:s', strtotime(substr($dateFormat, 0, 14)));
+        return $date;
+    }
+
     /**
      * 过滤速卖通产品信息模块
      * @param $str 产品详情信息

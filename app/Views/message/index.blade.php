@@ -121,6 +121,11 @@
                         <span class="glyphicon glyphicon-minus-sign"></span>
                     </button>
                 @endif
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{$message->table}}" data-id="{{$message->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

@@ -222,13 +222,7 @@ class ExportPackageController extends Controller
             $arr[$fieldItem->level]['type'] = 'database';
         }
         $packages = '';
-        Session::flash('warehouse_id', request('warehouse_id'));
-        Session::flash('logistics_id', request('logistics_id'));
-        Session::flash('channel_id', request('channel_id'));
-        Session::flash('status1', request('status'));
-        Session::flash('field_id', request('field_id'));
-        Session::flash('shipped_at', [date('Y-m-d H:i:s', strtotime(request('begin_shipped_at'))),
-                                      date('Y-m-d H:i:s', strtotime(request('over_shipped_at')))]);
+        
         if (request()->has('warehouse_id')) {
             $packages = PackageModel::where('warehouse_id', request('warehouse_id'));
         }
@@ -290,9 +284,8 @@ class ExportPackageController extends Controller
                 });
             })->download('csv');
         } else {
-            return redirect(route('exportPackage.exportPackageDetail'))->with('alert', $this->alert('danger', '根据条件找不到包裹信息'));
-            // Session::flash('alert', $this->alert('danger', '根据条件找不到包裹信息'));
-            // return view($this->viewPath.'exportPackageView', $response);
+            request()->flash();
+            return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '根据条件找不到包裹信息'));
         }
     }
 

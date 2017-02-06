@@ -35,7 +35,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='status' class='form-control status'>
                 @foreach($statuses as $key => $status)
-                    <option value="{{ $key }}" {{ old('status1') ? ($key == old('status1') ? 'selected' : '') : '' }}>{{ $status }}</option>
+                    <option value="{{ $key }}" {{ old('status') ? ($key == old('status') ? 'selected' : '') : '' }}>{{ $status }}</option>
                 @endforeach
             </select>
         </div>
@@ -52,12 +52,12 @@
     <div class='row'>
         <div class="form-group col-lg-2">
             <label for="name" class='control-label'>起始发货时间</label>
-            <input type='text' name='begin_shipped_at' class='form-control begin_shipped_at' placeholder='起始发货时间' value="{{ old('shipped_at') ? old('shipped_at')[0] : '' }}">
+            <input type='text' name='begin_shipped_at' class='form-control begin_shipped_at' placeholder='起始发货时间' value="{{ old('begin_shipped_at') ? old('begin_shipped_at') : '' }}">
         </div>
 
         <div class="form-group col-lg-2">
             <label for="name" class='control-label'>结束发货时间</label>
-            <input type='text' name='over_shipped_at' class='form-control over_shipped_at' placeholder='结束发货时间' value="{{ old('shipped_at') ? old('shipped_at')[1] : ''}}">
+            <input type='text' name='over_shipped_at' class='form-control over_shipped_at' placeholder='结束发货时间' value="{{ old('over_shipped_at') ? old('over_shipped_at') : ''}}">
         </div>
 
         <div class="form-group col-lg-2">

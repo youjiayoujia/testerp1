@@ -113,7 +113,7 @@ class CoeAdapter extends BasicAdapter
                         <postalCode><![CDATA[" . $this->config['returnZipcode'] . "]]></postalCode>
                     </sendContact>
                     <receiverContact>
-                        <companyName><![CDATA[.]]></companyName>
+                        <companyName><![CDATA[" . substr($buyer_name,0,30) . "]]></companyName>
                         <personName><![CDATA[" . $buyer_name . "]]></personName>
                         <countryCode><![CDATA[" . $countryCode . "]]></countryCode>
                         <phoneNumber><![CDATA[" . $package->shipping_phone . "]]></phoneNumber>

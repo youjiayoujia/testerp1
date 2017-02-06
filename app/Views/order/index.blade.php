@@ -189,7 +189,7 @@
                                                                 提交
                                                             </button>
                                                         </div>
-                                                        <input type="hidden" name="order_item_id" value="{{$order->id}}"/>
+                                                        <input type="hidden" name="order_item_id" value="{{$orderItem->id}}"/>
                                                     </form>
                                                 </div>
                                             </div>

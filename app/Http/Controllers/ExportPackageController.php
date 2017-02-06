@@ -17,6 +17,7 @@ use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\PackageModel;
 use Excel;
+use Session;
 
 class ExportPackageController extends Controller
 {
@@ -221,21 +222,33 @@ class ExportPackageController extends Controller
             $arr[$fieldItem->level]['type'] = 'database';
         }
         $packages = '';
-        if (request()->has('channel_id')) {
-            $packages = PackageModel::where('channel_id', request('channel_id'));
-        }
+        $warehouse_id = '';
+        $channel_id = '';
+        $logistics_id = '';
+        $status = '';
+        $shipped_at = [];
         if (request()->has('warehouse_id')) {
-            $packages = $packages->where('warehouse_id', request('warehouse_id'));
+            $warehouse_id = request('warehouse_id');
+            $packages = PackageModel::where('warehouse_id', request('warehouse_id'));
+        }
+        if (request()->has('channel_id')) {
+            $channel_id = request('channel_id');
+            $packages = $packages->where('channel_id', request('channel_id'));
         }
         if (request()->has('logistics_id')) {
+            $logistics_id = request('logistics_id');
             $packages = $packages->where('logistics_id', request('logistics_id'));
         }
         if (request()->has('status')) {
+            $status = request('status');
             $packages = $packages->where('status', request('status'));
         }
         if (request()->has('begin_shipped_at') && request()->has('over_shipped_at')) {
+            $begin_shipped_at = date('Y-m-d H:i:s', strtotime(request('begin_shipped_at')));
+            $over_shipped_at = date('Y-m-d H:i:s', strtotime(request('over_shipped_at')));
+            $shipped_at = [$begin_shipped_at, $over_shipped_at];
             $packages = $packages->whereRaw('shipped_at >=  ? and shipped_at <= ?',
-                [request('begin_shipped_at'), request('over_shipped_at')]);
+                [$over_shipped_at, $over_shipped_at]);
         }
         if (request()->hasFile('accordingTracking')) {
             $file = request()->file('accordingTracking');
@@ -279,7 +292,23 @@ class ExportPackageController extends Controller
                 });
             })->download('csv');
         } else {
-            return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '根据条件找不到包裹信息'));
+            $response = [
+                'warehouse_id' => $warehouse_id,
+                'logistics_id' => $logistics_id,
+                'channel_id' => $channel_id,
+                'status1' => $status,
+                'shipped_at' => $shipped_at,
+                'field_id' => request('field_id'),
+                'metas' => $this->metas(__FUNCTION__),
+                'fields' => $this->model->all(),
+                'channels' => ChannelModel::all(),
+                'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+                'statuses' => config('package'),
+                'logisticses' => LogisticsModel::all(),
+            ];
+
+            Session::flash('alert', $this->alert('danger', '根据条件找不到包裹信息'));
+            return view($this->viewPath.'exportPackageView', $response);
         }
     }
 

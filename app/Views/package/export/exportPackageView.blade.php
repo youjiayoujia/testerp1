@@ -7,7 +7,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='field_id' class='form-control field_id'>
                 @foreach($fields as $field)
-                    <option value="{{ $field->id }}">{{ $field->name }}</option>
+                    <option value="{{ $field->id }}" {{ !empty($field_id) ? ($field->id == $field_id ? 'selected' : '') : '' }}>{{ $field->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -15,8 +15,9 @@
             <label for="name" class='control-label'>渠道</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='channel_id' class='form-control channel_id'>
+                    <option value=''>请选择渠道</option>
                 @foreach($channels as $channel)
-                    <option value="{{ $channel->id }}">{{ $channel->name }}</option>
+                    <option value="{{ $channel->id }}" {{ !empty($channel_id) ? ($channel->id == $channel_id ? 'selected' : '') : '' }}>{{ $channel->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -25,7 +26,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouse_id' class='form-control warehouse_id'>
                 @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                    <option value="{{ $warehouse->id }}" {{ !empty($warehouse_id) ? ($warehouse->id == $warehouse_id ? 'selected' : '') : '' }}>{{ $warehouse->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -34,7 +35,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='status' class='form-control status'>
                 @foreach($statuses as $key => $status)
-                    <option value="{{ $key }}">{{ $status }}</option>
+                    <option value="{{ $key }}" {{ !empty($status1) ? ($key == $status1 ? 'selected' : '') : '' }}>{{ $status }}</option>
                 @endforeach
             </select>
         </div>
@@ -43,7 +44,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='logistics_id' class='form-control logistics_id'>
                 @foreach($logisticses as $logistics)
-                    <option value="{{ $logistics->id }}">{{ $logistics->code }}</option>
+                    <option value="{{ $logistics->id }}" {{ !empty($logistics_id) ? ($logistics->id == $logistics_id ? 'selected' : '') : '' }}>{{ $logistics->code }}</option>
                 @endforeach
             </select>
         </div>
@@ -51,12 +52,12 @@
     <div class='row'>
         <div class="form-group col-lg-2">
             <label for="name" class='control-label'>起始发货时间</label>
-            <input type='text' name='begin_shipped_at' class='form-control begin_shipped_at' placeholder='起始发货时间'>
+            <input type='text' name='begin_shipped_at' class='form-control begin_shipped_at' placeholder='起始发货时间' value="{{ isset($shipped_at) ? (count($shipped_at) ? $shipped_at['0'] : '') : ''}}">
         </div>
 
         <div class="form-group col-lg-2">
             <label for="name" class='control-label'>结束发货时间</label>
-            <input type='text' name='over_shipped_at' class='form-control over_shipped_at' placeholder='结束发货时间'>
+            <input type='text' name='over_shipped_at' class='form-control over_shipped_at' placeholder='结束发货时间' value="{{ isset($shipped_at) ? (count($shipped_at) ? $shipped_at['1'] : '') : ''}}">
         </div>
 
         <div class="form-group col-lg-2">

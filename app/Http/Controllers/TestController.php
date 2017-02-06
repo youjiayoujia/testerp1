@@ -237,10 +237,15 @@ class TestController extends Controller
     //     var_dump($test);
     // }
 
+    // public function test2()
+    // {
+    //     $model = PackageModel::find(10);
+    //     $buf = $model->relatedGet($model, 'order', 'id', '1');
+    // }
+
     public function test2()
     {
-        $model = PackageModel::find(10);
-        $buf = $model->relatedGet($model, 'order', 'id', '1');
+        Session::flush();
     }
 
     // public function test2()

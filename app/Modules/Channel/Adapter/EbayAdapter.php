@@ -2082,7 +2082,8 @@ class EbayAdapter implements AdapterInterface
                     }
                     $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
                     if(empty($list_obj)){
-                        EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary)); //合并list和detail 创建记录
+                        $data = (array_merge($case_new_ary,$case_detail_ary));
+                        EbayCasesListsModel::create($data); //合并list和detail 创建记录
                         echo 'add one';
                     }else{
                         echo $case->caseId->id.'exist insert into ERP';

@@ -496,8 +496,11 @@ class ItemController extends Controller
     public function index()
     {
         request()->flash();
-        $item = $this->model->where('id',0);
-        if(request()->input('mixedSearchFields')){
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $itemUrl = route('item.index');
+        if($url == $itemUrl){
+            $item = $this->model->where('id',0);
+        }else{
             $item = $this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit');
         }
         

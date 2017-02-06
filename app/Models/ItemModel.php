@@ -852,8 +852,6 @@ class ItemModel extends BaseModel
         //print_r($zaitu_num);exit;
 
         //缺货
-        //$data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-            //orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="' . $this->id . '" ')[0]->num;
         $data['need_total_num'] = $this->out_of_stock?$this->out_of_stock:0;
 
         $data['zaitu_num'] = $zaitu_num;

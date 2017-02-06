@@ -496,9 +496,17 @@ class ItemController extends Controller
     public function index()
     {
         request()->flash();
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $itemUrl = route('item.index');
+        if($url == $itemUrl){
+            $item = $this->model->where('id',0);
+        }else{
+            $item = $this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit');
+        }
+        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->with('catalog','warehouse','supplier','product','product.spu','purchaseAdminer','warehousePosition','product.wrapLimit')),
+            'data' => $this->autoList($this->model,$item),
             'mixedSearchFields' => $this->model->mixed_search,
             'warehouses' => $this->warehouse->all(),
             'channels' => ChannelModel::all(),

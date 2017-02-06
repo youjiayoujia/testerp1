@@ -2049,13 +2049,23 @@ class EbayAdapter implements AdapterInterface
                     $case_detail_ary = [];
                     $content = '';
                     $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
+
+                    //dd($case_detail);
                     if($case_detail->ack == 'Success'){
                         // $transaction_id = ''; //paypal交易号
                         if($case_detail->caseDetail->responseHistory){
                             $detail = (array)$case_detail->caseDetail;
-                            //dd($detail);
                             if(isset($detail['responseHistory'])){  //若包括消息
                                 foreach ($detail['responseHistory'] as $note){
+                                    if(count((array)$note) == 1){
+                                         $content []= [
+                                            'role' =>(string)$detail['responseHistory']->author->role,
+                                            'activity' => (string)$detail['responseHistory']->activity,
+                                            'creationDate'=> (string)$detail['responseHistory']->creationDate,
+                                            'note' => (string)$detail['responseHistory']->note,
+                                        ];
+                                        break;
+                                    }
                                     $content []= [
                                         'role' =>(string)$note->author->role,
                                         'activity' => (string)$note->activity,

@@ -54,8 +54,6 @@ class EbayCasesListsModel extends BaseModel{
         $html = '';
         $note = unserialize(base64_decode($this->content));
 
-        //dd($note);
-
         if(is_array($note)){
             if(isset($note['role'])){ //单条
                 if($note['role'] == 'BUYER'){

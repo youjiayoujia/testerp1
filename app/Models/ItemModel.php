@@ -85,11 +85,7 @@ class ItemModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
-        $catalogs = CatalogModel::all();
-        $arr = [];
-        foreach ($catalogs as $key => $single) {
-            $arr[$single->id] = $single->c_name;
-        }
+        
         return [
             'relatedSearchFields' => [],
             'filterFields' => ['html_mod'],
@@ -98,7 +94,7 @@ class ItemModel extends BaseModel
                 'new_status' => config('item.new_status'),
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
-            'selectRelatedSearchs' => ['supplier' => ['name' => SupplierModel::all()->pluck('name', 'id')],],
+            'selectRelatedSearchs' => ['supplier' => ['name' => []],],
             'doubleRelatedSelectedFields' => [],
             'sectionSelect' => [],
             'sectionGangedDouble' => [
@@ -354,16 +350,13 @@ class ItemModel extends BaseModel
         $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "' . $item_id . '" and
                 packages.id = package_items.package_id and packages.deleted_at is null group by packages.warehouse_id');
         $data = [];
-
         $warehouses = WarehouseModel::all();
         foreach ($warehouses as $warehouse) {
             $data[$warehouse->id]['need'] = 0;
         }
-
         foreach ($num as $key => $value) {
             $data[$value->warehouse_id]['need'] += $value->num;
         }
-
         return $data;
     }
 

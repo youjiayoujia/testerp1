@@ -73,7 +73,7 @@ class PurchaseOrderModel extends BaseModel
                                 'pay_type'=>config('purchase.purchaseOrder.pay_type'),
                                 'close_status'=>config('purchase.purchaseOrder.close_status'),
                                 ],
-            'selectRelatedSearchs' => ['supplier' => ['name' => SupplierModel::all()->pluck('name', 'name')],],
+            'selectRelatedSearchs' => ['supplier' => ['name' => []],],
             'sectionSelect' => ['time' => ['created_at']],
             'doubleRelatedSearchFields' => ['purchaseItem' => ['productItem' => ['sku']]],
         ];

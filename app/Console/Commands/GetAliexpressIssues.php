@@ -101,7 +101,7 @@ class GetAliexpressIssues extends Command
                             }
                         }
                     }else{
-                        $this->comment($account_name.' hasnot this time OR token is timeout');
+                        $this->comment('# no issues');
                     }
                 }
             }

@@ -129,7 +129,7 @@ class WinitAdapter extends BasicAdapter
               
             return array('code' => 'success', 'result' => $result['data']['orderNo'] );        
         }else{        
-            return array('code' => 'error', 'result' => 'error description.');
+            return array('code' => 'error', 'result' => $result['msg']);
         }
     }
     

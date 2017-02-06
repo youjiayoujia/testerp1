@@ -37,6 +37,7 @@ class EbayCasesListsModel extends BaseModel{
         'tran_date',
         'tran_price',
         'content',
+        'account_id'
     ];
 
     public function account()

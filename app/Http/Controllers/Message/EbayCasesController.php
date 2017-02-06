@@ -191,6 +191,7 @@ class EbayCasesController extends Controller
         if(empty($case) || empty($case->transaction_id)){
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '无法处理，数据不完整'));
         }
+        
         $ebay     = new EbayAdapter($case->account->ApiConfig);
         $caseId   = $case->id;
         $caseType = $case->type;

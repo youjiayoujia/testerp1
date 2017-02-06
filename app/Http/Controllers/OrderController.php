@@ -813,11 +813,6 @@ class OrderController extends Controller
                 $to = json_encode($this->model->find($id));
                 $this->eventLog($userName->name, '批量撤单,id=' . $id, $to, $from);
             }
-            if ($this->model->find($id)->packages) {
-                foreach ($this->model->find($id)->packages as $package) {
-                    $package->cancelPackage();
-                }
-            }
         }
         return 1;
     }
@@ -831,11 +826,6 @@ class OrderController extends Controller
         $data = request()->all();
         $order = $this->model->find($id);
         $order->cancelOrder($data['withdraw']);
-        if ($order->packages) {
-            foreach ($order->packages as $package) {
-                $package->cancelPackage();
-            }
-        }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;

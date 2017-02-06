@@ -183,7 +183,7 @@ class EbayCasesController extends Controller
      * case 回复： 退款
      */
     public function RefundBuyer(RefundModel $refund){
-        
+
         $reason  = request()->input('refund-reason');
         $comment = request()->input('comment');
         $case    = $this->model->find(request()->input('id'));
@@ -214,7 +214,7 @@ class EbayCasesController extends Controller
             $refund->save();
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '退款成功！'));
         }else{
-            $refund->type            = 'PARTIAL';
+            $refund->type            = 'FULL';
             $refund->refund          = 2;
             $refund->refund_currency = $relation_order->currency;
             $refund->price           = $relation_order->amount;

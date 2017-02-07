@@ -84,7 +84,7 @@ Class PaypalApi
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         //curl_setopt($ch, CURLOPT_SSLVERSION, 3);
-        curl_setopt($ch, CURLOPT_CAINFO,base_path('public\cacert.pem'));
+        curl_setopt($ch, CURLOPT_CAINFO,base_path('public/cacert.pem'));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);

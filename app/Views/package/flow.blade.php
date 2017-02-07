@@ -255,3 +255,20 @@
     @endif
 @stop
 @section('detailTitle')@parent <font color='red'>(面单打印不产生出入库信息)</font> @stop
+@section('pageJs')
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(document).on('click', '.all', function () {
+        id = $(this).data('channelid');
+        location.href="{{route('package.index')}}/?outer=all&id="+id;
+    });
+
+    $(document).on('click', '.single', function () {
+        id = $(this).data('channelid');
+        outer = $(this).data('warehouseid');
+        flag = $(this).data('flag');
+        location.href="{{route('package.index')}}/?outer="+outer+"&id="+id+"&flag="+flag;
+    });
+})
+</script>
+@stop

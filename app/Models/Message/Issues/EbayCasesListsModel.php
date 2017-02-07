@@ -9,10 +9,36 @@ use App\Base\BaseModel;
 use App\Models\OrderModel;
 use App\Models\Order\ItemModel;
 class EbayCasesListsModel extends BaseModel{
-    protected $table = 'ebay_cases_lists';
+    public $table = 'ebay_cases_lists';
     public $rules = [];
     public $searchFields =['id' => 'ID' , 'buyer_id' => '买家ID' , 'seller_id' => '卖家ID' ,'transaction_id' => '交易号'];
-    protected $guarded = [];
+    public $fillable = [
+        'case_id',
+        'status',
+        'type',
+        'buyer_id',
+        'seller_id',
+        'item_id',
+        'item_title',
+        'transaction_id',
+        'case_quantity',
+        'case_amount',
+        'respon_date',
+        'creation_date',
+        'last_modify_date',
+        'global_id',
+        'open_reason',
+        'decision',
+        'decision_date',
+        'fvf_credited',
+        'agreed_renfund_amount',
+        'buyer_expection',
+        'detail_status',
+        'tran_date',
+        'tran_price',
+        'content',
+        'account_id'
+    ];
 
     public function account()
     {
@@ -28,8 +54,6 @@ class EbayCasesListsModel extends BaseModel{
     public function getCaseContentAttribute(){
         $html = '';
         $note = unserialize(base64_decode($this->content));
-
-        //dd($note);
 
         if(is_array($note)){
             if(isset($note['role'])){ //单条

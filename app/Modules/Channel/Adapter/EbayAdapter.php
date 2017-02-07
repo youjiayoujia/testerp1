@@ -2049,13 +2049,23 @@ class EbayAdapter implements AdapterInterface
                     $case_detail_ary = [];
                     $content = '';
                     $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
+
+                    //dd($case_detail);
                     if($case_detail->ack == 'Success'){
                         // $transaction_id = ''; //paypal交易号
                         if($case_detail->caseDetail->responseHistory){
                             $detail = (array)$case_detail->caseDetail;
-                            //dd($detail);
                             if(isset($detail['responseHistory'])){  //若包括消息
                                 foreach ($detail['responseHistory'] as $note){
+                                    if(count((array)$note) == 1){
+                                         $content []= [
+                                            'role' =>(string)$detail['responseHistory']->author->role,
+                                            'activity' => (string)$detail['responseHistory']->activity,
+                                            'creationDate'=> (string)$detail['responseHistory']->creationDate,
+                                            'note' => (string)$detail['responseHistory']->note,
+                                        ];
+                                        break;
+                                    }
                                     $content []= [
                                         'role' =>(string)$note->author->role,
                                         'activity' => (string)$note->activity,
@@ -2082,10 +2092,8 @@ class EbayAdapter implements AdapterInterface
                     }
                     $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
                     if(empty($list_obj)){
-                        EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary)); //合并list和detail 创建记录
-                        echo 'add one';
-                    }else{
-                        echo $case->caseId->id.'exist insert into ERP';
+                        $data = (array_merge($case_new_ary,$case_detail_ary));
+                        EbayCasesListsModel::create($data); //合并list和detail 创建记录
                     }
                 }
             }

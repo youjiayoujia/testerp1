@@ -81,6 +81,7 @@ class ItemModel extends BaseModel
         'us_rate',
         'uk_rate',
         'eu_rate',
+        'declared_value',
     ];
 
     public function getMixedSearchAttribute()
@@ -189,7 +190,7 @@ class ItemModel extends BaseModel
         return $str;
     }
 
-    public function getDeclaredValueAttribute()
+    /*public function getDeclaredValueAttribute()
     {
         $purchase_price = $this->purchase_price;
         if (($purchase_price / 6) < 1) {
@@ -201,7 +202,7 @@ class ItemModel extends BaseModel
         }
 
         return $value;
-    }
+    }*/
 
     public function getImageAttribute()
     {
@@ -1782,6 +1783,18 @@ class ItemModel extends BaseModel
             }
         }
 
+    }
+
+    //
+    public function revertTo()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $items = $this->all();
+        foreach ($items as $item) {
+            
+            $item->update(['declared_value'=>$item->product->declared_value]);
+        }
     }
 
 }

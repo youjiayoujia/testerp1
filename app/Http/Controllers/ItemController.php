@@ -54,6 +54,7 @@ class ItemController extends Controller
     public function edit($id)
     {
         $model = $this->model->find($id);
+        $hideUrl = $_SERVER['HTTP_REFERER'];
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -74,6 +75,7 @@ class ItemController extends Controller
             'logisticsLimit' => $this->logisticsLimit->all(),
             'wrapLimit_arr' => $wrapLimit_arr,
             'logisticsLimit_arr' => $logisticsLimit_arr,
+            'hideUrl' => $hideUrl,
             'recieveWraps' => RecieveWrapsModel::all(),
 
         ];
@@ -175,7 +177,8 @@ class ItemController extends Controller
 
         $to = json_encode($model);
         $this->eventLog($userName->name, 'item信息更新,id='.$model->id, $to, $from);
-        return redirect($this->mainIndex);
+        $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
+        return redirect($url)->with('alert', $this->alert('success', 'sku ' . $model->sku . '编辑成功.'));
     }
 
     public function sectionGangedDouble()

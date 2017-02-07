@@ -2094,9 +2094,6 @@ class EbayAdapter implements AdapterInterface
                     if(empty($list_obj)){
                         $data = (array_merge($case_new_ary,$case_detail_ary));
                         EbayCasesListsModel::create($data); //合并list和detail 创建记录
-                        echo 'add one';
-                    }else{
-                        echo $case->caseId->id.'exist insert into ERP';
                     }
                 }
             }

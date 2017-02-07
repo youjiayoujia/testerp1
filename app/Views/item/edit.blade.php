@@ -5,6 +5,7 @@
 <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
 <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
 <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
+ <input type='hidden' name='hideUrl' value="{{$hideUrl}}">
     <input type='hidden' value='PUT' name="_method">
     <div class="row">
         <div class="form-group col-md-3">
@@ -143,6 +144,14 @@
             <input class="form-control" id="eu_rate" placeholder="eu税率" name='eu_rate' value="{{ old('eu_rate') ?  old('eu_rate') :$model->eu_rate }}">
         </div>
 
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="color">申报价值</label>
+            
+            <input class="form-control" id="declared_value" placeholder="申报价值" name='declared_value' value="{{ old('declared_value') ?  old('declared_value') :$model->declared_value }}">
+        </div>
     </div>
 
 

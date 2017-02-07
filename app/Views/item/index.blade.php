@@ -11,6 +11,7 @@
             <li><a href="javascript:" class="batchedit" data-name="status">SKU状态</a></li>
             <li><a href="javascript:" class="batchedit" data-name="package_size">体积</a></li>
             <li><a href="javascript:" class="batchedit" data-name="name">中英文资料</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="declared_value">申报价值</a></li>
             <li><a href="javascript:" class="batchedit" data-name="wrap_limit">包装方式</a></li>
             <li><a href="javascript:" class="batchedit" data-name="catalog">分类</a></li>
             <li><a href="javascript:" class="batchdelete" data-name="catalog">批量删除</a></li>

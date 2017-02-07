@@ -190,7 +190,7 @@ class ItemModel extends BaseModel
         return $str;
     }
 
-    public function getDeclaredValueAttribute()
+    /*public function getDeclaredValueAttribute()
     {
         $purchase_price = $this->purchase_price;
         if (($purchase_price / 6) < 1) {
@@ -202,7 +202,7 @@ class ItemModel extends BaseModel
         }
 
         return $value;
-    }
+    }*/
 
     public function getImageAttribute()
     {

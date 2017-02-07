@@ -48,7 +48,7 @@
     	@foreach($warehouses as $key=>$warehouse)
 	        <tr>
                 @if($key==0)
-                <td rowspan="4">{{$item->sku}}</td> 
+                <td rowspan="{{count($warehouses)}}">{{$item->sku}}</td> 
                 @endif    
 	            <td>{{$warehouse->name}}</td>
 	            <td>{{$item->c_name}}</td>

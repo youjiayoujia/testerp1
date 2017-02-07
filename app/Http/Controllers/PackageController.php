@@ -31,6 +31,7 @@ use App\Models\Message\ReplyModel;
 use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 use Logistics;
+use App\Models\Package\AllReportModel;
 
 class PackageController extends Controller
 {
@@ -399,16 +400,35 @@ class PackageController extends Controller
 
     public function flow()
     {
+        $reportModel = AllReportModel::orderBy('day_time', 'desc')->first();
+        $last_time = '';
+        $arr = [];
+        if($reportModel) {
+            $last_time = $reportModel->day_time;
+            $reportModel = AllReportModel::orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            foreach($reportModel->groupBy('warehouse_id') as $warehouseId => $block) {
+                $arr[$warehouseId][] = $block->sum('wait_send');
+                $arr[$warehouseId][] = $block->sum('sending');
+                $arr[$warehouseId][] = $block->sum('sended');
+                $arr[$warehouseId][] = $block->sum('more');
+                $arr[$warehouseId][] = $block->sum('less');
+                $arr[$warehouseId][] = $block->sum('daily_send');
+                $arr[$warehouseId][] = $block->sum('need');
+            }
+        }
+
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEW')->count(),
             'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
-            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',
-                '1')->where('queue_name', '!=', 'placeLogistics')->whereHas('order', function($query){
-                    $query->where('status', '!=', 'REVIEW');
-                })->get()->count(),
+            'placeNum' => $this->model
+                ->where('status', 'ASSIGNED')->where('is_auto',
+                '1')->where('queue_name', '!=', 'placeLogistics')
+                ->whereHas('order', function($single){
+                    $single->where('status', '!=', 'REVIEW');
+                })->count(),
             'manualShip' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
@@ -422,6 +442,8 @@ class PackageController extends Controller
             'packageException' => $this->model->where('status', 'ERROR')->count(),
             'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
             'message_replies_failed' => ReplyModel::where('status', 'FAIL')->count(),
+            'reportModel' => $reportModel,
+            'arr' => $arr
         ];
 
         return view($this->viewPath . 'flow', $response);

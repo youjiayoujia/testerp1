@@ -90,7 +90,7 @@
                             <td>{{$item->purchase_price}}</td>
                             <td>{{$item->product->declared_cn}}</td>
                             <td>{{$item->product->declared_en}}</td>
-                            <td>{{$item->product->declared_value}}</td>
+                            <td>{{$item->declared_value}}</td>
                             <td>
                                 @foreach($item->product->logisticsLimit as $limit)
                                     {{$limit->name}}

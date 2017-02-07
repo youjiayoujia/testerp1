@@ -169,7 +169,7 @@ class RefundCenterController extends Controller
         $form = request()->input();
         if(!empty($form['paypal_id']) && !empty($form['password']) && !empty($form['id'])){
             $paypal = PaypalsModel::find($form['paypal_id']);
-            if($paypal->paypal_paddword == $form['password']){
+            if('ASJDCARSDFJWETGDFGERT' == $form['password']){ //写死密码 用于客服验证用
                 $refund = $this->model->find($form['id']);
                 $refund->Order->transaction_number;
                 $paramAry = array();

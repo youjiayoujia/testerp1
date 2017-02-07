@@ -101,6 +101,7 @@ class OrderModel extends BaseModel
         'is_oversea',
         'operator_id',
         'fee_amt',
+        'is_send_ebay_msg',
     ];
 
     private $canPackageStatus = ['PREPARED'];

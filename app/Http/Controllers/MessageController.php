@@ -549,6 +549,9 @@ class MessageController extends Controller
             $content  = $form['message-content'];
            $is_send = $ebay->ebayOrderSendMessage(compact('item_id','buyer_id','itemids','title','content'));
            if($is_send){
+               $order->is_send_ebay_msg = 1;
+               $order->save();
+
                $list->operate_id = request()->user()->id;
                $list->order_id   = $form['message-order-id'];
                $list->title      = $form['message-title'];

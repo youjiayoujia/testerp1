@@ -31,7 +31,10 @@
             </td>
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
-            <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
+            <td>
+                {{ $order->by_id }}  <br/>{{ $order->email }} <br/>
+                @if($order->is_send_ebay_msg ==1) <font color="red">(已发消息)</font>  @endif
+            </td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>

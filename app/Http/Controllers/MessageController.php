@@ -533,7 +533,7 @@ class MessageController extends Controller
         $form = request()->input();
         foreach($form as $key => $input){
             if(empty($input)){
-                return redirect(route('order.index'))->with('alert',$this->alert('danger','参数不完整'.$key.'不能为空'));
+                return redirect(request()->server('HTTP_REFERER'))->with('alert',$this->alert('danger','参数不完整'.$key.'不能为空'));
             }
         }
         $order = OrderModel::find($form['message-order-id']);
@@ -549,18 +549,21 @@ class MessageController extends Controller
             $content  = $form['message-content'];
            $is_send = $ebay->ebayOrderSendMessage(compact('item_id','buyer_id','itemids','title','content'));
            if($is_send){
+               $order->is_send_ebay_msg = 1;
+               $order->save();
+
                $list->operate_id = request()->user()->id;
                $list->order_id   = $form['message-order-id'];
                $list->title      = $form['message-title'];
                $list->content    = $form['message-content'];
                $list->itemids    = implode(',',$form['item-ids']);
                $list->save();
-               return redirect(route('order.index'))->with('alert', $this->alert('success', '发送成功'));
+               return redirect(request()->server('HTTP_REFERER'))->with('alert', $this->alert('success', '发送成功'));
            }else{
-               return redirect(route('order.index'))->with('alert', $this->alert('danger', '发送失败'));
+               return redirect(request()->server('HTTP_REFERER'))->with('alert', $this->alert('danger', '发送失败'));
            }
         }
-        return redirect(route('order.index'))->with('alert',$this->alert('发送失败，未知错误'));
+        return redirect(request()->server('HTTP_REFERER'))->with('alert',$this->alert('发送失败，未知错误'));
     }
 
     public function ebayUnpaidCase(){
@@ -576,7 +579,7 @@ class MessageController extends Controller
         $transcation_id    = $order_item->transaction_id;
         $disputeType       = $form['disputeType'];
         if(!empty($order_item_number) || !empty($transcation_id) || !empty($disputeType)){
-            $result = $ebay->ebayUnpaidCase(compact('order_item_number','transcation_id','disputeType'));
+            $result = $ebay->癦ssage(compact('order_item_number','transcation_id','disputeType'));
             if($result){
                 $order_item->ebay_unpaid_status = 1;
                 $order_item->save();

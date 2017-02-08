@@ -72,7 +72,8 @@ Class PaypalApi
      */
     public function apiRefund($ParamAry){
         
-        $nvpreq = 'METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry,'','&',PHP_QUERY_RFC3986);
+        //$nvpreq = 'METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry,'','&',PHP_QUERY_RFC3986);
+        $nvpreq = urlencode('METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry));
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->URL);
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
@@ -99,6 +100,7 @@ Class PaypalApi
         $result = curl_exec($ch);
         //$error = curl_error($ch);
         //var_dump($error);
+        //dd(explode('&',$result));
         if($result)
         {
             $resultArray = explode('&',$result);

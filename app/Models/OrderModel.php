@@ -619,6 +619,24 @@ class OrderModel extends BaseModel
         }
     }
 
+    //ebay订单差评
+    public function getEbayFeedbackCommentAttribute(){
+        $items = $this->items;
+        $comment = '';
+        if(!$this->items->isEmpty()){
+            foreach($items as $item){
+                if(! empty($item->ebayFeedback)){
+                    if($item->ebayFeedback->comment_type == 'Negative'){
+                        $comment = '差评';
+                    }
+                    break;
+                }
+            }
+
+        }
+        return $comment;
+    }
+
     //订单备注
     public function getOrderReamrksAttribute()
     {

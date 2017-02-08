@@ -26,7 +26,10 @@
                     <strong>{{ $relatedOrder->order->status_text }}</strong>
                     -
                     <strong>{{ $relatedOrder->order->active_text }}</strong>
-
+                    @if(! empty($relatedOrder->order->EbayFeedbackComment))
+                        -
+                        <strong style="color: red">{{ $relatedOrder->order->EbayFeedbackComment }}</strong>
+                    @endif
                     <div class="close">
                         <a href="javascript:void(0);" onclick="if(confirm('确认取消此关联订单: {{ $relatedOrder->order->ordernum }} ?')){location.href='{{ route('message.cancelRelatedOrder', ['id'=>$message->id,'relatedOrderId'=>$relatedOrder->id]) }}'}">
                             <small class="glyphicon glyphicon glyphicon-off"></small>

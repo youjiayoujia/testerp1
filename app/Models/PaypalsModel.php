@@ -51,7 +51,7 @@ class PaypalsModel extends BaseModel
 
     public function getApiConfigAttribute(){
         return (object)[
-            'paypal_account'  => $this->paypal_password,
+            'paypal_account'  => $this->paypal_account,
             'paypal_password' => $this->paypal_password,
             'paypal_token'    => $this->paypal_token,
         ];

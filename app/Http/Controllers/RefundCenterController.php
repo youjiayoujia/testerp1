@@ -180,7 +180,7 @@ class RefundCenterController extends Controller
                 if(!empty($refund['memo'])){
                     $paramAry['NOTE'] = $refund['memo'];
                 }
-                if ( $refund['refundType'] == 'PARTIAL' ) {
+                if ( $refund['refundType'] != 'FULL' ) {
                     $paramAry['AMT'] = $refund['refund_amount'];
                 }
                 $paypalApi = new PaypalApi($paypal->ApiConfig);

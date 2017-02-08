@@ -289,6 +289,19 @@ class ExportPackageController extends Controller
         }
     }
 
+    public function getTnoReturnExcel()
+    {
+        $rows[] = [
+            '只一列追踪号' => '',
+        ];
+        $name = 'return_goods';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     public function getTnoExcel()
     {
         $rows[] = [

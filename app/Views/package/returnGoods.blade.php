@@ -5,6 +5,7 @@
     <div class='form-group col-lg-4'>
         <label for="ordernum" class='control-label'>上传文件</label>
         <input type='file' name='returnFile'>
+        <a href="javascript:" class='btn btn-info tracking_no'>模板</a>
     </div>
     <div class='form-group col-lg-4'>
         <label for="ordernum" class='control-label'>状态变更</label>
@@ -72,5 +73,9 @@
         })
 
         $('.logistics_select').select2();
+
+        $('.tracking_no').click(function () {
+            location.href = "{{ route('exportPackage.getTnoReturnExcel')}}";
+        })
     </script>
 @stop

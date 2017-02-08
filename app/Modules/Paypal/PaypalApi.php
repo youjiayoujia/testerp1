@@ -100,7 +100,7 @@ Class PaypalApi
         $result = curl_exec($ch);
         //$error = curl_error($ch);
         //var_dump($error);
-        //dd(explode('&',$result));
+        dd(explode('&',$result));
         if($result)
         {
             $resultArray = explode('&',$result);

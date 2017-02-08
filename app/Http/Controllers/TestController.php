@@ -1625,6 +1625,9 @@ class TestController extends Controller
     }
     public function getSmtIssue()
     {
+        $order = OrderModel::find(1000);
+        dd($order->EbayFeedbackComment);
+
         $account_name = 'Coolcoola04@126.com';  //渠道名称
 
         $account = AccountModel::where('account',$account_name)->first();

@@ -24,7 +24,7 @@ Class PaypalApi
         $this->USER = urlencode(trim($config->paypal_account));
         $this->PWD = urlencode(trim($config->paypal_password));
         $this->SIGNATURE = urlencode(trim($config->paypal_token));
-        $this->baseNvpreq = "VERSION=" . $this->VERSION . "&PWD=" . $this->PWD . "&USER=" . $this->USER . "&SIGNATURE=" . $this->SIGNATURE;
+        $this->baseNvpreq = "VERSION=" . $this->VERSION . "&PWD=" . $this->PWD . "&USER=" . $this->USER . "&SIGNATURE=" . $this->SIGNATURE . '&';
     }
 
 

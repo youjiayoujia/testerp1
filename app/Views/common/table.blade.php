@@ -392,7 +392,7 @@
             });
         });
 
-        $('.datetime_select').datetimepicker({theme: 'dark'});
+        $('.datetime_select').cxCalendar();
         $('.select_select0').select2();
         $( document ).ready(function () {
             //列表页修改编辑rul

@@ -158,7 +158,7 @@ class PickListModel extends BaseModel
         {
             $query = ListItemModel::where(['item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'type'=>$package->type, 'picklist_id'=>'0'])->first();
             if(!$query) {
-                $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'sku'=>$packageitem->item->sku, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'quantity'=>$packageitem->quantity]);
+                $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'sku'=>$packageitem->sku, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'quantity'=>$packageitem->quantity]);
                 $obj->pickListItemPackages()->create(['package_id' => $package->id]);
             } else {
                 $query->quantity += $packageitem->quantity;
@@ -210,7 +210,9 @@ class PickListModel extends BaseModel
         srand(time());
         $query = ListItemModel::where(['picklist_id'=>'0', 'type'=>'SINGLE']);
         if($query->count()) {
-            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            $picklists = $query->get()->sortBy(function($query){
+                return $query->position->name;
+            })->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
                 $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'logistic_id'=>$logistic_id, 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'1'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
@@ -230,7 +232,9 @@ class PickListModel extends BaseModel
         }
         $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLEMULTI']);
         if($query->count()) {
-            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            $picklists = $query->get()->sortBy(function($query){
+                return $query->position->name;
+            })->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
                 $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'logistic_id'=>$logistic_id, 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'2'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
@@ -283,7 +287,9 @@ class PickListModel extends BaseModel
         srand(time());
         $query = ListItemModel::where(['picklist_id'=>'0', 'type'=>'SINGLE']);
         if($query->count()) {
-            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            $picklists = $query->get()->sortBy(function($query){
+                return $query->position->name;
+            })->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
                 $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'logistic_id'=>'0', 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'1'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
@@ -303,7 +309,9 @@ class PickListModel extends BaseModel
          }
         $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLEMULTI']);
         if($query->count()) {
-            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            $picklists = $query->get()->sortBy(function($query){
+                return $query->position->name;
+            })->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
                 $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'logistic_id'=>'0', 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'2'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
@@ -323,7 +331,9 @@ class PickListModel extends BaseModel
         }
         $query = PackageScoreModel::where(['picklist_id'=>'0']);
         if($query->count()) {            
-            $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
+            $packageScores = $query->get()->sortBy(function($query){
+                return $query->position->name;
+            })->chunk($multiQuantity);
             foreach($packageScores as $packageScore) {
                 $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'logistic_id'=>'0', 'warehouse_id' => $warehouse_id]);
                 $obj->update(['picknum' => 'P'.'3'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);

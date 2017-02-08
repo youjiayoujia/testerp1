@@ -73,7 +73,7 @@
             <td>{{$item->user?$item->user->name:''}}</td>
             
         </tr>
-        <tr>  
+        <!-- <tr>  
             <th colspan='3'>仓库</th>
             <th colspan='3'>可用库存</th>
             <th colspan='3'>实库存</th>
@@ -90,7 +90,7 @@
                 <td colspan='3'>{{$item->item->transit_quantity[$warehouse->id]['special']}}</td>
                 <td colspan='3'>{{$item->item->warehouse_out_of_stock[$warehouse->id]['need']}}</td>
             </tr>
-        @endforeach
+        @endforeach -->
     @endforeach
  <script type="text/javascript">		 
 	$('#checkPurchaseItem').click(function () {

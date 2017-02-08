@@ -753,6 +753,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'AllReportController@packageReport', 'as' => 'allReport.report']);
     Route::resource('allReport', 'AllReportController');
     //包裹导出
+    Route::get('exportPackage/getTnoReturnExcel',
+        ['uses' => 'ExportPackageController@getTnoReturnExcel', 'as' => 'exportPackage.getTnoReturnExcel']);
     Route::get('exportPackage/getTnoExcelById',
         ['uses' => 'ExportPackageController@getTnoExcelById', 'as' => 'exportPackage.getTnoExcelById']);
     Route::get('exportPackage/getTnoExcel',

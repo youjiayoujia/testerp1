@@ -71,7 +71,7 @@
     @endforeach
 @stop
 @section('formButton')
-    <button type="submit" class="btn btn-success">生成拣货单</button>
+    <input type="button" class="btn btn-success submit" value='生成拣货单'/>
 @stop
 @section('pageJs')
 <script type='text/javascript'>
@@ -105,6 +105,12 @@ $(document).ready(function(){
                 $(this).prop('checked', true);
         })
     });
+
+    $('.submit').click(function(){
+        $(this).attr('disabled', true);
+        $(this).val('正在生成拣货单');
+        $('.thefatherform').submit();
+    })
 });
 </script>
 @stop

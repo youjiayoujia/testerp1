@@ -174,6 +174,7 @@ class RefundCenterController extends Controller
                 $refund->Order->transaction_number;
                 $paramAry = array();
                 $paramAry['TRANSACTIONID'] = $refund->Order->transaction_number;
+               // $paramAry['TRANSACTIONID'] = '4FS3465759982343B';
                 $paramAry['REFUNDTYPE']    = ( $refund['refundType'] === 'FULL' ) ? 'Full' : 'Partial';
                 $paramAry['CURRENCYCODE']  = $refund['refund_currency'];
                 if(!empty($refund['memo'])){

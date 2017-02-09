@@ -93,7 +93,8 @@
         <td>{{$item->Order->by_id}}</td>
         <td>{{$item->SKUs}}</td>
         <td>
-            <span class="label label-default">{{$item->refund_currency}}</span>{{$item->refund_amount}}
+            {{$item->refund_amount}}
+            <code>{{$item->refund_currency}}</code>
         </td>
         <td>{{$item->refund_voucher}}</td>
         <td>{{$item->ReasonName}}</td>

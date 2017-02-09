@@ -221,7 +221,10 @@ return [
         'aliexpress_issues_list.orderId' => '订单号',
         'reasonChinese' => '纠纷原因',
         'issueType' => '纠纷类型',
-
+        'buyer_id' => '买家ID',
+        'case_id' => 'CaseID',
+        'transaction_id' => '交易号',
+        'message_id' => '消息ID'
 
     ],
 ];

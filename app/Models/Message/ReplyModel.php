@@ -57,8 +57,11 @@ class ReplyModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => [],
-            'filterFields' => [],
+            'relatedSearchFields' => [
+            ],
+            'filterFields' => [
+                'message_id',
+            ],
             'filterSelects' => [
                 'status' => config('message.reply.status'),
 

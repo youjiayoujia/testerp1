@@ -193,6 +193,7 @@ class MessageController extends Controller
     public function assignToOther($id)
     {
         $message = $this->model->find($id);
+        $from = $message;
         $touser=UserModel::find(request()->input('assign_id'))->name;
         if (!$message) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
@@ -208,6 +209,10 @@ class MessageController extends Controller
                 return redirect(route('message.process'))
                     ->with('alert', $this->alert('success', '上条信息已转交他人.'));
             }
+
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '转交给其他人', $message, $from);
+
+
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '转交成功.'));
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '转交失败.'));
@@ -254,9 +259,12 @@ class MessageController extends Controller
     {
         $id = request()->input('id');
         $message = $this->model->find($id);
+        $from = $message;
         if(!empty($message)){
             $result = $message->notRequireReply(request()->user()->id);
             if($result){
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '在workflow中，标记为无需回复', $message, $from);
+
                 return config('status.ajax')['success'];
             }
         }
@@ -271,11 +279,13 @@ class MessageController extends Controller
     public function notRequireReply_1($id)
     {
         $message = $this->model->find($id);
+        $from = $message;
         if($message->status!="COMPLETE"){
             $message->assign_id=request()->user()->id;
             $message->required=0;
             $message->status="COMPLETE";
             $message->save();
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '标记为无需回复', $message, $from);
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '无需回复处理成功.'));
     }
@@ -288,11 +298,15 @@ class MessageController extends Controller
     public function dontRequireReply($id)
     {
         $message = $this->model->find($id);
+        $from = $message;
         if (!$message) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
         if ($message->dontRequireReply(request()->user()->id)) {
             if ($this->workflow == 'keeping') {
+
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'workflow中，标记为稍后处理', $message, $from);
+
                 return redirect(route('message.process',['id'=>$id]))
                     ->with('alert', $this->alert('success', '上条信息已标记稍后处理.'));
             }
@@ -384,6 +398,7 @@ class MessageController extends Controller
     public function reply($id, ReplyModel $reply)
     {
         $message = $this->model->find($id);
+        $from = $message;
         if (!$message) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
@@ -391,7 +406,6 @@ class MessageController extends Controller
         $this->validate(request(), $reply->rules('create')); //
 
         if ($message->reply(request()->all())) {
-
             /*
              * 写入队列
              */
@@ -405,6 +419,7 @@ class MessageController extends Controller
                 return redirect(route('message.process'))
                     ->with('alert', $this->alert('success', '上条信息已成功回复.'));
             }
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '邮件回复', $message, $from);
 
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '回复成功.'));
         }
@@ -415,12 +430,15 @@ class MessageController extends Controller
     {
         $form = request()->input();
         $message = $this->model->find($form['id']);
+        $from = $message;
         if(!empty($message)) {
             if ($message->reply($form)) {
                 $reply = ReplyModel::where('message_id', $message->id)->get()->first();
                 $job = new SendMessages($reply);
                 $job = $job->onQueue('SendMessages');
                 $this->dispatch($job);
+
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'workflow中，回复消息', $message, $from);
 
                 return config('status.ajax')['success'];
             }
@@ -664,6 +682,11 @@ class MessageController extends Controller
             ->update(['status' => 'COMPLETE', 'required' => '0', 'assign_id' => request()->user()->id]);
 
         if($is_modify){
+            $messages = $this->model->whereIn('id', explode(',', $ids))->get();
+            foreach ($messages as $message){
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '被批量标记为无需回复', $message);
+            }
+
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功'));
         }else{
             return redirect($this->mainIndex)->with('danger', $this->alert('success', '操作成功'));

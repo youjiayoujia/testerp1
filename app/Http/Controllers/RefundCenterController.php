@@ -189,7 +189,7 @@ class RefundCenterController extends Controller
                     $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '退款操作', $refund, $from);
                     return redirect($this->mainIndex)->with('alert', $this->alert('success', '退款成功！'));
                 }else{
-                    return redirect($this->mainIndex)->with('alert', $this->alert('danger', '退款失败，请联系IT！'));
+                    return redirect($this->mainIndex)->with('alert', $this->alert('danger', '退款失败，请确认用户支付的账号退款账号是否稳合！'));
                 }
             }else{
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'Paypal密码错误'));

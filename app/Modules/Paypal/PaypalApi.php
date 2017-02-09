@@ -102,30 +102,17 @@ Class PaypalApi
         $result = curl_exec($ch);
         //$error = curl_error($ch);
         //var_dump($error);
-        dd(explode('&',$result));
-        if($result)
-        {
-            $resultArray = explode('&',$result);
-            $httpResponseArray = array();
-            foreach($resultArray as $str)
-            {
-                $strArray = explode('=',$str);
-                $httpResponseArray[$strArray[0]] = urldecode($strArray[1]);
-            }
-
-            if(0 == sizeof($httpResponseArray) || !array_key_exists('ACK',$httpResponseArray))
-            {
-                return false;
-            }
-            else
-            {
-                //保存退款返回的记录
-                return true;
+        if(! empty($result)){
+            $result = explode('&', $result);
+            foreach ($result as $item){
+                if(! empty($item)){
+                    $filter = explode('=',$item);
+                    if($filter[0] == 'ACK' && $filter[1] = 'Success'){
+                        return true;
+                    }
+                }
             }
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 }

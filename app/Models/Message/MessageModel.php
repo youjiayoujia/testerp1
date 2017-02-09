@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Collection;
 class MessageModel extends BaseModel{
     public $table = 'messages';
 
-    protected $fillable = [
+    public $fillable = [
         'account_id',
         'message_id',
         'mime_type',

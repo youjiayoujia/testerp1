@@ -402,7 +402,7 @@ class PackageController extends Controller
             'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
-            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAILED'])->where('is_auto',
+            'placeNum' => $this->model->where('status', 'ASSIGNED')->where('is_auto',
                 '1')->where('queue_name', '!=', 'placeLogistics')->whereHas('order', function($query){
                     $query->where('status', '!=', 'REVIEW');
                 })->get()->count(),

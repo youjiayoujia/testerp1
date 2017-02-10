@@ -43,6 +43,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\UpdateEbayAmountStatistics::class,
         \App\Console\Commands\AutoRunPackages::class,
         \App\Console\Commands\ImitationOrders::class,
+        \App\Console\Commands\SeparateTable::class,
         \App\Console\Commands\UpdateUsers::class,
         //邮件
         \App\Console\Commands\ComputeCrmSatistics::class,

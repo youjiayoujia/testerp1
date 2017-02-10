@@ -49,7 +49,7 @@
             {{ $model->shipping_city }}&nbsp;&nbsp;&nbsp;{{ $model->shipping_state }}
             <br/>
             ZIP:{{ $model->shipping_zipcode }}<br/>
-            TEL:{{ $model->shipping_phone }}&nbsp;&nbsp;&nbsp;{{ $model->country ? $model->country->code : '' }}<br/>
+            {{ $model->country ? $model->country->code : '' }}&nbsp;&nbsp;&nbsp;TEL:{{ $model->shipping_phone }}<br/>
         </p>
     </div>
     <div style="width:100%;height:55px;">

@@ -241,6 +241,12 @@ class MessageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
         if ($message->notRequireReply(request()->user()->id)) {
+
+            if(($message->channel_diver_name == 'wish')){
+                $adpter = new WishAdapter($message->account->apiConfig);
+                $adpter->ticketClose($message->message_id);
+            }
+
             if ($this->workflow == 'keeping') {
                 return redirect(route('message.process'))
                     ->with('alert', $this->alert('success', '上条信息已标记无需回复.'));
@@ -263,8 +269,11 @@ class MessageController extends Controller
         if(!empty($message)){
             $result = $message->notRequireReply(request()->user()->id);
             if($result){
+                if(($message->channel_diver_name == 'wish')){
+                    $adpter = new WishAdapter($message->account->apiConfig);
+                    $adpter->ticketClose($message->message_id);
+                }
                 $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '在workflow中，标记为无需回复', $message, $from);
-
                 return config('status.ajax')['success'];
             }
         }
@@ -693,4 +702,20 @@ class MessageController extends Controller
         }
     }
 
+    public function wishRefundOrder()
+    {
+        $form = request()->input();
+        $message = $this->model->find($form['message_id']);
+        $adpter = new WishAdapter($message->account->apiConfig);
+        $id = $message->channel_order_number;
+        $reason_code = $form['reason_code'];
+        $reason_note = trim($form['reason_note']);
+        if($adpter->orderRefund(compact('id', 'reason_code', 'reason_note'))){
+            return config('status.ajax')['success'];
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'wish订单退款', $message);
+
+        }else{
+            return config('status.ajax')['fail'];
+        }
+    }
 }

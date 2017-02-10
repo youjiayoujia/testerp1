@@ -1283,6 +1283,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
     Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
     Route::any('changeMultipleStatus', 'MessageController@changeMultipleStatus')->name('changeMultipleStatus');
+    Route::any('wishRefundOrder', 'MessageController@wishRefundOrder')->name('wishRefundOrder');
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);

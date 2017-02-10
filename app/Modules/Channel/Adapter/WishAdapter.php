@@ -910,7 +910,7 @@ Class WishAdapter implements AdapterInterface
         $result_json = $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
         $result_ary = json_decode($result_json,true);
 
-        if(!empty($result_ary['data']) && $result_ary['data']['success']==1){
+        if(!empty($result_ary['data']) && $result_ary['data']['success'] == 1){
             $replyMessage->status = 'SENT';
         }else{
             $replyMessage->status = 'FAIL';
@@ -931,12 +931,50 @@ Class WishAdapter implements AdapterInterface
     public function ReplayWishSupport($mailID){
         $data['id']           =  $mailID;
         $data['access_token'] = $this->access_token;
-        $result = json_decode($this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/appeal-to-wish-support',$data),true);
-        if(!empty($re['data']) && $re['data']['success']==1){
+        $result = json_decode($this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/appeal-to-wish-support', $data), true);
+        if(!empty($re['data']) && $re['data']['success'] == 1){
             return true;
         }else{
             return false;
         }
+    }
+
+    /**
+     * @param $paramAry
+     * 关联数组参数组 键
+     *
+     * id
+     * reason_code
+     * reason_note
+     *
+     */
+    public function orderRefund($paramAry)
+    {
+        $url = 'https://merchant.wish.com/api/v2/order/refund';
+        $result = json_decode($this->postCurlHttpsData($url, $paramAry), true);
+        if(! empty($result['data']['success'])){
+            if($result['data']['success'] == 1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 关闭消息 （无需回复）
+     * @param $messageId
+     * @return bool
+     */
+    public function ticketClose($messageId)
+    {
+        $url = 'https://merchant.wish.com/api/v2/ticket/close';
+        $result = json_decode($this->postCurlHttpsData($url, $messageId), true);
+        if(! empty($result['data']['success'])){
+            if($result['data']['success'] == 1){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

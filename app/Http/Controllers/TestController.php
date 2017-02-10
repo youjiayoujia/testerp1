@@ -245,7 +245,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        Session::flush();
+        $package = PackageModel::find(20);
+        var_dump(date('Y-m-d H:i:s', strtotime($package->created_at)));
     }
 
     // public function test2()

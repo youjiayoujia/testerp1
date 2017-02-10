@@ -414,6 +414,13 @@ class OrderModel extends BaseModel
         ];
     }
 
+    public function getRelationArrAttribute()
+    {
+        return [
+            'items' => ['order_items', 'order_id', 'id']
+        ];
+    }
+
     //状态名称
     public function getStatusNameAttribute()
     {

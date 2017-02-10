@@ -819,7 +819,7 @@ class PurchaseOrderController extends Controller
                         if ($_packageItem->package->status == 'NEED' && $_packageItem->package->queue_name != 'assignStocks') {
                             $_packageItem->package->update(['queue_name' => 'assignStocks']);
                             $job = new AssignStocks($_packageItem->package);
-                            $job = $job->onQueue('assignStocks');
+                            $job = $job->onQueue('assignStocksTest');
                             $this->dispatch($job);
                         }
                     }
@@ -900,7 +900,7 @@ class PurchaseOrderController extends Controller
                 if ($_packageItem->package->status == 'NEED' && $_packageItem->package->queue_name != 'assignStocks') {
                     $_packageItem->package->update(['queue_name' => 'assignStocks']);
                     $job = new AssignStocks($_packageItem->package);
-                    $job = $job->onQueue('assignStocks');
+                    $job = $job->onQueue('assignStocksTest');
                     $this->dispatch($job);
                 }
             }

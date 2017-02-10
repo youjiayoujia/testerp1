@@ -113,7 +113,7 @@ class OrderController extends Controller
         while(count($model)) {
             foreach ($model as $key => $single) {
                 $job = new DoPackages($single);
-                $job = $job->onQueue('doPackages');
+                $job = $job->onQueue('doPackagesTest');
                 $this->dispatch($job);
             }
             $start += $len;
@@ -339,7 +339,10 @@ class OrderController extends Controller
         $startDate = request()->input('start_date');
         $endDate = request()->input('end_date');
         $orders = $this->model
-            ->whereBetween('created_at', [date('Y-m-d H:i:s', strtotime($startDate)), date('Y-m-d H:i:s', strtotime('+1 day', strtotime($endDate)))]);
+            ->whereBetween('created_at', [
+                date('Y-m-d H:i:s', strtotime($startDate)),
+                date('Y-m-d H:i:s', strtotime('+1 day', strtotime($endDate)))
+            ]);
         $data['totalAmount'] = 0;
         $data['averageProfit'] = 0;
         $data['totalPlatform'] = 0;
@@ -452,7 +455,7 @@ class OrderController extends Controller
     {
         $model = $this->model->find($id);
         $page = request()->input('page');
-        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
+        $url = request()->has('hideUrl') ? request('hideUrl') . '&page=' . $page : $this->mainIndex;
         $userName = UserModel::find(request()->user()->id);
         $from = json_encode($model);
         if (!$model) {
@@ -500,7 +503,7 @@ class OrderController extends Controller
         $data = request()->all();
         $data['user_id'] = request()->user()->id;
         $this->model->find($id)->remarks()->create($data);
-        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
+        $url = request()->has('hideUrl') ? request('hideUrl') . '&page=' . $page : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
 
@@ -558,7 +561,7 @@ class OrderController extends Controller
             }
         }
         $job = new DoPackages($this->model->find($id));
-        $job->onQueue('doPackages');
+        $job->onQueue('doPackagesTest');
         $this->dispatch($job);
 
         $to = json_encode($this->model->with('items')->find($id));
@@ -682,7 +685,7 @@ class OrderController extends Controller
             }
             if ($count == $model->items->count()) {
                 $model->calculateOrderChannelFee();
-                if($model->packages->count()) {
+                if ($model->packages->count()) {
                     $model->update(['status' => 'PICKING', 'is_review' => 1]);
                 } else {
                     $model->update(['status' => 'PREPARED', 'is_review' => 1]);
@@ -778,7 +781,7 @@ class OrderController extends Controller
                         }
                         $from = json_encode($model);
                         if ($model->status = 'REVIEW') {
-                            if($model->packages->count()) {
+                            if ($model->packages->count()) {
                                 $model->update(['status' => 'PICKING', 'is_review' => '1']);
                             } else {
                                 $model->update(['status' => 'PREPARED', 'is_review' => '1']);
@@ -821,6 +824,7 @@ class OrderController extends Controller
         }
         return 1;
     }
+
     //撤单
     public function withdrawUpdate($id)
     {
@@ -838,9 +842,10 @@ class OrderController extends Controller
         }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
-        $url = request()->has('hideUrl') ? request('hideUrl').'&page='.$page : $this->mainIndex;
+        $url = request()->has('hideUrl') ? request('hideUrl') . '&page=' . $page : $this->mainIndex;
         return redirect($url)->with('alert', $this->alert('success', '编辑成功.'));
     }
+
     //ajax撤单
     public function ajaxWithdraw()
     {

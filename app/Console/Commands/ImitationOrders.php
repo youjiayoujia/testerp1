@@ -61,7 +61,7 @@ class ImitationOrders extends Command
                 $i++;
             }
             $job = new DoPackages($single);
-            $job = $job->onQueue('doPackages');
+            $job = $job->onQueue('doPackagesTest');
             $this->dispatch($job);
         });
         $this->info('imitation orders data is success, quantity:' . $quantity);

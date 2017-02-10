@@ -559,7 +559,7 @@ class PickListController extends Controller
                 $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹未包装，点包装完成，包裹变缺货，重新进入缺货流程', json_encode($package));
                 $package->update(['queue_name' => 'assignStocks']);
                 $job = new AssignStocks($package);
-                $job = $job->onQueue('assignStocks');
+                $job = $job->onQueue('assignStocksTest');
                 $this->dispatch($job);
             } 
             $picklist->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);

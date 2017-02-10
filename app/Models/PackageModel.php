@@ -723,7 +723,7 @@ class PackageModel extends BaseModel
                             $order = OrderModel::find($orderId);
                             foreach ($order->packages as $package) {
                                 $job = new AssignStocks($package);
-                                Queue::pushOn('assignStocks', $job);
+                                Queue::pushOn('assignStocksTest', $job);
                             }
                             return false;
                         } else {
@@ -742,7 +742,7 @@ class PackageModel extends BaseModel
                                 'queue_name' => 'assignLogistics'
                             ]);
                             $job = new AssignLogistics($this);
-                            Queue::pushOn('assignLogistics', $job);
+                            Queue::pushOn('assignLogisticsTest', $job);
                             $this->order->update(['status' => 'NEED']);
                             return false;
                         }
@@ -784,7 +784,7 @@ class PackageModel extends BaseModel
                             'queue_name' => 'assignLogistics'
                         ]);
                         $job = new AssignLogistics($this);
-                        Queue::pushOn('assignLogistics', $job);
+                        Queue::pushOn('assignLogisticsTest', $job);
                         $this->order->update(['status' => 'NEED']);
                         return false;
                     }
@@ -1164,7 +1164,7 @@ class PackageModel extends BaseModel
                     'type' => $this->items()->count() > 1 ? 'MULTI' : ($this->items()->first()->quantity > 1 ? 'SINGLEMULTI' : 'SINGLE'),
                 ]);
                 $job = new AssignLogistics($this);
-                Queue::pushOn('assignLogistics', $job);
+                Queue::pushOn('assignLogisticsTest', $job);
             } else {
                 $newPackage = $this->create($this->toArray());
                 $weight = 0;
@@ -1192,7 +1192,7 @@ class PackageModel extends BaseModel
                         'type' => $this->items()->count() > 1 ? 'MULTI' : ($this->items()->first()->quantity > 1 ? 'SINGLEMULTI' : 'SINGLE'),
                     ]);
                     $job = new AssignLogistics($newPackage);
-                    Queue::pushOn('assignLogistics', $job);
+                    Queue::pushOn('assignLogisticsTest', $job);
                 }
             }
         }
@@ -1322,7 +1322,7 @@ class PackageModel extends BaseModel
                         'queue_name' => 'assignLogistics'
                     ]);
                     $job = new AssignLogistics($this);
-                    Queue::pushOn('assignLogistics', $job);
+                    Queue::pushOn('assignLogisticsTest', $job);
                 } else {
                     if ($oldWarehouseId != $warehouseId) {
                         $this->update([
@@ -1335,7 +1335,7 @@ class PackageModel extends BaseModel
                             'queue_name' => 'assignLogistics'
                         ]);
                         $job = new AssignLogistics($this);
-                        Queue::pushOn('assignLogistics', $job);
+                        Queue::pushOn('assignLogisticsTest', $job);
                     } else {
                         if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                             if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
@@ -1345,12 +1345,12 @@ class PackageModel extends BaseModel
                             if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
                                 $this->update(['status' => 'ASSIGNED', 'queue_name' => 'placeLogistics']);
                                 $job = new PlaceLogistics($this);
-                                Queue::pushOn('placeLogistics', $job);
+                                Queue::pushOn('placeLogisticsTest', $job);
                                 continue;
                             }
                             $this->update(['status' => 'WAITASSIGN', 'queue_name' => 'assignLogistics']);
                             $job = new AssignLogistics($this);
-                            Queue::pushOn('assignLogistics', $job);
+                            Queue::pushOn('assignLogisticsTest', $job);
                         } else {
                             $this->update([
                                 'status' => 'WAITASSIGN',
@@ -1361,7 +1361,7 @@ class PackageModel extends BaseModel
                                 'queue_name' => 'assignLogistics',
                             ]);
                             $job = new AssignLogistics($this);
-                            Queue::pushOn('assignLogistics', $job);
+                            Queue::pushOn('assignLogisticsTest', $job);
                         }
                     }
                 }
@@ -1401,7 +1401,7 @@ class PackageModel extends BaseModel
                                 'queue_name' => 'assignLogistics',
                             ]);
                             $job = new AssignLogistics($newPackage);
-                            Queue::pushOn('assignLogistics', $job);
+                            Queue::pushOn('assignLogisticsTest', $job);
                         } else {
                             if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                 if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
@@ -1411,12 +1411,12 @@ class PackageModel extends BaseModel
                                 if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
                                     $newPackage->update(['status' => 'ASSIGNED', 'queue_name' => 'placeLogistics']);
                                     $job = new PlaceLogistics($newPackage);
-                                    Queue::pushOn('placeLogistics', $job);
+                                    Queue::pushOn('placeLogisticsTest', $job);
                                     continue;
                                 }
                                 $newPackage->update(['status' => 'WAITASSIGN', 'queue_name' => 'assignLogistics']);
                                 $job = new AssignLogistics($newPackage);
-                                Queue::pushOn('assignLogistics', $job);
+                                Queue::pushOn('assignLogisticsTest', $job);
                             } else {
                                 $newPackage->update([
                                     'status' => 'WAITASSIGN',
@@ -1424,13 +1424,13 @@ class PackageModel extends BaseModel
                                     'queue_name' => 'assignLogistics'
                                 ]);
                                 $job = new AssignLogistics($newPackage);
-                                Queue::pushOn('assignLogistics', $job);
+                                Queue::pushOn('assignLogisticsTest', $job);
                             }
                         }
                     } else {
                         $newPackage->update(['queue_name' => 'assignLogistics']);
                         $job = new AssignLogistics($newPackage);
-                        Queue::pushOn('assignLogistics', $job);
+                        Queue::pushOn('assignLogisticsTest', $job);
                     }
                 }
             }

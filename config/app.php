@@ -158,7 +158,11 @@ return [
         /*
          * Debugbar
          */
+<<<<<<< HEAD
         // Barryvdh\Debugbar\ServiceProvider::class,
+=======
+//        Barryvdh\Debugbar\ServiceProvider::class,
+>>>>>>> f7a4617e3ec1664734dc2d69bb62ec1c1e28465c
 
         PicoPrime\BarcodeGen\BarcodeGenServiceProvider::class,
 

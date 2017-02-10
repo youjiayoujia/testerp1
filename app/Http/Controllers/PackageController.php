@@ -60,7 +60,7 @@ class PackageController extends Controller
             foreach ($packages as $package) {
                 $package->update(['queue_name' => 'assignStocks']);
                 $job = new AssignStocks($package);
-                $job->onQueue('assignStocks');
+                $job->onQueue('assignStocksTest');
                 $this->dispatch($job);
                 $to = json_encode($package);
                 $this->eventLog($name, '包裹放匹配库存队列', $to);
@@ -432,7 +432,7 @@ class PackageController extends Controller
         $packages = $this->model->where('status', 'ASSIGNFAILED')->where('queue_name', '!=', 'assignLogistics')->get();
         foreach ($packages as $package) {
             $job = new AssignLogistics($package);
-            $job = $job->onQueue('assignLogistics');
+            $job = $job->onQueue('assignLogisticsTest');
             $this->dispatch($job);
         }
 
@@ -445,7 +445,7 @@ class PackageController extends Controller
         foreach ($packages as $package) {
             $package->update(['queue_name' => 'assignStocks']);
             $job = new AssignStocks($package);
-            $job = $job->onQueue('assignStocks');
+            $job = $job->onQueue('assignStocksTest');
             $this->dispatch($job);
         }
 
@@ -466,7 +466,7 @@ class PackageController extends Controller
         $model->update(['status' => 'WAITASSIGN', 'logistics_id' => '', 'tracking_no' => '', 'is_auto' => '1']);
         $package = $this->model->find($id);
         $job = new AssignLogistics($package);
-        $job = $job->onQueue('assignLogistics');
+        $job = $job->onQueue('assignLogisticsTest');
         $this->dispatch($job);
         $package->eventLog(UserModel::find(request()->user()->id)->name, '重新匹配物流', json_encode($package));
 
@@ -483,7 +483,7 @@ class PackageController extends Controller
         $model->update(['tracking_no' => '']);
         $package = $this->model->find($id);
         $job = new PlaceLogistics($model, 'UPDATE');
-        $job = $job->onQueue('placeLogistics');
+        $job = $job->onQueue('placeLogisticsTest');
         $this->dispatch($job);
         $package->eventLog(UserModel::find(request()->user()->id)->name, '重新物流下单', json_encode($package));
 
@@ -749,7 +749,7 @@ class PackageController extends Controller
             if ($model) {
                 if($model->queue_name != 'placeLogistics') {
                     $job = new PlaceLogistics($model, 'UPDATE');
-                    $job = $job->onQueue('placeLogistics');
+                    $job = $job->onQueue('placeLogisticsTest');
                     $this->dispatch($job);
                 }
             }
@@ -1083,7 +1083,7 @@ class PackageController extends Controller
             foreach ($packages as $package) {
                 $package->update(['queue_name' => 'assignLogistics']);
                 $job = new AssignLogistics($package);
-                $job = $job->onQueue('assignLogistics');
+                $job = $job->onQueue('assignLogisticsTest');
                 $this->dispatch($job);
             }
             $start += $len;
@@ -1119,7 +1119,7 @@ class PackageController extends Controller
                 if ($package->order->status != 'REVIEW') {
                     $package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($package);
-                    $job = $job->onQueue('placeLogistics');
+                    $job = $job->onQueue('placeLogisticsTest');
                     $this->dispatch($job);
                     $packageIds[] = $package->id;
                 }
@@ -1288,7 +1288,7 @@ class PackageController extends Controller
         if ($orderRate > 0) {
             if ($is_auto) {
                 $job = new PlaceLogistics($model);
-                $job = $job->onQueue('placeLogistics');
+                $job = $job->onQueue('placeLogisticsTest');
                 $this->dispatch($job);
             }
         } else {

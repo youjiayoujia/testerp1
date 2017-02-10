@@ -61,7 +61,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                     $order->remark('包裹重量大于2kg.', 'WEIGHT');
                 }
                 //分渠道审核
-                if($order->is_oversea) {
+                if ($order->is_oversea) {
                     $profitRate = $order->overseaCalculateProfit();
                 } else {
                     $profitRate = $order->calculateProfitProcess();
@@ -95,11 +95,12 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                         break;
                 }
             }
+
             if ($this->package->order->status != 'REVIEW') {
                 if ($this->package->status == 'ASSIGNED') {
                     $this->package->update(['queue_name' => 'placeLogistics']);
                     $job = new PlaceLogistics($this->package);
-                    $job = $job->onQueue('placeLogistics');
+                    $job = $job->onQueue('placeLogisticsTest');
                     $this->dispatch($job);
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'Success.';

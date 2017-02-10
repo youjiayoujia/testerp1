@@ -301,7 +301,8 @@ class OrderController extends Controller
         $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model, $order),
+            'data' => $this->autoList($order->count() ? $this->model : $order, null, ['*'], null, 'restrict'),
+//            'data' => $this->autoList($this->model, $order),
             'mixedSearchFields' => $this->model->mixed_search,
             'currencys' => CurrencyModel::all(),
             'subtotal' => $subtotal,

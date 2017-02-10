@@ -23,7 +23,7 @@ class EbayCasesController extends Controller
     {
         $this->model = $caselist;
         $this->mainIndex = route('ebayCases.index');
-        $this->mainTitle = 'Ebay Channel Cases';
+        $this->mainTitle = 'Ebay纠纷';
         $this->viewPath = 'message.ebay_cases.';
     }
     /**
@@ -38,6 +38,7 @@ class EbayCasesController extends Controller
             'data'     => $this->autoList($this->model),
             'status'   => $this->model->distinct()->get(['status']),
             'types'     => $this->model->distinct()->get(['type']),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index',$response);
     }

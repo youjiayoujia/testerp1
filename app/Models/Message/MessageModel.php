@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Collection;
 class MessageModel extends BaseModel{
     public $table = 'messages';
 
-    protected $fillable = [
+    public $fillable = [
         'account_id',
         'message_id',
         'mime_type',
@@ -695,7 +695,7 @@ class MessageModel extends BaseModel{
         $account_ids = Channel_Accounts::where('customer_service_id',$user_id)->get()->pluck('id')->toArray(); //客服所属的账号
 
         return $query->where(function ($query) use ($account_ids){
-            $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0 ,'is_auto_reply'=> 0])
+            $query->where(['status'=> 'UNREAD', 'required'=> 1, 'dont_reply' => 0 ,'read' => 0])
                 ->whereIn('account_id',$account_ids);
             })
             ->orWhere(function($query) use ($user_id, $account_ids){
@@ -704,7 +704,6 @@ class MessageModel extends BaseModel{
                     ->where('required','=',1)
                     ->where('dont_reply','=',0)
                     ->where('read','=',0)
-                    ->where('is_auto_reply', '=', 0)
                 ->whereIn('account_id',$account_ids);
             })
             ->take($entry)

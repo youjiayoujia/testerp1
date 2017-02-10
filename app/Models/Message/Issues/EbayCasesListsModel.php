@@ -51,6 +51,29 @@ class EbayCasesListsModel extends BaseModel{
         return $this->belongsTo('App\Models\OrderModel','','');
     }*/
 
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [
+                'case_id',
+                'buyer_id',
+                'transaction_id'
+            ],
+            'filterSelects' => [
+                'type' => config('crm.ebay.case.type'),
+                'status' => config('crm.ebay.case.status'),
+            ],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
+
     public function getCaseContentAttribute(){
         $html = '';
         $note = unserialize(base64_decode($this->content));
@@ -94,13 +117,7 @@ class EbayCasesListsModel extends BaseModel{
                     }
                 }
             }
-
-
-
-
         }
-
-
         return $html;
     }
 

@@ -1,41 +1,8 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            Case状态(Status)
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($status as $item)
-                <li>
-                    <a href="{{ DataList::filtersEncode(['status','=',$item->status]) }}">{{ $item->status }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            Case类型(Type)
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($types as $item)
-                <li>
-                    <a href="{{ DataList::filtersEncode(['type','=',$item->type]) }}">{{ $item->type }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
 @stop
 
 @section('tableHeader')
-
     <th class="sort" data-field="id">ID</th>
     <th>CaseID</th>
     <th>标题</th>
@@ -46,7 +13,6 @@
     <th>交易号</th>
     <th>创建时间</th>
     <th>操作</th>
-
 @stop
 @section('tableBody')
     @foreach($data as $case)

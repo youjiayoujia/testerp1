@@ -194,7 +194,7 @@ return [
         'assign_id' => '客服',
         'from_name' => '用户昵称',
         'from' => '用户ID',
-        'messages.labels' => '标签',
+        'labels' => '标签',
         'ebay_feedback.transaction_id' => 'transactionID',
         'ebay_feedback.ebay_item_id' => 'itemID',
         'ebay_feedback.commenting_user' => '买家ID',
@@ -224,7 +224,8 @@ return [
         'buyer_id' => '买家ID',
         'case_id' => 'CaseID',
         'transaction_id' => '交易号',
-        'message_id' => '消息ID'
+        'message_id' => 'MessageID',
+        'channel_order_number' => '平台单号'
 
     ],
 ];

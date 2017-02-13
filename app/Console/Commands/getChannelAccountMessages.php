@@ -100,6 +100,7 @@ class getChannelAccountMessages extends Command
                         $messageNew->required  = 1;
                         $messageNew->read  = 0;
                         $messageNew->country  = ! empty($message['country']) ? $message['country'] : '';
+                        $messageNew->channel_url  = ! empty($message['channel_url']) ? $message['channel_url'] : ''; //暂时存储 wish订单号
 
                         if(!empty($message['list_id'])){
                             $messageNew->list_id  = $message['list_id'];

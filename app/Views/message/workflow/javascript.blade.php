@@ -286,7 +286,12 @@
             success : function (data) {
                 if(data == '1'){
                     alert('退款成功');
-                    $('#wish-refund-order').modal('hide')
+                    $('#wish-refund-order').modal('hide');
+                    //显示下一封
+                    message.showNextMessage();
+                    //继续加载一封的邮件池
+                    message.loadingNext();
+                    message.showTip('上一封消息已经回复');
                 }else{
                     alert('退款失败');
                 }

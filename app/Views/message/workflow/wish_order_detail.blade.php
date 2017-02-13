@@ -49,7 +49,7 @@
         </div>
         <div class="col-lg-1">
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#wish-refund-order">
+            <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#wish-refund-order-{{$message->id}}">
                 订单平台退款
             </button>
 
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="wish-refund-order" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal fade wish-refund-order" id="wish-refund-order-{{$message->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -69,18 +69,18 @@
                         <div class="form-group col-lg-12">
                             <label for="account" class="control-label">原因</label>
                             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                            <select class="form-control" name="wish-refund-code" id="wish-refund-code">
+                            <select class="form-control wish-refund-code" name="wish-refund-code" id="wish-refund-code">
                                 @foreach(config('crm.wish.refund.reason_code') as $key => $value)
                                     <option value="{{$key}}">{{$value}}</option>
                                 @endforeach
                             </select>
-                            <input type="hidden" id="wish-message-id" value="{{$message->id}}" />
+                            <input type="hidden" class="wish-message-id" id="wish-message-id" value="{{$message->id}}" />
 
                         </div>
                         <div class="form-group col-lg-12">
                             <label for="account" class="control-label">Enter your ticket reply</label>
                             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                            <textarea class="form-control" rows="6" name="wish-refund-reply" id="wish-refund-reply"></textarea>
+                            <textarea class="form-control wish-refund-reply" rows="6" name="wish-refund-reply" id="wish-refund-reply"></textarea>
                         </div>
                     </div>
                 </div>

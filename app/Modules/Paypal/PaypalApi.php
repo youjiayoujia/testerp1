@@ -75,7 +75,7 @@ Class PaypalApi
         //$nvpreq = 'METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry,'','&',PHP_QUERY_RFC3986);
         $nvpreq = 'METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry);
         //dd($this->baseNvpreq);
-        echo $nvpreq.'<br/>';
+        //echo $nvpreq.'<br/>';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->URL);
         curl_setopt($ch, CURLOPT_VERBOSE, 1);

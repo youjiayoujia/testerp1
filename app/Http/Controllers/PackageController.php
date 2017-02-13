@@ -51,6 +51,7 @@ class PackageController extends Controller
      */
     public function putNeedQueue()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model->where('status', 'NEW')->where('queue_name', '!=', 'assignStocks')->skip($start)->take($len)->get();
@@ -1064,6 +1065,7 @@ class PackageController extends Controller
      */
     public function assignLogistics()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model
@@ -1094,6 +1096,7 @@ class PackageController extends Controller
      */
     public function placeLogistics()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model

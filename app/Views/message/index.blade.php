@@ -63,7 +63,7 @@
             <td>{{ $message->ChannelName}}</td>
             <td>{{ $message->account->alias }}</td>
             <td>
-               {{ str_limit($message->subject,30) }}
+                <strong>{!! $message->subject !!}</strong>
             </td>
             <td>
                {{ str_limit($message->labels,30) }}

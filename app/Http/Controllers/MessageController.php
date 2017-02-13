@@ -707,13 +707,16 @@ class MessageController extends Controller
         $form = request()->input();
         $message = $this->model->find($form['message_id']);
         $adpter = new WishAdapter($message->account->apiConfig);
-        $id = $message->channel_order_number;
+        $id = $message->channel_url;
         $reason_code = $form['reason_code'];
         $reason_note = trim($form['reason_note']);
         if($adpter->orderRefund(compact('id', 'reason_code', 'reason_note'))){
-            return config('status.ajax')['success'];
-            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'wish订单退款', $message);
+            $adpter->ticketClose($message->message_id);
+            $message->status = 'COMPLETE';
+            $message->save();
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'wish订单退款,关闭留言', $message);
 
+            return config('status.ajax')['success'];
         }else{
             return config('status.ajax')['fail'];
         }

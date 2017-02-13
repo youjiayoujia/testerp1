@@ -808,6 +808,7 @@ Class WishAdapter implements AdapterInterface
             $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
             $jsonData = $this->getCurlData($url);
             $apiReturn = json_decode($jsonData,true);
+            //dd($apiReturn);
             if(empty($apiReturn['data'])){
                 break;
             }
@@ -841,6 +842,8 @@ Class WishAdapter implements AdapterInterface
                 }else{
                     $return_array[$j]['country'] = '';
                 }
+                $return_array[$j]['channel_url'] = !empty($gd['Ticket']['items'][0]['Order']['order_id']) ? $gd['Ticket']['items'][0]['Order']['order_id'] : '';//邮件是否包含图片
+
                 /**
                  *订单信息 结构
                  * [Order] => Array
@@ -951,6 +954,7 @@ Class WishAdapter implements AdapterInterface
     public function orderRefund($paramAry)
     {
         $url = 'https://merchant.wish.com/api/v2/order/refund';
+        $paramAry['access_token'] = $this->access_token;
         $result = json_decode($this->postCurlHttpsData($url, $paramAry), true);
         if(! empty($result['data']['success'])){
             if($result['data']['success'] == 1){
@@ -967,8 +971,10 @@ Class WishAdapter implements AdapterInterface
      */
     public function ticketClose($messageId)
     {
+        $paramAry['id'] = $messageId;
+        $paramAry['access_token'] = $this->access_token;
         $url = 'https://merchant.wish.com/api/v2/ticket/close';
-        $result = json_decode($this->postCurlHttpsData($url, $messageId), true);
+        $result = json_decode($this->postCurlHttpsData($url, $paramAry), true);
         if(! empty($result['data']['success'])){
             if($result['data']['success'] == 1){
                 return true;

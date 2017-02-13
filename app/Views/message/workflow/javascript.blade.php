@@ -198,10 +198,10 @@
             return;
         }
         //验证回复内容不能为空
-        if(!$('textarea').val()){
+/*        if(!$('textarea').val()){
             alert('请先回复的内容，再提交！');
             return;
-        }
+        }*/
         var param =  $('.reply-content').first().serialize();
         //异步发送
         $.ajax({
@@ -275,10 +275,9 @@
     });
 
     $(document).on('click', '.do-wish-refund', function(){
-        var reply = $('#wish-refund-reply').val();
-        var code = $('#wish-refund-code').val();
-        var message_id = $('#wish-message-id').val();
-
+        var reply = $('.wish-refund-reply').first().val();
+        var code = $('.wish-refund-code').first().val();
+        var message_id = $('.wish-message-id').first().val();
         $.ajax({
             url : "{{route('wishRefundOrder')}}",
             data : 'message_id=' + message_id + '&reason_code=' + code + '&reason_note=' + reply,
@@ -286,7 +285,16 @@
             success : function (data) {
                 if(data == '1'){
                     alert('退款成功');
-                    $('#wish-refund-order').modal('hide')
+                    if(message.is_workflow == false){
+                        window.location.href = document.referrer;
+                        return;
+                    }
+                    $('.wish-refund-order').first().modal('hide');
+                    //显示下一封
+            /*        message.showNextMessage();
+                    //继续加载一封的邮件池
+                    message.loadingNext();
+                    message.showTip('上一封消息已经回复');*/
                 }else{
                     alert('退款失败');
                 }

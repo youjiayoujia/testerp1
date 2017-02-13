@@ -37,10 +37,8 @@ class MessageModel extends BaseModel{
 
     public $searchFields = [
         'id'=>'ID',
-        'subject'=>'主题',
 /*        'from'=>'发件邮箱' ,
         'label' => '消息类型',*/
-        'channel_order_number' => '平台订单号'
     ];
 
     public $rules = [];
@@ -132,7 +130,9 @@ class MessageModel extends BaseModel{
             'filterFields' => [
                 'from_name',
                 'from',
-                'messages.labels'
+                'labels',
+                'message_id',
+                'channel_order_number',
             ],
             'filterSelects' => [
                 'messages.status' => config('message.statusText'),

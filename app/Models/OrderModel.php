@@ -412,6 +412,17 @@ class OrderModel extends BaseModel
         ];
     }
 
+    public function getRelationArrAttribute()
+    {
+        return [
+            'country' => ['countries', 'code' , 'shipping_country'],
+            'items' => ['order_items', 'order_id', 'id'],
+            'channelAccount' => ['channel_accounts', 'id' , 'channel_account_id'],
+            'userOperator' => ['users', 'id' , 'operator'],
+            'packages' => ['packages', 'order_id', 'id'],
+        ];
+    }
+
     //状态名称
     public function getStatusNameAttribute()
     {

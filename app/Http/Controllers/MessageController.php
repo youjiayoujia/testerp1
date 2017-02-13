@@ -715,6 +715,7 @@ class MessageController extends Controller
             $message->status = 'COMPLETE';
             $message->save();
             $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'wish订单退款,关闭留言', $message);
+
             return config('status.ajax')['success'];
         }else{
             return config('status.ajax')['fail'];

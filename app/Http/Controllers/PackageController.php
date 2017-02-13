@@ -30,6 +30,7 @@ use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 use Logistics;
 use App\Models\Package\AllReportModel;
+
 class PackageController extends Controller
 {
     public function __construct(PackageModel $package)
@@ -393,6 +394,7 @@ class PackageController extends Controller
                 $arr[$warehouseId][] = $block->sum('need');
             }
         }
+
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEW')->count(),

@@ -36,6 +36,11 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }
 
+    public function ebayFeedback()
+    {
+        return $this->hasOne('App\Models\Publish\Ebay\EbayFeedBackModel', 'transaction_id', 'transaction_id');
+    }
+
     public function getStatusNameAttribute()
     {
         $arr = config('order.item_status');

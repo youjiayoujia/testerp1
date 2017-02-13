@@ -387,7 +387,7 @@ class PackageModel extends BaseModel
         $declared_val = 0;
         foreach ($this->items as $packageItem) {
             if ($packageItem->item) {
-                $declared_val = $packageItem->item->product ? $packageItem->item->product->declared_value : 0;
+                $declared_val = $packageItem->item ? $packageItem->item->declared_value : 0;
             }
         }
         return $declared_val;

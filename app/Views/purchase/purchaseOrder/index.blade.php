@@ -405,6 +405,23 @@
             })
         })
 
+        $('.suppliers').select2({
+            
+            ajax: {
+                url: "{{ route('ajaxSupplier') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        supplier: params.term,
+                    };
+                },
+                results: function (data, page) {
+
+                }
+            },
+        });
+
         $('.view').click(function () {
             var purchaseOrder_id = $(this).attr('id');
             var url = "{{route('purchaseOrder.view')}}";

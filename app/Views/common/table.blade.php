@@ -120,7 +120,7 @@
                                         @foreach($value as $relation_ship => $contents)
                                             @foreach($contents as $name => $single)
                                                 <div class='col-lg-2 form-group searchItem'>
-                                                    <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
+                                                    <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" @if($relation_ship=='supplier'&&$name=='name') class='form-control suppliers col-lg-2' @endif class='form-control select_select0 col-lg-2'>
                                                         <option value=''>{{config('setting.transfer_search')[$relation_ship.'.'.$name]}}</option>
                                                         @foreach($single as $key => $value1)
                                                             <option value="{{ $key }}" {{request()->has('mixedSearchFields'.'.'.$type.'.'.$relation_ship.'.'.$name) ? ($key==request()->input('mixedSearchFields'.'.'.$type.'.'.$relation_ship.'.'.$name)?'selected':'') : '' }} >{{$value1}}</option>
@@ -392,7 +392,7 @@
             });
         });
 
-        $('.datetime_select').datetimepicker({theme: 'dark'});
+        $('.datetime_select').cxCalendar();
         $('.select_select0').select2();
         $( document ).ready(function () {
             //列表页修改编辑rul

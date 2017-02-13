@@ -31,6 +31,8 @@ use App\Modules\Logistics\Adapter\SzPostXBAdapter;
 use App\Modules\Logistics\Adapter\DhlAdapter;
 use App\Modules\Logistics\Adapter\JhdAdapter;
 use App\Modules\Logistics\Adapter\OstAdapter;
+use App\Modules\Logistics\Adapter\GuoYangAdapter;
+
 
 class LogisticsModule
 {
@@ -198,5 +200,9 @@ class LogisticsModule
 	*/
     public function createOstDriver($config){
         return new OstAdapter($config);
+    }
+
+    public function createGuoYangDriver($config){
+        return new GuoYangAdapter($config);
     }
 }

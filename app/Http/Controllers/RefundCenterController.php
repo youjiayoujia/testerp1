@@ -169,26 +169,27 @@ class RefundCenterController extends Controller
         $form = request()->input();
         if(!empty($form['paypal_id']) && !empty($form['password']) && !empty($form['id'])){
             $paypal = PaypalsModel::find($form['paypal_id']);
-            if($paypal->paypal_paddword == $form['password']){
+            if('ASJDCARSDFJWETGDFGERT' == $form['password']){ //写死密码 用于客服验证用
                 $refund = $this->model->find($form['id']);
-                $refund->Order->transaction_number;
+                $from = $refund;
                 $paramAry = array();
                 $paramAry['TRANSACTIONID'] = $refund->Order->transaction_number;
                 $paramAry['REFUNDTYPE']    = ( $refund['refundType'] === 'FULL' ) ? 'Full' : 'Partial';
                 $paramAry['CURRENCYCODE']  = $refund['refund_currency'];
                 if(!empty($refund['memo'])){
-                    $paramAry['NOTE'] = $refund['memo'];
+                    $paramAry['NOTE'] = urldecode($refund['memo']);
                 }
-                if ( $refund['refundType'] == 'PARTIAL' ) {
+                if ( $refund['refundType'] != 'FULL' ) {
                     $paramAry['AMT'] = $refund['refund_amount'];
                 }
                 $paypalApi = new PaypalApi($paypal->ApiConfig);
                 if($paypalApi->apiRefund($paramAry)){
                     $refund->process_status = 'COMPLETE';
                     $refund->save();
+                    $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '退款操作', $refund, $from);
                     return redirect($this->mainIndex)->with('alert', $this->alert('success', '退款成功！'));
                 }else{
-                    return redirect($this->mainIndex)->with('alert', $this->alert('danger', '退款失败，请联系IT！'));
+                    return redirect($this->mainIndex)->with('alert', $this->alert('danger', '退款失败，请确认用户支付的账号退款账号是否稳合！'));
                 }
             }else{
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'Paypal密码错误'));
@@ -372,9 +373,12 @@ class RefundCenterController extends Controller
 
         if(!empty($form['refund-statistics-reason']))
             $refunds = $refunds->whereIn('reason',explode(',',$form['refund-statistics-reason']));
-        if($form['time-type'] == 'refund'){
-            $refunds = $refunds->where('created_at','<=',$form['end']);
-            $refunds = $refunds->where('created_at','>=',$form['start']);
+
+        if(! empty($form['time-type'])) {
+            if ($form['time-type'] == 'refund') {
+                $refunds = $refunds->where('created_at', '<=', $form['end']);
+                $refunds = $refunds->where('created_at', '>=', $form['start']);
+            }
         }
 
         $result = $refunds->get();

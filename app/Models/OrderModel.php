@@ -101,6 +101,7 @@ class OrderModel extends BaseModel
         'is_oversea',
         'operator_id',
         'fee_amt',
+        'is_send_ebay_msg',
     ];
 
     private $canPackageStatus = ['PREPARED'];
@@ -413,6 +414,17 @@ class OrderModel extends BaseModel
         ];
     }
 
+    public function getRelationArrAttribute()
+    {
+        return [
+            'country' => ['countries', 'code' , 'shipping_country'],
+            'items' => ['order_items', 'order_id', 'id'],
+            'channelAccount' => ['channel_accounts', 'id' , 'channel_account_id'],
+            'userOperator' => ['users', 'id' , 'operator'],
+            'packages' => ['packages', 'order_id', 'id'],
+        ];
+    }
+
     //状态名称
     public function getStatusNameAttribute()
     {
@@ -616,6 +628,24 @@ class OrderModel extends BaseModel
         } else {
             return false;
         }
+    }
+
+    //ebay订单差评
+    public function getEbayFeedbackCommentAttribute(){
+        $items = $this->items;
+        $comment = '';
+        if(!$this->items->isEmpty()){
+            foreach($items as $item){
+                if(! empty($item->ebayFeedback)){
+                    if($item->ebayFeedback->comment_type == 'Negative'){
+                        $comment = '差评';
+                    }
+                    break;
+                }
+            }
+
+        }
+        return $comment;
     }
 
     //订单备注

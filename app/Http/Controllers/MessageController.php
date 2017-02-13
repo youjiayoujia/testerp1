@@ -193,6 +193,7 @@ class MessageController extends Controller
     public function assignToOther($id)
     {
         $message = $this->model->find($id);
+        $from = $message;
         $touser=UserModel::find(request()->input('assign_id'))->name;
         if (!$message) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
@@ -208,6 +209,10 @@ class MessageController extends Controller
                 return redirect(route('message.process'))
                     ->with('alert', $this->alert('success', '上条信息已转交他人.'));
             }
+
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '转交给其他人', $message, $from);
+
+
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '转交成功.'));
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '转交失败.'));
@@ -236,6 +241,12 @@ class MessageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
         if ($message->notRequireReply(request()->user()->id)) {
+
+            if(($message->channel_diver_name == 'wish')){
+                $adpter = new WishAdapter($message->account->apiConfig);
+                $adpter->ticketClose($message->message_id);
+            }
+
             if ($this->workflow == 'keeping') {
                 return redirect(route('message.process'))
                     ->with('alert', $this->alert('success', '上条信息已标记无需回复.'));
@@ -254,9 +265,15 @@ class MessageController extends Controller
     {
         $id = request()->input('id');
         $message = $this->model->find($id);
+        $from = $message;
         if(!empty($message)){
             $result = $message->notRequireReply(request()->user()->id);
             if($result){
+                if(($message->channel_diver_name == 'wish')){
+                    $adpter = new WishAdapter($message->account->apiConfig);
+                    $adpter->ticketClose($message->message_id);
+                }
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '在workflow中，标记为无需回复', $message, $from);
                 return config('status.ajax')['success'];
             }
         }
@@ -271,11 +288,13 @@ class MessageController extends Controller
     public function notRequireReply_1($id)
     {
         $message = $this->model->find($id);
+        $from = $message;
         if($message->status!="COMPLETE"){
             $message->assign_id=request()->user()->id;
             $message->required=0;
             $message->status="COMPLETE";
             $message->save();
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '标记为无需回复', $message, $from);
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '无需回复处理成功.'));
     }
@@ -288,11 +307,15 @@ class MessageController extends Controller
     public function dontRequireReply($id)
     {
         $message = $this->model->find($id);
+        $from = $message;
         if (!$message) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
         if ($message->dontRequireReply(request()->user()->id)) {
             if ($this->workflow == 'keeping') {
+
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'workflow中，标记为稍后处理', $message, $from);
+
                 return redirect(route('message.process',['id'=>$id]))
                     ->with('alert', $this->alert('success', '上条信息已标记稍后处理.'));
             }
@@ -384,6 +407,7 @@ class MessageController extends Controller
     public function reply($id, ReplyModel $reply)
     {
         $message = $this->model->find($id);
+        $from = $message;
         if (!$message) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
@@ -391,7 +415,6 @@ class MessageController extends Controller
         $this->validate(request(), $reply->rules('create')); //
 
         if ($message->reply(request()->all())) {
-
             /*
              * 写入队列
              */
@@ -405,6 +428,7 @@ class MessageController extends Controller
                 return redirect(route('message.process'))
                     ->with('alert', $this->alert('success', '上条信息已成功回复.'));
             }
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '邮件回复', $message, $from);
 
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '回复成功.'));
         }
@@ -415,12 +439,15 @@ class MessageController extends Controller
     {
         $form = request()->input();
         $message = $this->model->find($form['id']);
+        $from = $message;
         if(!empty($message)) {
             if ($message->reply($form)) {
                 $reply = ReplyModel::where('message_id', $message->id)->get()->first();
                 $job = new SendMessages($reply);
                 $job = $job->onQueue('SendMessages');
                 $this->dispatch($job);
+
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'workflow中，回复消息', $message, $from);
 
                 return config('status.ajax')['success'];
             }
@@ -533,7 +560,7 @@ class MessageController extends Controller
         $form = request()->input();
         foreach($form as $key => $input){
             if(empty($input)){
-                return redirect(route('order.index'))->with('alert',$this->alert('danger','参数不完整'.$key.'不能为空'));
+                return redirect(request()->server('HTTP_REFERER'))->with('alert',$this->alert('danger','参数不完整'.$key.'不能为空'));
             }
         }
         $order = OrderModel::find($form['message-order-id']);
@@ -549,18 +576,21 @@ class MessageController extends Controller
             $content  = $form['message-content'];
            $is_send = $ebay->ebayOrderSendMessage(compact('item_id','buyer_id','itemids','title','content'));
            if($is_send){
+               $order->is_send_ebay_msg = 1;
+               $order->save();
+
                $list->operate_id = request()->user()->id;
                $list->order_id   = $form['message-order-id'];
                $list->title      = $form['message-title'];
                $list->content    = $form['message-content'];
                $list->itemids    = implode(',',$form['item-ids']);
                $list->save();
-               return redirect(route('order.index'))->with('alert', $this->alert('success', '发送成功'));
+               return redirect(request()->server('HTTP_REFERER'))->with('alert', $this->alert('success', '发送成功'));
            }else{
-               return redirect(route('order.index'))->with('alert', $this->alert('danger', '发送失败'));
+               return redirect(request()->server('HTTP_REFERER'))->with('alert', $this->alert('danger', '发送失败'));
            }
         }
-        return redirect(route('order.index'))->with('alert',$this->alert('发送失败，未知错误'));
+        return redirect(request()->server('HTTP_REFERER'))->with('alert',$this->alert('发送失败，未知错误'));
     }
 
     public function ebayUnpaidCase(){
@@ -576,7 +606,7 @@ class MessageController extends Controller
         $transcation_id    = $order_item->transaction_id;
         $disputeType       = $form['disputeType'];
         if(!empty($order_item_number) || !empty($transcation_id) || !empty($disputeType)){
-            $result = $ebay->ebayUnpaidCase(compact('order_item_number','transcation_id','disputeType'));
+            $result = $ebay->癦ssage(compact('order_item_number','transcation_id','disputeType'));
             if($result){
                 $order_item->ebay_unpaid_status = 1;
                 $order_item->save();
@@ -661,10 +691,31 @@ class MessageController extends Controller
             ->update(['status' => 'COMPLETE', 'required' => '0', 'assign_id' => request()->user()->id]);
 
         if($is_modify){
+            $messages = $this->model->whereIn('id', explode(',', $ids))->get();
+            foreach ($messages as $message){
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, '被批量标记为无需回复', $message);
+            }
+
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功'));
         }else{
             return redirect($this->mainIndex)->with('danger', $this->alert('success', '操作成功'));
         }
     }
 
+    public function wishRefundOrder()
+    {
+        $form = request()->input();
+        $message = $this->model->find($form['message_id']);
+        $adpter = new WishAdapter($message->account->apiConfig);
+        $id = $message->channel_order_number;
+        $reason_code = $form['reason_code'];
+        $reason_note = trim($form['reason_note']);
+        if($adpter->orderRefund(compact('id', 'reason_code', 'reason_note'))){
+            return config('status.ajax')['success'];
+            $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'wish订单退款', $message);
+
+        }else{
+            return config('status.ajax')['fail'];
+        }
+    }
 }

@@ -274,6 +274,30 @@
         }
     });
 
+    $(document).on('click', '.do-wish-refund', function(){
+        var reply = $('#wish-refund-reply').val();
+        var code = $('#wish-refund-code').val();
+        var message_id = $('#wish-message-id').val();
+
+        $.ajax({
+            url : "{{route('wishRefundOrder')}}",
+            data : 'message_id=' + message_id + '&reason_code=' + code + '&reason_note=' + reply,
+            type : 'GET',
+            success : function (data) {
+                if(data == '1'){
+                    alert('退款成功');
+                    $('#wish-refund-order').modal('hide')
+                }else{
+                    alert('退款失败');
+                }
+            },
+            error : function (){
+                alert('退款失败');
+            }
+        });
+
+    });
+
     function getTransInfo(content) {
         $.ajax({
             url: "{{route('ajaxGetTranInfo')}}",

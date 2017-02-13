@@ -753,6 +753,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'AllReportController@packageReport', 'as' => 'allReport.report']);
     Route::resource('allReport', 'AllReportController');
     //包裹导出
+    Route::get('exportPackage/getTnoReturnExcel',
+        ['uses' => 'ExportPackageController@getTnoReturnExcel', 'as' => 'exportPackage.getTnoReturnExcel']);
     Route::get('exportPackage/getTnoExcelById',
         ['uses' => 'ExportPackageController@getTnoExcelById', 'as' => 'exportPackage.getTnoExcelById']);
     Route::get('exportPackage/getTnoExcel',
@@ -1281,6 +1283,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
     Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
     Route::any('changeMultipleStatus', 'MessageController@changeMultipleStatus')->name('changeMultipleStatus');
+    Route::any('wishRefundOrder', 'MessageController@wishRefundOrder')->name('wishRefundOrder');
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);

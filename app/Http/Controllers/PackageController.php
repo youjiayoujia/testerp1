@@ -50,6 +50,7 @@ class PackageController extends Controller
      */
     public function putNeedQueue()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model->where('status', 'NEW')->where('queue_name', '!=', 'assignStocks')->skip($start)->take($len)->get();
@@ -427,6 +428,7 @@ class PackageController extends Controller
     }
     public function autoFailAssignLogistics()
     {
+        set_time_limit(0);
         $packages = $this->model->where('status', 'ASSIGNFAILED')->where('queue_name', '!=', 'assignLogistics')->get();
         foreach ($packages as $package) {
             $job = new AssignLogistics($package);
@@ -1053,6 +1055,7 @@ class PackageController extends Controller
      */
     public function placeLogistics()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model

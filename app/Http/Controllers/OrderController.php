@@ -107,6 +107,7 @@ class OrderController extends Controller
 
     public function createVirtualPackage()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();

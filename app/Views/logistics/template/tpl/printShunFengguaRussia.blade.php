@@ -46,11 +46,10 @@
         <p style="width:230px;height:auto;border:2px solid #000;float:right;margin-top:5px;word-wrap: break-word;">
             To:{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
-            {{ $model->shipping_city }}<br/>
-            {{ $model->shipping_state }}<br/>
+            {{ $model->shipping_city }}&nbsp;&nbsp;&nbsp;{{ $model->shipping_state }}
+            <br/>
             ZIP:{{ $model->shipping_zipcode }}<br/>
-            TEL:{{ $model->shipping_phone }}<br/>
-            {{ $model->country ? $model->country->code : '' }}
+            {{ $model->country ? $model->country->code : '' }}&nbsp;&nbsp;&nbsp;TEL:{{ $model->shipping_phone }}<br/>
         </p>
     </div>
     <div style="width:100%;height:55px;">

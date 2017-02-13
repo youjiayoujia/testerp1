@@ -198,10 +198,10 @@
             return;
         }
         //验证回复内容不能为空
-        if(!$('textarea').val()){
+/*        if(!$('textarea').val()){
             alert('请先回复的内容，再提交！');
             return;
-        }
+        }*/
         var param =  $('.reply-content').first().serialize();
         //异步发送
         $.ajax({

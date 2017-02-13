@@ -286,7 +286,11 @@
             success : function (data) {
                 if(data == '1'){
                     alert('退款成功');
-                    $('#wish-refund-order').modal('hide');
+                    if(message.is_workflow == false){
+                        window.location.href = document.referrer;
+                        return;
+                    }
+                    //$('#wish-refund-order').modal('hide');
                     //显示下一封
                     message.showNextMessage();
                     //继续加载一封的邮件池

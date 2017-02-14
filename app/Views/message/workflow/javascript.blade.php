@@ -506,6 +506,10 @@
 
         }
     });
+    $(document).on('change', '.refund-lang-prompts', function () {
+        var content = $('.refund-lang-prompts').first().val();
+        $('.wish-refund-reply').first().val(content);
+    });
 
 
 

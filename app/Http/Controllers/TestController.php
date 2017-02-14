@@ -1625,6 +1625,12 @@ class TestController extends Controller
     }
     public function getSmtIssue()
     {
+       // dd(time() - strtotime('2016-12-14'));
+        dd((ceil(time() - strtotime('2016-12-14'))/ 86400));
+       $now = Carbon::now();
+       $date = Carbon::parse('2016-12-14');
+       dd($now->diffInDays($date));
+
         $array = [
               0 => "TIMESTAMP=2017%2d02%2d08T09%3a52%3a35Z",
               1 => "CORRELATIONID=b27dd764924f8",

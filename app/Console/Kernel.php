@@ -159,7 +159,7 @@ class Kernel extends ConsoleKernel
         //CRM
         $schedule->command('import:message aliexpress')->cron('40 8,15 * * *'); //aliexpress
         $schedule->command('import:message ebay')->everyFiveMinutes(); //ebay
-        $schedule->command('import:message wish')->cron('30 8,12,13,14,16,17 * * *'); //wish
+        $schedule->command('import:message wish')->hourly(); //wish
         $schedule->command('getEbayCases')->cron('30 8,12,13,14,16,17 * * *');
         $schedule->command('getFeedBack:account')->everyTenMinutes();
         //采购

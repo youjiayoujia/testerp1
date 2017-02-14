@@ -196,7 +196,7 @@ abstract class Controller extends BaseController
         return $list;
     }
 
-    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null, $level = '')
+    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null, $level = '', $preload = '')
     {
         $list = $list ? $list : $model;
         if (request()->has('keywords')) {
@@ -392,7 +392,11 @@ abstract class Controller extends BaseController
         if (!$pageSize) {
             $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
         }
-        
+        if($preload) {
+            foreach($preload as $single) {
+                $list = $list->with($single);
+            }
+        }
         return $list->paginate($pageSize, $fields);
     }
 

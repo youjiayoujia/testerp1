@@ -34,7 +34,9 @@
                                 {{$item_order['Order']['tracking_number']}}
                                 @endif
                             </td>
-                            <td>{{ !empty($item_order['Order']['shipped_date']) ? $item_order['Order']['shipped_date'] : ''}}</td>
+                            <td>{!!  !empty($item_order['Order']['shipped_date']) ? $item_order['Order']['shipped_date'] . '&nbsp; <font color="red">'.ceil((time() - strtotime($item_order['Order']['shipped_date'])) / 86400) . '天</font>' : '' !!}<br />
+
+                            </td>
 {{--
                             <td></td>
 --}}
@@ -80,6 +82,13 @@
                         <div class="form-group col-lg-12">
                             <label for="account" class="control-label">Enter your ticket reply</label>
                             <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                            <select class="form-control refund-lang-prompts" >
+                                <option value="" prompts="">自定义</option>
+
+                            @foreach(config('crm.wish.refund.lang_prompts') as $key => $value)
+                                    <option value="{{$value}}" prompts="{{$value}}">{{$key}}</option>
+                                @endforeach
+                            </select>
                             <textarea class="form-control wish-refund-reply" rows="6" name="wish-refund-reply" id="wish-refund-reply"></textarea>
                         </div>
                     </div>

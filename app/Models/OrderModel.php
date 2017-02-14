@@ -402,14 +402,14 @@ class OrderModel extends BaseModel
                 'packages' => ['tracking_no'],
             ],
             'selectRelatedSearchs' => [
-                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
+                'channel' => ['name' => ChannelModel::get(['name'])->pluck('name', 'name')],
                 'items' => ['item_status' => config('item.status')],
                 'remarks' => ['type' => config('order.review_type')],
                 'packages' => ['is_mark' => config('order.is_mark'), 'status' => config('package')],
             ],
             'doubleRelatedSearchFields' => [],
             'doubleRelatedSelectedFields' => [
-                'packages' => ['logistics' => ['code' => LogisticsModel::all()->pluck('code', 'code')]],
+                'packages' => ['logistics' => ['code' => LogisticsModel::where('is_enable', '1')->get(['code'])->pluck('code', 'code')]],
             ],
         ];
     }

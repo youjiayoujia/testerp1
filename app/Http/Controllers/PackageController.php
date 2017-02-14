@@ -41,6 +41,7 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
         $this->middleware('StockIOStatus');
     }
+
     /**
      *  将包裹need放到匹配队列中
      *
@@ -102,10 +103,11 @@ class PackageController extends Controller
         }
         $pagetype = request()->has('pagetype') ? request('pagetype') : 'false';
         request()->flash();
-        $logisticses = LogisticsModel::all();
+        $logisticses = LogisticsModel::where('is_enable', '1')->get(['id', 'code']);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList(!empty($buf) ? $buf : $this->model, null, ['*'], null, 'restrict'),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model, null, ['*'], null, 'restrict', 
+                    ['order', 'channel', 'warehouse', 'logistics', 'items', 'country', 'items.item', 'items.item.product.logisticsLimit', 'picklist', 'items.warehousePosition']),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
             'pagetype' => $pagetype,

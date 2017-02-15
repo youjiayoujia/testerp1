@@ -483,7 +483,7 @@
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="refund_currency" id="refund_currency">
                                         @foreach($currencys as $refund_currency)
-                                            <option value="{{ $refund_currency->code }}" <?php if ($refund_currency->code == 'USD') echo 'selected'; ?> {{ old('refund_currency') }}>
+                                            <option value="{{ $refund_currency->code }}" {{ $refund_currency->code == 'USD' ? 'selected' : '' }}>
                                                 {{ $refund_currency->code }}
                                             </option>
                                         @endforeach

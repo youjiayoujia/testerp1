@@ -107,6 +107,7 @@ class OrderController extends Controller
 
     public function createVirtualPackage()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $model = $this->model->where('status', 'PREPARED')->skip($start)->take($len)->get();
@@ -269,7 +270,7 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
-        $order = $this->model->with('items')->with('packages');
+        $order = $this->model;
         $orderStatistics = '';
 //        if ($this->allList($order)->count()) {
 //            $totalAmount = 0;
@@ -289,7 +290,6 @@ class OrderController extends Controller
 //        foreach ($this->autoList($order) as $value) {
 //            $subtotal += $value->amount * $value->rate;
 //        }
-        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         //订单首页不显示数据
         $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $orderUrl = route('order.index');
@@ -301,16 +301,17 @@ class OrderController extends Controller
         $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($order->count() ? $this->model : $order, null, ['*'], null, 'restrict'),
-//            'data' => $this->autoList($this->model, $order),
+            'data' => $this->autoList($order->count() ? $this->model : $order, null, ['*'], null, 'restrict', 
+                       ['packages', 'channel', 'channelAccount', 'userOperator', 'country', 'remarks', 'remarks.user', 'unpaidOrder',
+                        'refunds', 'items', 'items.item', 'items.item.warehouse', 'packages.logistics', 'packages.warehouse']),
             'mixedSearchFields' => $this->model->mixed_search,
-            'currencys' => CurrencyModel::all(),
+            'currencys' => CurrencyModel::get(['code']),
             'subtotal' => $subtotal,
-            'rmbRate' => $rmbRate,
             'hideUrl' => $url,
             'page' => $page,
             'orderStatistics' => $orderStatistics,
         ];
+
         return view($this->viewPath . 'index', $response);
     }
 

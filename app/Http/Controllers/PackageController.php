@@ -5,9 +5,7 @@
  * 2016-03-09
  * @author: Vincent<nyewon@gmail.com>
  */
-
 namespace App\Http\Controllers;
-
 use Illuminate\Routing\Route;
 use Tool;
 use Excel;
@@ -53,6 +51,7 @@ class PackageController extends Controller
      */
     public function putNeedQueue()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model->where('status', 'NEW')->where('queue_name', '!=', 'assignStocks')->skip($start)->take($len)->get();
@@ -72,7 +71,6 @@ class PackageController extends Controller
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至assignStocks队列成功'));
     }
-
     /**
      * 列表
      *
@@ -105,10 +103,11 @@ class PackageController extends Controller
         }
         $pagetype = request()->has('pagetype') ? request('pagetype') : 'false';
         request()->flash();
-        $logisticses = LogisticsModel::all();
+        $logisticses = LogisticsModel::where('is_enable', '1')->get(['id', 'code']);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList(!empty($buf) ? $buf : $this->model, null, ['*'], null, 'restrict'),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model, null, ['*'], null, 'restrict', 
+                    ['order', 'channel', 'warehouse', 'logistics', 'items', 'country', 'items.item', 'items.item.product.logisticsLimit', 'picklist', 'items.warehousePosition']),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
             'pagetype' => $pagetype,
@@ -116,16 +115,13 @@ class PackageController extends Controller
         
         return view($this->viewPath . 'index', $response);
     }
-
     public function showAllView()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-
         return view($this->viewPath . 'showCondition', $response);
     }
-
     public function getAllInfo()
     {
         $packageId = request()->has('packageid') ? request('packageid') : '';
@@ -166,7 +162,6 @@ class PackageController extends Controller
         $str .= "</tbody></table>";
         return $str;
     }
-
     public function ajaxRealTime()
     {
         $arr = request('arr');
@@ -183,10 +178,8 @@ class PackageController extends Controller
             $buf[$key][0] =  $realTimeLogistics ? $realTimeLogistics->logistics->code : '无匹配';
             $buf[$key][1] = '￥' . ($logisticsFee ? $logisticsFee : 0);
         }
-
         return $buf;
     }
-
     //预览包裹
     public function preview($id)
     {
@@ -201,10 +194,8 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
         ];
-
         return view('logistics.template.tpl.' . $view, $response);
     }
-
     public function sectionGanged()
     {
         $val = trim(request('val'));
@@ -218,7 +209,6 @@ class PackageController extends Controller
         }
         return $str;
     }
-
     public function logisticsDelivery()
     {
         $start = request()->input('start');
@@ -266,10 +256,8 @@ class PackageController extends Controller
             'end' => $end,
             'totalWeight' => $totalWeight,
         ];
-
         return view($this->viewPath . 'logisticsDelivery', $response);
     }
-
     /**
      *  批量修改包裹物流方式
      *
@@ -320,7 +308,6 @@ class PackageController extends Controller
             return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '修改成功'));
         }
     }
-
     /**
      * 批量删除包裹
      *
@@ -344,10 +331,8 @@ class PackageController extends Controller
             }
             $model->cancelPackage();
         }
-
         return redirect($_SERVER['HTTP_REFERER']);
     }
-
     /**
      * 批量清空物流方式
      *
@@ -372,10 +357,8 @@ class PackageController extends Controller
             $to = json_encode($model);
             $this->eventLog($name, '清空物流方式', $to, $from);
         }
-
         return redirect($_SERVER['HTTP_REFERER']);
     }
-
     /**
      * 编辑
      *
@@ -394,10 +377,8 @@ class PackageController extends Controller
     //         'logisticses' => LogisticsModel::all(),
     //         'status' => config('package'),
     //     ];
-
     //     return view($this->viewPath . 'edit', $response);
     // }
-
     public function flow()
     {
         $reportModel = AllReportModel::orderBy('day_time', 'desc')->first();
@@ -445,22 +426,19 @@ class PackageController extends Controller
             'reportModel' => $reportModel,
             'arr' => $arr
         ];
-
         return view($this->viewPath . 'flow', $response);
     }
-
     public function autoFailAssignLogistics()
     {
+        set_time_limit(0);
         $packages = $this->model->where('status', 'ASSIGNFAILED')->where('queue_name', '!=', 'assignLogistics')->get();
         foreach ($packages as $package) {
             $job = new AssignLogistics($package);
             $job = $job->onQueue('assignLogistics');
             $this->dispatch($job);
         }
-
         return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count() . '个包裹放入队列'));
     }
-
     public function processingAssignStocks()
     {
         $packages = $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->get();
@@ -470,10 +448,8 @@ class PackageController extends Controller
             $job = $job->onQueue('assignStocks');
             $this->dispatch($job);
         }
-
         return redirect(route('package.flow'))->with('alert', $this->alert('success','包裹已放入队列'));
     }
-
     public function recycle()
     {
         $id = request('id');
@@ -491,10 +467,8 @@ class PackageController extends Controller
         $job = $job->onQueue('assignLogistics');
         $this->dispatch($job);
         $package->eventLog(UserModel::find(request()->user()->id)->name, '重新匹配物流', json_encode($package));
-
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '包裹已重新匹配物流'));
     }
-
     public function retrack()
     {
         $id = request('id');
@@ -508,10 +482,8 @@ class PackageController extends Controller
         $job = $job->onQueue('placeLogistics');
         $this->dispatch($job);
         $package->eventLog(UserModel::find(request()->user()->id)->name, '重新物流下单', json_encode($package));
-
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', '包裹已重新下物流单'));
     }
-
     public function allocateLogistics($id)
     {
         $response = [
@@ -519,10 +491,8 @@ class PackageController extends Controller
             'logisticses' => LogisticsModel::all(),
             'id' => $id,
         ];
-
         return view($this->viewPath . 'allocateLogistics', $response);
     }
-
     public function downloadFee()
     {
         $rows[] = [
@@ -536,7 +506,6 @@ class PackageController extends Controller
             });
         })->download('csv');
     }
-
     public function returnGoods()
     {
         $response = [
@@ -544,19 +513,15 @@ class PackageController extends Controller
             'warehouses' => WarehouseModel::where(['is_available' => '1', 'type' => 'local'])->get(),
             'logisticses' => LogisticsModel::all(),
         ];
-
         return view($this->viewPath . 'returnGoods', $response);
     }
-
     public function returnGoodsInShelf()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-
         return view($this->viewPath . 'returnGoodsInShelf', $response);
     }
-
     public function ajaxReturnInShelf()
     {
         $buf = request('buf');
@@ -578,10 +543,8 @@ class PackageController extends Controller
         $html .= "<td><input type='checkbox' class='single'></td><td>" . $model->id . "</td><td>" . implode(',',
                 $arr['name']) . "</td><td>" . $model->tracking_no . "</td><td>" . implode(',',
                 $arr['sku']) . "</td><td>" . implode(',', $arr['position']) . "</td><td>" . $type . "</td></tr>";
-
         return [$html, $type];
     }
-
     public function exportInfo()
     {
         $rows = [];
@@ -613,7 +576,6 @@ class PackageController extends Controller
             });
         })->download('csv');
     }
-
     public function processReturnGoods()
     {
         $file = request()->file('returnFile');
@@ -717,16 +679,12 @@ class PackageController extends Controller
             }
             DB::commit();
         }
-
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'returnErrors' => $errors,
         ];
-
         return view($this->viewPath . 'returnErrors', $response);
-
     }
-
     public function returnSplitPackage()
     {
         $quantity = request('quantity');
@@ -740,10 +698,8 @@ class PackageController extends Controller
             'model' => $model,
             'quantity' => $quantity,
         ];
-
         return view($this->viewPath . 'splitPackage', $response);
     }
-
     public function editTrackingNo($id)
     {
         $hideUrl = $_SERVER['HTTP_REFERER'];
@@ -756,10 +712,8 @@ class PackageController extends Controller
             'model' => $model,
             'hideUrl' => $hideUrl
         ];
-
         return view($this->viewPath . 'editTrackingNo', $response);
     }
-
     public function multiPlace($tmp)
     {
         $arr = [];
@@ -776,10 +730,8 @@ class PackageController extends Controller
                 }
             }
         }
-
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', $this->mainTitle . '已重新匹配.'));
     }
-
     public function implodePackage($tmp)
     {
         $arr = [];
@@ -832,10 +784,8 @@ class PackageController extends Controller
         $model->forceCancelPackage();
         $to = json_encode($newPackage);
         $this->eventLog($name, '合并包裹', $to, $from);
-
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));
     }
-
     public function editTrackStore($id)
     {
         $model = $this->model->with('items')->find($id);
@@ -850,7 +800,6 @@ class PackageController extends Controller
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url);
     }
-
     public function actSplitPackage($arr, $id)
     {
         $model = $this->model->find($id);
@@ -899,11 +848,8 @@ class PackageController extends Controller
             }
             $model->cancelPackage();
         }
-
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '包裹拆分成功.'));
-
     }
-
     public function processArr($arr, $model)
     {
         $tmp = [];
@@ -925,10 +871,8 @@ class PackageController extends Controller
             }
             $tmp[$buf[0]][$buf[1]]['quantity'] += 1;
         }
-
         return $tmp;
     }
-
     public function downloadType()
     {
         $rows[] = [
@@ -943,7 +887,6 @@ class PackageController extends Controller
             });
         })->download('csv');
     }
-
     public function downloadTrackingNo()
     {
         $rows[] = [
@@ -957,7 +900,6 @@ class PackageController extends Controller
             });
         })->download('csv');
     }
-
     public function downloadLogisticsTno()
     {
         $rows[] = [
@@ -972,7 +914,6 @@ class PackageController extends Controller
             });
         })->download('csv');
     }
-
     public function forceOutPackage()
     {
         $package_id = trim(request('package_id'));
@@ -990,10 +931,8 @@ class PackageController extends Controller
         $package->update(['status' => 'PACKED']);
         $to = json_decode($package);
         $this->eventLog($name, '强制出库', $to, $from);
-
         return json_encode(true);
     }
-
     public function multiPackage()
     {
         $package_id = trim(request('package_id'));
@@ -1038,10 +977,8 @@ class PackageController extends Controller
             return json_encode(false);
         }
         DB::commit();
-
         return json_encode(true);
     }
-
     public function storeAllocateLogistics($id)
     {
         $model = $this->model->find($id);
@@ -1057,10 +994,8 @@ class PackageController extends Controller
         $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
         $to = json_encode($model);
         $this->eventLog($name, '拆分包裹', $to, $from);
-
         return redirect($this->mainIndex);
     }
-
     public function ajaxQuantityProcess()
     {
         $buf = request()->input('buf');
@@ -1085,10 +1020,8 @@ class PackageController extends Controller
             }
             DB::commit();
         }
-
         return json_encode(true);
     }
-
     /**
      * 添加未处理包裹至分配物流方式队列
      * @return \Illuminate\Http\RedirectResponse
@@ -1118,13 +1051,13 @@ class PackageController extends Controller
         return redirect(route('dashboard.index'))->with('alert',
             $this->alert('success', '添加至 [ASSIGN LOGISTICS] 队列成功'));
     }
-
     /**
      * 添加已分配物流方式包裹至物流下单队列
      * @return \Illuminate\Http\RedirectResponse
      */
     public function placeLogistics()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model
@@ -1160,7 +1093,6 @@ class PackageController extends Controller
         return redirect(route('dashboard.index'))->with('alert',
             $this->alert('success', '包裹[' . implode(',', $packageIds) . ']添加至 [PLACE LOGISTICS] 队列成功'));
     }
-
     public function create()
     {
         $response = [
@@ -1168,7 +1100,6 @@ class PackageController extends Controller
         ];
         return view($this->viewPath . 'create', $response);
     }
-
     public function store()
     {
         request()->flash();
@@ -1185,7 +1116,6 @@ class PackageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
         }
     }
-
     public function update($id)
     {
         $model = $this->model->find($id);
@@ -1200,10 +1130,8 @@ class PackageController extends Controller
             'shipping_firstname' => array_key_exists('0', $arr) ? $arr['0'] : '',
             'shipping_lastname' => array_key_exists('1', $arr) ? $arr['1'] : ''
         ]);
-
         return redirect($this->mainIndex);
     }
-
     /**
      * 删除
      *
@@ -1219,7 +1147,6 @@ class PackageController extends Controller
         $model->cancelPackage();
         return redirect($this->mainIndex);
     }
-
     public function ajaxReturnPackageId()
     {
         $trackno = request('trackno');
@@ -1231,7 +1158,6 @@ class PackageController extends Controller
         }
         return json_encode(false);
     }
-
     public function ajaxUpdatePackageLogistics()
     {
         $package_id = request('package_id');
@@ -1247,10 +1173,8 @@ class PackageController extends Controller
             $model->update(['logistics_id' => $logistics_id]);
             return json_encode($model->id);
         }
-
         return json_encode(false);
     }
-
     public function ajaxGetOrder()
     {
         if (request()->ajax()) {
@@ -1264,7 +1188,6 @@ class PackageController extends Controller
         }
         return 'error';
     }
-
     public function manualShipping()
     {
         $response = [
@@ -1272,10 +1195,8 @@ class PackageController extends Controller
             'logisticses' => LogisticsModel::all(),
             'packages' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->paginate(15),
         ];
-
         return view($this->viewPath . 'manualShipping', $response);
     }
-
     public function manualLogistics()
     {
         $response = [
@@ -1283,10 +1204,8 @@ class PackageController extends Controller
             'logisticses' => LogisticsModel::all(),
             'packages' => $this->model->where(['status' => 'ASSIGNFAILED', 'is_auto' => '1'])->paginate(15),
         ];
-
         return view($this->viewPath . 'manualLogistics', $response);
     }
-
     public function setManualLogistics()
     {
         $id = request('id');
@@ -1298,7 +1217,6 @@ class PackageController extends Controller
         $logistics = LogisticsModel::find($logistics_id);
         $object = $logistics->logisticsChannels->where('channel_id', $model->channel_id)->first();
         $trackingUrl = $object ? $object->url : '';
-
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
         $model->update([
             'logistics_id' => $logistics_id,
@@ -1316,10 +1234,8 @@ class PackageController extends Controller
         } else {
             $this->model->order->reviewOrder(); //todo：
         }
-
         return json_encode(true);
     }
-
     // public function ajaxPackageSend()
     // {
     //     $id = request()->input('id');
@@ -1339,7 +1255,6 @@ class PackageController extends Controller
     //     DB::commit();
     //     return json_encode('success');
     // }
-
     /**
      * 撤销包装的单个package
      *
@@ -1363,7 +1278,6 @@ class PackageController extends Controller
         }
         return json_encode(true);
     }
-
     /**
      * 跳转发货页面
      *
@@ -1377,10 +1291,8 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__, '出库复检'),
             'logistics' => LogisticsModel::all(),
         ];
-
         return view($this->viewPath . 'shipping', $response);
     }
-
     /**
      * 导出手工发货包裹信息
      *
@@ -1416,7 +1328,6 @@ class PackageController extends Controller
             });
         })->download('csv');
     }
-
     public function bagInfo()
     {
         $trackno = request('trackno');
@@ -1434,10 +1345,8 @@ class PackageController extends Controller
             'number' => 'S' . substr($number->number + 100000000, 1),
         ];
         $number->update(['number' => $number->number + 1]);
-
         return view($this->viewPath . 'bagInfo', $response);
     }
-
     /**
      * 执行发货
      *
@@ -1488,16 +1397,13 @@ class PackageController extends Controller
         } else {
             $order->update(['status' => 'PARTIAL']);
         }
-
         $to = json_encode($package);
         $this->eventLog($name, '包裹已发货', $to, $from);
         if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');
         }
-
         return json_encode('success');
     }
-
     /**
      * 跳转发货统计页面
      *
@@ -1510,10 +1416,8 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, '发货统计'),
         ];
-
         return view($this->viewPath . 'statistics', $response);
     }
-
     /**
      * 导出数据 according to start_time end_time
      *
@@ -1529,7 +1433,6 @@ class PackageController extends Controller
             [$start_time, $end_time])->get();
         $this->model->exportData($packages);
     }
-
     /**
      * 跳转excel页面
      *
@@ -1543,10 +1446,8 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__, '导入trackno'),
             'action' => route('package.excelProcess'),
         ];
-
         return view($this->viewPath . 'excel', $response);
     }
-
     /**
      * excel 处理
      *
@@ -1562,11 +1463,9 @@ class PackageController extends Controller
                 'metas' => $this->metas(__FUNCTION__, '导入结果'),
                 'errors' => $errors,
             ];
-
             return view($this->viewPath . 'excelResult', $response);
         }
     }
-
     // public function errorToShipped()
     // {
     //     $id = request('id');
@@ -1584,10 +1483,8 @@ class PackageController extends Controller
     //             $packageItem->id);
     //     }
     //     $model->update(['status' => 'PACKED']);
-
     //     return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功.'));
     // }
-
     /**
      * 跳转excel页面
      *
@@ -1602,10 +1499,8 @@ class PackageController extends Controller
             'action' => route('package.excelProcessFee', ['type' => request('type')]),
             'type' => request('type') ? request('type') : '',
         ];
-
         return view($this->viewPath . 'excel', $response);
     }
-
     /**
      * excel 处理
      *
@@ -1622,11 +1517,9 @@ class PackageController extends Controller
                 'errors' => $errors,
                 'type' => $type,
             ];
-
             return view($this->viewPath . 'excelFeeResult', $response);
         }
     }
-
     /**
      * 包裹面单信息
      */
@@ -1639,11 +1532,8 @@ class PackageController extends Controller
                 'metas' => $this->metas(__FUNCTION__),
                 'model' => $model,
             ];
-
             return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
         }
-
         return false;
     }
-
 }

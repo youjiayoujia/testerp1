@@ -30,7 +30,6 @@ use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 use Logistics;
 use App\Models\Package\AllReportModel;
-use Session;
 
 class PackageController extends Controller
 {
@@ -114,7 +113,7 @@ class PackageController extends Controller
             'pagetype' => $pagetype,
         ];
         $this->model->clearSession();
-
+        
         return view($this->viewPath . 'index', $response);
     }
     public function showAllView()
@@ -407,10 +406,11 @@ class PackageController extends Controller
             'weatherNum' => $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
             'placeNum' => $this->model
-                ->relatedGet($this->model, 'order', 'status', 'REVIEW')
-                ->where('packages.status', 'ASSIGNED')->where('packages.is_auto',
-                '1')->where('packages.queue_name', '!=', 'placeLogistics')
-                ->count(),
+                ->where('status', 'ASSIGNED')->where('is_auto',
+                '1')->where('queue_name', '!=', 'placeLogistics')
+                ->whereHas('order', function($single){
+                    $single->where('status', '!=', 'REVIEW');
+                })->count(),
             'manualShip' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
@@ -427,7 +427,6 @@ class PackageController extends Controller
             'reportModel' => $reportModel,
             'arr' => $arr
         ];
-        Session::forget('packages.order');
         return view($this->viewPath . 'flow', $response);
     }
     public function autoFailAssignLogistics()

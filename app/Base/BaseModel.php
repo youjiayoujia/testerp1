@@ -5,6 +5,7 @@ namespace App\Base;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Event\CategoryModel;
+use Session;
 
 class BaseModel extends Model
 {
@@ -58,16 +59,21 @@ class BaseModel extends Model
         return $arr;
     }
 
-    
     public function relatedGet($model = '', $relation_ship='', $key='', $value='')
     {
-        $model = $model->leftjoin($model->relation_arr[$relation_ship][0], 
-                                  $model->relation_arr[$relation_ship][0].'.'.$model->relation_arr[$relation_ship][1], 
+        if(Session::has($this->table.'.'.$relation_ship)) {
+            $model = $model->where($this->relation_arr[$relation_ship][0].'.'.$key, $value)
+                ->select($this->table.'.*');
+        } else {
+            Session::flash($this->table.'.'.$relation_ship, '1');
+            $model = $model->join($this->relation_arr[$relation_ship][0], 
+                                  $this->relation_arr[$relation_ship][0].'.'.$this->relation_arr[$relation_ship][1], 
                                   '=', 
-                                  $model->table.'.'.$model->relation_arr[$relation_ship][2])
-                ->where($model->relation_arr[$relation_ship][0].'.'.$key, $value)
-                ->select($model->table.'.*');
-
+                                  $this->table.'.'.$this->relation_arr[$relation_ship][2])
+                ->where($this->relation_arr[$relation_ship][0].'.'.$key, $value)
+                ->select($this->table.'.*');
+        }
+        
         return $model;
     }
 }

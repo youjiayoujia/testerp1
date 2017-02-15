@@ -81,15 +81,12 @@ class ItemModel extends BaseModel
         'us_rate',
         'uk_rate',
         'eu_rate',
+        'declared_value',
     ];
 
     public function getMixedSearchAttribute()
     {
-        $catalogs = CatalogModel::all();
-        $arr = [];
-        foreach ($catalogs as $key => $single) {
-            $arr[$single->id] = $single->c_name;
-        }
+        
         return [
             'relatedSearchFields' => [],
             'filterFields' => ['html_mod'],
@@ -98,7 +95,7 @@ class ItemModel extends BaseModel
                 'new_status' => config('item.new_status'),
                 'warehouse_id' => WarehouseModel::all()->pluck('name', 'id'),
             ],
-            'selectRelatedSearchs' => ['supplier' => ['name' => SupplierModel::all()->pluck('name', 'id')],],
+            'selectRelatedSearchs' => ['supplier' => ['name' => []],],
             'doubleRelatedSelectedFields' => [],
             'sectionSelect' => [],
             'sectionGangedDouble' => [
@@ -193,7 +190,7 @@ class ItemModel extends BaseModel
         return $str;
     }
 
-    public function getDeclaredValueAttribute()
+    /*public function getDeclaredValueAttribute()
     {
         $purchase_price = $this->purchase_price;
         if (($purchase_price / 6) < 1) {
@@ -205,7 +202,7 @@ class ItemModel extends BaseModel
         }
 
         return $value;
-    }
+    }*/
 
     public function getImageAttribute()
     {
@@ -239,7 +236,18 @@ class ItemModel extends BaseModel
     {
         return $this->stocks->sum('available_quantity');
     }
-
+    //本地仓库实库存
+    public function getAllQuantityLocalAttribute()
+    {
+        $warehouse = new WarehouseModel;
+        return $this->stocks()->whereIn('warehouse_id',$warehouse->getLocalIds())->get()->sum('all_quantity');
+    }
+    //本地虚仓库虚库存
+    public function getAvailableQuantityLocalAttribute()
+    {
+        $warehouse = new WarehouseModel;
+        return$this->stocks()->whereIn('warehouse_id',$warehouse->getLocalIds())->get()->sum('available_quantity');
+    }
     //普通在途库存
     public function getNormalTransitQuantityAttribute()
     {
@@ -343,16 +351,13 @@ class ItemModel extends BaseModel
         $num = DB::select('select packages.warehouse_id,sum(package_items.quantity) as num from packages,package_items where packages.status in ("NEED","TRACKINGFAILED","ASSIGNED","ASSIGNFAILED") and package_items.warehouse_position_id=0 and package_items.item_id = "' . $item_id . '" and
                 packages.id = package_items.package_id and packages.deleted_at is null group by packages.warehouse_id');
         $data = [];
-
         $warehouses = WarehouseModel::all();
         foreach ($warehouses as $warehouse) {
             $data[$warehouse->id]['need'] = 0;
         }
-
         foreach ($num as $key => $value) {
             $data[$value->warehouse_id]['need'] += $value->num;
         }
-
         return $data;
     }
 
@@ -848,15 +853,13 @@ class ItemModel extends BaseModel
         //print_r($zaitu_num);exit;
 
         //缺货
-        //$data['need_total_num'] = DB::select('select sum(order_items.quantity) as num from orders,order_items,purchases where orders.status= "NEED" and 
-            //orders.id = order_items.order_id and orders.deleted_at is null and purchases.item_id = order_items.item_id and order_items.item_id ="' . $this->id . '" ')[0]->num;
         $data['need_total_num'] = $this->out_of_stock?$this->out_of_stock:0;
 
         $data['zaitu_num'] = $zaitu_num;
         //实库存
-        $data['all_quantity'] = $this->all_quantity;
+        $data['all_quantity'] = $this->all_quantity_local;
         //可用库存
-        $data['available_quantity'] = $this->available_quantity;
+        $data['available_quantity'] = $this->available_quantity_local;
         $xu_kucun = $this->available_quantity - $data['need_total_num'];
         //7天销量
         $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
@@ -1052,9 +1055,9 @@ class ItemModel extends BaseModel
 
             $data['zaitu_num'] = $zaitu_num;
             //实库存
-            $data['all_quantity'] = $item->all_quantity;
+            $data['all_quantity'] = $item->all_quantity_local;
             //可用库存
-            $data['available_quantity'] = $item->available_quantity;
+            $data['available_quantity'] = $item->available_quantity_local;
             //虚库存
             /*$quantity = $requireModel->where('is_require', 1)->where('item_id',
                 $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',
@@ -1478,7 +1481,7 @@ class ItemModel extends BaseModel
                                         product_warehouse_id,products_location,products_name_en,products_name_cn,products_declared_en,products_declared_cn,
                                         products_declared_value,products_weight,products_value,products_suppliers_id,products_suppliers_ids,products_check_standard,weightWithPacket,
                                         products_more_img,productsPhotoStandard,products_remark_2,products_volume,products_status_2,productsIsActive
-                                        from erp_products_data where productsIsActive = 1 and model="E8217B" order by products_id desc');
+                                        from erp_products_data where productsIsActive = 1 and spu!="" order by products_id desc');
         foreach ($erp_products_data as $data) {
             $itemModel = $this->where('sku', $data->products_sku)->get()->first();
             if (count($itemModel)) {
@@ -1780,6 +1783,18 @@ class ItemModel extends BaseModel
             }
         }
 
+    }
+
+    //
+    public function revertTo()
+    {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $items = $this->all();
+        foreach ($items as $item) {
+            
+            $item->update(['declared_value'=>$item->product->declared_value]);
+        }
     }
 
 }

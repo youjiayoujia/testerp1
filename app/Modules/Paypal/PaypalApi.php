@@ -9,7 +9,7 @@ namespace App\Modules\Paypal;
 
 Class PaypalApi
 {
-    private $RUL;
+    private $URL;
     private $VERSION;
     private $PWD;
     private $USER;
@@ -19,12 +19,12 @@ Class PaypalApi
 
     public function __construct($config)
     {
-        $this->RUL = "https://api-3t.paypal.com/nvp";
+        $this->URL = "https://api-3t.paypal.com/nvp";
         $this->VERSION = urlencode('51.0');
         $this->USER = urlencode(trim($config->paypal_account));
         $this->PWD = urlencode(trim($config->paypal_password));
         $this->SIGNATURE = urlencode(trim($config->paypal_token));
-        $this->baseNvpreq = "VERSION=" . $this->VERSION . "&PWD=" . $this->PWD . "&USER=" . $this->USER . "&SIGNATURE=" . $this->SIGNATURE;
+        $this->baseNvpreq = "VERSION=" . $this->VERSION . "&PWD=" . $this->PWD . "&USER=" . $this->USER . "&SIGNATURE=" . $this->SIGNATURE . '&';
     }
 
 
@@ -34,7 +34,7 @@ Class PaypalApi
         $nvpreq = "METHOD=" . $callName . "&VERSION=" . $this->VERSION . "&PWD=" . $this->PWD . "&USER=" . $this->USER . "&SIGNATURE=" . $this->SIGNATURE . "&TRANSACTIONID=" . urldecode(trim($TRANSACTIONID));
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->RUL);
+        curl_setopt($ch, CURLOPT_URL, $this->URL);
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh- CN; rv:1.9.0.5) Gecko/2008120122 Firefox/3.0.5 FirePHP/0.2.1');
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
@@ -71,10 +71,13 @@ Class PaypalApi
      * 退款
      */
     public function apiRefund($ParamAry){
-        
-        $nvpreq = 'METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry,'','&',PHP_QUERY_RFC3986);
+
+        //$nvpreq = 'METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry,'','&',PHP_QUERY_RFC3986);
+        $nvpreq = 'METHOD=RefundTransaction&'.$this->baseNvpreq.http_build_query($ParamAry);
+        //dd($this->baseNvpreq);
+        //echo $nvpreq.'<br/>';
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->RUL);
+        curl_setopt($ch, CURLOPT_URL, $this->URL);
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh- CN; rv:1.9.0.5) Gecko/2008120122 Firefox/3.0.5 FirePHP/0.2.1');
 
@@ -84,7 +87,7 @@ Class PaypalApi
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         //curl_setopt($ch, CURLOPT_SSLVERSION, 3);
-        curl_setopt($ch, CURLOPT_CAINFO,base_path('public\cacert.pem'));
+        curl_setopt($ch, CURLOPT_CAINFO,base_path('public/cacert.pem'));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -99,29 +102,17 @@ Class PaypalApi
         $result = curl_exec($ch);
         //$error = curl_error($ch);
         //var_dump($error);
-        if($result)
-        {
-            $resultArray = explode('&',$result);
-            $httpResponseArray = array();
-            foreach($resultArray as $str)
-            {
-                $strArray = explode('=',$str);
-                $httpResponseArray[$strArray[0]] = urldecode($strArray[1]);
-            }
-
-            if(0 == sizeof($httpResponseArray) || !array_key_exists('ACK',$httpResponseArray))
-            {
-                return false;
-            }
-            else
-            {
-                //保存退款返回的记录
-                return true;
+        if(! empty($result)){
+            $result = explode('&', $result);
+            foreach ($result as $item){
+                if(! empty($item)){
+                    $filter = explode('=',$item);
+                    if($filter[0] == 'ACK' && $filter[1] = 'Success'){
+                        return true;
+                    }
+                }
             }
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 }

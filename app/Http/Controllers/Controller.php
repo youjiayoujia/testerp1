@@ -106,7 +106,7 @@ abstract class Controller extends BaseController
                                 $name = trim($name);
                                 if ($name != '') {
                                     $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
-                                        $query = $query->where($k, 'like', '%' . $name . '%');
+                                        $query = $query->where($k, $name);
                                     });
                                 }
                             }
@@ -122,7 +122,7 @@ abstract class Controller extends BaseController
                                             function ($query) use ($relation_ship2, $name, $key) {
                                                 $query = $query->wherehas($relation_ship2,
                                                     function ($query1) use ($name, $key) {
-                                                        $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                        $query1 = $query1->where($key, $name);
                                                     });
                                             });
                                     }
@@ -140,7 +140,7 @@ abstract class Controller extends BaseController
                                             function ($query) use ($relation_ship2, $name, $key) {
                                                 $query = $query->wherehas($relation_ship2,
                                                     function ($query1) use ($name, $key) {
-                                                        $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                        $query1 = $query1->where($key, $name);
                                                     });
                                             });
                                     }
@@ -152,7 +152,7 @@ abstract class Controller extends BaseController
                         foreach ($related as $key => $value3) {
                             $value3 = trim($value3);
                             if ($value3) {
-                                $list = $list->where($key, 'like', '%' . $value3 . '%');
+                                $list = $list->where($key, $value3);
                             }
                         }
                         break;
@@ -192,10 +192,11 @@ abstract class Controller extends BaseController
                 }
             }
         }
+
         return $list;
     }
 
-    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null)
+    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null, $level = '', $preload = '')
     {
         $list = $list ? $list : $model;
         if (request()->has('keywords')) {
@@ -203,7 +204,7 @@ abstract class Controller extends BaseController
             $searchFields = $model->searchFields;
             $list = $list->where(function ($query) use ($keywords, $searchFields) {
                 foreach ($searchFields as $key => $searchField) {
-                    $query = $query->orWhere($key, trim($keywords));
+                    $query = $query->orWhere($key, 'like', '%'.trim($keywords).'%');
                 }
             });
         }
@@ -216,9 +217,13 @@ abstract class Controller extends BaseController
                             foreach ($name_arr as $k => $name) {
                                 $name = trim($name);
                                 if ($name != '') {
-                                    $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
-                                        $query = $query->where($k, 'like', '%' . $name . '%');
-                                    });
+                                    if(!$level) {
+                                        $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
+                                            $query = $query->where($k, $name);
+                                        }); 
+                                    } else {
+                                        $list = $list->relatedGet($list, $relation_ship, $k, $name);
+                                    }
                                 }
                             }
                         }
@@ -233,7 +238,7 @@ abstract class Controller extends BaseController
                                             function ($query) use ($relation_ship2, $name, $key) {
                                                 $query = $query->wherehas($relation_ship2,
                                                     function ($query1) use ($name, $key) {
-                                                        $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                        $query1 = $query1->where($key, $name);
                                                     });
                                             });
                                     }
@@ -251,7 +256,7 @@ abstract class Controller extends BaseController
                                             function ($query) use ($relation_ship2, $name, $key) {
                                                 $query = $query->wherehas($relation_ship2,
                                                     function ($query1) use ($name, $key) {
-                                                        $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                        $query1 = $query1->where($key, $name);
                                                     });
                                             });
                                     }
@@ -263,7 +268,7 @@ abstract class Controller extends BaseController
                         foreach ($related as $key => $value3) {
                             $value3 = trim($value3);
                             if ($value3) {
-                                $list = $list->where($key, 'like', '%' . $value3 . '%');
+                                $list = $list->where($key, $value3);
                             }
                         }
                         break;
@@ -312,7 +317,7 @@ abstract class Controller extends BaseController
                                                     function ($query) use ($relation_ship2, $name, $key) {
                                                         $query = $query->wherehas($relation_ship2,
                                                             function ($query1) use ($name, $key) {
-                                                                $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                                $query1 = $query1->where($key, $name);
                                                             });
                                                     });
                                             }
@@ -374,14 +379,23 @@ abstract class Controller extends BaseController
             }
         }
         if (request()->has('sorts')) {
-            foreach (DataList::sortsDecode(request()->input('sorts')) as $sort) {
-                $list = $list->orderBy($sort['field'], $sort['direction']);
+            if($list->first()) {
+                foreach (DataList::sortsDecode(request()->input('sorts')) as $sort) {
+                    $list = $list->orderBy($list->first()->table.'.'.$sort['field'], $sort['direction']);
+                }
             }
         } else {
-            $list = $list->orderBy('id', 'desc');
+            if($list->first()) {
+                $list = $list->orderBy($list->first()->table.'.id', 'desc');
+            }
         }
         if (!$pageSize) {
             $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
+        }
+        if($preload) {
+            foreach($preload as $single) {
+                $list = $list->with($single);
+            }
         }
         return $list->paginate($pageSize, $fields);
     }

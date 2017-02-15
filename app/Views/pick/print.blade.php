@@ -55,6 +55,7 @@
             <th>注意事项</th>
             <th>品名</th>
             <th>拣货单id</th>
+            <th>可用库存</th>
         </thead>
         <tbody>
             @foreach($picklistitems as $key => $picklistitem)
@@ -66,6 +67,7 @@
                     <td>{{ $picklistitem->items ? $picklistitem->items->remark : '' }}</td>
                     <td>{{ $picklistitem->items ? $picklistitem->items->c_name : '' }}</td>
                     <td>{{ $model->picknum }}</td>
+                    <td>{{ $picklistitem->items->stocks()->where('warehouse_position_id', $picklistitem->warehouse_position_id)->first()->all_quantity }}</td>
                 </tr>
                 @endif
             @endforeach

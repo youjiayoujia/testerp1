@@ -18,7 +18,7 @@ class CreateSendEbayMessageListTable extends Migration
 			$table->integer('operate_id');
 			$table->integer('order_id');
 			$table->string('title')->nullable();
-			$table->string('content')->nullable();
+			$table->text('content')->nullable();
 			$table->enum('is_send', array('0','1'))->default('0');
 			$table->string('itemids')->nullable();
 			$table->timestamps();

@@ -57,4 +57,16 @@ class BaseModel extends Model
         }
         return $arr;
     }
+
+    public function relatedGet($model = '', $relation_ship='', $key='', $value='')
+    {
+        $model = $model->leftjoin($model->relation_arr[$relation_ship][0], 
+                                  $model->relation_arr[$relation_ship][0].'.'.$model->relation_arr[$relation_ship][1], 
+                                  '=', 
+                                  $model->table.'.'.$model->relation_arr[$relation_ship][2])
+                ->where($model->relation_arr[$relation_ship][0].'.'.$key, $value)
+                ->select($model->table.'.*');
+
+        return $model;
+    }
 }

@@ -113,6 +113,6 @@ class UpdateEbaySkuSaleReport extends Command
             }
         }
         $end = microtime(true);
-        echo '黑名单抓取耗时' . round($end - $begin, 3) . '秒';
+        echo 'EbaySku销量报表更新耗时' . round($end - $begin, 3) . '秒';
     }
 }

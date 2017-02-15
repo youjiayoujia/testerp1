@@ -46,11 +46,10 @@
         <p style="width:230px;height:auto;border:2px solid #000;float:right;margin-top:5px;word-wrap: break-word;">
             To:{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
             {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
-            {{ $model->shipping_city }}<br/>
-            {{ $model->shipping_state }}<br/>
+            {{ $model->shipping_city }}&nbsp;&nbsp;&nbsp;{{ $model->shipping_state }}
+            <br/>
             ZIP:{{ $model->shipping_zipcode }}<br/>
-            TEL:{{ $model->shipping_phone }}<br/>
-            {{ $model->country ? $model->country->code : '' }}
+            {{ $model->country ? $model->country->code : '' }}&nbsp;&nbsp;&nbsp;TEL:{{ $model->shipping_phone }}<br/>
         </p>
     </div>
     <div style="width:100%;height:55px;">
@@ -59,9 +58,10 @@
             <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             <br/>{{$model->tracking_no}}
         </p>
-    </div><br>
+    </div><br/>
     <div style="width:100%;height:50px;">
         <p style="width:240px;height:100%;float:left;font-weight:bold;text-align:center;">
+            <br/>
             <img src="{{ route('barcodeGen', ['content' => $model->logistics_order_number]) }}">
             <br/>{{$model->logistics_order_number}}
         </p>

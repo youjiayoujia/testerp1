@@ -266,6 +266,18 @@
                 <?php
                     break;
 
+                case 'declared_value':
+                ?>
+                
+                    <div class="form-group col-md-3">
+                        <label for="color">申报价值</label>
+                        <input class="form-control" id="declared_value" placeholder="" name='declared_value' value="{{old('declared_value')}}">
+                    </div>
+                    
+                
+                <?php
+                    break;
+
                 case 'catalog':
                 ?>
                     <div class="form-group col-md-3">

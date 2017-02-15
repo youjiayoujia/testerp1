@@ -35,19 +35,32 @@
 <div class="panel panel-default">
     <div class="panel-heading">调拨单sku列表</div>
     <div class="panel-body">
-    @foreach($allotments as $allotment)
-    <div class='row'>
-        <div class="col-lg-2">
-            <strong>sku</strong>: {{ $allotment->item ? $allotment->item->sku : '' }}
-        </div>
-        <div class="col-lg-2">
-            <strong>库位</strong>: {{ $allotment->position ? $allotment->position->name : '' }}
-        </div>
-        <div class="col-lg-2">
-            <strong>数量</strong>: {{ $allotment->quantity }}
-        </div>
-    </div>
-    @endforeach
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+            <th>sku</th>
+            <th>库位</th>
+            <th>数量</th>
+            <th>实发数量</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach($allotments as $allotment)
+        <tr>
+            <td>{{ $allotment->item ? $allotment->item->sku : '' }}</td>
+            <td>{{ $allotment->position ? $allotment->position->name : '' }}</td>
+            <td>{{ $allotment->quantity }}</td>
+            <td>{{ $allotment->inboxed_quantity }}</td>
+        </tr>
+        @endforeach
+        <tr>
+            <td>sku总数:{{ $allotments->groupBy('item_id')->count() }}</td>
+            <td>调拨总数:{{ $allotments->sum('quantity') }}</td>
+            <td>实发总数:{{ $allotments->sum('inboxed_quantity') }}</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
     </div>
 </div>
 
@@ -60,11 +73,14 @@
         </tr>
     </thead>
     <tbody>
-    <tr class='success'><td>ERP总重量</td><td>{{$all_weight}}kg</td><td>ERP总重量=erp重量x商品实发数 ，累加</td></tr>
-    <tr class='success'><td>实测总重量</td><td>{{$model->boxes ? $model->boxes->sum('weight') : ''}}kg</td><td>实测总重量=各箱重量之和</td></tr>
-    <tr class='success'><td>实测体积</td><td>{{$volumn}}</td><td>实测体积=各箱体积重之和体积重=（长*宽*高）÷6000</td></tr>
-    <tr class='success'><td>实际总运费</td><td>{{$model->boxes ? $model->boxes->sum('fee') : ''}}￥</td><td>人工手动输入</td></tr>
-    <tr class='success'><td>预测总运费</td><td>{{ $model->boxes ? $model->boxes->sum('expected_fee') : ''}}￥</td><td>各箱之和</td></tr>
+    <tr class='success'><td>ERP总重量</td><td>{{$all_weight}}kg</td><td>=∑每个SKU的重量x实际发走的每个SKU体积系数</td></tr>
+    <tr class='success'><td>实测总重量</td><td>{{$model->boxes ? $model->boxes->sum('weight') : ''}}kg</td><td>=∑各箱实际录入重量之和</td></tr>
+    <tr class='success'><td>体积重</td><td>{{round($volumn, 2)}}</td><td>=∑每箱体积重（每箱子长*宽*高）÷6000</td></tr>
+    <tr class='success'><td>实际总运费</td><td>{{ $model->fee }}￥</td><td>人工手动输入</td></tr>
+    <tr class='success'><td>ERP总运费</td><td>{{ $model->boxes ? $model->boxes->sum('expected_fee') : ''}}￥</td><td>=头程物流单价xERP总重量</td></tr>
+    <tr class='success'><td>预计到货时间</td><td>{{ $model->expected_date }}</td><td></td></tr>
+    <tr class='success'><td>ERP总税金</td><td>{{ $model->virtual_rate }}</td><td></td></tr>
+    <tr class='success'><td>实际总税金</td><td>{{ $model->actual_rate_value }}</td><td></td></tr>
     </tbody>
 </table>
 
@@ -74,32 +90,25 @@
     @foreach($boxes as $key => $box)
     <div class='row'>
         <div class="form-group col-lg-3">
-            <label>箱号</label>
-            <input type='text' class="form-control" value="{{ $box->boxnum }}">
+            <strong>箱号</strong>: {{ $box->boxnum }}
         </div>
         <div class="form-group col-lg-3">
-            <label>物流方式</label>
-            <input type='text' class="form-control" value="{{ $box->logistics ? $box->logistics->name : '' }}">
+            <strong>物流方式</strong>: {{ $box->logistics ? $box->logistics->name : '' }}
         </div>
         <div class="form-group col-lg-3">
-            <label>体积(m3)</label>
-            <input type='text' class="form-control" value="{{ $box->length . '*' . $box->width . '*' . $box->height }}">
+            <strong>体积(cm3)</strong>: {{ $box->length . '*' . $box->width . '*' . $box->height }}
         </div>
         <div class="form-group col-lg-3">
-            <label>预估重量(kg)</label>
-            <input type='text' class="form-control" value="{{$arr[$key]}}">
+            <strong>预估重量(kg)</strong>: {{ $arr[$key] }}
         </div>
         <div class="form-group col-lg-3">
-            <label>实际重量(kg)</label>
-            <input type='text' class="form-control" value="{{ $box->weight }}">
+            <strong>实际重量(kg)</strong>: {{ $box->weight }}
         </div>
         <div class="form-group col-lg-3">
-            <label>体积重</label>
-            <input type='text' class="form-control" value="{{ round($box->length * $box->height * $box->width / 5000, 3) }}">
+            <strong>体积重(kg)</strong>: {{ round($box->length * $box->height * $box->width / 6000, 3) }}
         </div>
         <div class="form-group col-lg-3">
-            <label>体积系数</label>
-            <input type='text' class="form-control" value="{{ $box->weight != 0 ? round($box->length * $box->height * $box->width / 5000 / $box->weight, 4) : '重量为0' }}">
+            <strong>体积系数</strong>: {{ $box->weight != 0 ? round($box->length * $box->height * $box->width / 6000 / $box->weight, 3) : '重量为0' }}
         </div>
     </div>
 
@@ -109,6 +118,8 @@
             <tr>
             <th>sku</th>
             <th>数量</th>
+            <th>申报名称</th>
+            <th>申报价值</th>
             </tr>
         </thead>
         <tbody>
@@ -116,6 +127,8 @@
         <tr class='success'>
             <td>{{ $form->sku }}</td>
             <td>{{ $form->quantity }}</td>
+            <td>{{ $form->item->product->declared_en }}</td>
+            <td>{{ $form->item->declared_value }}</td>
         </tr>
         @endforeach
         </tbody>

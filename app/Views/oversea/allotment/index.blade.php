@@ -50,21 +50,19 @@
                     </a>
                 @endif
                 @if(in_array($overseaAllotment->status, ['inboxed', 'out']))
-                    <a href="{{route('overseaAllotment.returnBoxInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回填箱子信息并出库'>
+                    <a href="{{route('overseaAllotment.returnAllInfo', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='回填箱子信息并出库'>
                         <span class="glyphicon glyphicon-folder-close"></span>
                     </a>
-                @endif
-                @if(in_array($overseaAllotment->status, ['new', 'pick']))
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $overseaAllotment->id }}"
-                   data-url="{{ route('overseaAllotment.destroy', ['id' => $overseaAllotment->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </a>
                 @endif
                 @if($overseaAllotment->status == 'out')
                     <a href="{{route('overseaAllotment.allotmentInStock', ['id' => $overseaAllotment->id])}}" class="btn btn-success btn-xs" title='调拨单已入库'>
                         <span class="glyphicon glyphicon-sort-by-attributes"></span>
                     </a>
+                @endif
+                @if(in_array($overseaAllotment->status, ['out', 'over']))
+                <a href="javascript:" class="btn btn-success btn-xs printBox" title='打印装箱单'>
+                    <span class="glyphicon glyphicon-folder-open"></span>
+                </a>
                 @endif
             </td>
         </tr>
@@ -77,6 +75,16 @@
             $(document).on('click', '.print', function () {
                 id = $(this).parent().parent().find('td:eq(0)').text();
                 src = "{{ route('overseaAllotment.pick', ['id'=>'']) }}/" + id;
+                $('#iframe_print').attr('src', src);
+                $('#iframe_print').load(function () {
+                    $('#iframe_print')[0].contentWindow.focus();
+                    $('#iframe_print')[0].contentWindow.print();
+                });
+            });
+
+            $(document).on('click', '.printBox', function () {
+                id = $(this).parent().parent().find('td:eq(0)').text();
+                src = "{{ route('overseaAllotment.printBox', ['id'=>'']) }}/" + id;
                 $('#iframe_print').attr('src', src);
                 $('#iframe_print').load(function () {
                     $('#iframe_print')[0].contentWindow.focus();

@@ -133,7 +133,7 @@ class SmtAdapter extends BasicAdapter
             
             $addressArray = array(
                 'receiver' => array( //收件人地址
-                    'country' => $package->shipping_country,
+                    'country' => $package->shipping_country ? ($package->shipping_country == 'GB' ? 'UK' : $package->shipping_country) : '' ,
                     //国家简称, 速卖通下单下来应该就是吧
                     'province' => $package->shipping_state,
                     //省/州,（必填，长度限制1-48字节）

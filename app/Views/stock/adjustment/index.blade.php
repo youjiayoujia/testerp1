@@ -36,13 +36,6 @@
                     
                 </a>
                 @endif
-                @if($adjust->status == '0')
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $adjust->id }}"
-                   data-url="{{ route('stockAdjustment.destroy', ['id' => $adjust->id]) }}" title='删除'>
-                    <span class="glyphicon glyphicon-trash"></span> 
-                </a>
-                @endif
                 <button class="btn btn-primary btn-xs dialog"
                         data-toggle="modal"
                         data-target="#dialog" data-table="{{ $adjust->table }}" data-id="{{$adjust->id}}" title='日志'>

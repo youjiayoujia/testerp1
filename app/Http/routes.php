@@ -84,6 +84,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
     //海外仓库存调整
     Route::resource('overseaStockAdjustment', 'Oversea\StockAdjustmentController');
     //海外仓调拨  
+    Route::get('overseaAllotment/printBox/{id}', ['uses' => 'Oversea\AllotmentController@printBox', 'as' => 'overseaAllotment.printBox']); 
+    Route::get('overseaAllotment/returnAllInfo/{id}', ['uses' => 'Oversea\AllotmentController@returnAllInfo', 'as' => 'overseaAllotment.returnAllInfo']); 
+    Route::post('overseaAllotment/returnAllInfoStore/{id}', ['uses' => 'Oversea\AllotmentController@returnAllInfoStore', 'as' => 'overseaAllotment.returnAllInfoStore']); 
     Route::get('overseaAllotment/inboxOver/{str}/{id}', ['uses' => 'Oversea\AllotmentController@inboxOver', 'as' => 'overseaAllotment.inboxOver']);
     Route::get('overseaAllotment/allotmentInStock/{id}', ['uses' => 'Oversea\AllotmentController@allotmentInStock', 'as' => 'overseaAllotment.allotmentInStock']); 
     Route::post('overseaAllotment/returnBoxInfoStore/{id}', ['uses' => 'Oversea\AllotmentController@returnBoxInfoStore', 'as' => 'overseaAllotment.returnBoxInfoStore']); 
@@ -96,6 +99,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('overseaAllotment/add', ['uses' => 'Oversea\AllotmentController@ajaxAllotmentAdd', 'as' => 'overseaAllotment.add']); 
     Route::resource('overseaAllotment', 'Oversea\AllotmentController');
     //海外仓头程物流
+    Route::get('firstLeg/sectionAdd',
+        ['uses' => 'Oversea\FirstLegController@sectionAdd', 'as' => 'firstLeg.sectionAdd']);
     Route::resource('firstLeg', 'Oversea\FirstLegController');
 
     //箱子信息
@@ -748,6 +753,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'AllReportController@packageReport', 'as' => 'allReport.report']);
     Route::resource('allReport', 'AllReportController');
     //包裹导出
+    Route::get('exportPackage/getTnoReturnExcel',
+        ['uses' => 'ExportPackageController@getTnoReturnExcel', 'as' => 'exportPackage.getTnoReturnExcel']);
     Route::get('exportPackage/getTnoExcelById',
         ['uses' => 'ExportPackageController@getTnoExcelById', 'as' => 'exportPackage.getTnoExcelById']);
     Route::get('exportPackage/getTnoExcel',
@@ -1276,6 +1283,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('ebayUnpaidCase', ['uses' => 'MessageController@ebayUnpaidCase', 'as' => 'message.ebayUnpaidCase']);
     Route::any('ajaxGetMsgInfo', ['uses' => 'MessageController@ajaxGetMsgInfo', 'as' => 'ajaxGetMsgInfo']);
     Route::any('changeMultipleStatus', 'MessageController@changeMultipleStatus')->name('changeMultipleStatus');
+    Route::any('wishRefundOrder', 'MessageController@wishRefundOrder')->name('wishRefundOrder');
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
@@ -1324,6 +1332,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('AliexpressIssue', 'Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',
         ['uses' => 'Message\Dispute\AliexpressIssueController@doRefuseIssues', 'as' => 'aliexpress.doRefuseIssues']);
+    Route::any('MutiChangePlatform', 'Message\Dispute\AliexpressIssueController@MutiChangePlatformProcess')->name('aliexpress.MutiChangePlatform');
     Route::resource('crmStatistics', 'Message\StatisticsController');
     //spu
     Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);

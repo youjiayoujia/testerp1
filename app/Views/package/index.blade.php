@@ -136,8 +136,8 @@
                     </button>
                 @endif
                 @if($package->logistics_id != 0)
-                    <a href="{{ route('preview', ['id'=>$package->id]) }}" target="_blank" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 面单预览
+                    <a href="{{ route('preview', ['id'=>$package->id]) }}" target="_blank" class="btn btn-info btn-xs" title='面单预览'>
+                        <span class="glyphicon glyphicon-eye-open"></span>
                     </a>
                 @endif
             </td>

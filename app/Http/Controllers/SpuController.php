@@ -23,7 +23,7 @@ class SpuController extends Controller
     {
         $this->model = $spu;
         $this->mainIndex = route('spu.index');
-        $this->mainTitle = 'SPU列表';
+        $this->mainTitle = 'SPU';
         $this->viewPath = 'spu.';
     }
 

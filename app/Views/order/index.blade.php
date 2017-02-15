@@ -31,7 +31,10 @@
             </td>
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
-            <td>{{ $order->by_id }}<br/>{{ $order->email }}</td>
+            <td>
+                {{ $order->by_id }}  <br/>{{ $order->email }} <br/>
+                @if($order->is_send_ebay_msg ==1) <font color="red">(已发消息)</font>  @endif
+            </td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
@@ -185,11 +188,11 @@
                                                             <button type="button" class="btn btn-default" data-dismiss="modal">
                                                                 取消
                                                             </button>
-                                                            <button type="button" class="btn btn-primary  ebay-unpaid-form-button">
+                                                            <button type="submit" class="btn btn-primary  ebay-unpaid-form-button">
                                                                 提交
                                                             </button>
                                                         </div>
-                                                        <input type="hidden" name="order_item_id" value="{{$order->id}}"/>
+                                                        <input type="hidden" name="order_item_id" value="{{$orderItem->id}}"/>
                                                     </form>
                                                 </div>
                                             </div>
@@ -480,7 +483,7 @@
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="refund_currency" id="refund_currency">
                                         @foreach($currencys as $refund_currency)
-                                            <option value="{{ $refund_currency->code }}" <?php if ($refund_currency->code == 'USD') echo 'selected'; ?> {{ old('refund_currency') }}>
+                                            <option value="{{ $refund_currency->code }}" {{ $refund_currency->code == 'USD' ? 'selected' : '' }}>
                                                 {{ $refund_currency->code }}
                                             </option>
                                         @endforeach

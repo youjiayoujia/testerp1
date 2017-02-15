@@ -17,6 +17,7 @@ use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\PackageModel;
 use Excel;
+use Session;
 
 class ExportPackageController extends Controller
 {
@@ -221,11 +222,12 @@ class ExportPackageController extends Controller
             $arr[$fieldItem->level]['type'] = 'database';
         }
         $packages = '';
-        if (request()->has('channel_id')) {
-            $packages = PackageModel::where('channel_id', request('channel_id'));
-        }
+        
         if (request()->has('warehouse_id')) {
-            $packages = $packages->where('warehouse_id', request('warehouse_id'));
+            $packages = PackageModel::where('warehouse_id', request('warehouse_id'));
+        }
+        if (request()->has('channel_id')) {
+            $packages = $packages->where('channel_id', request('channel_id'));
         }
         if (request()->has('logistics_id')) {
             $packages = $packages->where('logistics_id', request('logistics_id'));
@@ -234,8 +236,10 @@ class ExportPackageController extends Controller
             $packages = $packages->where('status', request('status'));
         }
         if (request()->has('begin_shipped_at') && request()->has('over_shipped_at')) {
-            $packages = $packages->whereRaw('shipped_at >=  ? and shipped_at <= ?',
-                [request('begin_shipped_at'), request('over_shipped_at')]);
+            $begin_shipped_at = date('Y-m-d H:i:s', strtotime(request('begin_shipped_at')));
+            $over_shipped_at = date('Y-m-d H:i:s', strtotime(request('over_shipped_at')));
+            $packages = $packages->whereBetween('shipped_at',
+                [$begin_shipped_at, $over_shipped_at]);
         }
         if (request()->hasFile('accordingTracking')) {
             $file = request()->file('accordingTracking');
@@ -273,14 +277,29 @@ class ExportPackageController extends Controller
             if(!$rows) {
                 return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '导出信息有误，请查看模板是否有问题'));
             }
+            Session::forget('alert');
             Excel::create($name, function ($excel) use ($rows) {
                 $excel->sheet('', function ($sheet) use ($rows) {
                     $sheet->fromArray($rows);
                 });
             })->download('csv');
         } else {
+            request()->flash();
             return redirect(route('exportPackage.exportPackageView'))->with('alert', $this->alert('danger', '根据条件找不到包裹信息'));
         }
+    }
+
+    public function getTnoReturnExcel()
+    {
+        $rows[] = [
+            '只一列追踪号' => '',
+        ];
+        $name = 'return_goods';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
     }
 
     public function getTnoExcel()

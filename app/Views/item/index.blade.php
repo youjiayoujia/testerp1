@@ -11,6 +11,7 @@
             <li><a href="javascript:" class="batchedit" data-name="status">SKU状态</a></li>
             <li><a href="javascript:" class="batchedit" data-name="package_size">体积</a></li>
             <li><a href="javascript:" class="batchedit" data-name="name">中英文资料</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="declared_value">申报价值</a></li>
             <li><a href="javascript:" class="batchedit" data-name="wrap_limit">包装方式</a></li>
             <li><a href="javascript:" class="batchedit" data-name="catalog">分类</a></li>
             <li><a href="javascript:" class="batchdelete" data-name="catalog">批量删除</a></li>
@@ -74,18 +75,7 @@
                 ${{$item->declared_value}}
             </td>
             <td>{{$item->product?$item->product->notify:''}}</td>
-            <td>
-                <!-- 400条sql -->
-                <!-- @foreach($warehouses as $warehouse)
-                    {{$warehouse->name}}
-                    <br>
-                    <div>虚：{{$item->getStockQuantity($warehouse->id)}}</div>
-                    <div>实：{{$item->getStockQuantity($warehouse->id,1)}}</div>
-                    <div>途：{{$item->transit_quantity[$warehouse->id]['normal']}}</div>
-                    <div>特：{{$item->transit_quantity[$warehouse->id]['special']}}</div>
-                    <div>缺：{{$item->warehouse_out_of_stock[$warehouse->id]['need']}}</div>
-                @endforeach -->
-                
+            <td> 
                 <br>
                 <div>7天销量：{{$item->getsales('-7 day')}}</div>
                 <div>14天销量：{{$item->getsales('-14 day')}}</div>
@@ -611,7 +601,8 @@
             },
         });
 
-        $('.supplier').select2({
+        $('.suppliers').select2({
+            
             ajax: {
                 url: "{{ route('ajaxSupplier') }}",
                 dataType: 'json',

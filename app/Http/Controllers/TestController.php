@@ -23,6 +23,7 @@ use App\Models\Publish\Ebay\EbayFeedBackModel;
 use App\Models\Publish\Ebay\EbaySpecificsModel;
 use App\Models\PackageModel;
 use App\Models\ItemModel;
+use App\Models\Oversea\Box\BoxModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\ChannelNameModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
@@ -229,11 +230,22 @@ class TestController extends Controller
     //     var_dump('123');
     // }
 
+    // public function test2()
+    // {  
+    //     $package = BoxModel::find(25);
+    //     $test = $package->expected_fee;
+    //     var_dump($test);
+    // }
+
+    // public function test2()
+    // {
+    //     $model = PackageModel::find(10);
+    //     $buf = $model->relatedGet($model, 'order', 'id', '1');
+    // }
+
     public function test2()
     {
-        $test = 'abcdef';
-        $buf = substr($test, 0, 3);
-        var_dump($buf);exit;
+        Session::flush();
     }
 
     // public function test2()
@@ -1613,90 +1625,97 @@ class TestController extends Controller
     }
     public function getSmtIssue()
     {
-        //  $refund = RefundModel::find(2);
-        /*        dd($refund->PakcageWeight);
-                dd($refund);*/
-        for ($i = 1; $i > 0; $i++) {
-            $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page=' . $i;
-            $data = json_decode($this->getCurlData($url));
-            if (empty($data)) {
-                break;
-            } else {
-                foreach ($data as $key => $value) {
-                    $img_src = 'http://erp.moonarstore.com' . substr($value->attachment_url, 1);
-                    $content = file_get_contents($img_src);
-                    $suffix = strstr(substr($value->attachment_url, 1), '.');
-                    $uploads_file = '/product/supplier/' . Tool::randString(16, false) . $suffix;
-                    //dd($uploads_file);
-                    $bytes = Storage::put($uploads_file, $content);
-                    $pay_type = $value->pay_method;
-                    $insert = [
-                        'company' => $value->suppliers_company,
-                        'address' => $value->suppliers_address,
-                        'contact_name' => $value->suppliers_name,
-                        //'contact_name' => $value->suppliers_phone,
-                        'telephone' => $value->suppliers_mobile,
-                        'official_url' => $value->suppliers_website,
-                        'qq' => $value->suppliers_qq,
-                        'wangwang' => $value->suppliers_wangwang,
-                        'bank_account' => $value->suppliers_bank,
-                        'bank_code' => $value->suppliers_card_number,
-                        'examine_status' => $value->suppliers_status,
-                        'purchase_time' => $value->supplierArrivalMinDays,
-                        'created_by' => $value->user_id,
-                        'pay_type' => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
-                        'qualifications' => Tool::randString(16, false) . $suffix,
-                    ];
-                    if (!empty($insert)) {
-                        SupplierModel::create($insert);
-                    }
+       // dd(time() - strtotime('2016-12-14'));
+        dd((ceil(time() - strtotime('2016-12-14'))/ 86400));
+       $now = Carbon::now();
+       $date = Carbon::parse('2016-12-14');
+       dd($now->diffInDays($date));
+
+        $array = [
+              0 => "TIMESTAMP=2017%2d02%2d08T09%3a52%3a35Z",
+              1 => "CORRELATIONID=b27dd764924f8",
+              2 => "ACK=Failure",
+              3 => "VERSION=51%2e0",
+              4 => "BUILD=29835611",
+              5 => "L_ERRORCODE0=10007",
+              6 => "L_SHORTMESSAGE0=Permission%20denied",
+              7 => "L_LONGMESSAGE0=You%20do%20not%20have%20permission%20to%20refund%20this%20transaction",
+              8 => "L_SEVERITYCODE0=Error"
+        ];
+        //dd($array);
+        foreach ($array as $item){
+            if(! empty($item)){
+                $filter = explode('=',$item);
+                if($filter[0] == 'ACK' && $filter[1] = 'Success'){
+
                 }
+
+
             }
         }
-        foreach (AccountModel::all() as $account) {
-            if ($account->account == 'smtjiahongming@126.com') { //测试diver
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $getIssueLists = $channel->getIssues();
-                if (!empty($getIssueLists)) {
-                    foreach ($getIssueLists as $issue) {
-                        $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
-                        if (empty($issue_list->id)) {
-                            $issue_list->issue_id = $issue['issue_id'];
-                            $issue_list->gmtModified = $issue['gmtModified'];
-                            $issue_list->issueStatus = $issue['issueStatus'];
-                            $issue_list->gmtCreate = $issue['gmtCreate'];
-                            $issue_list->reasonChinese = $issue['reasonChinese'];
-                            $issue_list->orderId = $issue['orderId'];
-                            $issue_list->reasonEnglish = $issue['reasonEnglish'];
-                            $issue_list->issueType = $issue['issueType'];
-                            $issue_list->save();
-                            if (!empty($issue['issue_detail'])) {
-                                $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
-                                if (empty($issue_detail->id)) {
-                                    $issue_detail->issue_list_id = $issue_list->id;
-                                    $issue_detail->resultMemo = $issue['issue_detail']->resultMemo;
-                                    $issue_detail->orderId = $issue['issue_detail']->resultObject->orderId;
-                                    $issue_detail->gmtCreate = $issue['issue_detail']->resultObject->gmtCreate;
-                                    $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
-                                    $issue_detail->buyerAliid = $issue['issue_detail']->resultObject->buyerAliid;
-                                    $issue_detail->issueStatus = $issue['issue_detail']->resultObject->issueStatus;
-                                    $issue_detail->issueReason = $issue['issue_detail']->resultObject->issueReason;
-                                    $issue_detail->productName = $issue['issue_detail']->resultObject->productName;
-                                    //序列化对象
-                                    $issue_detail->productPrice = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
-                                    $issue_detail->buyerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
-                                    $issue_detail->sellerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->sellerSolutionList));
-                                    $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
-                                    $issue_detail->refundMoneyMax = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
-                                    $issue_detail->refundMoneyMaxLocal = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
-                                    $issue_detail->save();
-                                }
+
+        $account_name = 'Coolcoola04@126.com';  //渠道名称
+
+        $account = AccountModel::where('account',$account_name)->first();
+        if(! empty($account)){
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $getIssueLists = $channel->getIssues();
+            //dd($getIssueLists);
+            if(!empty($getIssueLists)){
+                foreach($getIssueLists as $issue){
+                    $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
+                    if(empty($issue_list->id)){
+                        $issue_list->issue_id      = $issue['issue_id'];
+                        $issue_list->account_id    = $account->id;
+                        $issue_list->gmtModified   = $issue['gmtModified'];
+                        $issue_list->issueStatus   = $issue['issueStatus'];
+                        $issue_list->gmtCreate     = $issue['gmtCreate'];
+                        $issue_list->reasonChinese = $issue['reasonChinese'];
+                        $issue_list->orderId       = $issue['orderId'];
+                        $issue_list->reasonEnglish = $issue['reasonEnglish'];
+                        $issue_list->issueType     = $issue['issueType'];
+                        $issue_list->save();
+
+                        //$this->info('issue #' .$issue['issue_id']. ' Received.');
+
+                        if(!empty($issue['issue_detail'])){
+                            $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
+                            if(empty($issue_detail->id)){
+                                $issue_detail->issue_list_id = $issue_list->id;
+                                $issue_detail->resultMemo    = $issue['issue_detail']->resultMemo;
+                                $issue_detail->orderId       = $issue['issue_detail']->resultObject->orderId;
+                                $issue_detail->gmtCreate     = date('Y-m-d H:i:s', substr($issue['issue_detail']->resultObject->gmtCreate, 0, 10));
+                                $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
+                                $issue_detail->buyerAliid    = $issue['issue_detail']->resultObject->buyerAliid;
+                                $issue_detail->issueStatus   = $issue['issue_detail']->resultObject->issueStatus;
+                                $issue_detail->issueReason   = $issue['issue_detail']->resultObject->issueReason;
+                                $issue_detail->productName   = $issue['issue_detail']->resultObject->productName;
+
+                                //序列化对象
+                                $issue_detail->productPrice         = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
+                                $issue_detail->buyerSolutionList    = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
+                                $issue_detail->sellerSolutionList   = base64_encode(serialize($issue['issue_detail']->resultObject->sellerSolutionList));
+                                $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
+                                $issue_detail->refundMoneyMax       = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
+                                $issue_detail->refundMoneyMaxLocal  = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
+
+                                $issue_detail->save();
                             }
                         }
                     }
                 }
+            }else{
+                dd(' hasnot this time OR token is timeout');
+
             }
+        }else{
+            //$this->comment('account num maybe worng.');
+            dd('account num maybe worng.');
+
         }
+        //$this->info('finsh.');
+        dd('finsh');
+
     }
     public function oneSku()
     {

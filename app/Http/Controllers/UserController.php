@@ -12,6 +12,7 @@ use App\Models\UserModel;
 use App\Models\RoleModel;
 use App\Models\PermissionModel;
 use Gate;
+use App\Models\WarehouseModel;
 
 class UserController extends Controller
 {
@@ -30,6 +31,7 @@ class UserController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'roles' => RoleModel::all(),
+            'warehouses' => WarehouseModel::where(['type' => 'local', 'is_available' => '1'])->get(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -77,6 +79,7 @@ class UserController extends Controller
             'model' => $model,
             'roles' => RoleModel::all(),
             'select_role' => $select_role,
+            'warehouses' => WarehouseModel::where(['type' => 'local', 'is_available' => '1'])->get(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

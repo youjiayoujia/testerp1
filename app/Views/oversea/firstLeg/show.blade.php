@@ -13,14 +13,27 @@
                 <strong>物流方式</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式</strong>: {{ $model->cost }}
-            </div>
-            <div class="col-lg-4">
                 <strong>运输方式</strong>: {{ $model->transport == '0' ? '海运' : '空运' }}
             </div>
             <div class="col-lg-4">
-                <strong>公式</strong>: {{ $model->formula }}
+                <strong>时效(天)</strong>: {{ $model->days }}
             </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">物流单价信息</div>
+        <div class="panel-body">
+        @foreach($forms as $form)
+            <div class="col-lg-4">
+                <strong>起始重量(kg)</strong>: {{ $form->weight_from }}
+            </div>
+            <div class="col-lg-4">
+                <strong>结束重量(kg)</strong>: {{ $form->weight_to }}
+            </div>
+            <div class="col-lg-4">
+                <strong>单价(￥)</strong>: {{ $model->cost }}
+            </div>
+        @endforeach
         </div>
     </div>
     <div class="panel panel-default">

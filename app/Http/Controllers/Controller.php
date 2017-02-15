@@ -222,7 +222,7 @@ abstract class Controller extends BaseController
                                             $query = $query->where($k, $name);
                                         }); 
                                     } else {
-                                        $list = $list->relatedGet($list, $relation_ship, $k, $name);
+                                        $list = $model->relatedGet($list, $relation_ship, $k, $name);
                                     }
                                 }
                             }
@@ -238,7 +238,7 @@ abstract class Controller extends BaseController
                                             function ($query) use ($relation_ship2, $name, $key) {
                                                 $query = $query->wherehas($relation_ship2,
                                                     function ($query1) use ($name, $key) {
-                                                        $query1 = $query1->where($key, $name);
+                                                        $query1 = $query1->where($model->table.'.'.$key, $name);
                                                     });
                                             });
                                     }
@@ -268,7 +268,7 @@ abstract class Controller extends BaseController
                         foreach ($related as $key => $value3) {
                             $value3 = trim($value3);
                             if ($value3) {
-                                $list = $list->where($key, $value3);
+                                $list = $list->where($model->table.'.'.$key, $value3);
                             }
                         }
                         break;
@@ -276,7 +276,7 @@ abstract class Controller extends BaseController
                         foreach ($related as $key => $value2) {
                             $value2 = trim($value2);
                             if ($value2||$value2=='0') {
-                                $list = $list->where($key, $value2);
+                                $list = $list->where($model->table.'.'.$key, $value2);
                             }
                         }
                         break;
@@ -285,9 +285,13 @@ abstract class Controller extends BaseController
                             foreach ($contents as $name => $single) {
                                 $single = trim($single);
                                 if ($single != '') {
-                                    $list = $list->whereHas($relation_ship, function ($query) use ($name, $single) {
-                                        $query = $query->where($name, $single);
-                                    });
+                                    if(!$level) {
+                                        $list = $list->whereHas($relation_ship, function ($query) use ($name, $single) {
+                                            $query = $query->where($name, $single);
+                                        });
+                                    } else {
+                                        $list = $model->relatedGet($list, $relation_ship, $name, $single);
+                                    }
                                 }
                             }
                         }
@@ -295,13 +299,13 @@ abstract class Controller extends BaseController
                     case 'sectionSelect':
                         foreach ($related as $kind => $content) {
                             if(!empty($content['begin']) && !empty($content['end'])) {
-                                $list = $list->whereBetween($kind, [str_replace('/', '-', trim($content['begin'])), str_replace('/', '-', trim($content['end']))]);
+                                $list = $list->whereBetween($model->table.'.'.$kind, [str_replace('/', '-', trim($content['begin'])), str_replace('/', '-', trim($content['end']))]);
                             }
                             if(empty($content['begin']) && !empty($content['end'])) {
-                                $list = $list->where($kind, '<', str_replace('/', '-', trim($content['end'])));
+                                $list = $list->where($model->table.'.'.$kind, '<', str_replace('/', '-', trim($content['end'])));
                             }
                             if(!empty($content['begin']) && empty($content['end'])) {
-                                $list = $list->where($kind, '>', str_replace('/', '-', trim($content['begin'])));
+                                $list = $list->where($model->table.'.'.$kind, '>', str_replace('/', '-', trim($content['begin'])));
                             }
                         }
                         break;
@@ -386,7 +390,7 @@ abstract class Controller extends BaseController
             }
         } else {
             if($list->first()) {
-                $list = $list->orderBy($list->first()->table.'.id', 'desc');
+                $list = $list->orderBy($model->table.'.id', 'desc');
             }
         }
         if (!$pageSize) {

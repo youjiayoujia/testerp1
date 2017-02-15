@@ -112,7 +112,8 @@ class PackageController extends Controller
             'logisticses' => $logisticses,
             'pagetype' => $pagetype,
         ];
-        
+        $this->model->clearSession();
+
         return view($this->viewPath . 'index', $response);
     }
     public function showAllView()

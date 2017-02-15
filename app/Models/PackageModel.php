@@ -25,6 +25,7 @@ use App\Models\Logistics\ChannelModel as LogisticChannel;
 use App\Models\ChannelModel;
 use Queue;
 use Cache;
+use Session;
 
 class PackageModel extends BaseModel
 {
@@ -117,8 +118,18 @@ class PackageModel extends BaseModel
     {
         return [
             'order' => ['orders', 'id', 'order_id'],
-            'items' => ['package_items', 'package_id', 'id']
+            'items' => ['package_items', 'package_id', 'id'],
+            'channel' => ['channels', 'id', 'channel_id'],
+            'channelAccount' => ['channel_accounts', 'id', 'channel_account_id'],
         ];
+    }
+
+    public function clearSession()
+    {
+        $arr = $this->relation_arr;
+        foreach($arr as $key => $single) {
+            Session::forget($this->table.'.'.$key);
+        }
     }
 
     public function getPackageInfoAttribute()

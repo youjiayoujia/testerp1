@@ -311,7 +311,7 @@ class OrderController extends Controller
             'page' => $page,
             'orderStatistics' => $orderStatistics,
         ];
-
+        
         return view($this->viewPath . 'index', $response);
     }
 

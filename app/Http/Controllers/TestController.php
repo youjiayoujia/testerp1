@@ -245,7 +245,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        Session::flush();
+        
     }
 
     // public function test2()

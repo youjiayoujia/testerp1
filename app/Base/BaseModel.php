@@ -58,6 +58,7 @@ class BaseModel extends Model
         return $arr;
     }
 
+    
     public function relatedGet($model = '', $relation_ship='', $key='', $value='')
     {
         $model = $model->leftjoin($model->relation_arr[$relation_ship][0], 

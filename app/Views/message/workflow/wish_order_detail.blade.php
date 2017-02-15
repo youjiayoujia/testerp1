@@ -30,6 +30,7 @@
                             <td>{{ !empty($item_order['Order']['state']) ? $item_order['Order']['state'] : ''}}</td>
                             <td>{{ !empty($item_order['Order']['cost']) ? $item_order['Order']['cost'] : ''}}</td>
                             <td>{{ !empty($item_order['Order']['order_total']) ? $item_order['Order']['order_total'] : ''}}</td>
+
                             <td>
                                 @if(!empty($item_order['Order']['tracking_number']))
                                 {{$item_order['Order']['tracking_number']}}

@@ -381,7 +381,7 @@ class PackageController extends Controller
     //     return view($this->viewPath . 'edit', $response);
     // }
     public function flow()
-    {
+    {return 1;
         ini_set('memory_limit','2G');
         $reportModel = AllReportModel::orderBy('day_time', 'desc')->first();
         $last_time = '';

@@ -30,6 +30,7 @@ use App\Models\Logistics\CatalogModel as LogisticsCatalogModel;
 use Cache;
 use Logistics;
 use App\Models\Package\AllReportModel;
+use Session;
 
 class PackageController extends Controller
 {
@@ -426,6 +427,7 @@ class PackageController extends Controller
             'reportModel' => $reportModel,
             'arr' => $arr
         ];
+        Session::forget('packages.order');
         return view($this->viewPath . 'flow', $response);
     }
     public function autoFailAssignLogistics()

@@ -808,7 +808,6 @@ Class WishAdapter implements AdapterInterface
             $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
             $jsonData = $this->getCurlData($url);
             $apiReturn = json_decode($jsonData,true);
-            //dd($apiReturn);
             if(empty($apiReturn['data'])){
                 break;
             }
@@ -837,10 +836,10 @@ Class WishAdapter implements AdapterInterface
                 $return_array[$j]['channel_order_number']=
                     !empty($gd['Ticket']['items'][0]['Order']['transaction_id']) ? $gd['Ticket']['items'][0]['Order']['transaction_id'] : '';//邮件是否包含图片
 
-                if(! empty($gd['Ticket']['items'][0]['Order']['ShippingDetail']['country'])){
-                    $return_array[$j]['country'] = $gd['Ticket']['items'][0]['Order']['ShippingDetail']['country'];
+                if(! empty($gd['Ticket']['UserInfo']['locale'])){
+                    $return_array[$j]['country'] = ! empty(config('crm.wish.refund.locale')[$gd['Ticket']['UserInfo']['locale']]) ? config('crm.wish.refund.locale')[$gd['Ticket']['UserInfo']['locale']] : '未知';
                 }else{
-                    $return_array[$j]['country'] = '';
+                    $return_array[$j]['country'] = '未知';
                 }
                 $return_array[$j]['channel_url'] = !empty($gd['Ticket']['items'][0]['Order']['order_id']) ? $gd['Ticket']['items'][0]['Order']['order_id'] : '';//邮件是否包含图片
 

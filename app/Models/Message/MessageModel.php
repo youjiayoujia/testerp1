@@ -638,19 +638,16 @@ class MessageModel extends BaseModel{
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;
-
-                $language = ! empty(config('message.wish')['country'][$this->country]) ? config('message.wish')['country'][$this->country] : '未知';
-
                 if($files){
+                    $html .= '<li class="list-group-item"><p><strong>标签</strong>:'.$this->labels.'</p></li>';
                     $html .= '<li class="list-group-item"><p><strong>Transaction id</strong>:'.$files['order_items'][0]['Order']['transaction_id'].'</p></li>';
-                    $html .= '<li class="list-group-item"><p><strong>语言</strong>:'.$language.'</p></li>';
+                    $html .= '<li class="list-group-item"><p><strong>语言</strong>:'.$this->country.'</p></li>';
                 }else{
                     $html .= '<li class="list-group-item"><p>暂无</p></li>';
                 }
                 break;
             case 'ebay':
                 $files = $this->MessageFieldsDecodeBase64;
-                //dd($files);
                 if(!empty($files)){
                     $html .= '<li class="list-group-item"><p><strong>ItemID</strong><a href="http://www.ebay.com/itm/'.$files['ItemID'].'" target="_blank">:'.$files['ItemID'].'</a></p></li>';
                     $html .= '<li class="list-group-item"><p><strong>Ebay平台链接</strong>:<a target="_blank" href="'.$files['ResponseDetails'].'"><span class="glyphicon glyphicon-link"></span></a></p></li>';

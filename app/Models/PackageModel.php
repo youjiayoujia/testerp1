@@ -22,8 +22,10 @@ use App\Models\LogisticsModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\Product\ProductLogisticsLimitModel;
 use App\Models\Logistics\ChannelModel as LogisticChannel;
+use App\Models\ChannelModel;
 use Queue;
 use Cache;
+use Session;
 
 class PackageModel extends BaseModel
 {
@@ -84,44 +86,50 @@ class PackageModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
-        $arr = [];
-        $arr1 = [];
-        $arr2 = [];
-        $channels = ChannelModel::all();
-        foreach ($channels as $single) {
-            $arr[$single->name] = $single->name;
-        }
-        $accounts = AccountModel::all();
-        foreach ($accounts as $account) {
-            $arr1[$account->account] = $account->account;
-        }
         return [
             'relatedSearchFields' => [
                 'order' => ['id', 'channel_ordernum'],
+                'items' => ['sku']
             ],
             'filterFields' => ['tracking_no', 'shipping_firstname', 'shipping_country'],
             'filterSelects' => [
+                'is_oversea' => config('order.whether'),
                 'status' => config('package'),
-                'warehouse_id' => WarehouseModel::where('is_available', '1')->get()->pluck('name', 'id'),
-                //'logistics_id' => LogisticsModel::all()->pluck('code', 'id')
+                'warehouse_id' => WarehouseModel::where('is_available', '1')->get(['id', 'name'])->pluck('name', 'id'),
             ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
-                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
-                'channelAccount' => ['account' => AccountModel::all()->pluck('account', 'account')]
+                'channel' => ['name' => ChannelModel::get(['name'])->pluck('name', 'name')],
+                'channelAccount' => ['account' => AccountModel::get(['account'])->pluck('account', 'account')]
             ],
-            'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
+            'sectionSelect' => ['time' => ['created_at', 'shipped_at']],
             'doubleRelatedSearchFields' => [
-                'items' => ['item' => ['sku']]
             ],
             'doubleRelatedSelectedFields' => [
-                //'logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]],
             ],
             'sectionGanged' => [
-                'first' => ['logistics' => ['catalog' => ['name' => CatalogModel::all()->pluck('name', 'name')]]],
-                'second' => ['logistics_id' => LogisticsModel::all()->pluck('code', 'id')]
+                'first' => ['logistics' => ['catalog' => ['name' => CatalogModel::get(['name'])->pluck('name', 'name')]]],
+                'second' => ['logistics_id' => LogisticsModel::where('is_enable', '1')->get(['id', 'code'])->pluck('code', 'id')]
             ],
         ];
+    }
+
+    public function getRelationArrAttribute()
+    {
+        return [
+            'order' => ['orders', 'id', 'order_id'],
+            'items' => ['package_items', 'package_id', 'id'],
+            'channel' => ['channels', 'id', 'channel_id'],
+            'channelAccount' => ['channel_accounts', 'id', 'channel_account_id'],
+        ];
+    }
+
+    public function clearSession()
+    {
+        $arr = $this->relation_arr;
+        foreach($arr as $key => $single) {
+            Session::forget($this->table.'.'.$key);
+        }
     }
 
     public function getPackageInfoAttribute()
@@ -377,7 +385,7 @@ class PackageModel extends BaseModel
         $declared_val = 0;
         foreach ($this->items as $packageItem) {
             if ($packageItem->item) {
-                $declared_val = $packageItem->item->product ? $packageItem->item->product->declared_value : 0;
+                $declared_val = $packageItem->item ? $packageItem->item->declared_value : 0;
             }
         }
         return $declared_val;
@@ -706,6 +714,12 @@ class PackageModel extends BaseModel
         if ($this->canAssignStocks()) {
             $items = $this->setPackageItems();
             if ($items) {
+                $channel = ChannelModel::find($this->channel_id);
+                if($channel->name == 'Wish') {
+                    if(count($items) > 1) {
+                        return false;
+                    }
+                }
                 return $this->createPackageDetail($items);
             } else {
                 if ($this->status == 'NEW') {

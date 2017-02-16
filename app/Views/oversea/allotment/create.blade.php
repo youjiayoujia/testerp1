@@ -3,10 +3,6 @@
 @section('formBody')
     <div class='row'>
         <div class="form-group col-lg-3">
-            <label class='control-label'>调拨单号</label> 
-            <input type='text' class="form-control" name='allotment_num' value="{{ old('allotment_num') ? old('allotment_num') : 'Oversea'.time()}}" readonly>
-        </div>
-        <div class="form-group col-lg-3">
             <label for="out_warehouse_id" class='control-label'>调出仓库</label>  <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select id='out_warehouse_id' name='out_warehouse_id' class='form-control' flag='false'>
             <option value=''>请选择仓库</option>

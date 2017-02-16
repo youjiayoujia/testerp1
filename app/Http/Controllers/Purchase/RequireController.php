@@ -17,6 +17,7 @@ use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseRequireModel;
 use App\Models\Product\SupplierModel;
 use App\Models\StockModel;
+use App\Models\WarehouseModel;
 use App\Models\UserModel;
 use App\Models\PackageModel;
 use App\Models\Package\ItemModel;
@@ -45,6 +46,7 @@ class RequireController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->purchases),
             'mixedSearchFields' => $this->model->mixed_search,
+            'warehouses' => WarehouseModel::all(),
         ];
         
         return view($this->viewPath . 'index', $response);

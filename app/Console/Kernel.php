@@ -40,12 +40,14 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetBlacklists::class,
         \App\Console\Commands\UpdateBlacklists::class,
         \App\Console\Commands\UpdateEbaySkuSaleReport::class,
+        \App\Console\Commands\UpdateEbayAmountStatistics::class,
         \App\Console\Commands\AutoRunPackages::class,
         \App\Console\Commands\ImitationOrders::class,
         \App\Console\Commands\UpdateUsers::class,
         //邮件
         \App\Console\Commands\ComputeCrmSatistics::class,
         \App\Console\Commands\GetMessages::class,
+        \App\Console\Commands\getChannelAccountMessages::class,
         \App\Console\Commands\SendMessages::class,
         \App\Console\Commands\SetMessageRead::class,
         \App\Console\Commands\GetGmailCredentials::class,
@@ -82,6 +84,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AutoChangeAliOderRefund::class,
         //DHL确认发货
         \App\Console\Commands\AutoSureDHLShip::class,
+        \App\Console\Commands\TemplateWriteSku::class,
 
     ];
 
@@ -94,7 +97,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
-        $schedule->command('imitate:orders 20000')->everyThirtyMinutes();
+        $schedule->command('imitate:orders 5000')->everyThirtyMinutes();
         //半小时一次将包裹放入队列
         $schedule
             ->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')
@@ -105,6 +108,12 @@ class Kernel extends ConsoleKernel
 //        //黑名单定时任务
 //        $schedule->command('blacklists:get')->dailyAt('2:00');
 //        $schedule->command('blacklists:update')->dailyAt('3:00');
+
+        //EbaySku销量报表定时任务
+        $schedule->command('ebaySkuSaleReport:update')->cron('0 16 * * *');
+
+        //EBAY销售额统计定时任务
+        $schedule->command('ebayAmountStatistics:update')->cron('0 17 * * *');
 
         //抓单定时任务规则
 //        foreach (ChannelModel::all() as $channel) {
@@ -164,6 +173,7 @@ class Kernel extends ConsoleKernel
 //        //API同步sellmore database
 //        $schedule->command('SyncSellmoreApi:all')->everyFiveMinutes();
 //        $schedule->command('SyncImportApi:all')->everyFiveMinutes();
+
         //财务
 //        $schedule->command('aliexpressRefundStatus:change')->cron('21 * * * *');//速卖通退款小于15美金
 //        //DHL

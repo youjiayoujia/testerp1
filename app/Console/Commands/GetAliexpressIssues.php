@@ -16,14 +16,14 @@ class GetAliexpressIssues extends Command
      *
      * @var string
      */
-    protected $signature = 'issues:get  {accountName}';
+    protected $signature = 'issues:get {accountName=all}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '获取速卖通纠纷';
 
     /**
      * Create a new command instance.
@@ -45,60 +45,68 @@ class GetAliexpressIssues extends Command
         //
         $account_name =  $this->argument('accountName');  //渠道名称
 
-        $account = AccountModel::where('account',$account_name)->first();
-        if(is_object($account)){
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $getIssueLists = $channel->getIssues();
-            if(!empty($getIssueLists)){
-                foreach($getIssueLists as $issue){
-                    $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
-                    if(empty($issue_list->id)){
-                        $issue_list->issue_id      = $issue['issue_id'];
-                        $issue_list->account_id    = $account->id;
-                        $issue_list->gmtModified   = $issue['gmtModified'];
-                        $issue_list->issueStatus   = $issue['issueStatus'];
-                        $issue_list->gmtCreate     = $issue['gmtCreate'];
-                        $issue_list->reasonChinese = $issue['reasonChinese'];
-                        $issue_list->orderId       = $issue['orderId'];
-                        $issue_list->reasonEnglish = $issue['reasonEnglish'];
-                        $issue_list->issueType     = $issue['issueType'];
-                        $issue_list->save();
+        if($account_name == 'all'){
+            $accounts = AccountModel::where('is_available', 1)->get();
+        }else{
+            $accounts = AccountModel::where('account',$account_name)->get();
+        }
 
-                        $this->info('issue #' .$issue['issue_id']. ' Received.');
+        if(! $accounts->isEmpty()){
+            foreach ($accounts as $account){
+                if($account->channel->driver == 'aliexpress'){
+                    $this->info('#start '.$account->account);
+                    $channel = Channel::driver($account->channel->driver, $account->api_config);
+                    $getIssueLists = $channel->getIssues();
+                    if(!empty($getIssueLists)){
+                        foreach($getIssueLists as $issue){
+                            $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
+                            if(empty($issue_list->id)){
+                                $issue_list->issue_id      = $issue['issue_id'];
+                                $issue_list->account_id    = $account->id;
+                                $issue_list->gmtModified   = $issue['gmtModified'];
+                                $issue_list->issueStatus   = $issue['issueStatus'];
+                                $issue_list->gmtCreate     = $issue['gmtCreate'];
+                                $issue_list->reasonChinese = $issue['reasonChinese'];
+                                $issue_list->orderId       = $issue['orderId'];
+                                $issue_list->reasonEnglish = $issue['reasonEnglish'];
+                                $issue_list->issueType     = $issue['issueType'];
+                                $issue_list->save();
 
-                        if(!empty($issue['issue_detail'])){
-                            $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
-                            if(empty($issue_detail->id)){
-                                $issue_detail->issue_list_id = $issue_list->id;
-                                $issue_detail->resultMemo    = $issue['issue_detail']->resultMemo;
-                                $issue_detail->orderId       = $issue['issue_detail']->resultObject->orderId;
-                                $issue_detail->gmtCreate     = $issue['issue_detail']->resultObject->gmtCreate;
-                                $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
-                                $issue_detail->buyerAliid    = $issue['issue_detail']->resultObject->buyerAliid;
-                                $issue_detail->issueStatus   = $issue['issue_detail']->resultObject->issueStatus;
-                                $issue_detail->issueReason   = $issue['issue_detail']->resultObject->issueReason;
-                                $issue_detail->productName   = $issue['issue_detail']->resultObject->productName;
+                                $this->info('issue #' .$issue['issue_id']. ' Received.');
 
-                                //序列化对象
-                                $issue_detail->productPrice         = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
-                                $issue_detail->buyerSolutionList    = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
-                                $issue_detail->sellerSolutionList   = base64_encode(serialize($issue['issue_detail']->resultObject->sellerSolutionList));
-                                $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
-                                $issue_detail->refundMoneyMax       = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
-                                $issue_detail->refundMoneyMaxLocal  = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
+                                if(!empty($issue['issue_detail'])){
+                                    $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
+                                    if(! $issue_detail->exists){
+                                        $issue_detail->issue_list_id = $issue_list->id;
+                                        $issue_detail->resultMemo    = $issue['issue_detail']->resultMemo;
+                                        $issue_detail->orderId       = $issue['issue_detail']->resultObject->orderId;
+                                        $issue_detail->gmtCreate     = date('Y-m-d H:i:s', substr($issue['issue_detail']->resultObject->gmtCreate, 0, 10));
+                                        $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
+                                        $issue_detail->buyerAliid    = $issue['issue_detail']->resultObject->buyerAliid;
+                                        $issue_detail->issueStatus   = $issue['issue_detail']->resultObject->issueStatus;
+                                        $issue_detail->issueReason   = $issue['issue_detail']->resultObject->issueReason;
+                                        $issue_detail->productName   = $issue['issue_detail']->resultObject->productName;
 
-                                $issue_detail->save();
+                                        //序列化对象
+                                        $issue_detail->productPrice         = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
+                                        $issue_detail->buyerSolutionList    = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
+                                        $issue_detail->sellerSolutionList   = base64_encode(serialize($issue['issue_detail']->resultObject->sellerSolutionList));
+                                        $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
+                                        $issue_detail->refundMoneyMax       = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
+                                        $issue_detail->refundMoneyMaxLocal  = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
+
+                                        $issue_detail->save();
+                                    }
+                                }
                             }
                         }
+                    }else{
+                        $this->comment('# no issues');
                     }
                 }
-            }else{
-                $this->comment($account_name.' hasnot this time OR token is timeout');
-
             }
-        }else{
-            $this->comment('account num maybe worng.');
-
         }
+        $this->info('finsh.');
+
     }
 }

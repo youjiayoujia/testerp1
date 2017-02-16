@@ -157,12 +157,14 @@ return [
         'packages.tracking_no' => '追踪号',
         'price.profit_rate' => '利润率',
         'packages.status' => '包裹状态',
+        'is_oversea' => '是否海外仓',
 
         'product.status' => '==ERP状态==',
         'account' => '=帐号=',
         'code' => '物流方式简码',
         'logistics_code' => '物流编码',
         'user_id' => 'EBAY业务组',
+        'created_date' => '日期',
 
         'parent.shipmentCostNum' => '批次号',
         'questionUser.name' => '提问人',
@@ -192,7 +194,7 @@ return [
         'assign_id' => '客服',
         'from_name' => '用户昵称',
         'from' => '用户ID',
-        'messages.labels' => '标签',
+        'labels' => '标签',
         'ebay_feedback.transaction_id' => 'transactionID',
         'ebay_feedback.ebay_item_id' => 'itemID',
         'ebay_feedback.commenting_user' => '买家ID',
@@ -216,7 +218,14 @@ return [
         'plat' => '平台',
         'message_statistics.compute_time' => '统计时间',
         'message_statistics.user_id' => '客服名称',
-
+        'aliexpress_issues_list.orderId' => '订单号',
+        'reasonChinese' => '纠纷原因',
+        'issueType' => '纠纷类型',
+        'buyer_id' => '买家ID',
+        'case_id' => 'CaseID',
+        'transaction_id' => '交易号',
+        'message_id' => 'MessageID',
+        'channel_order_number' => '平台单号'
 
     ],
 ];

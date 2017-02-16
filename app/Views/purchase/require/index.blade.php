@@ -16,10 +16,10 @@
     SKUID</th>
     <th>sku</th>
     <th>中文名</th>
-    <th class="sort" data-field="need_total_num">缺货</th>
-    <th class="sort" data-field="available_quantity">可用库存</th>
-    <th class="sort" data-field="all_quantity">实库存</th>
-    <th class="sort" data-field="zaitu_num">在途</th>
+    <th class="sort" data-field="need_total_num">总缺货</th>
+    <th class="sort" data-field="available_quantity">总可用库存</th>
+    <th class="sort" data-field="all_quantity">总实库存</th>
+    <th class="sort" data-field="zaitu_num">总在途</th>
     <th class="sort" data-field="thirty_sales">近30天销量</th>
     <th class="sort" data-field="fourteen_sales">近14天销量</th>
     <th class="sort" data-field="seven_sales">近7天销量</th>
@@ -35,7 +35,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $item)
-        <tr>
+        <tr class="dark-info">
             <td>
              @if($item->require_create !="1")
                 <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="1" >
@@ -73,6 +73,24 @@
             <td>{{$item->user?$item->user->name:''}}</td>
             
         </tr>
+        <!-- <tr>  
+            <th colspan='3'>仓库</th>
+            <th colspan='3'>可用库存</th>
+            <th colspan='3'>实库存</th>
+            <th colspan='3'>在途</th>
+            <th colspan='3'>特采在途</th>
+            <th colspan='3'>缺货</th>    
+        </tr>
+        @foreach($warehouses as $warehouse)
+            <tr>
+                <td colspan='3'>{{$warehouse->name}}</td>
+                <td colspan='3'>{{$item->item->getStockQuantity($warehouse->id,1)}}</td>
+                <td colspan='3'>{{$item->item->getStockQuantity($warehouse->id)}}</td>
+                <td colspan='3'>{{$item->item->transit_quantity[$warehouse->id]['normal']}}</td>
+                <td colspan='3'>{{$item->item->transit_quantity[$warehouse->id]['special']}}</td>
+                <td colspan='3'>{{$item->item->warehouse_out_of_stock[$warehouse->id]['need']}}</td>
+            </tr>
+        @endforeach -->
     @endforeach
  <script type="text/javascript">		 
 	$('#checkPurchaseItem').click(function () {

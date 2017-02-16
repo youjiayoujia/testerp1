@@ -48,6 +48,7 @@ class GetEbayCases extends Command
             $channel = ChannelModel::where('driver','=','ebay')->first();
             $accounts = $channel->accounts;
             foreach ($accounts as $account){
+                $this->info('#'.$account->account.'start get cases');
                 $driver = Channel::driver($account->channel->driver, $account->api_config);
                 $case_lists = $driver->getCases();
             }
@@ -60,5 +61,6 @@ class GetEbayCases extends Command
                 $this->comment('account num maybe worng.');
             }
         }
+        $this->info('#finish');
     }
 }

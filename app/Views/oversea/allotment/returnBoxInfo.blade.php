@@ -8,64 +8,52 @@
         </div>
     </div>
     <div class="panel panel-info">
-        <div class="panel-heading">列表@if($model->status == 'inboxed')<font color='red'>(提交后,item信息出库)</font>@endif</div>
+        <div class="panel-heading">列表</div>
         <div class="panel-body">
                 <div class='row'>
                     <div class='form-group col-lg-1'>
                         <label>箱号</label>
                     </div>
-                    <div class='form-group col-lg-1'>
+                    <div class='form-group col-lg-1'><small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <label>长(cm)</label>
                     </div>
-                    <div class='form-group col-lg-1'>
+                    <div class='form-group col-lg-1'><small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <label>宽(cm)</label>
                     </div>
-                    <div class='form-group col-lg-1'>
+                    <div class='form-group col-lg-1'><small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <label>高(cm)</label>
                     </div>
-                    <div class='form-group col-lg-2'>
+                    <div class='form-group col-lg-2'><small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <label>重量(kg)</label>
                     </div>
-                    <div class='from-group col-lg-2'>
+                    <div class='from-group col-lg-2'><small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <label>物流方式</label>
                     </div>
-                    <div class='form-group col-lg-2'>
-                        <label>追踪号</label>
-                    </div>
-                    <div class='form-group col-lg-2'>
-                        <label>物流费(￥)</label>
-                    </div>
                 </div>
-            @foreach($model->boxes as $box)
+            @foreach($model->boxes as $key => $box)
                 <div class='row'>
                     <div class='form-group col-lg-1'>
                         <input type='text' class='form-control' value="{{$box->boxnum}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][length]" class='form-control' placeholder='长(cm)' value="{{ ($box->length != 0 ? $box->length : '')}}">
+                        <input type='text' name="boxinfo[{{$box->id}}][length]" class='form-control' placeholder='长(cm)' value="{{ old('boxinfo.'.$box->id.'.length') ? old('boxinfo.'.$box->id.'.length') : ($box->length != 0 ? $box->length : '')}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][width]" class='form-control' placeholder='宽(cm)' value="{{ ($box->width != 0 ? $box->width : '')}}">
+                        <input type='text' name="boxinfo[{{$box->id}}][width]" class='form-control' placeholder='宽(cm)' value="{{ old('boxinfo.'.$box->id.'.width') ? old('boxinfo.'.$box->id.'.width') : ($box->width != 0 ? $box->width : '')}}">
                     </div>
                     <div class='form-group col-lg-1'>
-                        <input type='text' name="boxInfo[{{$box->id}}][height]" class='form-control' placeholder='高(cm)' value="{{ ($box->height != 0 ? $box->height : '')}}">
+                        <input type='text' name="boxinfo[{{$box->id}}][height]" class='form-control' placeholder='高(cm)' value="{{ old('boxinfo.'.$box->id.'.height') ? old('boxinfo.'.$box->id.'.height') : ($box->height != 0 ? $box->height : '')}}">
                     </div>
                     <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][weight]" class='form-control' placeholder="重量(kg)" value="{{ ($box->weight != 0 ? $box->weight : '')}}">
+                        <input type='text' name="boxinfo[{{$box->id}}][weight]" class='form-control' placeholder="重量(kg)" value="{{ old('boxinfo.'.$box->id.'.weight') ? old('boxinfo.'.$box->id.'.weight') : ($box->weight != 0 ? $box->weight : '')}}">
                     </div>
                     <div class='from-group col-lg-2'>
-                        <select name="boxInfo[{{$box->id}}][logistics_id]" class='form-control logistics'>
+                        <select name="boxinfo[{{$box->id}}][logistics_id]" class='form-control logistics'>
                         <option value=''>请选择物流方式</option>
                         @foreach($logisticses as $logistics)
-                            <option value='{{$logistics->id}}' {{ $box->logistics_id == $logistics->id ? 'selected' : ''}}>{{$logistics->name}}</option>
+                            <option value='{{$logistics->id}}' {{ old('boxinfo.'.$box->id.'.logistics_id') ? old('boxinfo.'.$box->id.'.logistics_id') == $logistics->id ? 'selected' : '' : ''}}>{{$logistics->name}}</option>
                         @endforeach
                         </select>
-                    </div>
-                    <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][tracking_no]" class='form-control' placeholder="追踪号" value="{{ $box->tracking_no}}">
-                    </div>
-                    <div class='form-group col-lg-2'>
-                        <input type='text' name="boxInfo[{{$box->id}}][fee]" class='form-control' placeholder="物流费" value="{{ ($box->fee != 0 ? $box->fee : '')}}">
                     </div>
                 </div>
             @endforeach

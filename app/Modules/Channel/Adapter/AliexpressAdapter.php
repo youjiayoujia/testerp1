@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Channel\AccountModel;
 use App\models\Publish\Smt\smtCategoryAttribute;
 use App\Models\Message\MessageModel;
+use App\Models\Message\Issues\AliexpressIssueListModel;
 set_time_limit(1800);
 Class AliexpressAdapter implements AdapterInterface
 {
@@ -554,6 +555,7 @@ Class AliexpressAdapter implements AdapterInterface
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+                        $detailArrJson = mb_convert_encoding($detailArrJson, "UTF-8","UTF-8");
                         $message_list[$j]['message_id'] = $item['lastMessageId'];
                         $message_list[$j]['list_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
@@ -1429,12 +1431,13 @@ Class AliexpressAdapter implements AdapterInterface
         );
         $page = 1;
         $page_size = 10;
+
         foreach ($issue_ary as $issue){
             for($i = 1 ; $i>0; $i++){
                 $method = 'api.queryIssueList';
                 $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
                 $issue_list = json_decode($this->getJsonData($method, $para));
-                if(isset($issue_list->success)) {
+                if(! empty($issue_list->dataList)) {
                     foreach ($issue_list->dataList as $key => $item) {
                         $detail_param = "issueId=".$item->id;
                         $return_detail = json_decode($this->getJsonData('alibaba.ae.issue.findIssueDetailByIssueId',$detail_param));
@@ -1445,9 +1448,9 @@ Class AliexpressAdapter implements AdapterInterface
                         }
                         $issueAry[] = [
                             'issue_id'      => $item->id,
-                            'gmtModified'   => $item->gmtModified,
+                            'gmtModified'   => $this->getIssueDate($item->gmtModified),
                             'issueStatus'   => $item->issueStatus,
-                            'gmtCreate'     => $item->gmtCreate,
+                            'gmtCreate'     => $this->getIssueDate($item->gmtCreate),
                             'reasonChinese' => $item->reasonChinese,
                             'orderId'       => $item->orderId,
                             'reasonEnglish' => $item->reasonEnglish,
@@ -1458,14 +1461,35 @@ Class AliexpressAdapter implements AdapterInterface
                 }else{
                     break;
                 }
+                $page += 1;
             }
         }
         return $issueAry;
     }
-    public function changetime($time){
+
+    /**
+     * api: 纠纷中卖家新增订单留言（试用）留言内容同订单留言。
+     */
+    public function leaveOrderMessage($orderId,$content)
+    {
+        $parameter = "orderId=$orderId&content=$content";
+        $result = json_decode($this->getJsonData('api.leaveOrderMessage', $parameter));
+        return $result['result']['isSuccess'] ? true : false;
+
+    }
+
+    public function changetime($time)
+    {
         $time = date('Y-m-d H:i:s', substr($time, 0, 10));
         return $time;
     }
+
+    public function getIssueDate($dateFormat)
+    {
+        $date = date('Y-m-d H:i:s', strtotime(substr($dateFormat, 0, 14)));
+        return $date;
+    }
+
     /**
      * 过滤速卖通产品信息模块
      * @param $str 产品详情信息

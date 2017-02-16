@@ -808,6 +808,7 @@ Class WishAdapter implements AdapterInterface
             $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
             $jsonData = $this->getCurlData($url);
             $apiReturn = json_decode($jsonData,true);
+            //dd($apiReturn);
             if(empty($apiReturn['data'])){
                 break;
             }
@@ -841,6 +842,8 @@ Class WishAdapter implements AdapterInterface
                 }else{
                     $return_array[$j]['country'] = '';
                 }
+                $return_array[$j]['channel_url'] = !empty($gd['Ticket']['items'][0]['Order']['order_id']) ? $gd['Ticket']['items'][0]['Order']['order_id'] : '';//邮件是否包含图片
+
                 /**
                  *订单信息 结构
                  * [Order] => Array
@@ -910,7 +913,7 @@ Class WishAdapter implements AdapterInterface
         $result_json = $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
         $result_ary = json_decode($result_json,true);
 
-        if(!empty($result_ary['data']) && $result_ary['data']['success']==1){
+        if(!empty($result_ary['data']) && $result_ary['data']['success'] == 1){
             $replyMessage->status = 'SENT';
         }else{
             $replyMessage->status = 'FAIL';
@@ -931,12 +934,53 @@ Class WishAdapter implements AdapterInterface
     public function ReplayWishSupport($mailID){
         $data['id']           =  $mailID;
         $data['access_token'] = $this->access_token;
-        $result = json_decode($this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/appeal-to-wish-support',$data),true);
-        if(!empty($re['data']) && $re['data']['success']==1){
+        $result = json_decode($this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/appeal-to-wish-support', $data), true);
+        if(!empty($re['data']) && $re['data']['success'] == 1){
             return true;
         }else{
             return false;
         }
+    }
+
+    /**
+     * @param $paramAry
+     * 关联数组参数组 键
+     *
+     * id
+     * reason_code
+     * reason_note
+     *
+     */
+    public function orderRefund($paramAry)
+    {
+        $url = 'https://merchant.wish.com/api/v2/order/refund';
+        $paramAry['access_token'] = $this->access_token;
+        $result = json_decode($this->postCurlHttpsData($url, $paramAry), true);
+        if(! empty($result['data']['success'])){
+            if($result['data']['success'] == 1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 关闭消息 （无需回复）
+     * @param $messageId
+     * @return bool
+     */
+    public function ticketClose($messageId)
+    {
+        $paramAry['id'] = $messageId;
+        $paramAry['access_token'] = $this->access_token;
+        $url = 'https://merchant.wish.com/api/v2/ticket/close';
+        $result = json_decode($this->postCurlHttpsData($url, $paramAry), true);
+        if(! empty($result['data']['success'])){
+            if($result['data']['success'] == 1){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

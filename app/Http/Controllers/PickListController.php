@@ -530,7 +530,7 @@ class PickListController extends Controller
                 } 
             }
         }
-
+        
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $sum.'个包裹已加入生成拣货单'));
     }
 
@@ -696,38 +696,50 @@ class PickListController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '人员没有所属仓库'));
         }
         if(!request()->has('mixed') && request()->has('logistics')) {
-            foreach(request()->input('logistics') as $logistic_id) {
-                foreach(request('package') as $key => $type) {
-                    $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
+            $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'warehouse_id' => $warehouse_id])
                     ->where(function($query){
                         if(request()->has('channel')) {
                             $query->whereIn('channel_id', request('channel'));
                         }
-                    })->get();
-                    $sum += $packages->count();
-                    if($packages->count()) {
-                        $this->model->createPickListItems($packages);
-                        $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
-                                                     (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id, $warehouse_id);
-
+                    })
+                    ->whereIn('logistics_id', request('logistics'))
+                    ->whereIn('type', request('package'))
+                    ->with('items')
+                    ->get()->groupBy('logistics_id');
+            foreach(request()->input('logistics') as $logistics_id) {
+                $inner_packages = $packages->get($logistics_id);
+                if($inner_packages) {
+                    $inner_packages = $inner_packages->groupBy('type');
+                    foreach(request('package') as $key => $type) {
+                        $inner_packages1 = $inner_packages->get($type);
+                        if($inner_packages1) {
+                            $sum += $inner_packages1->count();
+                            if($inner_packages1->count()) {
+                                $this->model->createPickListItems($inner_packages1);
+                                $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
+                                                             (request()->has('multitext') ? request()->input('multitext') : '20'), $logistics_id, $warehouse_id);
+                            }
+                        }
                     }
                 }
+                
             }
         } elseif(request()->has('mixed') && request()->has('logistics')) {
+            $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'warehouse_id' => $warehouse_id])
+                    ->where(function($query){
+                        if(request()->has('channel')) {
+                            $query->whereIn('channel_id', request('channel'));
+                        }
+                    })
+                    ->whereIn('logistics_id', request('logistics'))
+                    ->whereIn('type', request('package'))
+                    ->with('items')
+                    ->get()->groupBy('type');
             foreach(request('package') as $key => $type) {
-               $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'type' => $type, 'warehouse_id' => $warehouse_id])
-               ->where(function($query){
-                    if(request()->has('logistics')) {
-                        $query = $query->whereIn('logistics_id', request('logistics'));
-                    }
-                })->where(function($query){
-                    if(request()->has('channel')) {
-                        $query = $query->whereIn('channel_id', request('channel'));
-                    }
-                })->get();
-                $sum += $packages->count();
-                if($packages->count()) {
-                    $this->model->createPickListItems($packages);
+                $inner_packages = $packages->get($type);
+                $sum += $inner_packages->count();
+                if($inner_packages->count()) {
+                    $this->model->createPickListItems($inner_packages);
                     $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                  (request()->has('multitext') ? request()->input('multitext') : '20'), $warehouse_id);
                 } 

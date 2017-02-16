@@ -101,6 +101,7 @@ class OrderModel extends BaseModel
         'is_oversea',
         'operator_id',
         'fee_amt',
+        'is_send_ebay_msg',
     ];
 
     private $canPackageStatus = ['PREPARED'];
@@ -384,6 +385,7 @@ class OrderModel extends BaseModel
                 'currency',
             ],
             'filterSelects' => [
+                'is_oversea' => config('order.whether'),
                 'status' => config('order.status'),
                 'active' => config('order.active'),
                 'is_chinese' => config('order.is_chinese')
@@ -400,14 +402,14 @@ class OrderModel extends BaseModel
                 'packages' => ['tracking_no'],
             ],
             'selectRelatedSearchs' => [
-                'channel' => ['name' => ChannelModel::all()->pluck('name', 'name')],
+                'channel' => ['name' => ChannelModel::get(['name'])->pluck('name', 'name')],
                 'items' => ['item_status' => config('item.status')],
                 'remarks' => ['type' => config('order.review_type')],
                 'packages' => ['is_mark' => config('order.is_mark'), 'status' => config('package')],
             ],
             'doubleRelatedSearchFields' => [],
             'doubleRelatedSelectedFields' => [
-                'packages' => ['logistics' => ['code' => LogisticsModel::all()->pluck('code', 'code')]],
+                'packages' => ['logistics' => ['code' => LogisticsModel::where('is_enable', '1')->get(['code'])->pluck('code', 'code')]],
             ],
         ];
     }
@@ -628,6 +630,24 @@ class OrderModel extends BaseModel
         } else {
             return false;
         }
+    }
+
+    //ebay订单差评
+    public function getEbayFeedbackCommentAttribute(){
+        $items = $this->items;
+        $comment = '';
+        if(!$this->items->isEmpty()){
+            foreach($items as $item){
+                if(! empty($item->ebayFeedback)){
+                    if($item->ebayFeedback->comment_type == 'Negative'){
+                        $comment = '差评';
+                    }
+                    break;
+                }
+            }
+
+        }
+        return $comment;
     }
 
     //订单备注
@@ -858,6 +878,10 @@ class OrderModel extends BaseModel
                     $packageItem['remark'] = 'REMARK';
                 }
                 $packageItem['order_item_id'] = $packageItem['id'];
+                $item = ItemModel::find($packageItem['item_id']);
+                if($item) {
+                    $packageItem['sku'] = $item->sku;
+                }
                 if ($packageItem['is_active']) {
                     $newPackageItem = $package->items()->create($packageItem);
                 }

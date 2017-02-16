@@ -136,8 +136,8 @@
                     </button>
                 @endif
                 @if($package->logistics_id != 0)
-                    <a href="{{ route('preview', ['id'=>$package->id]) }}" target="_blank" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 面单预览
+                    <a href="{{ route('preview', ['id'=>$package->id]) }}" target="_blank" class="btn btn-info btn-xs" title='面单预览'>
+                        <span class="glyphicon glyphicon-eye-open"></span>
                     </a>
                 @endif
             </td>
@@ -322,19 +322,19 @@
                 arr[i] = $(this).data('id');
                 i++;
             })
-            $.get(
-                "{{ route('package.ajaxRealTime')}}",
-                {'arr': arr},
-                function (result) {
-                    j = 0;
-                    $.each($('.packageId'), function () {
-                        block = $(this).parent();
-                        block.children('.logisticsReal').html(block.children('.logisticsReal').text() + "   <font color='gray'>" + result[j][0] + "</font>");
-                        block.children('.logisticsFee').text(result[j][1]);
-                        j++;
-                    })
-                }
-            )
+            // $.get(
+            //     "{{ route('package.ajaxRealTime')}}",
+            //     {'arr': arr},
+            //     function (result) {
+            //         j = 0;
+            //         $.each($('.packageId'), function () {
+            //             block = $(this).parent();
+            //             block.children('.logisticsReal').html(block.children('.logisticsReal').text() + "   <font color='gray'>" + result[j][0] + "</font>");
+            //             block.children('.logisticsFee').text(result[j][1]);
+            //             j++;
+            //         })
+            //     }
+            // )
 
             $('.returnTrackno').click(function () {
                 location.href = "{{ route('package.returnTrackno')}}";

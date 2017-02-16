@@ -16,9 +16,12 @@ use App\Models\ChannelModel;
 use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\Order\EbayAmountStatisticsModel;
 use App\Models\Order\EbaySkuSaleReportModel;
 use App\Models\OrderModel;
 use App\Models\Publish\Ebay\EbayPublishProductModel;
+use App\Models\RoleModel;
+use App\Models\User\UserRoleModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 use App\Models\Order\ItemModel as orderItem;
@@ -192,14 +195,45 @@ class OrderController extends Controller
     }
 
     /**
-     * EB销量额统计
+     * EBAY销售额统计
      */
     public function amountStatistics()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-        return view($this->viewPath . 'amountStatistics', $response);
+        $roleId = RoleModel::where('role', 'ebay_staff')->first()->id;
+        $userRoles = UserRoleModel::where('role_id', $roleId)->get();
+        $data['channel_name'] = 'Ebay';
+        foreach ($userRoles as $userRole) {
+            $data['user_id'] = $userRole->user_id;
+            $data['prefix'] = 0;
+            $ebayPublishProducts = EbayPublishProductModel::where('seller_id', $data['user_id']);
+            if ($ebayPublishProducts->count()) {
+                $data['prefix'] = explode('*', $ebayPublishProducts->first()->sku)[0];
+            }
+            foreach ($ebayPublishProducts->get() as $ebayPublishProduct) {
+
+            }
+            $data['january_publish'] = EbayPublishProductModel::where('seller_id', $data['user_id'])
+                ->whereBetween('created_at', [date('Y-m-01', strtotime(date('Y-m-d'))) . ' 00:00:00', date('Y-m-d', strtotime('+1 month', strtotime(date('Y-m-01')))) . ' 00:00:00'])
+                ->where('listing_type', '!=', 'Chinese')
+                ->count();
+            $data['yesterday_publish'] = EbayPublishProductModel::where('seller_id', $data['user_id'])
+                ->whereBetween('created_at', [date('Y-m-d', strtotime('-1 day', strtotime(date('Y-m-d')))) . ' 00:00:00', date('Y-m-d') . ' 00:00:00'])
+                ->where('listing_type', '!=', 'Chinese')
+                ->count();
+            $data['created_date'] = date('Y-m');
+            $ebayAmountStatistics = EbayAmountStatisticsModel::where('user_id', $data['user_id'])->where('created_date', date('Y-m'));
+            if ($ebayAmountStatistics->count()) {
+                $ebayAmountStatistics->update([
+                    'january_publish' => $data['january_publish'],
+                    'yesterday_publish' => $data['yesterday_publish'],
+                    'created_date' => $data['created_date'],
+                ]);
+            } else {
+                EbayAmountStatisticsModel::create($data);
+            }
+        }
+
+        return 1;
     }
 
     /**
@@ -236,7 +270,7 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
-        $order = $this->model->with('items')->with('packages');
+        $order = $this->model;
         $orderStatistics = '';
 //        if ($this->allList($order)->count()) {
 //            $totalAmount = 0;
@@ -256,7 +290,6 @@ class OrderController extends Controller
 //        foreach ($this->autoList($order) as $value) {
 //            $subtotal += $value->amount * $value->rate;
 //        }
-        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         //订单首页不显示数据
         $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $orderUrl = route('order.index');
@@ -268,11 +301,12 @@ class OrderController extends Controller
         $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($order->count() ? $this->model : $order, null, ['*'], null, 'restrict'),
+            'data' => $this->autoList($order->count() ? $this->model : $order, null, ['*'], null, 'restrict', 
+                       ['packages', 'channel', 'channelAccount', 'userOperator', 'country', 'remarks', 'remarks.user', 'unpaidOrder',
+                        'refunds', 'items', 'items.item', 'items.item.warehouse', 'packages.logistics', 'packages.warehouse']),
             'mixedSearchFields' => $this->model->mixed_search,
-            'currencys' => CurrencyModel::all(),
+            'currencys' => CurrencyModel::get(['code']),
             'subtotal' => $subtotal,
-            'rmbRate' => $rmbRate,
             'hideUrl' => $url,
             'page' => $page,
             'orderStatistics' => $orderStatistics,
@@ -785,11 +819,6 @@ class OrderController extends Controller
                 $to = json_encode($this->model->find($id));
                 $this->eventLog($userName->name, '批量撤单,id=' . $id, $to, $from);
             }
-            if ($this->model->find($id)->packages) {
-                foreach ($this->model->find($id)->packages as $package) {
-                    $package->cancelPackage();
-                }
-            }
         }
         return 1;
     }
@@ -804,11 +833,6 @@ class OrderController extends Controller
         $data = request()->all();
         $order = $this->model->find($id);
         $order->cancelOrder($data['withdraw']);
-        if ($order->packages) {
-            foreach ($order->packages as $package) {
-                $package->cancelPackage();
-            }
-        }
         $to = json_encode($this->model->find($id));
         $this->eventLog($userName->name, '撤单新增,id=' . $id, $to, $from);
         $url = request()->has('hideUrl') ? request('hideUrl') . '&page=' . $page : $this->mainIndex;

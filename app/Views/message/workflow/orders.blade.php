@@ -71,6 +71,7 @@
                                 <thead>
                                 <tr>
                                     <th>SKU</th>
+                                    <th>Name</th>
                                     <th>Qty</th>
                                     <th>Price</th>
                                     <th>Status</th>
@@ -82,6 +83,7 @@
 
                                             <a href="{{ route('item.show', $item->item_id ) }}" target="_blank">{{$item->sku}}</a>
                                         </td>
+                                        <td>{{ $item->item->c_name }}</td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>{{ $item->price }}</td>
                                         <td>{{ $item->status_text }}</td>

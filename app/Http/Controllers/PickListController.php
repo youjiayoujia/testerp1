@@ -508,6 +508,7 @@ class PickListController extends Controller
                         $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                      (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id, $warehouse_id);
                     }
+                    unset($packages);
                 }
             }
         } elseif(request()->has('mixed') && request()->has('logistics')) {
@@ -528,6 +529,7 @@ class PickListController extends Controller
                     $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                  (request()->has('multitext') ? request()->input('multitext') : '20'), $warehouse_id);
                 } 
+                unset($packages);
             }
         }
         

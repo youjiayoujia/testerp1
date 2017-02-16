@@ -685,6 +685,25 @@ Class WishAdapter implements AdapterInterface
     }
 
     /**
+     * 主动刷新 accessToken
+     */
+    public function ActiveGetAcessToken()
+    {
+        $json =  $this->getAccessTokenByRefresh();
+        $data = json_decode($json, true);
+        if(isset($data['data']["access_token"])){
+            DB::table('channel_accounts')->where('wish_client_id', $this->client_id)->update([
+                'wish_access_token' => $data['data']["access_token"],
+                'wish_refresh_token' => $data['data']['refresh_token'],
+                'wish_expiry_time' => date('Y-m-d H:i:s', $data['data']['expiry_time'])
+            ]);
+            $this->sendToSlme($data['data']["access_token"],$this->client_id,$data['data']['expiry_time']);
+
+            $this->access_token = $data['data']["access_token"];
+        }
+    }
+
+    /**
      * 用refresh重新获取访问token
      * 并把wish的token重新更新
      */
@@ -798,6 +817,8 @@ Class WishAdapter implements AdapterInterface
 
     public function getMessages()
     {
+        $this->ActiveGetAcessToken();
+
         $j = 0; //信息条数
         $initArray = [];
         $initArray['limit'] = 100; //每页数量
@@ -808,7 +829,6 @@ Class WishAdapter implements AdapterInterface
             $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
             $jsonData = $this->getCurlData($url);
             $apiReturn = json_decode($jsonData,true);
-            //dd($apiReturn);
             if(empty($apiReturn['data'])){
                 break;
             }
@@ -837,10 +857,10 @@ Class WishAdapter implements AdapterInterface
                 $return_array[$j]['channel_order_number']=
                     !empty($gd['Ticket']['items'][0]['Order']['transaction_id']) ? $gd['Ticket']['items'][0]['Order']['transaction_id'] : '';//邮件是否包含图片
 
-                if(! empty($gd['Ticket']['items'][0]['Order']['ShippingDetail']['country'])){
-                    $return_array[$j]['country'] = $gd['Ticket']['items'][0]['Order']['ShippingDetail']['country'];
+                if(! empty($gd['Ticket']['UserInfo']['locale'])){
+                    $return_array[$j]['country'] = ! empty(config('crm.wish.refund.locale')[$gd['Ticket']['UserInfo']['locale']]) ? config('crm.wish.refund.locale')[$gd['Ticket']['UserInfo']['locale']] : '未知';
                 }else{
-                    $return_array[$j]['country'] = '';
+                    $return_array[$j]['country'] = '未知';
                 }
                 $return_array[$j]['channel_url'] = !empty($gd['Ticket']['items'][0]['Order']['order_id']) ? $gd['Ticket']['items'][0]['Order']['order_id'] : '';//邮件是否包含图片
 
@@ -905,6 +925,8 @@ Class WishAdapter implements AdapterInterface
      */
     public function sendMessages($replyMessage)
     {
+        $this->ActiveGetAcessToken();
+
         $message_obj = $replyMessage->message;
         $param['id'] = $message_obj->message_id;
         $param['access_token'] = $this->access_token;
@@ -932,14 +954,17 @@ Class WishAdapter implements AdapterInterface
      * @return bool
      */
     public function ReplayWishSupport($mailID){
+        $this->ActiveGetAcessToken();
         $data['id']           =  $mailID;
         $data['access_token'] = $this->access_token;
         $result = json_decode($this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/appeal-to-wish-support', $data), true);
-        if(!empty($re['data']) && $re['data']['success'] == 1){
-            return true;
-        }else{
-            return false;
+
+        if(! empty($result['data']['success'])){
+            if($result['data']['success'] == 1){
+                return true;
+            }
         }
+        return false;
     }
 
     /**
@@ -953,6 +978,7 @@ Class WishAdapter implements AdapterInterface
      */
     public function orderRefund($paramAry)
     {
+        $this->ActiveGetAcessToken();
         $url = 'https://merchant.wish.com/api/v2/order/refund';
         $paramAry['access_token'] = $this->access_token;
         $result = json_decode($this->postCurlHttpsData($url, $paramAry), true);
@@ -971,6 +997,7 @@ Class WishAdapter implements AdapterInterface
      */
     public function ticketClose($messageId)
     {
+        $this->ActiveGetAcessToken();
         $paramAry['id'] = $messageId;
         $paramAry['access_token'] = $this->access_token;
         $url = 'https://merchant.wish.com/api/v2/ticket/close';

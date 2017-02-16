@@ -44,7 +44,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AutoRunPackages::class,
         \App\Console\Commands\ImitationOrders::class,
         \App\Console\Commands\UpdateUsers::class,
-        //邮件
         \App\Console\Commands\ComputeCrmSatistics::class,
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\getChannelAccountMessages::class,
@@ -162,6 +161,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('import:message wish')->hourly(); //wish
         $schedule->command('getEbayCases')->cron('30 8,12,13,14,16,17 * * *');
         $schedule->command('getFeedBack:account')->everyTenMinutes();
+        $schedule->command('reply:again all')->everyThirtyMinutes();
         //采购
         $schedule->command('aliShipmentName:get')->hourly();
         $schedule->command('sendEmailToPurchase:notWarehouse')->cron('15 4 * * *');

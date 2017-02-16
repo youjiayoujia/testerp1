@@ -402,7 +402,7 @@
                 type: 'POST',
                 success: function (data) {
 
-                    if(data == 1){
+                    if(data == '1'){
                         if(message.is_workflow == false){
                             window.location.href = document.referrer;
                             return;
@@ -411,9 +411,8 @@
                         message.showTip('请求wish,回复成功');
                         message.loadingNext();
 
-                    }else if(data == -1){
+                    }else {
                         alert('请求wish,回复失败');
-
                     }
                 }
             });

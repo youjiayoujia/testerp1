@@ -666,7 +666,6 @@
                                     <input class="form-control" type="text" value="Artisanal kale" id="example-text-input" disabled>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-xs-2">
                                     <label>物 品:</label>
@@ -675,7 +674,6 @@
                                     <div class="row">
                                         <div class="form-group col-sm-1">
                                             <label for="id" class="control-label">选择</label>
-
                                         </div>
                                         <div class="form-group col-sm-2">
                                             <label for="id" class="control-label">渠道ItemID</label>
@@ -709,36 +707,8 @@
                                             </div>
                                         </div>
                                     @endforeach
-                                    {{--
-                                     <table class="table table-bordered">
-                                        <thead>
-                                        <tr>
-                                            <th>选择</th>
-                                            <th>Item ID</th>
-                                            <th>SKU</th>
-                                            <th>物品名称</th>
-                                            <th>数量</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($order->items as $item)
-                                            <tr>
-                                                <td><input type="checkbox"  name=""/></td>
-                                                <td>{{$item->item_id}}</td>
-                                                <td>{{$item->sku}}</td>
-                                                <td>{{$item->item->c_name}}</td>
-                                                <td>{{$item->quantity}}</td>
-                                            </tr>
-
-                                        @endforeach
-                                        </tbody>
-
-                                    </table>
-                                    --}}
                                 </div>
-
                             </div>
-
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="panel panel-default">
@@ -762,7 +732,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="panel panel-default">
@@ -770,7 +739,6 @@
                                             <label class="panel-title">历史记录</label>
                                         </div>
                                         <div class="panel-body">
-
                                             @if($order->SendEbayMessageHistory)
                                                 <div class="list-group">
                                                     @foreach($order->SendEbayMessageHistory as $item)
@@ -785,7 +753,6 @@
                                             @else
                                                 <div class="list-group">
                                                     <h4 class="list-group-item-heading ">无</h4>
-
                                                 </div>
                                             @endif
                                         </div>
@@ -814,22 +781,6 @@
 @stop
 @stop
 @section('tableToolButtons')
-    {{--<div class="btn-group" role="group">--}}
-    {{--<input class="form-control lr" id="lr" placeholder="利润" name="lr">--}}
-    {{--</div>--}}
-    {{--<div class="btn-group" role="group">--}}
-    {{--<select class="form-control sx" name="sx" id="sx">--}}
-    {{--<option value="null">利润筛选</option>--}}
-    {{--<option value="high">高于</option>--}}
-    {{--<option value="low">低于</option>--}}
-    {{--</select>--}}
-    {{--</div>--}}
-    {{--<div class="btn-group" role="group">--}}
-    {{--<select class="form-control special" name="special" id="special">--}}
-    {{--<option value="null">特殊要求</option>--}}
-    {{--<option value="yes">有特殊要求</option>--}}
-    {{--</select>--}}
-    {{--</div>--}}
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             展示类型

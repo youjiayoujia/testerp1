@@ -61,6 +61,7 @@ class BaseModel extends Model
 
     public function relatedGet($model = '', $relation_ship='', $key='', $value='')
     {
+        return 1;
         if(Session::has($this->table.'.'.$relation_ship)) {
             $model = $model->where($this->relation_arr[$relation_ship][0].'.'.$key, $value)
                 ->select($this->table.'.*');

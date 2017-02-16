@@ -934,11 +934,13 @@ Class WishAdapter implements AdapterInterface
         $data['id']           =  $mailID;
         $data['access_token'] = $this->access_token;
         $result = json_decode($this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/appeal-to-wish-support', $data), true);
-        if(!empty($re['data']) && $re['data']['success'] == 1){
-            return true;
-        }else{
-            return false;
+
+        if(! empty($result['data']['success'])){
+            if($result['data']['success'] == 1){
+                return true;
+            }
         }
+        return false;
     }
 
     /**

@@ -186,7 +186,6 @@ return [
         'check_status' => '审核状态',
         'shipping_country' => '收货国家',
         'assign_id' => '客服名称',
-        'messages.status' => '消息状态',
         'refund' => '退款方式',
         'process_status'=> '处理状态',
         'customer_id' => '客服',

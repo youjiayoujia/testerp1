@@ -420,6 +420,8 @@ class OrderModel extends BaseModel
             'channelAccount' => ['channel_accounts', 'id' , 'channel_account_id'],
             'userOperator' => ['users', 'id' , 'operator'],
             'packages' => ['packages', 'order_id', 'id'],
+            'channel' => ['channels', 'id', 'channel_id'],
+            'remarks' => ['order_remarks', 'order_id', 'id'],
         ];
     }
 

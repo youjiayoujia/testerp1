@@ -135,7 +135,7 @@ class MessageModel extends BaseModel{
                 'channel_order_number',
             ],
             'filterSelects' => [
-                'messages.status' => config('message.statusText'),
+                'status' => config('message.statusText'),
                 'assign_id' => UserModel::all()->pluck('name','id'),
             ],
             'selectRelatedSearchs' => [

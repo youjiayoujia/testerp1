@@ -337,6 +337,7 @@ class MessageController extends Controller
     public function WishSupportReplay(){
         $id = request()->input('id');
         $message = $this->model->find($id);
+        $from = $message;
         if($message){
 
             $account = Channel_account::find($message->account_id);
@@ -347,6 +348,7 @@ class MessageController extends Controller
                 $message->required=0;
                 $message->status="COMPLETE";
                 $message->save();
+                $this->eventLog(\App\Models\UserModel::find(request()->user()->id)->name, 'workflow中，标记为稍后处理', $message, $from);
 
                 return config('status.ajax')['success'];
             }

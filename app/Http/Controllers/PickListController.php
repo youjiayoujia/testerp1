@@ -64,7 +64,8 @@ class PickListController extends Controller
         $tmp = $this->model->where('warehouse_id', $warehouseId);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model, !empty($model) ? $model : ($this->model->where('warehouse_id', $warehouseId))),
+            'data' => $this->autoList($this->model, !empty($model) ? $model : ($this->model->where('warehouse_id', $warehouseId)), ['*'], null, 'restrict', 
+                    ['warehouse', 'logistics', 'package', 'pickByName']),
             'mixedSearchFields' => $this->model->mixed_search,
             'today_print' => $today_print,
             'allocate' => $allocate,
@@ -508,6 +509,7 @@ class PickListController extends Controller
                         $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                      (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id, $warehouse_id);
                     }
+                    unset($packages);
                 }
             }
         } elseif(request()->has('mixed') && request()->has('logistics')) {
@@ -528,6 +530,7 @@ class PickListController extends Controller
                     $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                  (request()->has('multitext') ? request()->input('multitext') : '20'), $warehouse_id);
                 } 
+                unset($packages);
             }
         }
         
@@ -548,7 +551,7 @@ class PickListController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $sum = 0;
-        foreach($picklist->package()->withTrashed()->get() as $package)
+        foreach($picklist->package as $package)
         {
             if(!in_array($package->status, ['PACKED', 'SHIPPED'])) {
                 foreach($package->items as $packageItem) {
@@ -557,10 +560,6 @@ class PickListController extends Controller
                 }
                 $package->update(['status' => 'NEED', 'picklist_id' => '']);
                 $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹未包装，点包装完成，包裹变缺货，重新进入缺货流程', json_encode($package));
-                $package->update(['queue_name' => 'assignStocks']);
-                $job = new AssignStocks($package);
-                $job = $job->onQueue('assignStocks');
-                $this->dispatch($job);
             } 
             $picklist->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);
         }
@@ -648,8 +647,7 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'pickListItems' => $model->pickListItem,
-            'packages' => $model->package
+            'packages' => $model->package->with('items','items.item', 'order')->get()
         ];
 
         return view($this->viewPath.'inbox', $response);

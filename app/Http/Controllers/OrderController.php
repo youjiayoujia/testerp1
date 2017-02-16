@@ -311,7 +311,8 @@ class OrderController extends Controller
             'page' => $page,
             'orderStatistics' => $orderStatistics,
         ];
-
+        $this->model->clearSession();
+        
         return view($this->viewPath . 'index', $response);
     }
 

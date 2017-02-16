@@ -181,19 +181,7 @@ class getChannelAccountMessages extends Command
                             }
                         }
                     }else{
-                        if(empty($messageNew->list_id)){
-
-                            if(!empty($message['list_id'])){
-                                $messageNew->list_id  = $message['list_id'];
-                            }else{
-                                $messageNew->list_id  = '';
-                            }
-                            $messageNew->save();
-                            $this->comment('Message #' . $messageNew->message_id . ' alerady exist.(list_id is update)');
-                        }else{
-                            $this->comment('Message #' . $messageNew->message_id . ' alerady exist.');
-                        }
-
+                        $this->comment('Message #' . $messageNew->message_id . ' alerady exist.');
                     }
 
 

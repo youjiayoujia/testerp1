@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Oversea\ChannelSaleModel;
 use App\Models\WarehouseModel;
 use App\Models\Oversea\ItemCostModel;
+use Session;
 
 class OrderModel extends BaseModel
 {
@@ -425,6 +426,14 @@ class OrderModel extends BaseModel
             'channel' => ['channels', 'id', 'channel_id'],
             'remarks' => ['order_remarks', 'order_id', 'id'],
         ];
+    }
+
+    public function clearSession()
+    {
+        $arr = $this->relation_arr;
+        foreach($arr as $key => $single) {
+            Session::forget($this->table.'.'.$key);
+        }
     }
 
     //状态名称

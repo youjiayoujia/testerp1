@@ -550,7 +550,7 @@ class PickListController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $sum = 0;
-        foreach($picklist->package()->withTrashed()->get() as $package)
+        foreach($picklist->package as $package)
         {
             if(!in_array($package->status, ['PACKED', 'SHIPPED'])) {
                 foreach($package->items as $packageItem) {
@@ -559,10 +559,6 @@ class PickListController extends Controller
                 }
                 $package->update(['status' => 'NEED', 'picklist_id' => '']);
                 $package->eventLog(UserModel::find(request()->user()->id)->name, '包裹未包装，点包装完成，包裹变缺货，重新进入缺货流程', json_encode($package));
-                $package->update(['queue_name' => 'assignStocks']);
-                $job = new AssignStocks($package);
-                $job = $job->onQueue('assignStocks');
-                $this->dispatch($job);
             } 
             $picklist->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);
         }

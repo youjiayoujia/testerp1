@@ -381,8 +381,7 @@ class PackageController extends Controller
     //     return view($this->viewPath . 'edit', $response);
     // }
     public function flow()
-    {return 1;
-        ini_set('memory_limit','2G');
+    {
         $reportModel = AllReportModel::orderBy('day_time', 'desc')->first();
         $last_time = '';
         $arr = [];
@@ -406,12 +405,11 @@ class PackageController extends Controller
             'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
-            'placeNum' => $this->model
-                ->where('status', 'ASSIGNED')->where('is_auto',
-                '1')->where('queue_name', '!=', 'placeLogistics')
-                ->whereHas('order', function($single){
-                    $single->where('status', '!=', 'REVIEW');
-                })->count(),
+            'placeNum' => $this->model->
+                relatedGet($this->model, 'order', 'status', 'REVIEW')
+                ->where('packages.status', 'ASSIGNED')->where('packages.is_auto',
+                '1')->where('packages.queue_name', '!=', 'placeLogistics')
+                ->count(),
             'manualShip' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),

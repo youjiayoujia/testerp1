@@ -441,6 +441,7 @@ class PackageController extends Controller
         }
         return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count() . '个包裹放入队列'));
     }
+    
     public function processingAssignStocks()
     {
         $packages = $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->get();

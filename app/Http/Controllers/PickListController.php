@@ -64,8 +64,7 @@ class PickListController extends Controller
         $tmp = $this->model->where('warehouse_id', $warehouseId);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model, !empty($model) ? $model : ($this->model->where('warehouse_id', $warehouseId)), ['*'], null, 'restrict', 
-                    ['warehouse', 'logistics', 'package', 'pickByName']),
+            'data' => $this->autoList($this->model, !empty($model) ? $model : ($this->model->where('warehouse_id', $warehouseId))),
             'mixedSearchFields' => $this->model->mixed_search,
             'today_print' => $today_print,
             'allocate' => $allocate,

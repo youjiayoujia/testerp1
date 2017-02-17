@@ -19,7 +19,7 @@ use App\Models\CountriesModel;
 
 class ShipmentCostModel extends BaseModel
 {
-    protected $table = 'shipment_costs';
+    public $table = 'shipment_costs';
 
     protected $fillable = [
     	'shipmentCostNum',

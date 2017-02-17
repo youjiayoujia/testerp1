@@ -14,7 +14,7 @@ class InOutModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_in_outs';
+    public $table = 'stock_in_outs';
 
     /**
      * The attributes that are mass assignable.

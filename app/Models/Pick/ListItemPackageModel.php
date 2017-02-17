@@ -14,7 +14,7 @@ class ListItemPackageModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'picklistitem_packages';
+    public $table = 'picklistitem_packages';
 
     /**
      * The attributes that are mass assignable.

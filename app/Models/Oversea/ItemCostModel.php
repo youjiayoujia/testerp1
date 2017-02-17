@@ -11,7 +11,7 @@ class ItemCostModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'oversea_item_costs';
+    public $table = 'oversea_item_costs';
 
     /**
      * The attributes that are mass assignable.

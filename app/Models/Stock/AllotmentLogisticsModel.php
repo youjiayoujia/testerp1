@@ -12,7 +12,7 @@ class AllotmentLogisticsModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'allotment_logistics';
+    public $table = 'allotment_logistics';
 
     /**
      * The attributes that are mass assignable.

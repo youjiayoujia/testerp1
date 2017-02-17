@@ -13,7 +13,7 @@ class ErrorListModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'picklist_error_lists';
+    public $table = 'picklist_error_lists';
 
     /**
      * The attributes that are mass assignable.

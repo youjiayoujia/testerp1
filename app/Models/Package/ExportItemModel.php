@@ -13,7 +13,7 @@ use App\Base\BaseModel;
 
 class ExportItemModel extends BaseModel
 {
-    protected $table = 'export_package_items';
+    public $table = 'export_package_items';
 
     protected $fillable = [
     	'parent_id',

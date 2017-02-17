@@ -13,7 +13,7 @@ class AllotmentModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'oversead_allotments';
+    public $table = 'oversead_allotments';
 
     /**
      * The attributes that are mass assignable.

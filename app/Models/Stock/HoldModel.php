@@ -12,7 +12,7 @@ class HoldModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_holds';
+    public $table = 'stock_holds';
 
     /**
      * The attributes that are mass assignable.

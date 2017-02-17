@@ -12,7 +12,7 @@ class AdjustFormModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'adjust_forms';
+    public $table = 'adjust_forms';
 
     /**
      * The attributes that are mass assignable.

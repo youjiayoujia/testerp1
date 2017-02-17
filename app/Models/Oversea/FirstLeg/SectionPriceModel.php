@@ -12,7 +12,7 @@ class SectionPriceModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'firstLeg_sectionPrices';
+    public $table = 'firstLeg_sectionPrices';
 
     /**
      * The attributes that are mass assignable.

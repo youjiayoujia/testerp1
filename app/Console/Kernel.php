@@ -99,6 +99,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('imitate:orders 5000')->everyThirtyMinutes();
+
+        $schedule->command('table:separate')->cron('0 0 * * *');
         //半小时一次将包裹放入队列
         // $schedule
             // ->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')

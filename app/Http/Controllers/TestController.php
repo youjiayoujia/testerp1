@@ -254,41 +254,53 @@ class TestController extends Controller
     //     var_dump($package);exit;
     // }
 
+    // public function test2()
+    // {
+    //     $package = PackageModel::find('31828');
+
+    //     if($package->order->status != 'REVIEW' && in_array($package->status, ['NEW', 'NEED'])) {
+    //         if($package->is_oversea) {
+    //             $flag = $package->oversea_createPackageItems();
+    //         } else {
+    //             $flag = $package->createPackageItems();
+    //         }
+    //         if ($flag) {
+    //             if ($package->status == 'WAITASSIGN') {
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success to assign stock.';
+    //                 $package->eventLog('队列', '已匹配到库存,待分配', json_encode($package));
+    //             } elseif ($package->status == 'PROCESSING') { //todo:如果缺货订单匹配到了库存，不是原匹配仓库，需要匹配物流下单
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success to assign stock.';
+    //                 $package->eventLog('队列', '已匹配到库存,待拣货', json_encode($package));
+    //             } elseif ($package->status == 'ASSIGNED') {
+    //                 $this->result['status'] = 'success';
+    //                 $this->result['remark'] = 'Success to assign stock.';
+    //                 $package->eventLog('队列', '已匹配到库存,待下单', json_encode($package));
+    //             }
+    //         } else {
+    //             $this->result['status'] = 'success';
+    //             $this->result['remark'] = 'have no enough stocks or can\'t assign stocks.';
+    //             $package->eventLog('队列', 'have no enough stocks or can\'t assign stocks.',
+    //                 json_encode($package));
+    //         }
+    //     } else {
+    //         $package->update(['queue_name' => '']);
+    //     }
+
+    //     var_dump('123');
+    // }
+
     public function test2()
     {
-        $package = PackageModel::find('31828');
-
-        if($package->order->status != 'REVIEW' && in_array($package->status, ['NEW', 'NEED'])) {
-            if($package->is_oversea) {
-                $flag = $package->oversea_createPackageItems();
-            } else {
-                $flag = $package->createPackageItems();
-            }
-            if ($flag) {
-                if ($package->status == 'WAITASSIGN') {
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success to assign stock.';
-                    $package->eventLog('队列', '已匹配到库存,待分配', json_encode($package));
-                } elseif ($package->status == 'PROCESSING') { //todo:如果缺货订单匹配到了库存，不是原匹配仓库，需要匹配物流下单
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success to assign stock.';
-                    $package->eventLog('队列', '已匹配到库存,待拣货', json_encode($package));
-                } elseif ($package->status == 'ASSIGNED') {
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success to assign stock.';
-                    $package->eventLog('队列', '已匹配到库存,待下单', json_encode($package));
-                }
-            } else {
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'have no enough stocks or can\'t assign stocks.';
-                $package->eventLog('队列', 'have no enough stocks or can\'t assign stocks.',
-                    json_encode($package));
-            }
-        } else {
-            $package->update(['queue_name' => '']);
+        $model = PickListModel::find('1979');
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-
-        var_dump('123');
+        var_dump($model->toarray());
+         $arr = $model->package()->with('items', 'logistics', 'warehouse', 'pickByName')->get();
+         var_dump($arr);exit;
+        
     }
 
     // public function test2()

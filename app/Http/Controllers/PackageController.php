@@ -406,7 +406,7 @@ class PackageController extends Controller
             'weatherNum' => $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
             'placeNum' => $this->model->
-                relatedGet($this->model, 'order', 'status', 'REVIEW')
+                relatedGet($this->model, 'order', 'status', 'PACKED')
                 ->where('packages.status', 'ASSIGNED')->where('packages.is_auto',
                 '1')->where('packages.queue_name', '!=', 'placeLogistics')
                 ->count(),
@@ -836,14 +836,16 @@ class PackageController extends Controller
                         'weight' => $weight,
                         'status' => 'WAITASSIGN',
                         'logistics_id' => '',
-                        'tracking_no' => ''
+                        'tracking_no' => '',
+                        'picklist_id' => '',
                     ]);
                 } else {
                     $newPackage->update([
                         'weight' => $weight,
                         'status' => 'NEW',
                         'logistics_id' => '',
-                        'tracking_no' => ''
+                        'tracking_no' => '',
+                        'picklist_id' => '',
                     ]);
                 }
                 $this->eventLog($name, '拆分包裹', $to);

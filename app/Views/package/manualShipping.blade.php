@@ -18,7 +18,7 @@
             <tr>
                 <td><input type='checkbox' name='select[]' class='select_single'></td>
                 <td>{{$model->id}}</td>
-                <td>{{$model->order ? $model->order->ordernum : ''}}</td>
+                <td>{{$model->order ? $model->order->id : ''}}</td>
                 <td>{{$model->channel->name}}</td>
                 <td>{{$model->status_name}}</td>
             </tr>

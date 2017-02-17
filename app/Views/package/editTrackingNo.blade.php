@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-lg-2">
                     <label>订单号</label>
-                    <input type='text' class='form-control' value="{{ $model->order ? $model->order->ordernum : '无订单号' }}" readonly>
+                    <input type='text' class='form-control' value="{{ $model->order ? $model->order->id : '无订单号' }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>渠道</label>

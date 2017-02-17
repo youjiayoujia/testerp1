@@ -103,6 +103,10 @@ class RefundModel extends BaseModel
         return $this->belongsTo('App\Models\ChannelModel', 'channel_id' , 'id');
     }
 
+    public function paypalDetail()
+    {
+        return $this->hasMany('App\Models\Order\OrderPaypalDetailModel', 'order_id', 'order_id');
+    }
 
     /**
      * 更多搜索

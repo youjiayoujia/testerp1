@@ -31,4 +31,10 @@ class OrderPaypalDetailModel extends BaseModel{
         ]
     ];
 
+    public function paypalAccount()
+    {
+        return $this->belongsTo('App\Models\PaypalsModel', 'paypal_id', 'id');
+    }
+
+
 }

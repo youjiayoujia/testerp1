@@ -54,7 +54,6 @@
                         <button type="submit" class="btn btn-primary">导出</button>
                     </div>
                 </div>
-
             </form>
 
         </div>
@@ -137,7 +136,7 @@
 
 
                             <div class="row">
-                                <div class="col-lg-8"><label>退款金额：<span class="label label-danger">{{$item->refund_currency}}</span>{{$item->refund_amount}}</label></div>
+                                <div class="col-lg-8"><label>退款金额：{{$item->refund_amount}} <code>{{$item->refund_currency}}</code></label></div>
                                 <div class="col-lg-4"><label>国家：</label>{{$item->Order->currency}}</div>
                             </div>
                             <div class="row">
@@ -173,17 +172,30 @@
                             </div>
                         <div class="row">
                             <div class="col-lg-12"><label>查看截图：</label>
-                                <a href="../../{{$item->image}}" target="_blank"><span class="glyphicon glyphicon-paperclip"></span></a>
+                                @if($item->image)
+                                    <a href="../../{{$item->image}}" target="_blank"><span class="glyphicon glyphicon-paperclip"></span></a>
+                                @else
+                                    无
+                                @endif
                             </div>
                         </div>
 
                             <div class="row">
                                 <div class="col-lg-6"><label>Paypal账号：</label>
-                                    <select class="form-control" name="paypal_id">
-                                        @foreach($paypals as $paypal)
-                                            <option value="{{$paypal->id}}">{{$paypal->paypal_email_address}}</option>
-                                        @endforeach
-                                    </select>
+                                    @if(! $item->paypalDetail->isEmpty())
+                                        <select class="form-control" name="paypal_id">
+                                            @foreach($item->paypalDetail as $paypal)
+                                                <option value="{{$paypal->paypalAccount->id}}">{{$paypal->paypalAccount->paypal_email_address}}</option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <label><code>没有匹配到订单对应的paypal账号</code></label>
+                                        <select class="form-control" name="paypal_id">
+                                            @foreach($paypals as $paypal)
+                                                <option value="{{$paypal->id}}">{{$paypal->paypal_email_address}}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
                                 </div>
                                 <div class="col-lg-6"><label>退款密码：</label>
                                     <input type="password" name="password" class="form-control" />

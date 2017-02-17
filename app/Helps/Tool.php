@@ -379,4 +379,18 @@ class Tool
             return $mainIndex;
         }
     }
+
+    /**
+     *  获得分表对应的年和季度
+     * @param $date 需要转化的日期
+     * return 类似2017_1_,2017_2_,2017_3_,2017_4_
+     */
+    public function getYearAndQuarter($date)
+    {
+        //计算是哪一季度
+        $season = ceil((date('n',strtotime($date)))/3);
+        //计算是哪一年
+        $year = ceil((date('Y',strtotime($date))));
+        return $year."_".$season;
+    }
 }

@@ -649,7 +649,7 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'pickListItems' => $model->pickListItem,
-            'packages' => $model->package()->with('logistics', 'warehouse', 'package', 'pickByName', )->get(),
+            'packages' => $model->package()->with('logistics', 'warehouse', 'package', 'pickByName')->get(),
         ];
 
         return view($this->viewPath.'inbox', $response);

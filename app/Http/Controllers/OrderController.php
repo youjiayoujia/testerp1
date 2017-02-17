@@ -301,7 +301,7 @@ class OrderController extends Controller
         $page = request()->input('page');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($order->count() ? $this->model : $order, null, ['*'], null, 'restrict', 
+            'data' => $this->autoList($order->count() ? $this->model : $order, null, ['*'], null, 'restrict',
                        ['packages', 'channel', 'channelAccount', 'userOperator', 'country', 'remarks', 'remarks.user', 'unpaidOrder',
                         'refunds', 'items', 'items.item', 'items.item.warehouse', 'packages.logistics', 'packages.warehouse']),
             'mixedSearchFields' => $this->model->mixed_search,

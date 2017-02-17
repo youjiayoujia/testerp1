@@ -12,7 +12,7 @@
         </div>
         <div class='form-group col-lg-2'>
             <label>订单号</label>
-            <input type='text' class='form-control' value={{ $package->order ? $package->order->ordernum : '订单号有误' }}>
+            <input type='text' class='form-control' value={{ $package->order ? $package->order->id : '订单号有误' }}>
         </div>
     </div>
     <div class='row'>
@@ -62,7 +62,7 @@
                     <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
                         @if($key == '0')
                         <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
-                        <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                        <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
                         @endif
                         <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                         <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>

@@ -58,7 +58,7 @@
                     <tr data-id="{{$package->id}}">
                         @if($key == '0')
                             <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1' name="{{ $k+1 }}" data-cname="{{ $packageitem->item->c_name}}">{{ $package->id }}</td>
-                            <td rowspan="{{$package->items()->count()}}" class='col-lg-2'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                            <td rowspan="{{$package->items()->count()}}" class='col-lg-2'>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
                         @endif
                         <td class='sku col-lg-6' name="{{ $k+1 }}">{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                         <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>

@@ -16,7 +16,7 @@
                 </div>
                 <div class="col-lg-2">
                     <label>订单号</label>
-                    <input type='text' class='form-control' value="{{ $model->order->ordernum }}" readonly>
+                    <input type='text' class='form-control' value="{{ $model->order->id }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>状态</label>

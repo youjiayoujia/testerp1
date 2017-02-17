@@ -689,7 +689,7 @@ class PickListController extends Controller
     public function createPickStore()
     {
         set_time_limit(0);
-        ini_set('memory_limit', '128M');
+        ini_set('memory_limit', '2G');
         $sum = 0;
         $warehouse_id = UserModel::find(request()->user()->id)->warehouse_id;
         if(!$warehouse_id) {

@@ -211,7 +211,7 @@ class PickListModel extends BaseModel
         $query = ListItemModel::where(['picklist_id'=>'0', 'type'=>'SINGLE']);
         if($query->count()) {
             $picklists = $query->get()->sortBy(function($query){
-                return $query->position->name;
+                return $query->position ? $query->position->name : '';
             })->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
                 $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'logistic_id'=>$logistic_id, 'warehouse_id' => $warehouse_id]);
@@ -233,7 +233,7 @@ class PickListModel extends BaseModel
         $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLEMULTI']);
         if($query->count()) {
             $picklists = $query->get()->sortBy(function($query){
-                return $query->position->name;
+                return $query->position ? $query->position->name : '';
             })->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
                 $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'logistic_id'=>$logistic_id, 'warehouse_id' => $warehouse_id]);

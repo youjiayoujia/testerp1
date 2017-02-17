@@ -97,12 +97,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('inspire')->hourly();
+        // $schedule->command('inspire')->hourly();
         $schedule->command('imitate:orders 5000')->everyThirtyMinutes();
+
+        $schedule->command('table:separate')->cron('0 0 * * *');
         //半小时一次将包裹放入队列
-        $schedule
-            ->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')
-            ->everyThirtyMinutes();
+        // $schedule
+            // ->command('autoRun:packages doPackages,assignStocks,assignLogistics,placeLogistics')
+            // ->everyThirtyMinutes();
 //        $schedule->command('purchase:create')->cron('20 4,12 * * *');
 //        $schedule->command('purchaseStaticstics:create')->cron('20 6 * * *');
 //
@@ -111,10 +113,10 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('blacklists:update')->dailyAt('3:00');
 
         //EbaySku销量报表定时任务
-        $schedule->command('ebaySkuSaleReport:update')->cron('0 16 * * *');
+        // $schedule->command('ebaySkuSaleReport:update')->cron('0 16 * * *');
 
         //EBAY销售额统计定时任务
-        $schedule->command('ebayAmountStatistics:update')->cron('0 17 * * *');
+        // $schedule->command('ebayAmountStatistics:update')->cron('0 17 * * *');
 
         //抓单定时任务规则
 //        foreach (ChannelModel::all() as $channel) {

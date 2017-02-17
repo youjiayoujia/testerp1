@@ -14,7 +14,7 @@ class PackageScoreModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'pick_package_scores';
+    public $table = 'pick_package_scores';
 
     /**
      * The attributes that are mass assignable.

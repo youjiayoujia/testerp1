@@ -13,7 +13,7 @@ use App\Base\BaseModel;
 
 class ShipmentCostErrorModel extends BaseModel
 {
-    protected $table = 'shipment_cost_errors';
+    public $table = 'shipment_cost_errors';
 
     public $searchFields = ['hang_num' => '挂号码'];
     

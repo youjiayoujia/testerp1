@@ -12,7 +12,7 @@ class CarryOverModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_carry_overs';
+    public $table = 'stock_carry_overs';
 
     /**
      * The attributes that are mass assignable.

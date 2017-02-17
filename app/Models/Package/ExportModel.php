@@ -14,7 +14,7 @@ use Excel;
 
 class ExportModel extends BaseModel
 {
-    protected $table = 'export_packages';
+    public $table = 'export_packages';
 
     protected $fillable = [
         'name'

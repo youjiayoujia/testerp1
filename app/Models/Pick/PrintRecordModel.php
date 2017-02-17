@@ -14,7 +14,7 @@ class PrintRecordModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'picklist_print_records';
+    public $table = 'picklist_print_records';
 
     /**
      * The attributes that are mass assignable.

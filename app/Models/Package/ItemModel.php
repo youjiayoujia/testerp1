@@ -13,7 +13,7 @@ use App\Base\BaseModel;
 
 class ItemModel extends BaseModel
 {
-    protected $table = 'package_items';
+    public $table = 'package_items';
 
     protected $fillable = [
         'item_id',

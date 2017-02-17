@@ -12,7 +12,7 @@ class BoxModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'oversead_boxes';
+    public $table = 'oversead_boxes';
 
     /**
      * The attributes that are mass assignable.

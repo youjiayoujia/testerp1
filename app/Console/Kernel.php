@@ -84,6 +84,7 @@ class Kernel extends ConsoleKernel
         //DHL确认发货
         \App\Console\Commands\AutoSureDHLShip::class,
         \App\Console\Commands\TemplateWriteSku::class,
+        \App\Console\Commands\AutoCancelOrder::class, // 订单超过20天 自动撤单
 
     ];
 
@@ -152,6 +153,8 @@ class Kernel extends ConsoleKernel
                     break;
             }
         }
+        //订单导入时间超过20天 系统自动撤单
+        $schedule->command('autoCancelOrder:cancelOrder')->hourly();
         //包裹报表
         $schedule->command('pick:report')->hourly();
         $schedule->command('all:report')->daily();

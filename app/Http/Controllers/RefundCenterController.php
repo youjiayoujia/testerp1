@@ -36,7 +36,6 @@ class RefundCenterController extends Controller
      */
     public function index()
     {
-
         $response = [
             'metas'   => $this->metas(__FUNCTION__),
             'data'    => $this->autoList($this->model),

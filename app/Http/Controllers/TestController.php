@@ -1630,6 +1630,8 @@ class TestController extends Controller
     public function getSmtIssue()
     {
        // dd(time() - strtotime('2016-12-14'));
+        $order = OrderModel::find(2882);
+        dd($order->paypalDetail);
         dd((ceil(time() - strtotime('2016-12-14'))/ 86400));
        $now = Carbon::now();
        $date = Carbon::parse('2016-12-14');

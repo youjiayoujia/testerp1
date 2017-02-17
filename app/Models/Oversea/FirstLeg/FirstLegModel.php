@@ -12,7 +12,7 @@ class FirstLegModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'firstLeg_logisticses';
+    public $table = 'firstLeg_logisticses';
 
     /**
      * The attributes that are mass assignable.

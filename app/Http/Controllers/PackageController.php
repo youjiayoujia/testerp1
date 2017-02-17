@@ -113,7 +113,7 @@ class PackageController extends Controller
             'pagetype' => $pagetype,
         ];
         $this->model->clearSession();
-
+        
         return view($this->viewPath . 'index', $response);
     }
     public function showAllView()
@@ -405,12 +405,11 @@ class PackageController extends Controller
             'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'weatherNum' => $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
-            'placeNum' => $this->model
-                ->where('status', 'ASSIGNED')->where('is_auto',
-                '1')->where('queue_name', '!=', 'placeLogistics')
-                ->whereHas('order', function($single){
-                    $single->where('status', '!=', 'REVIEW');
-                })->count(),
+            'placeNum' => $this->model->
+                relatedGet($this->model, 'order', 'status', 'REVIEW')
+                ->where('packages.status', 'ASSIGNED')->where('packages.is_auto',
+                '1')->where('packages.queue_name', '!=', 'placeLogistics')
+                ->count(),
             'manualShip' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
@@ -427,6 +426,8 @@ class PackageController extends Controller
             'reportModel' => $reportModel,
             'arr' => $arr
         ];
+        $this->model->clearSession();
+
         return view($this->viewPath . 'flow', $response);
     }
     public function autoFailAssignLogistics()
@@ -440,6 +441,7 @@ class PackageController extends Controller
         }
         return redirect(route('package.flow'))->with('alert', $this->alert('success', $packages->count() . '个包裹放入队列'));
     }
+    
     public function processingAssignStocks()
     {
         $packages = $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->get();
@@ -1029,6 +1031,7 @@ class PackageController extends Controller
      */
     public function assignLogistics()
     {
+        set_time_limit(0);
         $len = 1000;
         $start = 0;
         $packages = $this->model

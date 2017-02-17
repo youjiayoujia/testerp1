@@ -10,7 +10,7 @@ namespace App\Models\Package;
 use App\Base\BaseModel;
 class ShippingLogModel extends BaseModel
 {
-    protected $table = 'erp_shipping_log';
+    public $table = 'erp_shipping_log';
 
     public $searchFields = [];
 

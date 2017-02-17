@@ -11,7 +11,7 @@ class AdjustmentModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'oversea_stock_adjustments';
+    public $table = 'oversea_stock_adjustments';
 
     /**
      * The attributes that are mass assignable.

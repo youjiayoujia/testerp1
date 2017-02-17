@@ -12,7 +12,7 @@ class CarryOverFormsModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'carry_over_forms';
+    public $table = 'carry_over_forms';
 
     /**
      * The attributes that are mass assignable.

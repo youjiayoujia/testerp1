@@ -12,7 +12,7 @@ class UnholdModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_unholds';
+    public $table = 'stock_unholds';
 
     /**
      * The attributes that are mass assignable.

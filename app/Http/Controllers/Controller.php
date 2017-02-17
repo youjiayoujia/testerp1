@@ -238,7 +238,7 @@ abstract class Controller extends BaseController
                                             function ($query) use ($relation_ship2, $name, $key) {
                                                 $query = $query->wherehas($relation_ship2,
                                                     function ($query1) use ($name, $key) {
-                                                        $query1 = $query1->where($model->table.'.'.$key, $name);
+                                                        $query1 = $query1->where($key, $name);
                                                     });
                                             });
                                     }

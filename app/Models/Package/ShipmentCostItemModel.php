@@ -13,7 +13,7 @@ use App\Base\BaseModel;
 
 class ShipmentCostItemModel extends BaseModel
 {
-    protected $table = 'shipment_cost_items';
+    public $table = 'shipment_cost_items';
 
     protected $fillable = [
     	'parent_id',

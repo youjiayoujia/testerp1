@@ -13,7 +13,7 @@ use App\Base\BaseModel;
 
 class AllReportModel extends BaseModel
 {
-    protected $table = 'package_all_reports';
+    public $table = 'package_all_reports';
 
     protected $fillable = [
         'channel_id',

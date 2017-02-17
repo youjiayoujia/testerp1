@@ -12,7 +12,7 @@ class AllotmentFormModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'allotment_forms';
+    public $table = 'allotment_forms';
 
     /**
      * The attributes that are mass assignable.

@@ -646,7 +646,7 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'packages' => $model->package->with('items','items.item', 'order')->get()
+            'packages' => $model->package()->with('items','items.item', 'order')->get()
         ];
 
         return view($this->viewPath.'inbox', $response);

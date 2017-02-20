@@ -1629,36 +1629,13 @@ class TestController extends Controller
     }
     public function getSmtIssue()
     {
-       // dd(time() - strtotime('2016-12-14'));
-        $order = OrderModel::find(2882);
-        dd($order->paypalDetail);
-        dd((ceil(time() - strtotime('2016-12-14'))/ 86400));
-       $now = Carbon::now();
-       $date = Carbon::parse('2016-12-14');
-       dd($now->diffInDays($date));
+       $messgaes = MessageModel::limit(1000)->WithOnly('account', ['account'])->get();
+       foreach ($messgaes as $message){
+           $message->account;
+           //dd($message->account);
+       }
+       dd($messgaes);
 
-        $array = [
-              0 => "TIMESTAMP=2017%2d02%2d08T09%3a52%3a35Z",
-              1 => "CORRELATIONID=b27dd764924f8",
-              2 => "ACK=Failure",
-              3 => "VERSION=51%2e0",
-              4 => "BUILD=29835611",
-              5 => "L_ERRORCODE0=10007",
-              6 => "L_SHORTMESSAGE0=Permission%20denied",
-              7 => "L_LONGMESSAGE0=You%20do%20not%20have%20permission%20to%20refund%20this%20transaction",
-              8 => "L_SEVERITYCODE0=Error"
-        ];
-        //dd($array);
-        foreach ($array as $item){
-            if(! empty($item)){
-                $filter = explode('=',$item);
-                if($filter[0] == 'ACK' && $filter[1] = 'Success'){
-
-                }
-
-
-            }
-        }
 
         $account_name = 'Coolcoola04@126.com';  //渠道名称
 

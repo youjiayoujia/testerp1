@@ -46,57 +46,41 @@ class MessageController extends Controller
     public function index()
     {
         request()->flash();
-        //$userarr=config('user.staff');
-        //$users=UserModel::all();
         $response = [
             'metas'             => $this->metas(__FUNCTION__),
-            'data'              => $this->autoList($this->model,$this->model),
+            'data'              => $this->autoList($this->model, null, ['*'], null, null, ['account', 'assigner', 'channel']),
             'mixedSearchFields' => $this->model->mixed_search,
-            //'channel_accounts'  => Channel_account::all(),
-            //'users'             => $users,
-            //'channels'          => ChannelModel::All(),
         ];
         return view($this->viewPath . 'index', $response);
     }
 
     public function process(){
         $currencys = CurrencyModel::all();
-
         if (request()->input('id')) {
             $message = $this->model->find(request()->input('id'));
         } elseif ($this->workflow == 'keeping') { //工作流
             //根据登陆的客服id 获取其被分配的账号消息
             //$messages = $this->model->getMyWorkFlowMsg(3);
-
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
-                //'parents' => TypeModel::where('parent_id', 0)->get(), //模版分类
                 'users' => UserModel::all(),
                 'currencys' => $currencys,
-
-                //'messages' => $messages,
             ];
-
             return view($this->viewPath . 'workflow')->with($response);
-
         }
-
         if (!$message) {
               return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
         }
         if($this->workflow == 'keeping'){
             request()->session()->pull('workflow'); //关闭
         }
-
         if(request()->input('id')){
             $model = $this->model->find(request()->input('id'));
             $count = $this->model->where('from','=',$model->from)->where('status','<>','UNREAD')->count();
         }else{
             $count='';
         }
-
         if ($message->assign(request()->user()->id)) {
-
             if($message->related == 0){
                 $message->findOrderWithMessage();  //消息中的订单号 与 erp订单匹配
             }
@@ -113,10 +97,8 @@ class MessageController extends Controller
                 'currencys' => $currencys,
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
-
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '该信息已被他人处理.'));
-
     }
 
     /**

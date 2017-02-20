@@ -77,7 +77,7 @@ class BaseModel extends Model
         return $model;
     }
 
-    public function scopeWithCertain($query, $relation, $columns = ['*'])
+    public function scopeWithOnly($query, $relation, $columns = ['*'])
     {
         return $query->with([$relation => function ($query) use ($columns){
             $query->select($columns);

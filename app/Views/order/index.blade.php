@@ -319,17 +319,12 @@
                     {{--<span class="glyphicon glyphicon-pencil"></span> 删除--}}
                     {{--</a>--}}
                     {{--@endif--}}
-                    @foreach($order->items as $item)
-                        @if($item->is_refund == 0)
                             <button class="btn btn-primary btn-xs"
                                     data-toggle="modal"
                                     data-target="#refund{{ $order->id }}"
                                     title="退款">
                                 <span class="glyphicon glyphicon-link"></span> 退款
                             </button>
-                            <?php break ?>
-                        @endif
-                    @endforeach
                     @if($order->channel->name == 'Ebay')
                         <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#send_ebay_message_{{ $order->id }}" title="Send ebay Message">
                             <span class="glyphicon glyphicon-envelope"></span>Send ebay Message
@@ -556,7 +551,6 @@
                                     </div>
                                 </div>
                                 @foreach($order->items as $key => $orderItem)
-                                    @if($orderItem->is_refund == 0)
                                         <div class='row'>
                                             <div class="form-group col-sm-2">
                                                 <input type="checkbox" name="tribute_id[]" value="{{$orderItem->id}}">
@@ -574,7 +568,6 @@
                                                 <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $orderItem->quantity }}" readonly>
                                             </div>
                                         </div>
-                                    @endif
                                 @endforeach
                             @endif
                             <div class="row">

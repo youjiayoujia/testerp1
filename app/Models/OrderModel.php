@@ -695,13 +695,13 @@ class OrderModel extends BaseModel
             $data['image'] = '';
         }
         if ($data['type'] == 'FULL') {
-            $total = 0;
+/*            $total = 0;
             foreach ($this->items as $orderItem) {
                 $orderItem->update(['is_refund' => 1]);
                 $total = $orderItem['price'] * $orderItem['quantity'] + $total;
-            }
-            $data['refund_amount'] = $total;
-            $data['price'] = $total;
+            }*/
+            $data['refund_amount'] = $this->amount;
+            $data['price'] = $this->amount;
         }
         if ($data['type'] == 'PARTIAL') {
             foreach ($data['tribute_id'] as $id) {

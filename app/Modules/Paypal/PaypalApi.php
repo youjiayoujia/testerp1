@@ -104,7 +104,6 @@ Class PaypalApi
         //var_dump($error);
         if(! empty($result)){
             $result = explode('&', $result);
-            dd($result);
             foreach ($result as $item){
                 if(! empty($item)){
                     $filter = explode('=',$item);
@@ -114,6 +113,7 @@ Class PaypalApi
                 }
             }
         }
+        dd($result);
         return false;
     }
 }

@@ -166,7 +166,7 @@ class ExportModel extends BaseModel
                             $rows[$k][!empty($value['defaultName']) ? $value['defaultName'] : $buf['channel_account_id']] = $package->channelAccount ? $package->channelAccount->name : '渠道账号有误';
                             break;
                         case 'order_id':
-                            $rows[$k][!empty($value['defaultName']) ? $value['defaultName'] : $buf['order_id']] = $package->order ? $package->order->ordernum : '订单号有误';
+                            $rows[$k][!empty($value['defaultName']) ? $value['defaultName'] : $buf['order_id']] = $package->order ? $package->order->id : '订单号有误';
                             break;
                         case 'warehouse_id':
                             $rows[$k][!empty($value['defaultName']) ? $value['defaultName'] : $buf['warehouse_id']] = $package->warehouse ? $package->warehouse->name : '仓库有误';

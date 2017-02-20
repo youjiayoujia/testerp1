@@ -50,6 +50,7 @@ class AutoCancelOrder extends Command
         $orders = OrderModel::whereIn('status', ['UNPAID','PAID','PREPARED','NEED','PACKED','REVIEW'])->where('created_at','<',date('Y-m-d H:i:s',strtotime("-20 days")))->get();
         if($orders->count()){
             foreach($orders as $order){
+               echo $order->id.'\n';
                 $result = $order->cancelOrder(10);//撤单，4为客户撤单类型
                 if($result){
                      $order->eventLog('队列', '订单导入超过20天，系统自动撤单.');

@@ -572,7 +572,7 @@ class PackageModel extends BaseModel
 
     public function cancelPackage()
     {
-        if (in_array($this->status, ['PACKED', 'SHIPPED'])) {
+        if ($this->status == 'SHIPPED') {
             return false;
         }
         $item = $this->items()->first();
@@ -1329,6 +1329,7 @@ class PackageModel extends BaseModel
                     ]);
                     $job = new AssignLogistics($this);
                     Queue::pushOn('assignLogistics', $job);
+                    $this->eventLog('队列', '已匹配到库存,待分配', json_encode($this));
                 } else {
                     if ($oldWarehouseId != $warehouseId) {
                         $this->update([
@@ -1342,21 +1343,25 @@ class PackageModel extends BaseModel
                         ]);
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
+                        $this->eventLog('队列', '已匹配到库存,待分配', json_encode($this));
                     } else {
                         if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                             if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
                                 $this->update(['status' => 'PROCESSING', 'queue_name' => '']);
+                                $this->eventLog('队列', '已匹配到库存,待拣货', json_encode($this));
                                 continue;
                             }
                             if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
                                 $this->update(['status' => 'ASSIGNED', 'queue_name' => 'placeLogistics']);
                                 $job = new PlaceLogistics($this);
                                 Queue::pushOn('placeLogistics', $job);
+                                $this->eventLog('队列', '已匹配到库存,待下单', json_encode($this));
                                 continue;
                             }
                             $this->update(['status' => 'WAITASSIGN', 'queue_name' => 'assignLogistics']);
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
+                            $this->eventLog('队列', '已匹配到库存,待分配', json_encode($this));
                         } else {
                             $this->update([
                                 'status' => 'WAITASSIGN',
@@ -1368,6 +1373,7 @@ class PackageModel extends BaseModel
                             ]);
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
+                            $this->eventLog('队列', '已匹配到库存,待分配', json_encode($this));
                         }
                     }
                 }
@@ -1408,21 +1414,25 @@ class PackageModel extends BaseModel
                             ]);
                             $job = new AssignLogistics($newPackage);
                             Queue::pushOn('assignLogistics', $job);
+                            $newPackage->eventLog('队列', '已匹配到库存,待分配', json_encode($newPackage));
                         } else {
                             if (floatval($weight) - floatval($oldWeight) < 0.00000000001) {
                                 if (!empty($oldLogisticsId) && !empty($oldTrackingNo)) {
                                     $newPackage->update(['status' => 'PROCESSING', 'queue_name' => '']);
+                                    $newPackage->eventLog('队列', '已匹配到库存,待拣货', json_encode($newPackage));
                                     continue;
                                 }
                                 if (!empty($oldLogisticsId) && empty($oldTrackingNo)) {
                                     $newPackage->update(['status' => 'ASSIGNED', 'queue_name' => 'placeLogistics']);
                                     $job = new PlaceLogistics($newPackage);
                                     Queue::pushOn('placeLogistics', $job);
+                                    $newPackage->eventLog('队列', '已匹配到库存,待下单', json_encode($newPackage));
                                     continue;
                                 }
                                 $newPackage->update(['status' => 'WAITASSIGN', 'queue_name' => 'assignLogistics']);
                                 $job = new AssignLogistics($newPackage);
                                 Queue::pushOn('assignLogistics', $job);
+                                $newPackage->eventLog('队列', '已匹配到库存,待分配', json_encode($newPackage));
                             } else {
                                 $newPackage->update([
                                     'status' => 'WAITASSIGN',
@@ -1431,12 +1441,14 @@ class PackageModel extends BaseModel
                                 ]);
                                 $job = new AssignLogistics($newPackage);
                                 Queue::pushOn('assignLogistics', $job);
+                                $newPackage->eventLog('队列', '已匹配到库存,待分配', json_encode($newPackage));
                             }
                         }
                     } else {
                         $newPackage->update(['queue_name' => 'assignLogistics']);
                         $job = new AssignLogistics($newPackage);
                         Queue::pushOn('assignLogistics', $job);
+                        $newPackage->eventLog('队列', '已匹配到库存,待分配', json_encode($newPackage));
                     }
                 }
             }

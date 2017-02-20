@@ -11,7 +11,7 @@
                     <strong>渠道</strong>: {{ $model->channel ? $model->channel->name : '' }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>订单号</strong>: {{ $model->order ? $model->order->ordernum : '' }}
+                    <strong>订单号</strong>: {{ $model->order ? $model->order->id : '' }}
                 </div>
                 <div class="col-lg-2">
                     <strong>状态</strong>: {{ $model->status_name }}

@@ -107,7 +107,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList(!empty($buf) ? $buf : $this->model, null, ['*'], null, 'restrict', 
-                    ['order', 'channel', 'warehouse', 'logistics', 'items', 'country', 'items.item', 'items.item.product.logisticsLimit', 'picklist', 'items.warehousePosition']),
+                    ['order' => ['id', 'channel_ordernum', 'currency', 'amount', 'status', 'shipping'], 'channel' => ['name'], 'warehouse' => ['name'], 'logistics' => ['id', 'code'], 'items' => ['quantity', 'sku'], 'country' => ['name', 'cn_name'], 'items.item' => ['weight'], 'items.item.product.logisticsLimit' => ['ico', 'name'], 'picklist' => ['picknum'], 'items.warehousePosition' => ['name']]),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
             'pagetype' => $pagetype,
@@ -406,7 +406,7 @@ class PackageController extends Controller
             'weatherNum' => $this->model->where('status', 'NEED')->where('queue_name', '!=', 'assignStocks')->count(),
             'assignNum' => $this->model->where('status', 'WAITASSIGN')->where('queue_name', '!=', 'assignLogistics')->count(),
             'placeNum' => $this->model->
-                relatedGet($this->model, 'order', 'status', 'REVIEW')
+                relatedGet($this->model, 'order', 'status', 'PACKED')
                 ->where('packages.status', 'ASSIGNED')->where('packages.is_auto',
                 '1')->where('packages.queue_name', '!=', 'placeLogistics')
                 ->count(),
@@ -789,6 +789,7 @@ class PackageController extends Controller
         $this->eventLog($name, '合并包裹', $to, $from);
         return redirect($_SERVER['HTTP_REFERER'])->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));
     }
+
     public function editTrackStore($id)
     {
         $model = $this->model->with('items')->find($id);
@@ -803,6 +804,7 @@ class PackageController extends Controller
         $url = request()->has('hideUrl') ? request('hideUrl') : $this->mainIndex;
         return redirect($url);
     }
+
     public function actSplitPackage($arr, $id)
     {
         $model = $this->model->find($id);
@@ -836,14 +838,16 @@ class PackageController extends Controller
                         'weight' => $weight,
                         'status' => 'WAITASSIGN',
                         'logistics_id' => '',
-                        'tracking_no' => ''
+                        'tracking_no' => '',
+                        'picklist_id' => '',
                     ]);
                 } else {
                     $newPackage->update([
                         'weight' => $weight,
                         'status' => 'NEW',
                         'logistics_id' => '',
-                        'tracking_no' => ''
+                        'tracking_no' => '',
+                        'picklist_id' => '',
                     ]);
                 }
                 $this->eventLog($name, '拆分包裹', $to);
@@ -853,6 +857,7 @@ class PackageController extends Controller
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '包裹拆分成功.'));
     }
+    
     public function processArr($arr, $model)
     {
         $tmp = [];

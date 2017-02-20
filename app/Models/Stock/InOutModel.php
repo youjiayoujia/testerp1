@@ -123,7 +123,7 @@ class InOutModel extends BaseModel
                 return '库存导入';
                 break;
             case 'PACKAGE':
-                return $this->packageItem ? (($this->packageItem->package ? ($this->packageItem->package->order ? $this->packageItem->package->order->ordernum : '') : ''). ' : ' . ($this->packageItem->package ? $this->packageItem->package->id : '')) : '';
+                return $this->packageItem ? (($this->packageItem->package ? ($this->packageItem->package->order ? $this->packageItem->package->order->id : '') : ''). ' : ' . ($this->packageItem->package ? $this->packageItem->package->id : '')) : '';
                 break;
             case 'CANCEL':
                 return $this->relation_id;

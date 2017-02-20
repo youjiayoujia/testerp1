@@ -459,8 +459,6 @@ class PickListController extends Controller
         $obj->update(['status' => 'INBOXED', 'inbox_by' => request()->user()->id, 'inbox_at' => date('Y-m-d H:i:s', time())]);
         foreach($obj->package as $package)
         {
-            $package->status = 'PICKED';
-            $package->save();
             $package->eventLog('系统', '包裹对应拣货单已分拣完成', json_encode($package));
         }
         $this->eventLog($name, '分拣完成,id='.$obj->id, $from);

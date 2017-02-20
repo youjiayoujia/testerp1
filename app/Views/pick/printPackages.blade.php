@@ -34,7 +34,7 @@
                             <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
                                 @if($key == '0')
                                 <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
-                                <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                                <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
                                 @endif
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                                 <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>
@@ -50,7 +50,7 @@
                             <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
                                 @if($key == '0')
                                 <td rowspan="{{$package->items()->withTrashed()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
-                                <td rowspan="{{$package->items()->withTrashed()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
+                                <td rowspan="{{$package->items()->withTrashed()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->id : '订单号有误' }}</td>
                                 @endif
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                                 <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>

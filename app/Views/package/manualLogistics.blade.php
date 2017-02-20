@@ -15,7 +15,7 @@
             @foreach($packages as $model)
             <tr>
               <td>{{$model->id}}</td>
-              <td>{{$model->order ? $model->order->ordernum : ''}}</td>
+              <td>{{$model->order ? $model->order->id : ''}}</td>
               <td>{{$model->status_name}}</td>
               <td class='col-lg-2'>
                 <select name='logistics' class='form-control logistics'>

@@ -398,7 +398,7 @@ abstract class Controller extends BaseController
         }
         if($preload) {
             foreach($preload as $key => $single) {
-                $list = $list->withCertain($key, $single);
+                $list = $list->withOnly($key, $single);
             }
         }
         return $list->paginate($pageSize, $fields);

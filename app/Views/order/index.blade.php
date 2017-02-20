@@ -154,53 +154,51 @@
                             @endif
                             <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}
-                                @if($order->channel)
-                                    @if($order->channel->driver == 'ebay')
-                                        @if($orderItem->ebay_unpaid_status != 1)
-                                            <button class="label label-danger  ebay-unpaid-case" data-toggle="modal" data-target="#ebay-unpaid-case-{{ $orderItem->id }}">
-                                                消
-                                            </button>
-                                            <div class="modal fade in" id="ebay-unpaid-case-{{$orderItem->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <form id="ebay-unpaid-form" action="{{route('message.ebayUnpaidCase')}}" methon="POST">
-                                                            {!! csrf_field() !!}
-                                                            <div class="modal-header">
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                    <span aria-hidden="true">×</span>
-                                                                </button>
-                                                                <h4 class="modal-title text-left" id="myModalLabel">Ebay
-                                                                    unpaid case</h4>
+                                @if($order->channel->driver == 'ebay')
+                                    @if($orderItem->ebay_unpaid_status != 1)
+                                        <button class="label label-danger  ebay-unpaid-case" data-toggle="modal" data-target="#ebay-unpaid-case-{{ $orderItem->id }}">
+                                            消
+                                        </button>
+                                        <div class="modal fade in" id="ebay-unpaid-case-{{$orderItem->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <form id="ebay-unpaid-form" action="{{route('message.ebayUnpaidCase')}}" methon="POST">
+                                                        {!! csrf_field() !!}
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                            <h4 class="modal-title text-left" id="myModalLabel">Ebay
+                                                                unpaid case</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="input-group">
+                                                                <label>
+                                                                    <input type="radio" name="disputeType" value="complaints"/>Unpaid
+                                                                    case(the buyer has not paid)
+                                                                </label>
+                                                                <br/>
+                                                                <label>
+                                                                    <input type="radio" name="disputeType" value="cancel"/>取消交易(cancel)
+                                                                </label>
                                                             </div>
-                                                            <div class="modal-body">
-                                                                <div class="input-group">
-                                                                    <label>
-                                                                        <input type="radio" name="disputeType" value="complaints"/>Unpaid
-                                                                        case(the buyer has not paid)
-                                                                    </label>
-                                                                    <br/>
-                                                                    <label>
-                                                                        <input type="radio" name="disputeType" value="cancel"/>取消交易(cancel)
-                                                                    </label>
-                                                                </div>
 
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-default" data-dismiss="modal">
-                                                                    取消
-                                                                </button>
-                                                                <button type="submit" class="btn btn-primary  ebay-unpaid-form-button">
-                                                                    提交
-                                                                </button>
-                                                            </div>
-                                                            <input type="hidden" name="order_item_id" value="{{$orderItem->id}}"/>
-                                                        </form>
-                                                    </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                                取消
+                                                            </button>
+                                                            <button type="submit" class="btn btn-primary  ebay-unpaid-form-button">
+                                                                提交
+                                                            </button>
+                                                        </div>
+                                                        <input type="hidden" name="order_item_id" value="{{$orderItem->id}}"/>
+                                                    </form>
                                                 </div>
                                             </div>
-                                        @else
-                                            <span class="label label-success">已消</span>
-                                        @endif
+                                        </div>
+                                    @else
+                                        <span class="label label-success">已消</span>
                                     @endif
                                 @endif
                             </div>

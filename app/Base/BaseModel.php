@@ -77,18 +77,10 @@ class BaseModel extends Model
         return $model;
     }
 
-    /**
-     * with 时只查询目标关联的部分字段
-     * @param $query
-     * @param $relation
-     * @param array $columns
-     * @return mixed
-     */
-    public function scopeWithOnly($query, $relation, Array $columns)
+    public function scopeWithOnly($query, $relation, $columns = ['*'])
     {
         return $query->with([$relation => function ($query) use ($columns){
-            $query->select(array_merge(['id'], $columns));
+            $query->select($columns);
         }]);
     }
-
 }

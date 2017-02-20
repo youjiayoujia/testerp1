@@ -78,14 +78,16 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">拣货人</div>
                     <div class="panel-body">
-                        <div class='row'>
+                        <div class='form-horizontal'>
                             <form action="{{ route('pickList.confirmPickBy') }}" method='POST'>
                                 {!! csrf_field() !!}
                                 <div class='form-group col-lg-4'>
-                                    <input type='text' class='form-control col-lg-2' name='pickBy' placeholder='拣货人id'>
-                                    <input type='hidden' name='pickId' class='pickId' value="">
+                                    <input type='text' class='form-control' name='pickBy' placeholder='拣货人id'>
                                 </div>
-                                <div class='form-group col-lg-2'>
+                                <div class='form-group col-lg-4'>
+                                    <input type='text' name='pickid' class='pickid form-control' value="拣货单id">
+                                </div>
+                                <div class='form-group col-lg-4'>
                                     <button type='submit' class='btn btn-info'>确认</button>
                                 </div>
                         </div>
@@ -127,7 +129,7 @@
 
                     $('.pickBy').click(function () {
                         id = $(this).parent().parent().find('td:eq(1)').text();
-                        $('.pickId').val(id);
+                        $('.pickid').val(id);
                     })
 
                     $('.multiPrint').click(function () {

@@ -48,7 +48,7 @@ class MessageController extends Controller
         request()->flash();
         $response = [
             'metas'             => $this->metas(__FUNCTION__),
-            'data'              => $this->autoList($this->model, null, ['*'], null, null, ['account', 'assigner', 'channel']),
+            'data'              => $this->autoList($this->model, null, ['*'], null, null, ['account' => ['id','account','alias'], 'assigner' => ['id', 'name'], 'channel' => ['id','name', 'driver']]),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);

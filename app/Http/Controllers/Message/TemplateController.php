@@ -23,6 +23,23 @@ class TemplateController extends Controller
     }
 
     /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $template = $this->model->WithOnly('type.parent', ['id', 'name']);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model, $template),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 新建
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View

@@ -73,24 +73,7 @@
             <td>{{$item->user?$item->user->name:''}}</td>
             
         </tr>
-        <!-- <tr>  
-            <th colspan='3'>仓库</th>
-            <th colspan='3'>可用库存</th>
-            <th colspan='3'>实库存</th>
-            <th colspan='3'>在途</th>
-            <th colspan='3'>特采在途</th>
-            <th colspan='3'>缺货</th>    
-        </tr>
-        @foreach($warehouses as $warehouse)
-            <tr>
-                <td colspan='3'>{{$warehouse->name}}</td>
-                <td colspan='3'>{{$item->item->getStockQuantity($warehouse->id,1)}}</td>
-                <td colspan='3'>{{$item->item->getStockQuantity($warehouse->id)}}</td>
-                <td colspan='3'>{{$item->item->transit_quantity[$warehouse->id]['normal']}}</td>
-                <td colspan='3'>{{$item->item->transit_quantity[$warehouse->id]['special']}}</td>
-                <td colspan='3'>{{$item->item->warehouse_out_of_stock[$warehouse->id]['need']}}</td>
-            </tr>
-        @endforeach -->
+        
     @endforeach
  <script type="text/javascript">		 
 	$('#checkPurchaseItem').click(function () {

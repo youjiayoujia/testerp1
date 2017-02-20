@@ -178,7 +178,7 @@ class PickListController extends Controller
     public function confirmPickBy()
     {
         $url = $_SERVER['HTTP_REFERER'];
-        $model = $this->model->find(request('pickId'));
+        $model = $this->model->find(request('pickid'));
         $from = json_encode($model);
         $name = UserModel::find(request()->user()->id)->name;
         if (!$model) {
@@ -381,7 +381,7 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__,'包装'),
             'model' => $model,
             'pickListItems' => $model->pickListItem,
-            'packages' => $model->package()->withTrashed()->get(),
+            'packages' => $model->package()->with('items', 'order', 'items.item', 'items.item.product.wrapLimit')->withTrashed()->get(),
             'logistics' => LogisticsModel::all(),
         ];
         if($model->type == 'MULTI')

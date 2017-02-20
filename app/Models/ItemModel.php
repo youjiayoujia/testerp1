@@ -826,6 +826,7 @@ class ItemModel extends BaseModel
     {
         $quantity = $quantity ? $quantity : $stock->available_quantity;
         $stockData['item_id'] = $this->id;
+        $stockData['sku'] = $stock->item ? $stock->item->sku : 'item_id对应sku不存在';
         $stockData['warehouse_id'] = $stock->warehouse_id;
         $stockData['warehouse_position_id'] = $stock->warehouse_position_id;
         $stockData['quantity'] = $quantity;

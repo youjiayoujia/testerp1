@@ -383,7 +383,7 @@ class TestController extends Controller
 
     public function test1()
     {
-        $orders = OrderModel::find(3319);
+        $orders = OrderModel::find(3977);
         $orders->calculateProfitProcess();
         return 1;
     }

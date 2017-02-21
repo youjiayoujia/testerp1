@@ -303,20 +303,8 @@ class OrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model, $order, ['*'], null, 'restrict',
                 [
-                    'packages' => ['*'],
-                    'channel' => ['*'],
-                    'channelAccount' => ['*'],
-                    'userOperator' => ['*'],
-                    'country' => ['*'],
-                    'remarks' => ['*'],
-                    'remarks.user' => ['*'],
-                    'unpaidOrder' => ['*'],
-                    'refunds' => ['*'],
-                    'items' => ['*'],
-                    'items.item' => ['*'],
-                    'items.item.warehouse' => ['*'],
-                    'packages.logistics' => ['*'],
-                    'packages.warehouse'=> ['*'],
+                    'channel' => ['name', 'driver']
+                    
                 ]
             ),
             'mixedSearchFields' => $this->model->mixed_search,

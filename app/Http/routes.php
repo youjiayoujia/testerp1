@@ -1384,5 +1384,7 @@ Route::any('joomrefreshtoken', ['uses' => 'TestController@joomrefreshtoken']);
 Route::any('testReply/{id}',
     ['as' => 'test.testReply', 'uses' => 'TestController@testReply']);
 Route::any('tryGetLogtisticsNo/{id}',[ 'uses' => 'TestController@tryGetLogtisticsNo']);
+Route::any('testCancelOrder', ['uses' => 'TestController@testAutoCancelOrder']);
+
 
 

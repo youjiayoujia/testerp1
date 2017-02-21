@@ -397,8 +397,8 @@ abstract class Controller extends BaseController
             $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
         }
         if($preload) {
-            foreach($preload as $key => $single) {
-                $list = $list->withOnly($key, $single);
+            foreach($preload as $single) {
+                $list = $list->with($single);
             }
         }
         return $list->paginate($pageSize, $fields);

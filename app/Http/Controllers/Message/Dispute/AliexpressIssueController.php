@@ -32,8 +32,8 @@ class AliexpressIssueController extends Controller
     public function index()
     {
         $response = [
-            'metas'        => $this->metas(__FUNCTION__),
-            'data'         => $this->autoList($this->model),
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model, null, ['*'], null, null, ['account' => ['id','account','alias']]),
             'mixedSearchFields' => $this->model->mixed_search,
 
             //'reasonFilter' => $this->model->distinct()->get(['reasonChinese']),

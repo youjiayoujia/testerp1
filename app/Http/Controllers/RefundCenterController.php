@@ -178,9 +178,9 @@ class RefundCenterController extends Controller
                 if(!empty($refund['memo'])){
                     $paramAry['NOTE'] = urldecode($refund['memo']);
                 }
-                if ( $refund['refundType'] != 'FULL' ) {
-                    $paramAry['AMT'] = $refund['refund_amount'];
-                }
+
+                $paramAry['AMT'] = $refund['refund_amount']; //退款金额
+
                 $paypalApi = new PaypalApi($paypal->ApiConfig);
                 if($paypalApi->apiRefund($paramAry)){
                     $refund->process_status = 'COMPLETE';

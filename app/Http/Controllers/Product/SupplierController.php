@@ -30,6 +30,24 @@ class SupplierController extends Controller
         $this->viewPath = 'product.supplier.';
     }
 
+
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model, null, ['*'], null, null, ['purchaseName' => ['id', 'name'], 'createdByName' => ['id', 'name'], 'levelByName' => 'name' ]),
+
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
     /**
      * 新建
      *

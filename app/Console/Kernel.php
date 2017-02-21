@@ -108,15 +108,14 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('blacklists:get')->dailyAt('2:00');
 //        $schedule->command('blacklists:update')->dailyAt('3:00');
 
-<<<<<<< HEAD
+
         //EbaySku销量报表定时任务
         $schedule->command('ebaySkuSaleReport:update')->cron('0 16 * * *');
 
         //EBAY销售额统计定时任务
         $schedule->command('ebayAmountStatistics:update')->cron('0 17 * * *');
 
-=======
->>>>>>> f7a4617e3ec1664734dc2d69bb62ec1c1e28465c
+
         //抓单定时任务规则
 //        foreach (ChannelModel::all() as $channel) {
 //            switch ($channel->driver) {

@@ -49,10 +49,10 @@ return [
         ],
         'mysql' => [
             'driver' => 'mysql',
-            'host' => 'rm-wz9y2o04pzl8p0r58.mysql.rds.aliyuncs.com',
-            'database' => 'fuck_test',
-            'username' => 'new_erp'
-            'password' => 'ItibAwsBC9v2hQbDJ4Up'
+            'host' => env('DB_HOST', 'localhost'),
+            'database' => 'smerp',
+            'username' => 'root',
+            'password' => '',
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix' => '',

@@ -151,7 +151,7 @@ class RefundModel extends BaseModel
         return $this->Order->channel->name;
     }
     public function getOrderRemarksAttribute(){
-        $remarks = $this->Order->WithOnly('remarks');
+        $remarks = $this->Order->remarks;
         $html = '<ul>';
         if(!$remarks->isEmpty()){
             foreach ($remarks as $remark){

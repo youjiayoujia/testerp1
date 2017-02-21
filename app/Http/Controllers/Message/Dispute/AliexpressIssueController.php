@@ -33,7 +33,7 @@ class AliexpressIssueController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model, null, ['*'], null, null, ['account' => ['id','account','alias']]),
+            'data' => $this->autoList($this->model, null, ['*'], null, null, ['account']),
             'mixedSearchFields' => $this->model->mixed_search,
 
             //'reasonFilter' => $this->model->distinct()->get(['reasonChinese']),

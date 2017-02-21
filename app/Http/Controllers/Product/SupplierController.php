@@ -41,7 +41,7 @@ class SupplierController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model, null, ['*'], null, null, ['purchaseName' => ['id', 'name'], 'createdByName' => ['id', 'name'], 'levelByName' => 'name' ]),
+            'data' => $this->autoList($this->model, null, ['*'], null, null, ['purchaseName', 'createdByName', 'levelByName']),
 
             'mixedSearchFields' => $this->model->mixed_search,
         ];

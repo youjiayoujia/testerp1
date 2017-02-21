@@ -383,7 +383,7 @@ class TestController extends Controller
 
     public function test1()
     {
-        $orders = OrderModel::find(3319);
+        $orders = OrderModel::find(3977);
         $orders->calculateProfitProcess();
         return 1;
     }
@@ -1916,6 +1916,27 @@ class TestController extends Controller
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
 
+
+    public function  testAutoCancelOrder(){
+        $id = request()->get('id');
+        if(!empty($id)){
+            $list  = OrderModel::whereIn('status', ['UNPAID','PAID','PREPARED','NEED','PACKED','REVIEW'])->where('created_at','<',date('Y-m-d H:i:s',strtotime("-20 days")))->where('id',$id);
+        }else{
+            $list  = OrderModel::whereIn('status', ['UNPAID','PAID','PREPARED','NEED','PACKED','REVIEW'])->where('created_at','<',date('Y-m-d H:i:s',strtotime("-20 days")));
+        }
+        $orders = $list->get();
+        if($orders->count()){
+            foreach($orders as $order){
+                echo $order->id.'\n';
+                $result = $order->cancelOrder(10);//撤单，4为客户撤单类型
+                if($result){
+                    $order->eventLog('队列', '订单导入超过20天，系统自动撤单.');
+                }else{
+                    $order->eventLog('队列', '系统自动撤单失败.');
+                }
+            }
+        }
+    }
 
 
 

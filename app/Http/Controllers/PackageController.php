@@ -107,7 +107,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList(!empty($buf) ? $buf : $this->model, null, ['*'], null, 'restrict', 
-                    ['order' => ['id', 'channel_ordernum', 'currency', 'amount', 'status', 'shipping'], 'channel' => ['name'], 'warehouse' => ['name'], 'logistics' => ['id', 'code'], 'items' => ['quantity', 'sku'], 'country' => ['name', 'cn_name'], 'items.item' => ['weight'], 'items.item.product.logisticsLimit' => ['ico', 'name'], 'picklist' => ['picknum'], 'items.warehousePosition' => ['name']]),
+                    ['order', 'channel', 'warehouse', 'logistics', 'items', 'country', 'items.item', 'items.item.product.logisticsLimit', 'picklist', 'items.warehousePosition']),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => $logisticses,
             'pagetype' => $pagetype,

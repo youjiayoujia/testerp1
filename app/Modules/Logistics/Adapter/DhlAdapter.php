@@ -334,6 +334,8 @@ class DhlAdapter extends BasicAdapter
                     $num++;
                 }
             }
+            @$model = PackageModel::where('id',$orderInfo->id);
+            @$model->update(['sure_tracking_no'=>0]);
             $result = [
                 'code' => 'success',
                 'result' =>$shipmentID //跟踪号

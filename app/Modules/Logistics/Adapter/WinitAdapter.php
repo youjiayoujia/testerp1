@@ -73,7 +73,7 @@ class WinitAdapter extends BasicAdapter
         $creatOrder['buyerAddress2'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_address1);
         $creatOrder['buyerCity'] = $package->shipping_city;
         $creatOrder['buyerContactNo'] = $package->shipping_phone;
-        $creatOrder['buyerCountry'] = $package->shipping_country;
+        $creatOrder['buyerCountry'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_country);
         $creatOrder['buyerEmail'] = $package->order->email;
         $creatOrder['buyerHouseNo'] = "";
         $creatOrder['buyerName'] = preg_replace("/&|’|\/|'/",' ',$package->shipping_firstname . " " . $package->shipping_lastname);

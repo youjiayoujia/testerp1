@@ -78,9 +78,9 @@ class EventChildController extends Controller
             if (!$from) {
                 $html .= "<div class='panel panel-default'>
                         <div class='panel-heading'>备注:" . $model->what . '<br/>操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:" . $model->who . "
-                    <a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample" . $key1 . "' aria-expanded='false' aria-controls='collapseExample'>数据详情</a>
+                    <a class='btn btn-xs btn-primary' role='button' data-toggle='collapse' href='#collapseExample" . $rate . $key1 . "' aria-expanded='false' aria-controls='collapseExample'>数据详情</a>
                         </div>
-                        <div class='panel-body collapse' id='collapseExample" . $key1 . "'><div class='col-lg-12'>";
+                        <div class='panel-body collapse' id='collapseExample" . $rate . $key1 . "'><div class='col-lg-12'>";
                 if($to) {
                     foreach ($to as $key => $value) {
                         $html .= "<div class='row'>to['" . $key . "']<span class='glyphicon glyphicon-arrow-right'></span>";

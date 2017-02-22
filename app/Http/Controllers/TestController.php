@@ -293,10 +293,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(32895);
-        var_dump($package->with(['items' => function($query){
-            $query->select(['*']);
-        }])->get()->toarray());exit;
+        $packages = PackageModel::all()->sortByDesc('id')->take('2');
+        var_dump($packages->toarray());exit;
     }
 
     // public function test2()

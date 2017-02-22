@@ -108,6 +108,12 @@ class RefundModel extends BaseModel
         return $this->hasMany('App\Models\Order\OrderPaypalDetailModel', 'order_id', 'order_id');
     }
 
+    //订单备注
+    public function remarks()
+    {
+        return $this->hasMany('App\Models\Order\RemarkModel', 'order_id', 'id');
+    }
+
     /**
      * 更多搜索
      * @return array
@@ -134,7 +140,7 @@ class RefundModel extends BaseModel
     }
 
     public function getSKUsAttribute(){
-        $items = $this->Order->items;
+        $items = $this->OrderItems;
         $sku ='';
         foreach ($items as $item){
             if($item->is_refund == '1'){
@@ -148,10 +154,10 @@ class RefundModel extends BaseModel
         return $this->Order->payment_date;
     }
     public function getChannelNameAttribute(){
-        return $this->Order->channel->name;
+        return $this->channel->name;
     }
     public function getOrderRemarksAttribute(){
-        $remarks = $this->Order->remarks;
+        $remarks = $this->remarks;
         $html = '<ul>';
         if(!$remarks->isEmpty()){
             foreach ($remarks as $remark){
@@ -187,7 +193,7 @@ class RefundModel extends BaseModel
     }
 
     public function getChannelAccountNameAttribute(){
-        return $this->Order->channelAccount->account;
+        return $this->Account->account;
     }
 
     public function getRefundProductsAttribute(){

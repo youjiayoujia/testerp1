@@ -33,8 +33,9 @@ class AccountController extends Controller
         
         //
         $response = [
-            'metas'    => $this->metas(__FUNCTION__),
-            'data'     => $this->autoList($this->model),
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model, null, ['*'], null, null, ['user']),
+
         ];
         return view($this->viewPath . 'index',$response);
     }

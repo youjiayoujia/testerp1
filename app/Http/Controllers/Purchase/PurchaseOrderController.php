@@ -1456,6 +1456,8 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $data,
+            'success' =>0,
+            'fail' =>0,
         ];
 
         return view($this->viewPath . 'payOffIndex', $response);
@@ -1475,24 +1477,38 @@ class PurchaseOrderController extends Controller
         }
         $csv = Excel::load($_FILES['upload']['tmp_name'])->noHeading()->toArray();
         $result = [];
+        $success = 0;
+        $fail = 0;
         foreach ($csv as $key => $value) {
             if($key==0)continue;
             $purchaseOrderModel = $this->model->find($value['1']);
+
             if(count($purchaseOrderModel)){
-                $purchaseOrderModel->update(['close_status'=>'1']);
-                $result[$key]['status'] = '1';
-                $result[$key]['id'] = $value['1'];
+                if($purchaseOrderModel->close_status=='1'){
+                    $result[$key]['status'] = '2';
+                    $result[$key]['id'] = $value['1'];
+                    $fail++;
+                }else{
+                    $purchaseOrderModel->update(['close_status'=>'1']);
+                    $result[$key]['status'] = '1';
+                    $result[$key]['id'] = $value['1'];
+                    $success++;
+                }  
             }else{
-                $result[$key]['status'] = '2';
+                $result[$key]['status'] = '0';
                 $result[$key]['id'] = $value['1'];
+                $fail++;
             }
         }
+        
       
         $this->mainIndex = route('purchaseOrder.excelPayOff');
         $this->mainTitle = '采购单批量付款';
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data'  => $result,
+            'success' =>$success,
+            'fail' =>$fail,
         ];
 
         return view($this->viewPath . 'payOffIndex', $response);

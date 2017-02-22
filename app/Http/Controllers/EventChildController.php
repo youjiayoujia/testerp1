@@ -64,7 +64,7 @@ class EventChildController extends Controller
         if (!$category) {
             return false;
         }
-        $models = $category->child()->where('type_id', $id)->skip($start)->take($len)->get()->sortByDesc('when');
+        $models = $category->child()->where('type_id', $id)->orderBy('when', 'desc')->skip($start)->take($len)->skip($start)->get();
         $html = '';
         foreach ($models as $key1 => $model) {
             $to = json_decode($model->to_arr);

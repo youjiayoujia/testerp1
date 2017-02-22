@@ -98,7 +98,7 @@
         }
         for (var i=p*listNum;i<(p+1)*listNum;i++){
         if(obj[i])obj[i].style.display="table-row"
-        }//欢迎来到站长特效网，我们的网址是www.zzjs.net，很好记，zz站长，js就是js特效，本站收集大量高质量js代码，还有许多广告代码下载。
+        }
         //分页链接变换
         strS='<a href="###" onclick="upPage(0)">首页</a>  '
         var PageNum_2=PageNum%2==0?Math.ceil(PageNum/2)+1:Math.ceil(PageNum/2)
@@ -110,7 +110,7 @@
         for (var i=startPage;i<=endPage;i++){
          if (i==nowPage)strC+='<a href="###" style="color:red;font-weight:700;" onclick="upPage('+i+')">'+(i+1)+'</a> '
          else strC+='<a href="###" onclick="upPage('+i+')">'+(i+1)+'</a> '
-        }//欢迎来到站长特效网，我们的网址是www.zzjs.net，很好记，zz站长，js就是js特效，本站收集大量高质量js代码，还有许多广告代码下载。
+        }
         strE=' <a href="###" onclick="upPage('+(PagesLen-1)+')">尾页</a>  '
         strE2=nowPage+1+"/"+PagesLen+"页"+"  共"+j+"条"
         strE3 = "，成功"+{{$success}}+"条，失败<span style='color:red;font-weight:700;'>"+{{$fail}}+"</span>条"

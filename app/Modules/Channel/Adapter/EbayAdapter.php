@@ -2259,6 +2259,7 @@ class EbayAdapter implements AdapterInterface
                 ';
         $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
         $result = $this->buildcaseBody($xml,'issueFullRefund');
+        dd($result);
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
             return true;
         }else{

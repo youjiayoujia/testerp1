@@ -858,18 +858,18 @@
                 arr[i] = $(this).data('id');
                 i++;
             });
-            // $.get(
-            //         "{{ route('order.logisticsFee')}}",
-            //         {'arr': arr},
-            //         function (result) {
-            //             j = 0;
-            //             $.each($('.orderId'), function () {
-            //                 block = $(this).parent();
-            //                 block.find('.logisticsFee').text(result[j][1]);
-            //                 j++;
-            //             })
-            //         }
-            // );
+            $.get(
+                    "{{ route('order.logisticsFee')}}",
+                    {'arr': arr},
+                    function (result) {
+                        j = 0;
+                        $.each($('.orderId'), function () {
+                            block = $(this).parent();
+                            block.find('.logisticsFee').text(result[j][1]);
+                            j++;
+                        })
+                    }
+            );
 
             //备注是否为空
             $(document).on('click', '.confirm_remark', function () {

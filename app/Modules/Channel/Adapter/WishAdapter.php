@@ -171,6 +171,9 @@ Class WishAdapter implements AdapterInterface
             if(($this->client_id=='57e9ceaec9727a1331cd81dd')&&(date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)<'2016-12-08 15:00:00')){
                 continue;
             }
+            if(($this->client_id=='57e9ceaec9727a1331cd81dd')&&(date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)>'2017-02-24 09:00:00')){
+                continue;
+            }
 
 
             /*if(($this->client_id=='56274645b9096a0fd6eae3e5')&&date('Y-m-d H:i:s',strtotime($orderInfo['payment_date'])-8*3600)<'2016-12-14 13:00:00'){

@@ -291,7 +291,9 @@ class EbayAdapter implements AdapterInterface
         if($CreatedTime<'2016-12-19 15:00:00'){
             return false; //跳过
         }
-
+        if($CreatedTime>'2017-02-24 09:00:00'){
+            return false; //跳过
+        }
         //121864765676-1639850594002
         /*   $thisOrder = orderModel::where(['channel_ordernum' => (string)$order->OrderID])->where('status', '!=', 'UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续
 

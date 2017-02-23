@@ -9,7 +9,7 @@
 
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th class="sort">ID</th>
+    <th class="sort" data-field="id">ID</th>
     <th>中文名称</th>
     <th>英文名称</th>
     <th>创建时间</th>

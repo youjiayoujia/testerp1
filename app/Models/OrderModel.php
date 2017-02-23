@@ -384,6 +384,7 @@ class OrderModel extends BaseModel
                 'by_id',
                 'shipping_firstname',
                 'currency',
+                'transaction_number',
             ],
             'filterSelects' => [
                 'is_oversea' => config('order.whether'),

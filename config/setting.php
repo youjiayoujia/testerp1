@@ -72,6 +72,7 @@ return [
         'userOperator.name' => '运营人员',
         'email' => '邮箱',
         'currency' => '币种',
+        'transaction_number' => '交易号',
         'name' => '名称',
         'zipcode' => '邮编',
         'type' => '类型',

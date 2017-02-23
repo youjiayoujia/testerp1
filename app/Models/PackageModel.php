@@ -749,7 +749,6 @@ class PackageModel extends BaseModel
                             ]);
                             $job = new AssignLogistics($this);
                             Queue::pushOn('assignLogistics', $job);
-                            $this->order->update(['status' => 'NEED']);
                             return false;
                         }
                     } else {
@@ -791,7 +790,6 @@ class PackageModel extends BaseModel
                         ]);
                         $job = new AssignLogistics($this);
                         Queue::pushOn('assignLogistics', $job);
-                        $this->order->update(['status' => 'NEED']);
                         return false;
                     }
                 } else {

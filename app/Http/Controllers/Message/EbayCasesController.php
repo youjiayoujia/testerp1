@@ -197,8 +197,7 @@ class EbayCasesController extends Controller
         $caseId   = $case->case_id;
         $caseType = $case->type;
         $relation_order = $case->orderItem->order;
-
-        if($ebay->caseFullRefund(compact('caseId','caseType','comment'))){
+        if($ebay->caseFullRefund(compact('caseId', 'caseType', 'comment'))){
             $case->process_status = 'COMPLETE';
             $case->save();
 

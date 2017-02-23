@@ -2258,8 +2258,8 @@ class EbayAdapter implements AdapterInterface
                 </caseId>
                 ';
         $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
-        $result = $this->buildcaseBody($xml,'issueFullRefund');
-        dd($result);
+
+        $result = $this->buildcaserefundBody($xml, 'issueFullRefund', $paramAry['caseId']);
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
             return true;
         }else{
@@ -2281,5 +2281,22 @@ class EbayAdapter implements AdapterInterface
         }else{
             return false;
         }
+    }
+
+    /**
+     * 创建退款DOM
+     * case XML DOM
+     */
+    public function buildcaserefundBody($xml, $call, $caseId)
+    {
+        $this->serverUrl = 'https://api.ebay.com/post-order/v2/casemanagement/'.$caseId.'/issue_refund';  //cases API地址
+        $this->verb = $call;
+        $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?><' . $call . 'Request xmlns="http://www.ebay.com/marketplace/resolution/v1/services">';
+        $requestXmlBody .= $xml;
+        $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . $this->requestToken . '</eBayAuthToken></RequesterCredentials></' . $call . 'Request>';
+        $result = $this->sendHttpRequest($requestXmlBody, 'Resolution');
+        $response = simplexml_load_string($result);
+
+        return $response;
     }
 }

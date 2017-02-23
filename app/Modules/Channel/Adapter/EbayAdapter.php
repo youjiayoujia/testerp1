@@ -2259,8 +2259,9 @@ class EbayAdapter implements AdapterInterface
                 ';
         $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
 
-        $result = $this->buildcaserefundBody($xml, 'issueFullRefund', $paramAry['caseId']);
-        if($result->Ack =='Success' || $result->Ack == 'Warning'){
+        //$result = $this->buildcaserefundBody($xml, 'issueFullRefund', $paramAry['caseId']);
+        $result = $this->refundByHand($paramAry);
+        if($result){
             return true;
         }else{
             return false;
@@ -2275,7 +2276,7 @@ class EbayAdapter implements AdapterInterface
                   </caseId>
         ';
         $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
-        $result = $this->buildcaseBody($xml,'issuePartialRefund');
+        $result = $this->buildcaseBody($paramAry);
         if($result->Ack =='Success' || $result->Ack == 'Warning'){
             return true;
         }else{
@@ -2299,4 +2300,67 @@ class EbayAdapter implements AdapterInterface
 
         return $response;
     }
+
+
+    public function refundByHand($paramAry)
+    {
+        switch ($paramAry['currency']) {
+            case 'USD':
+                $dq = 'EBAY-US';
+                break;
+            case 'GBP':
+                $dq = 'EBAY-UK';
+                break;
+            case 'EUR':
+                $dq = 'EBAY-DE';
+                break;
+            default:
+                //其他都放这里吧，暂时没其他的
+                $dq = 'EBAY-US';
+                break;
+        }
+
+        $url = 'https://api.ebay.com/post-order/v2/casemanagement/' . $paramAry['caseId'] . '/issue_refund';
+        $headers = array(
+            'Accept:application/json',
+            'Content-Type:application/json',
+            "X-EBAY-C-MARKETPLACE-ID:$dq",
+            "Authorization:TOKEN $this->requestToken"
+        );
+        $postdata = '{"comments":{"content":"d","language":"LanguageEnum","translateFromContent":"string","translateFromLanguage":"LanguageEnum"}}';
+
+        $result = $this->postCurlHttpsData($url, $headers, $postdata);
+
+        $result = json_decode($result, true);
+
+        if ($result['refundResult']['refundStatus'] == 'SUCCESS') { //操作成功了才插入一条操作记录
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function postCurlHttpsData($url,$headers, $data) { // 模拟提交数据函数
+
+        $curl = curl_init (); // 启动一个CURL会话
+        curl_setopt ( $curl, CURLOPT_URL, $url ); // 要访问的地址
+        curl_setopt ( $curl, CURLOPT_SSL_VERIFYPEER, 0 ); // 对认证证书来源的检查
+        curl_setopt ( $curl, CURLOPT_SSL_VERIFYHOST, 1 ); // 从证书中检查SSL加密算法是否存在
+        //curl_setopt ( $curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT'] ); // 模拟用户使用的浏览器
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt ( $curl, CURLOPT_FOLLOWLOCATION, 1 ); // 使用自动跳转
+        curl_setopt ( $curl, CURLOPT_AUTOREFERER, 1 ); // 自动设置Referer
+        curl_setopt ( $curl, CURLOPT_POST, 0 ); // 发送一个常规的Post请求
+        curl_setopt ( $curl, CURLOPT_POSTFIELDS, $data ); // Post提交的数据包
+        curl_setopt ( $curl, CURLOPT_TIMEOUT, 30 ); // 设置超时限制防止死循环
+        curl_setopt ( $curl, CURLOPT_HEADER, 0 ); // 显示返回的Header区域内容
+        curl_setopt ( $curl, CURLOPT_RETURNTRANSFER, 1 ); // 获取的信息以文件流的形式返回
+        $tmpInfo = curl_exec ( $curl ); // 执行操作
+        if (curl_errno ( $curl )) {
+            die(curl_error ( $curl )); //异常错误
+        }
+        curl_close ( $curl ); // 关闭CURL会话
+        return $tmpInfo; // 返回数据
+    }
+
 }

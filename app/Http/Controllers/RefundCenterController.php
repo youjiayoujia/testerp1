@@ -38,7 +38,8 @@ class RefundCenterController extends Controller
     {
         $response = [
             'metas'   => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model, null, ['*'], null, null, ['Order', 'Order.channel', 'User', 'Currency', 'OrderItems', 'paypalDetail']),
+            //, 'Order.channel', 'User', 'Currency', 'OrderItems', 'paypalDetail', 'Account'
+            'data' => $this->autoList($this->model, null, ['*'], null, null, ['Order', 'User', 'channel', 'paypalDetail', 'OrderItems', 'remarks', 'Account']),
             'paypals' => PaypalsModel::where('is_enable','=','1')->get(),
             'users'   => UserModel::all(),
             'channels'=> ChannelModel::all(),

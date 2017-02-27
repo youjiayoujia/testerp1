@@ -130,12 +130,12 @@ class Kernel extends ConsoleKernel
                 //    }
                 //    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
                 //    break;
-                case 'ebay':
-                    foreach ($channel->accounts->where('is_available', '1') as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-                    }
-                    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
-                    break;
+                //case 'ebay':
+                //    foreach ($channel->accounts->where('is_available', '1') as $account) {
+                //        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                //    }
+                //    $schedule->command('sentReturnTrack:get ' . $channel->id)->cron('02 * * * *');
+                //    break;
                 case 'lazada':
                     foreach ($channel->accounts->where('is_available', '1') as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();

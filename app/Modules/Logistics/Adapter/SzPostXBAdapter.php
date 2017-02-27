@@ -158,7 +158,7 @@ class SzPostXBAdapter extends BasicAdapter
                 'custid' => '5796625949'
             );
         }*/
-         
+        $package->shipping_phone = str_replace("+","",$package->shipping_phone);
         $dateTime = date('Y-m-d H:i:s');
         $batchNo = date('Ymd');
         $orderId = $package->id;       //内单号

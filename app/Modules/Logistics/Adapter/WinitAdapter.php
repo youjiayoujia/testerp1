@@ -127,7 +127,7 @@ class WinitAdapter extends BasicAdapter
         $result = json_decode($result,true);
         if(isset($result['code'])&&($result['code']==0)&&($result['msg']=='操作成功'))        {   
               
-            return array('code' => 'success', 'result' => $result['data']['orderNo'] );        
+            return array('code' => 'success', 'result' => $result['data']['trackingNo'],'result_other' => $result['data']['orderNo'] );        
         }else{        
             return array('code' => 'error', 'result' => $result['msg']);
         }

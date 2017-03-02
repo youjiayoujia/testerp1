@@ -186,7 +186,7 @@ class SzPostXBAdapter extends BasicAdapter
         $str .="<Raddress>".$package->shipping_address.' '.$package->shipping_address1."</Raddress>";
         $str .='<Rpostcode>'.$package->shipping_zipcode.'</Rpostcode>';
         $str .="<Rname>".$package->shipping_firstname . ' ' . $package->shipping_lastname."</Rname>";
-        $str .='<Rphone>'.$package->shipping_phone.'</Rphone>';
+        $str .='<Rphone>'.ltrim($package->shipping_phone,'+').'</Rphone>';
         $str .='<Sname>'.$this->sendInfo['j_contact'].'</Sname>';
         $str .='<Sprovince>'.$this->sendInfo['j_province'].'</Sprovince>';
         $str .='<Scity>'.$this->sendInfo['j_city'].'</Scity>';

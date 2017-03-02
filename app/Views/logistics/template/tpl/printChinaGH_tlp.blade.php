@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>打印中邮通用平邮面单</title>
+    <title>打印中邮通用挂号面单</title>
      <style>
         * {
             margin:0 auto;
@@ -72,7 +72,7 @@
 			<tr style="height:5mm;">
 				<td style="text-align:left;"> 自编号:{{ $model->id }}</td>
 				<td>
-				    <?php  $countryZone = config('countryZone'); ?>  
+				    <?php  $countryZone = config('china_post_country_zone_gh'); ?>  
 				    @if($model->country)				   
 				        @foreach($countryZone as $key => $val)  
 				            @if(in_array($model->country->cn_name, explode(',',$val)))
@@ -83,15 +83,15 @@
 				</td>
 				<td colspan="2">{{ $model->country ? $model->country->cn_name : '' }}</td>
 			</tr>
-			<tr style="height:16mm;" valign="center">				
-    			@if($model->logistics_order_number)
+			<tr style="height:16mm;" valign="center">
+		        @if($model->logistics_order_number)
     			<td style="font-size:16px;text-align:center;" valign="top">	
     				<p style="text-align:left;height:4mm;border-bottom:1px solid black;line-height:4mm;">{{ $model->logistics_order_number }}  </p>
-    				<p style="font-size:16px;font-weight:bold;text-align:center;">UNTRACKED</p>
+    				<p style="font-size:16px;font-weight:bold;text-align:center;">R</p>
     			</td>
     			@else
     			<td style="font-size:16px;text-align:center;">
-    				<p style="font-size:16px;font-weight:bold;text-align:center;">UNTRACKED</p>
+    				<p style="font-size:16px;font-weight:bold;text-align:center;">R</p>
     			</td>
     			@endif				
 				<td colspan="3" >
@@ -108,7 +108,7 @@
 				<td colspan="2" >Dcscription of Contents</td>
 				<td>Kg</td>
 				<td>Val(US $)</td>
-			</tr>
+			</tr>		
 			<tr style="height:5mm;line-height:11px;font-size:12px;">
 				<td colspan="2">
 					{{ $model->getDeclaredInfo()['declared_en'] }}({{ $model->getDeclaredInfo()['declared_cn'] }})
